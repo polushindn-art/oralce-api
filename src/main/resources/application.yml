@@ -9,6 +9,9 @@ knife4j:
     - group: main-api
       name: Описание
       locations: classpath:markdown/description/*
+    - group: main-api
+      name: GitLab
+      locations: classpath:markdown/gitlab/*
 logging:
   charset:
     console: UTF-8
