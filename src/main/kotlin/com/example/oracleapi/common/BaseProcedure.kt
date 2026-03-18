@@ -9,7 +9,7 @@ import java.time.format.DateTimeFormatter
 import com.fasterxml.jackson.module.kotlin.readValue
 
 /**
- * Базовый класс для всех процедур Oracle *
+ * Базовый класс для всех процедур Oracle
  */
 abstract class BaseProcedure(
     protected val entityManager: EntityManager,
