@@ -18,7 +18,7 @@ abstract class BaseProcedure(
     protected val log = LoggerFactory.getLogger(this.javaClass)
 
     /**
-     * Название пакета Oracle
+     * Название пакета Oracle ***
      */
     companion object {
         const val MARK: String = "PKG_MARK"
