@@ -1,0 +1,15 @@
+knife4j:
+  enable: true
+  setting:
+    language: en
+  documents:
+    - group: main-api
+      name: Документация
+      locations: classpath:markdown/*
+    - group: main-api
+      name: Описание
+      locations: classpath:markdown/description/*
+logging:
+  charset:
+    console: UTF-8
+    file: UTF-8
