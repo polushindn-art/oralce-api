@@ -12,6 +12,23 @@ class JwtHelper(
     private val jwtConfig: JwtConfigProperties  // Внедряем конфиг вместо @Value
 ) {
 
+    companion object {
+        const val COOCKIENAME = "accessToken"
+        val skipPaths = arrayOf(
+            "/api/health",
+            "/auth/token",
+            "/login",
+            "/swagger-ui/**",      // для всех вложенных путей
+            "/v3/api-docs/**",
+            "/favicon.ico",
+            "/doc.html",
+            "/webjars/**",
+            "/error",
+            "/not-found",
+            "/auth/**",             // если нужно открыть все под auth
+            "/knife4j/**")
+    }
+
     private val log = LoggerFactory.getLogger(JwtHelper::class.java)
     private val key: SecretKey
 

@@ -1,6 +1,5 @@
 package com.example.oracleapi.config
 
-import com.example.oracleapi.Common
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
@@ -68,7 +67,7 @@ class JwtAuthenticationFilter( private val jwtHelper: JwtHelper,
      * Проверяет, является ли путь публичным (не требует аутентификации)
      */
     private fun isPublicPath(path: String): Boolean {
-        return Common.skipPaths.any { pattern -> pathMatcher.match(pattern, path) }
+        return JwtHelper.skipPaths.any { pattern -> pathMatcher.match(pattern, path) }
     }
 
     /**
@@ -79,7 +78,7 @@ class JwtAuthenticationFilter( private val jwtHelper: JwtHelper,
      */
     private fun extractToken(request: HttpServletRequest): String? {
         // 1. Проверяем cookie
-        request.cookies?.firstOrNull { it.name == Common.COOCKIENAME }?.let { cookie ->
+        request.cookies?.firstOrNull { it.name == JwtHelper.COOCKIENAME }?.let { cookie ->
             log.debug("Token found in cookie")
             return cookie.value
         }

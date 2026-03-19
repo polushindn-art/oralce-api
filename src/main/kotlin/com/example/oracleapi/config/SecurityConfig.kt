@@ -1,6 +1,5 @@
 package com.example.oracleapi.config
 
-import com.example.oracleapi.Common
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -43,7 +42,7 @@ class SecurityConfig(
             .authorizeHttpRequests { auth ->
                 auth
                     // Публичные пути
-                    .requestMatchers(*Common.skipPaths).permitAll()
+                    .requestMatchers(*JwtHelper.skipPaths).permitAll()
 
                     // Административные пути
                     .requestMatchers("/admin/**").hasRole("ADMIN")
