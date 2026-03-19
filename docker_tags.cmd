@@ -1,8 +1,6 @@
 @echo off
 chcp 65001 > nul
 title Docker Registry Checker
-color 0D
-
 
 echo [%date% %time%] Проверка Docker Registry на api.ars:5000
 echo ================================================

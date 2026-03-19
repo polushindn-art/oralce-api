@@ -2,7 +2,7 @@
 chcp 65001 > nul
 setlocal enabledelayedexpansion
 
-:: Цветной вывод (опционально)
+:: Цветной вывод
 set "GREEN=[32m"
 set "YELLOW=[33m"
 set "RED=[31m"
@@ -11,6 +11,11 @@ set "RESET=[0m"
 :: Настройки
 set REGISTRY=api.ars:5000
 set IMAGE_NAME=oracle-api
+
+:: === НАСТРОЙКА ПРЕФИКСА ВЕРСИИ ===
+:: Это число будет стоять перед точкой (например 1.6, 1.7, 2.0 и т.д.)
+set VERSION_PREFIX=1.25
+:: =================================
 
 :: Проверка наличия Docker
 where docker >nul 2>&1
@@ -114,8 +119,8 @@ if "!LOCAL_TAG!"=="" set LOCAL_TAG=latest
 echo.
 
 :continue
-:: ========== ГЕНЕРАЦИЯ ВЕРСИИ ИЗ GIT (ВАРИАНТ 4) ==========
-echo %YELLOW%[5/8] Генерация версии из Git...%RESET%
+:: ========== ГЕНЕРАЦИЯ ВЕРСИИ С ПРЕФИКСОМ ==========
+echo %YELLOW%[5/8] Генерация версии...%RESET%
 echo.
 
 :: Проверяем, что мы в Git репозитории
@@ -123,57 +128,26 @@ git rev-parse --git-dir >nul 2>&1
 if %errorlevel% neq 0 (
     echo %RED%[ОШИБКА] Это не Git репозиторий!%RESET%
     echo Пожалуйста, инициализируйте Git или введите версию вручную
-    set /p REMOTE_TAG="Введите версию вручную (например v1.0.0): "
-    if "!REMOTE_TAG!"=="" pause & exit /b 1
+    set /p CUSTOM_VERSION="Введите версию вручную (например 1.6): "
+    if "!CUSTOM_VERSION!"=="" pause & exit /b 1
+    set REMOTE_TAG=!CUSTOM_VERSION!
     goto continue_version
 )
 
-:: Получаем общее количество коммитов
-for /f %%i in ('git rev-list --count HEAD 2^>nul') do set TOTAL_COMMITS=%%i
-if not defined TOTAL_COMMITS set TOTAL_COMMITS=0
+:: Получаем количество коммитов
+for /f %%i in ('git rev-list --count HEAD 2^>nul') do set COMMIT_COUNT=%%i
+if not defined COMMIT_COUNT set COMMIT_COUNT=0
 
-:: Получаем дополнительную информацию для вывода
+:: Получаем хэш для информации
 for /f %%i in ('git rev-parse --short HEAD 2^>nul') do set COMMIT_HASH=%%i
-for /f %%i in ('git branch --show-current 2^>nul') do set BRANCH=%%i
 
-:: Пробуем получить последний тег
-set LAST_TAG=
-for /f %%i in ('git describe --tags --abbrev^=0 2^>nul') do set LAST_TAG=%%i
+:: Формируем версию: ПРЕФИКС.КОММИТЫ
+set REMOTE_TAG=%VERSION_PREFIX%.!COMMIT_COUNT!
 
-:: Генерируем версию
-if defined LAST_TAG (
-    :: Убираем 'v' из тега если есть (v1.2.3 -> 1.2.3)
-    set CLEAN_TAG=!LAST_TAG:v=!
-    
-    :: Проверяем, содержит ли тег точки
-    echo !CLEAN_TAG! | findstr "\." >nul
-    if !errorlevel! equ 0 (
-        :: Тег уже в формате semver (x.y.z)
-        set BASE_VERSION=!CLEAN_TAG!
-    ) else (
-        :: Тег просто число или строка
-        set BASE_VERSION=!CLEAN_TAG!.0
-    )
-    
-    set REMOTE_TAG=!BASE_VERSION!.!TOTAL_COMMITS!
-    
-    :: Показываем информацию о коммитах после тега
-    for /f %%i in ('git rev-list --count %LAST_TAG%..HEAD 2^>nul') do set COMMITS_SINCE_TAG=%%i
-) else (
-    :: Нет тегов - используем 1.0.0 как базовую версию
-    set REMOTE_TAG=1.0.0.!TOTAL_COMMITS!
-    set COMMITS_SINCE_TAG=%TOTAL_COMMITS%
-)
-
-:: Показываем информацию о репозитории
 echo %GREEN%Информация о репозитории:%RESET%
-echo   Ветка:     %BRANCH%
-echo   Всего коммитов: %TOTAL_COMMITS%
-echo   Хэш:       %COMMIT_HASH%
-if defined LAST_TAG (
-    echo   Последний тег: %LAST_TAG%
-    echo   Коммитов после тега: !COMMITS_SINCE_TAG!
-)
+echo   Префикс версии: %VERSION_PREFIX%
+echo   Коммитов:       !COMMIT_COUNT!
+echo   Хэш:           !COMMIT_HASH!
 echo.
 echo %GREEN%Сгенерированная версия: %REMOTE_TAG%%RESET%
 echo.
@@ -181,8 +155,9 @@ echo.
 :: Спрашиваем подтверждение
 set /p CONFIRM="Использовать эту версию? (y/n - ввести вручную): "
 if /i not "!CONFIRM!"=="y" (
-    set /p REMOTE_TAG="Введите версию вручную (например v1.0.0): "
-    if "!REMOTE_TAG!"=="" pause & exit /b 1
+    set /p CUSTOM_VERSION="Введите версию вручную (например 1.6): "
+    if "!CUSTOM_VERSION!"=="" pause & exit /b 1
+    set REMOTE_TAG=!CUSTOM_VERSION!
 )
 
 :continue_version
