@@ -4,12 +4,16 @@
 # ќтключаем конвертацию окончаний строк
 * -text
 
-# явно указываем UTF-8 дл€ текстовых файлов
-*.kt working-tree-encoding=UTF-8
-*.kts working-tree-encoding=UTF-8
-*.java working-tree-encoding=UTF-8
-*.xml working-tree-encoding=UTF-8
-*.gradle working-tree-encoding=UTF-8
-*.md working-tree-encoding=UTF-8
-*.txt working-tree-encoding=UTF-8
+# ”казываем UTF-8 дл€ всех текстовых файлов
+*.* working-tree-encoding=UTF-8
+
+# явно дл€ исходного кода
+*.kt working-tree-encoding=UTF-8 eol=lf
+*.java working-tree-encoding=UTF-8 eol=lf
+*.xml working-tree-encoding=UTF-8 eol=lf
+*.gradle working-tree-encoding=UTF-8 eol=lf
+*.properties working-tree-encoding=UTF-8
+
+# ‘айлы с русскими именами
+*.[–-€]* working-tree-encoding=UTF-8
 
