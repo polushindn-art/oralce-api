@@ -1,2 +1,15 @@
 /mvnw text eol=lf
 *.cmd text eol=crlf
+
+# ќтключаем конвертацию окончаний строк
+* -text
+
+# явно указываем UTF-8 дл€ текстовых файлов
+*.kt working-tree-encoding=UTF-8
+*.kts working-tree-encoding=UTF-8
+*.java working-tree-encoding=UTF-8
+*.xml working-tree-encoding=UTF-8
+*.gradle working-tree-encoding=UTF-8
+*.md working-tree-encoding=UTF-8
+*.txt working-tree-encoding=UTF-8
+
