@@ -3,7 +3,6 @@ package com.example.oracleapi.dto.common
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonInclude
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 /**
  * Универсальный ответ API для всех эндпоинтов
