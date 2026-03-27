@@ -6,6 +6,7 @@ import com.example.oracleapi.dto.mark.MarkUpdRequest
 import com.example.oracleapi.dto.mark.MarkUpdResponse
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.persistence.EntityManager
+import org.springframework.cache.CacheManager
 import org.springframework.stereotype.Component
 
 
@@ -15,7 +16,8 @@ import org.springframework.stereotype.Component
 @Component
 class MarkUpdProcedure(
     entityManager: EntityManager,
-    objectMapper: ObjectMapper
+    objectMapper: ObjectMapper,
+    private val cacheManager: CacheManager
 ) : BaseProcedure(entityManager, objectMapper) {
     override val packageName: String = MARK
     //@Transactional
@@ -39,6 +41,9 @@ class MarkUpdProcedure(
 
                 // Выполняем
                 query.execute()
+
+                // Очищам КЭШ для запроса КМ
+                cacheManager.getCache("markCache")?.evict(request.km)
 
                 val executionTime = System.currentTimeMillis() - startTime
 

@@ -1,4 +1,4 @@
-package com.example.oracleapi.repository
+package com.example.oracleapi.repository.user
 
 import com.example.oracleapi.dto.user.UserList
 import org.springframework.data.jpa.repository.JpaRepository

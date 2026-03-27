@@ -1,7 +1,7 @@
 package com.example.oracleapi.service.user
 
 import com.example.oracleapi.dto.user.UserList
-import com.example.oracleapi.repository.UserRepository
+import com.example.oracleapi.repository.user.UserRepository
 import org.slf4j.LoggerFactory
 import org.springframework.security.authentication.AuthenticationServiceException
 import org.springframework.security.core.userdetails.User
