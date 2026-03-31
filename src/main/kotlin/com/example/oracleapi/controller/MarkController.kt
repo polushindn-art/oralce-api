@@ -1,6 +1,6 @@
 package com.example.oracleapi.controller
 
-import com.example.oracleapi.common.ProcedureResult
+import com.example.oracleapi.common.GeneralResponse
 import com.example.oracleapi.dto.common.ApiResponse
 import com.example.oracleapi.dto.mark.MarkFindRequest
 import com.example.oracleapi.dto.mark.MarkFindResponse
@@ -35,7 +35,7 @@ class MarkController(
     ): ResponseEntity<ApiResponse<MarkUpdResponse>> {
         log.info("PKG_MARK.UPD: km={}", request.km)
         return when (val result = markProcedureService.upd(request)) {
-            is ProcedureResult.Success -> {
+            is GeneralResponse.Success -> {
                 ResponseEntity.ok(
                     ApiResponse(
                         success = true,
@@ -45,7 +45,7 @@ class MarkController(
                 )
             }
 
-            is ProcedureResult.Error -> {
+            is GeneralResponse.Error -> {
                 ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(
                         ApiResponse(
@@ -66,7 +66,7 @@ class MarkController(
         val request = MarkFindRequest(km = km)
 
         return when (val result = markProcedureService.find(request)) {
-            is ProcedureResult.Success -> {
+            is GeneralResponse.Success -> {
                 ResponseEntity.ok(
                     ApiResponse(
                         success = true,
@@ -76,7 +76,7 @@ class MarkController(
                 )
             }
 
-            is ProcedureResult.Error -> {
+            is GeneralResponse.Error -> {
                 val status = if (result.message.contains("не найден")) {
                     HttpStatus.NOT_FOUND
                 } else {

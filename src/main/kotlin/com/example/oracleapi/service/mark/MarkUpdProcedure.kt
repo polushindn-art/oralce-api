@@ -1,7 +1,7 @@
 package com.example.oracleapi.service.mark
 
 import com.example.oracleapi.common.BaseProcedure
-import com.example.oracleapi.common.ProcedureResult
+import com.example.oracleapi.common.GeneralResponse
 import com.example.oracleapi.dto.mark.MarkUpdRequest
 import com.example.oracleapi.dto.mark.MarkUpdResponse
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -21,7 +21,7 @@ class MarkUpdProcedure(
 ) : BaseProcedure(entityManager, objectMapper) {
     override val packageName: String = MARK
     //@Transactional
-    fun execute(request: MarkUpdRequest): ProcedureResult<MarkUpdResponse> {
+    fun execute(request: MarkUpdRequest): GeneralResponse<MarkUpdResponse> {
         return execute("UPD") {
             val startTime = System.currentTimeMillis()
 
@@ -47,7 +47,7 @@ class MarkUpdProcedure(
 
                 val executionTime = System.currentTimeMillis() - startTime
 
-                ProcedureResult.Success(
+                GeneralResponse.Success(
                     data = MarkUpdResponse(
                         success = true,
                         message = "Метка успешно обновлена",
@@ -62,7 +62,7 @@ class MarkUpdProcedure(
             } catch (e: Exception) {
                 val executionTime = System.currentTimeMillis() - startTime
 
-                ProcedureResult.Error(
+                GeneralResponse.Error(
                     message = e.message ?: "Unknown error",
                     errorCode = "MARK_UPD_ERROR",
                     executionTimeMs = executionTime,

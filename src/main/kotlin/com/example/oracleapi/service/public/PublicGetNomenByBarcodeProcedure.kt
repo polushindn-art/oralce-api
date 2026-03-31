@@ -1,7 +1,7 @@
 package com.example.oracleapi.service.public
 
 import com.example.oracleapi.common.BaseProcedure
-import com.example.oracleapi.common.ProcedureResult
+import com.example.oracleapi.common.GeneralResponse
 import com.example.oracleapi.dto.public.GetNomenByBarcodeResponse
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.persistence.EntityManager
@@ -15,7 +15,7 @@ class PublicGetNomenByBarcodeProcedure(
 
     override val packageName: String = PUBLIC
 
-    fun getNomen(barcode: String): ProcedureResult<GetNomenByBarcodeResponse> {
+    fun getNomen(barcode: String): GeneralResponse<GetNomenByBarcodeResponse> {
         return execute("GETNOMENBYBARCODE") {
             val startTime = System.currentTimeMillis()
             try {
@@ -31,7 +31,7 @@ class PublicGetNomenByBarcodeProcedure(
                 val resultId = resultNumber.toLong()
                 val executionTime = System.currentTimeMillis() - startTime
 
-                ProcedureResult.Success(
+                GeneralResponse.Success(
                     data = GetNomenByBarcodeResponse(
                         nomen = resultId,
                         barcode = barcode,
@@ -43,7 +43,7 @@ class PublicGetNomenByBarcodeProcedure(
                 )
             } catch (e: Exception) {
                 val executionTime = System.currentTimeMillis() - startTime
-                ProcedureResult.Error(
+                GeneralResponse.Error(
                     message = e.message ?: "Неизвестная ошибка",
                     errorCode = "GET_NOMEN_ERROR",
                     executionTimeMs = executionTime,

@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.client.HttpStatusCodeException
 import org.springframework.web.client.RestTemplate
+import org.springframework.web.client.exchange
 import org.springframework.web.util.UriComponentsBuilder
 import java.time.Duration
 import java.time.LocalDateTime
@@ -27,7 +28,7 @@ import java.util.*
 import java.util.concurrent.atomic.AtomicLong
 
 @RestController
-@RequestMapping("/api/proxy")
+@RequestMapping("/api/1c")
 @Tag(name = "API Proxy 1C", description = "Прокси для внешних API 1C")
 class ApiProxyController(
     private val restTemplateBuilder: RestTemplateBuilder
@@ -188,9 +189,9 @@ class ApiProxyController(
     ): ResponseEntity<*> {
         val totalStartTime = System.currentTimeMillis()
 
-        // Получаем путь после /api/proxy/
+        // Получаем путь после /api/1c/
         val requestUri = request.requestURI
-        val targetPath = requestUri.substringAfter("/api/proxy/")
+        val targetPath = requestUri.substringAfter("/api/1c/")
 
         // Исключаем эндпоинты статистики
         if (targetPath == "stats" || targetPath == "stats/reset") {
@@ -210,7 +211,7 @@ class ApiProxyController(
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(
                     ApiResponse.error<Unit>(
-                        message = "Please specify the target path. Example: /api/proxy/UT_2025_TEST_1/hs/TokenRequest/UninvoicedGoods",
+                        message = "Please specify the target path. Example: /api/1c/UT_2025_TEST_1/hs/TokenRequest/UninvoicedGoods",
                         path = request.servletPath
                     )
                 )
@@ -271,11 +272,10 @@ class ApiProxyController(
 
             // Замеряем время запроса к целевому API
             val apiStartTime = System.currentTimeMillis()
-            val responseEntity = restTemplate.exchange(
+            val responseEntity = restTemplate.exchange<ByteArray>(
                 targetUrl,
                 method,
-                httpEntity,
-                ByteArray::class.java
+                httpEntity
             )
             val apiTime = System.currentTimeMillis() - apiStartTime
 

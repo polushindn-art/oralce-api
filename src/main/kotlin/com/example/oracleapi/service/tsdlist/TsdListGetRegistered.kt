@@ -1,10 +1,9 @@
 package com.example.oracleapi.service.tsdlist
 
 import com.example.oracleapi.common.BaseProcedure
-import com.example.oracleapi.common.ProcedureResult
+import com.example.oracleapi.common.GeneralResponse
+import com.example.oracleapi.dto.JsonResponseView
 import com.example.oracleapi.dto.tsdlist.Registeredjson
-import com.example.oracleapi.dto.userlist.RegisteredJsonResponse
-import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.persistence.EntityManager
 import org.springframework.stereotype.Component
@@ -15,7 +14,7 @@ class TsdListGetRegistered(
     objectMapper: ObjectMapper
 ) : BaseProcedure(entityManager, objectMapper) {
     override val packageName: String = TSDLIST
-    fun execute(sn: String? = null): ProcedureResult<RegisteredJsonResponse> {
+    fun execute(sn: String? = null): GeneralResponse<JsonResponseView<Registeredjson>> {
         return execute("registered_json") {
             val startTime = System.currentTimeMillis()
 
@@ -24,20 +23,19 @@ class TsdListGetRegistered(
                 val sessions = callListFunction<Registeredjson>("registered_json", sn)
                 val executionTime = System.currentTimeMillis() - startTime
 
-                ProcedureResult.Success(
-                    data = RegisteredJsonResponse(
-                        sessions = sessions,  // ← список сессий
-                        count = sessions.size,
-                        executionTimeMs = executionTime,
-                        timestamp = currentTimestamp()
+                GeneralResponse.Success(
+                    JsonResponseView(
+                        sessions.size,
+                        executionTime,
+                        sessions
                     ),
-                    executionTimeMs = executionTime,
-                    timestamp = currentTimestamp()
+                    executionTime,
+                    currentTimestamp()
                 )
 
             } catch (e: Exception) {
                 val executionTime = System.currentTimeMillis() - startTime
-                ProcedureResult.Error(
+                GeneralResponse.Error(
                     message = e.message ?: "Ошибка получения ТСД",
                     errorCode = "REGISTERED_JSON_ERROR",
                     executionTimeMs = executionTime,

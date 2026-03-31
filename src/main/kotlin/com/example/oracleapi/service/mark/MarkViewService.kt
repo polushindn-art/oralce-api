@@ -1,6 +1,7 @@
 package com.example.oracleapi.service.mark
 
-import com.example.oracleapi.common.ProcedureResult
+import com.example.oracleapi.Helper
+import com.example.oracleapi.common.GeneralResponse
 import com.example.oracleapi.dto.mark.MarkFindRequest
 import com.example.oracleapi.dto.mark.MarkFindResponse
 import com.example.oracleapi.repository.mark.MarkViewRepository
@@ -11,7 +12,7 @@ class MarkViewService(
     private val markViewRepository: MarkViewRepository
 ) {
 
-    fun findByKm(request: MarkFindRequest): ProcedureResult<MarkFindResponse> {
+    fun findByKm(request: MarkFindRequest): GeneralResponse<MarkFindResponse> {
         val startTime = System.currentTimeMillis()
 
         return try {
@@ -19,32 +20,28 @@ class MarkViewService(
             val executionTime = System.currentTimeMillis() - startTime
 
             if (response != null) {
-                ProcedureResult.Success(
+                GeneralResponse.Success(
                     data = response,
                     executionTimeMs = executionTime,
-                    timestamp = currentTimestamp()
+                    timestamp = Helper.currentTimestamp()
                 )
             } else {
-                ProcedureResult.Error(
+                GeneralResponse.Error(
                     message = "Код маркировки ${request.km} не найден",
                     errorCode = "MARK_NOT_FOUND",
                     executionTimeMs = executionTime,
-                    timestamp = currentTimestamp()
+                    timestamp = Helper.currentTimestamp()
                 )
             }
         } catch (e: Exception) {
             val executionTime = System.currentTimeMillis() - startTime
-            ProcedureResult.Error(
+            GeneralResponse.Error(
                 message = e.message ?: "Неизвестная ошибка",
                 errorCode = "MARK_FIND_ERROR",
                 executionTimeMs = executionTime,
-                timestamp = currentTimestamp()
+                timestamp = Helper.currentTimestamp()
             )
         }
     }
 
-    private fun currentTimestamp(): String {
-        return java.time.LocalDateTime.now()
-            .format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-    }
 }

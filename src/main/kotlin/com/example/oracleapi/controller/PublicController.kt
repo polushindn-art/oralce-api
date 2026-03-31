@@ -1,6 +1,6 @@
 package com.example.oracleapi.controller
 
-import com.example.oracleapi.common.ProcedureResult
+import com.example.oracleapi.common.GeneralResponse
 import com.example.oracleapi.dto.common.ApiResponse
 import com.example.oracleapi.dto.public.GenIdResponse
 import com.example.oracleapi.dto.public.GetNomenByBarcodeRequest
@@ -32,7 +32,7 @@ class PublicController(
     )
     fun getNomenByBarcode(@Valid @RequestBody(required = true) request: GetNomenByBarcodeRequest): ResponseEntity<ApiResponse<GetNomenByBarcodeResponse>> {
         return when (val result = publicProcedureService.getNomenByBarcode(request)) {
-            is ProcedureResult.Success -> {
+            is GeneralResponse.Success -> {
                 ResponseEntity.ok(
                     ApiResponse(
                         success = true,
@@ -42,7 +42,7 @@ class PublicController(
                 )
             }
 
-            is ProcedureResult.Error -> {
+            is GeneralResponse.Error -> {
                 ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(
                         ApiResponse(
@@ -62,7 +62,7 @@ class PublicController(
     )
     fun genIdRn(): ResponseEntity<ApiResponse<GenIdResponse>> {
         return when (val result = publicProcedureService.getIdRn()) {
-            is ProcedureResult.Success -> {
+            is GeneralResponse.Success -> {
                 ResponseEntity.ok(
                     ApiResponse(
                         success = true,
@@ -72,7 +72,7 @@ class PublicController(
                 )
             }
 
-            is ProcedureResult.Error -> {
+            is GeneralResponse.Error -> {
                 ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(
                         ApiResponse(
@@ -92,7 +92,7 @@ class PublicController(
     ): ResponseEntity<ApiResponse<GenIdResponse>> {
 
         return when (val result = publicProcedureService.generateMultipleRn(count)) {
-            is ProcedureResult.Success -> {
+            is GeneralResponse.Success -> {
                 ResponseEntity.ok(
                     ApiResponse.success(
                         data = result.data,
@@ -101,7 +101,7 @@ class PublicController(
                     )
                 )
             }
-            is ProcedureResult.Error -> {
+            is GeneralResponse.Error -> {
                 when {
                     result.message.contains("Count must be") -> {
                         ResponseEntity.badRequest().body(

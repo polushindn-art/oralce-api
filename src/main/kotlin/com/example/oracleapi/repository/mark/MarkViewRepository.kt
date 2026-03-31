@@ -22,7 +22,7 @@ class MarkViewRepository {
         return try {
             val jsonNode = objectMapper.readTree(jsonString)
             objectMapper.writeValueAsString(jsonNode)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             // Если невалидный JSON, возвращаем как есть
             jsonString
         }
