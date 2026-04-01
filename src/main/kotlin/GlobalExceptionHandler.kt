@@ -1,19 +1,30 @@
+package com.example.oracleapi.handler
 
 import com.example.oracleapi.dto.common.ApiResponse
 import jakarta.servlet.http.HttpServletRequest
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.http.converter.HttpMessageNotReadableException
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.web.bind.MissingServletRequestParameterException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
 import org.springframework.web.servlet.NoHandlerFoundException
+import org.springframework.web.servlet.resource.NoResourceFoundException
+import org.springframework.dao.DataAccessException
+import org.springframework.dao.EmptyResultDataAccessException
+import jakarta.persistence.EntityNotFoundException
+import org.springframework.web.HttpRequestMethodNotSupportedException
 import javax.naming.AuthenticationException
 
 @RestControllerAdvice
 class GlobalExceptionHandler {
 
-    // Ошибка преобразования типа (pbe=abc)
+    private val logger = LoggerFactory.getLogger(javaClass)
+
+    // 1. Ошибка преобразования типа (pbe=abc)
     @ExceptionHandler(MethodArgumentTypeMismatchException::class)
     fun handleTypeMismatch(
         e: MethodArgumentTypeMismatchException,
@@ -24,12 +35,16 @@ class GlobalExceptionHandler {
         val wrongValue = e.value
 
         val message = when (requiredType) {
-            "Long" -> "Параметр '$paramName' должен быть целым числом. Получено: '$wrongValue'"
-            "Int" -> "Параметр '$paramName' должен быть целым числом. Получено: '$wrongValue'"
-            else -> "Параметр '$paramName' имеет неверный тип. Ожидается: $requiredType"
+            "Long", "Integer", "Int" ->
+                "Параметр '$paramName' должен быть целым числом. Получено: '$wrongValue'"
+            "Boolean" ->
+                "Параметр '$paramName' должен быть true или false. Получено: '$wrongValue'"
+            else ->
+                "Параметр '$paramName' имеет неверный тип. Ожидается: $requiredType"
         }
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
             .body(
                 ApiResponse.error(
                     message = message,
@@ -38,13 +53,14 @@ class GlobalExceptionHandler {
             )
     }
 
-    // Отсутствует обязательный параметр
+    // 2. Отсутствует обязательный параметр
     @ExceptionHandler(MissingServletRequestParameterException::class)
     fun handleMissingParam(
         e: MissingServletRequestParameterException,
         request: HttpServletRequest
     ): ResponseEntity<ApiResponse<Nothing>> {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
             .body(
                 ApiResponse.error(
                     message = "Отсутствует обязательный параметр: ${e.parameterName}",
@@ -53,73 +69,154 @@ class GlobalExceptionHandler {
             )
     }
 
-    // Ошибка аутентификации
+    // 3. Некорректный JSON в теле запроса
+    @ExceptionHandler(HttpMessageNotReadableException::class)
+    fun handleHttpMessageNotReadable(
+        e: HttpMessageNotReadableException,
+        request: HttpServletRequest
+    ): ResponseEntity<ApiResponse<Nothing>> {
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(
+                ApiResponse.error(
+                    message = "Некорректный формат запроса. Проверьте тело запроса.",
+                    path = request.requestURI
+                )
+            )
+    }
+
+    // 4. Неподдерживаемый HTTP метод
+    @ExceptionHandler(HttpRequestMethodNotSupportedException::class)
+    fun handleMethodNotSupported(
+        e: HttpRequestMethodNotSupportedException,
+        request: HttpServletRequest
+    ): ResponseEntity<ApiResponse<Nothing>> {
+        return ResponseEntity
+            .status(HttpStatus.METHOD_NOT_ALLOWED)
+            .body(
+                ApiResponse.error(
+                    message = "Метод ${e.method} не поддерживается для этого эндпоинта. Поддерживаемые методы: ${e.supportedMethods?.joinToString(", ")}",
+                    path = request.requestURI
+                )
+            )
+    }
+
+    // 5. Ошибка аутентификации
     @ExceptionHandler(AuthenticationException::class)
     fun handleAuthenticationException(
         e: AuthenticationException,
         request: HttpServletRequest
     ): ResponseEntity<ApiResponse<Nothing>> {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+        return ResponseEntity
+            .status(HttpStatus.UNAUTHORIZED)
             .body(
                 ApiResponse.error(
-                    message = "Требуется авторизация: ${e.message}",
+                    message = "Требуется авторизация: ${e.message ?: "пожалуйста, войдите в систему"}",
                     path = request.requestURI
                 )
             )
     }
 
-    // Ошибка доступа
+    // 6. Ошибка доступа (недостаточно прав)
     @ExceptionHandler(AccessDeniedException::class)
     fun handleAccessDeniedException(
         e: AccessDeniedException,
         request: HttpServletRequest
     ): ResponseEntity<ApiResponse<Nothing>> {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+        return ResponseEntity
+            .status(HttpStatus.FORBIDDEN)
             .body(
                 ApiResponse.error(
-                    message = "Недостаточно прав для доступа: ${e.message}",
+                    message = "Недостаточно прав для доступа к ресурсу: ${e.message ?: "доступ запрещен"}",
                     path = request.requestURI
                 )
             )
     }
 
-    // Ресурс не найден
+    // 7. Ресурс не найден (404) - для эндпоинтов API
     @ExceptionHandler(NoHandlerFoundException::class)
-    fun handleResourceNotFound(
+    fun handleNoHandlerFound(
         e: NoHandlerFoundException,
         request: HttpServletRequest
     ): ResponseEntity<ApiResponse<Nothing>> {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-            .body(
-                ApiResponse.error(
-                    message = "Запрашиваемый ресурс не найден: ${request.requestURI}",
-                    path = request.requestURI
-                )
-            )
+        logger.info("Эндпоинт не найден: {} {}", request.method, request.requestURI)
+        return createNotFoundResponse(request)
     }
 
-    // Некорректный токен
-    @ExceptionHandler(InvalidTokenException::class)
-    fun handleInvalidToken(
-        e: InvalidTokenException,
+    // 8. Статический ресурс не найден (404) - для файлов и статики
+    @ExceptionHandler(NoResourceFoundException::class)
+    fun handleNoResourceFound(
+        e: NoResourceFoundException,
         request: HttpServletRequest
     ): ResponseEntity<ApiResponse<Nothing>> {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        logger.debug("Статический ресурс не найден: {}", request.requestURI)
+        return createNotFoundResponse(request)
+    }
+
+    // 9. Entity не найдена в базе данных
+    @ExceptionHandler(EntityNotFoundException::class)
+    fun handleEntityNotFound(
+        e: EntityNotFoundException,
+        request: HttpServletRequest
+    ): ResponseEntity<ApiResponse<Nothing>> {
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
             .body(
                 ApiResponse.error(
-                    message = e.message ?: "Неверный или истекший токен",
+                    message = e.message ?: "Запись не найдена",
                     path = request.requestURI
                 )
             )
     }
 
-    // IllegalArgumentException (наша валидация в сервисе)
+    // 10. Ошибка при работе с базой данных
+    @ExceptionHandler(DataAccessException::class)
+    fun handleDataAccessException(
+        e: DataAccessException,
+        request: HttpServletRequest
+    ): ResponseEntity<ApiResponse<Nothing>> {
+        logger.error("Ошибка базы данных: ${e.message}", e)
+
+        val message = if (isDevelopment()) {
+            "Ошибка базы данных: ${e.message}"
+        } else {
+            "Ошибка при обращении к базе данных"
+        }
+
+        return ResponseEntity
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(
+                ApiResponse.error(
+                    message = message,
+                    path = request.requestURI
+                )
+            )
+    }
+
+    // 11. Пустой результат (например, при удалении несуществующей записи)
+    @ExceptionHandler(EmptyResultDataAccessException::class)
+    fun handleEmptyResult(
+        e: EmptyResultDataAccessException,
+        request: HttpServletRequest
+    ): ResponseEntity<ApiResponse<Nothing>> {
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(
+                ApiResponse.error(
+                    message = "Запись не найдена для удаления/обновления",
+                    path = request.requestURI
+                )
+            )
+    }
+
+    // 12. Ошибка бизнес-логики
     @ExceptionHandler(IllegalArgumentException::class)
     fun handleIllegalArgument(
         e: IllegalArgumentException,
         request: HttpServletRequest
     ): ResponseEntity<ApiResponse<Nothing>> {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
             .body(
                 ApiResponse.error(
                     message = e.message ?: "Неверный параметр запроса",
@@ -128,21 +225,64 @@ class GlobalExceptionHandler {
             )
     }
 
-    // Все остальные ошибки
-    @ExceptionHandler(Exception::class)
-    fun handleGeneralException(
-        e: Exception,
+    // 13. Некорректный токен
+    @ExceptionHandler(InvalidTokenException::class)
+    fun handleInvalidToken(
+        e: InvalidTokenException,
         request: HttpServletRequest
     ): ResponseEntity<ApiResponse<Nothing>> {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+        return ResponseEntity
+            .status(HttpStatus.UNAUTHORIZED)
             .body(
                 ApiResponse.error(
-                    message = "Внутренняя ошибка сервера: ${e.message}",
+                    message = e.message ?: "Неверный или истекший токен",
                     path = request.requestURI
                 )
             )
     }
 
-    // Внутренний класс исключения
+    // 14. Все остальные ошибки (500)
+    @ExceptionHandler(Exception::class)
+    fun handleGeneralException(
+        e: Exception,
+        request: HttpServletRequest
+    ): ResponseEntity<ApiResponse<Nothing>> {
+        logger.error("Необработанное исключение: ${e.message}", e)
+
+        val message = if (isDevelopment()) {
+            "Внутренняя ошибка сервера: ${e.message}"
+        } else {
+            "Внутренняя ошибка сервера. Пожалуйста, попробуйте позже."
+        }
+
+        return ResponseEntity
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(
+                ApiResponse.error(
+                    message = message,
+                    path = request.requestURI
+                )
+            )
+    }
+
+    // Вспомогательный метод для создания ответа 404
+    private fun createNotFoundResponse(request: HttpServletRequest): ResponseEntity<ApiResponse<Nothing>> {
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(
+                ApiResponse.error(
+                    message = "Ресурс не найден: ${request.requestURI}",
+                    path = request.requestURI
+                )
+            )
+    }
+
+    // Вспомогательный метод для определения окружения
+    private fun isDevelopment(): Boolean {
+        return System.getProperty("spring.profiles.active") == "dev" ||
+                System.getenv("SPRING_PROFILES_ACTIVE") == "dev"
+    }
+
+    // Кастомное исключение для токенов
     class InvalidTokenException(message: String?) : RuntimeException(message)
 }

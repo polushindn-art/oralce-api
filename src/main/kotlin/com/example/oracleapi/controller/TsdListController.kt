@@ -1,7 +1,6 @@
 package com.example.oracleapi.controller
 
 import com.example.oracleapi.Helper
-import com.example.oracleapi.common.GeneralResponse
 import com.example.oracleapi.dto.JsonResponseView
 import com.example.oracleapi.dto.common.ApiResponse
 import com.example.oracleapi.dto.tsdlist.Registeredjson
@@ -30,28 +29,14 @@ class TsdListController(
     )
     fun registeredjson(
         @RequestParam(required = false) sn: String?,
-    ): ResponseEntity<ApiResponse<JsonResponseView<Registeredjson>>> {
-        return when (val result = tsdListService.getRegisteredSessions(sn)) {
-            is GeneralResponse.Success -> {
-                ResponseEntity.ok(
-                    ApiResponse(
-                        true,
-                        "Список получен",
-                        result.data
-                    )
-                )
-            }
-
-            is GeneralResponse.Error -> {
-                ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(
-                        ApiResponse(
-                            success = false,
-                            message = "Не удалось получить данные по ТСД $sn"
-                        )
-                    )
-            }
-        }
+        request: HttpServletRequest
+    ): ApiResponse<JsonResponseView<Registeredjson>> {
+        val result = tsdListService.getRegisteredSessions(sn)
+        return ApiResponse.success(
+            data = result,
+            "Список получен",
+            path = request.requestURI
+        )
     }
 
     @GetMapping("/usedtsd")
@@ -62,34 +47,12 @@ class TsdListController(
     fun usedTsd(
         @RequestParam(required = false) pbe: Long?,
         request: HttpServletRequest
-    ): ResponseEntity<ApiResponse<JsonResponseView<UsedJson>>> {
-
-        return try {
-            val data = tsdListService.getUsedTsd(pbe)
-            ResponseEntity.ok(
-                ApiResponse.success(
-                    data = data,
-                    message = "Список активных пользователей ТСД успешно получен",
-                    path = request.requestURI
-                )
-            )
-        } catch (e: IllegalArgumentException) {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(
-                    ApiResponse.error(
-                        message = e.message ?: "Неверный параметр pbe",
-                        path = request.requestURI
-                    )
-                )
-        } catch (e: Exception) {
-            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(
-                    ApiResponse.error(
-                        message = "Ошибка при получении данных: ${e.message}",
-                        path = request.requestURI
-                    )
-                )
-        }
+    ): ApiResponse<JsonResponseView<UsedJson>> {
+        val data = tsdListService.getUsedTsd(pbe)
+        return ApiResponse.success(
+            data = data,
+            message = "Список активных пользователей ТСД успешно получен",
+            path = request.requestURI
+        )
     }
-
 }

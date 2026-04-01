@@ -1,7 +1,6 @@
 package com.example.oracleapi.service.tsdlist
 
-import com.example.oracleapi.common.BaseProcedure
-import com.example.oracleapi.common.GeneralResponse
+import com.example.oracleapi.common.BasePkgFunc
 import com.example.oracleapi.dto.JsonResponseView
 import com.example.oracleapi.dto.tsdlist.Registeredjson
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -12,36 +11,23 @@ import org.springframework.stereotype.Component
 class TsdListGetRegistered(
     entityManager: EntityManager,
     objectMapper: ObjectMapper
-) : BaseProcedure(entityManager, objectMapper) {
+) : BasePkgFunc(entityManager, objectMapper) {
     override val packageName: String = TSDLIST
-    fun execute(sn: String? = null): GeneralResponse<JsonResponseView<Registeredjson>> {
-        return execute("registered_json") {
-            val startTime = System.currentTimeMillis()
+    fun execute(sn: String? = null): JsonResponseView<Registeredjson> {
 
-            try {
-                // Для JSON массива
-                val sessions = callListFunction<Registeredjson>("registered_json", sn)
-                val executionTime = System.currentTimeMillis() - startTime
+        val startTime = System.currentTimeMillis()
 
-                GeneralResponse.Success(
-                    JsonResponseView(
-                        sessions.size,
-                        executionTime,
-                        sessions
-                    ),
-                    executionTime,
-                    currentTimestamp()
-                )
+        val sessions = callListFunction<Registeredjson>("registered_json", sn)
+        val executionTime = System.currentTimeMillis() - startTime
 
-            } catch (e: Exception) {
-                val executionTime = System.currentTimeMillis() - startTime
-                GeneralResponse.Error(
-                    message = e.message ?: "Ошибка получения ТСД",
-                    errorCode = "REGISTERED_JSON_ERROR",
-                    executionTimeMs = executionTime,
-                    timestamp = currentTimestamp()
-                )
-            }
+        if (sessions.isEmpty()) {
+            throw RuntimeException("Не удалось получить данные по ТСД ${sn ?: ""}")
         }
+
+        return JsonResponseView(
+            sessions.size,
+            executionTime,
+            sessions
+        )
     }
 }

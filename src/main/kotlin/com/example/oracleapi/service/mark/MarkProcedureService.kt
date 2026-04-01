@@ -1,6 +1,5 @@
 package com.example.oracleapi.service.mark
 
-import com.example.oracleapi.common.GeneralResponse
 import com.example.oracleapi.dto.mark.MarkFindRequest
 import com.example.oracleapi.dto.mark.MarkFindResponse
 import com.example.oracleapi.dto.mark.MarkUpdRequest
@@ -16,9 +15,9 @@ class MarkProcedureService(
     private val markUpdProcedure: MarkUpdProcedure,
     private val markViewService: MarkViewService
 ) {
-    fun upd(request: MarkUpdRequest): GeneralResponse<MarkUpdResponse> =
+    fun upd(request: MarkUpdRequest): MarkUpdResponse =
         markUpdProcedure.execute(request)
 
-    fun find(request: MarkFindRequest): GeneralResponse<MarkFindResponse> =
+    fun find(request: MarkFindRequest): MarkFindResponse =
         markViewService.findByKm(request)
 }

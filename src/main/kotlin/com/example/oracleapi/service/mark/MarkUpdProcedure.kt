@@ -1,7 +1,6 @@
 package com.example.oracleapi.service.mark
 
-import com.example.oracleapi.common.BaseProcedure
-import com.example.oracleapi.common.GeneralResponse
+import com.example.oracleapi.common.BasePkgFunc
 import com.example.oracleapi.dto.mark.MarkUpdRequest
 import com.example.oracleapi.dto.mark.MarkUpdResponse
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -18,10 +17,10 @@ class MarkUpdProcedure(
     entityManager: EntityManager,
     objectMapper: ObjectMapper,
     private val cacheManager: CacheManager
-) : BaseProcedure(entityManager, objectMapper) {
+) : BasePkgFunc(entityManager, objectMapper) {
     override val packageName: String = MARK
     //@Transactional
-    fun execute(request: MarkUpdRequest): GeneralResponse<MarkUpdResponse> {
+    fun execute(request: MarkUpdRequest): MarkUpdResponse {
         return execute("UPD") {
             val startTime = System.currentTimeMillis()
 
@@ -47,29 +46,16 @@ class MarkUpdProcedure(
 
                 val executionTime = System.currentTimeMillis() - startTime
 
-                GeneralResponse.Success(
-                    data = MarkUpdResponse(
+                MarkUpdResponse(
                         success = true,
                         message = "Метка успешно обновлена",
                         km = request.km,
                         executionTimeMs = executionTime,
                         timestamp = currentTimestamp()
-                    ),
-                    executionTimeMs = executionTime,
-                    timestamp = currentTimestamp()
-                )
+                    )
 
             } catch (e: Exception) {
-                val executionTime = System.currentTimeMillis() - startTime
-
-                GeneralResponse.Error(
-                    message = e.message ?: "Unknown error",
-                    errorCode = "MARK_UPD_ERROR",
-                    executionTimeMs = executionTime,
-                    timestamp = currentTimestamp()
-                )
-            } finally {
-                // Здесь можно освободить ресурсы если нужно
+                throw IllegalArgumentException("Ошибка в upd MarkCode $e")
             }
         }
     }

@@ -1,7 +1,6 @@
 package com.example.oracleapi.service.public
 
-import com.example.oracleapi.common.BaseProcedure
-import com.example.oracleapi.common.GeneralResponse
+import com.example.oracleapi.common.BasePkgFunc
 import com.example.oracleapi.dto.public.GetNomenByBarcodeResponse
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.persistence.EntityManager
@@ -11,45 +10,38 @@ import org.springframework.stereotype.Component
 class PublicGetNomenByBarcodeProcedure(
     entityManager: EntityManager,
     objectMapper: ObjectMapper
-) : BaseProcedure(entityManager, objectMapper) {
+) : BasePkgFunc(entityManager, objectMapper) {
 
     override val packageName: String = PUBLIC
 
-    fun getNomen(barcode: String): GeneralResponse<GetNomenByBarcodeResponse> {
-        return execute("GETNOMENBYBARCODE") {
-            val startTime = System.currentTimeMillis()
-            try {
-                // Используем нативный SQL для вызова функции
-                val query = entityManager.createNativeQuery(
-                    "SELECT PKG_PUBLIC.GETNOMENBYBARCODE(:barcode) FROM DUAL"
-                )
-                query.setParameter("barcode", barcode)
+    fun getNomen(barcode: String): GetNomenByBarcodeResponse {
+        val startTime = System.currentTimeMillis()
+        try {
+            // Используем нативный SQL для вызова функции
+            val query = entityManager.createNativeQuery(
+                "SELECT PKG_PUBLIC.GETNOMENBYBARCODE(:barcode) FROM DUAL"
+            )
+            query.setParameter("barcode", barcode)
 
-                val resultNumber = query.singleResult as? Number
-                    ?: throw IllegalStateException("Функция не вернула идентификатор")
+            val resultNumber = query.singleResult as? Number
+                ?: throw IllegalStateException("Функция не вернула идентификатор")
 
-                val resultId = resultNumber.toLong()
-                val executionTime = System.currentTimeMillis() - startTime
+            val resultId = resultNumber.toLong()
+            val executionTime = System.currentTimeMillis() - startTime
 
-                GeneralResponse.Success(
-                    data = GetNomenByBarcodeResponse(
-                        nomen = resultId,
-                        barcode = barcode,
-                        executionTimeMs = executionTime,
-                        timestamp = currentTimestamp()
-                    ),
-                    executionTimeMs = executionTime,
-                    timestamp = currentTimestamp()
-                )
-            } catch (e: Exception) {
-                val executionTime = System.currentTimeMillis() - startTime
-                GeneralResponse.Error(
-                    message = e.message ?: "Неизвестная ошибка",
-                    errorCode = "GET_NOMEN_ERROR",
-                    executionTimeMs = executionTime,
-                    timestamp = currentTimestamp()
-                )
+            // Проверяем, что идентификатор валидный (например, не 0 или не отрицательный)
+            if (resultId <= 0) {
+                throw IllegalArgumentException("Ошибка GETNOMENBYBARCODE")
             }
+
+            return GetNomenByBarcodeResponse(
+                nomen = resultId,
+                barcode = barcode,
+                executionTimeMs = executionTime,
+                timestamp = currentTimestamp()
+            )
+        } catch (e: Exception) {
+            throw RuntimeException("Ошибка получения номенклатуры по штрихкоду '$barcode': ${e.message}", e)
         }
     }
 }

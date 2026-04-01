@@ -1,6 +1,5 @@
 package com.example.oracleapi.controller
 
-import com.example.oracleapi.common.GeneralResponse
 import com.example.oracleapi.dto.common.ApiResponse
 import com.example.oracleapi.dto.public.GenIdResponse
 import com.example.oracleapi.dto.public.GetNomenByBarcodeRequest
@@ -30,29 +29,16 @@ class PublicController(
         summary = "pkg_public.getnomenbybarcode",
         description = "Получить идентификатор номенклатуры по штрих-коду"
     )
-    fun getNomenByBarcode(@Valid @RequestBody(required = true) request: GetNomenByBarcodeRequest): ResponseEntity<ApiResponse<GetNomenByBarcodeResponse>> {
-        return when (val result = publicProcedureService.getNomenByBarcode(request)) {
-            is GeneralResponse.Success -> {
-                ResponseEntity.ok(
-                    ApiResponse(
-                        success = true,
-                        message = "Идентификатор получен",
-                        data = result.data
-                    )
-                )
-            }
-
-            is GeneralResponse.Error -> {
-                ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(
-                        ApiResponse(
-                            success = false,
-                            message = result.message
-                        )
-                    )
-            }
-        }
-
+    fun getNomenByBarcode(
+        @Valid @RequestBody(required = true) request: GetNomenByBarcodeRequest,
+        httpRequest: HttpServletRequest
+    ): ApiResponse<GetNomenByBarcodeResponse> {
+        val result = publicProcedureService.getNomenByBarcode(request)
+        return ApiResponse.success(
+            data = result,
+            message = "Идентификатор получен",
+            httpRequest.requestURI
+        )
     }
 
     @GetMapping("/genIdRn")
@@ -60,68 +46,28 @@ class PublicController(
         summary = "pkg_public.genidrn",
         description = "Получить уникальный идентификатор RN"
     )
-    fun genIdRn(): ResponseEntity<ApiResponse<GenIdResponse>> {
-        return when (val result = publicProcedureService.getIdRn()) {
-            is GeneralResponse.Success -> {
-                ResponseEntity.ok(
-                    ApiResponse(
-                        success = true,
-                        message = "Идентификатор RN получен",
-                        data = result.data
-                    )
-                )
-            }
-
-            is GeneralResponse.Error -> {
-                ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(
-                        ApiResponse(
-                            success = false,
-                            message = result.message
-                        )
-                    )
-            }
-        }
+    fun genIdRn(
+        httpRequest: HttpServletRequest
+    ): ApiResponse<GenIdResponse> {
+        val result = publicProcedureService.getIdRn()
+        return ApiResponse.success(
+            data = result,
+            message = "Идентификатор RN получен",
+            httpRequest.requestURI
+        )
     }
 
     @GetMapping("/genIdRn/multiple")
     @Operation(summary = "Получить несколько RN", description = "Генерирует несколько уникальных идентификаторов")
     fun generateMultipleRn(
         @RequestParam(defaultValue = "3") count: Int,
-        request: HttpServletRequest
-    ): ResponseEntity<ApiResponse<GenIdResponse>> {
-
-        return when (val result = publicProcedureService.generateMultipleRn(count)) {
-            is GeneralResponse.Success -> {
-                ResponseEntity.ok(
-                    ApiResponse.success(
-                        data = result.data,
-                        message = "Сгенерировано ${result.data.count} идентификаторов",
-                        path = request.servletPath
+        httpRequest: HttpServletRequest
+    ): ApiResponse<GenIdResponse> {
+        val result = publicProcedureService.generateMultipleRn(count)
+        return  ApiResponse.success(
+                        data = result,
+                        message = "Сгенерировано $count идентификаторов",
+                        httpRequest.requestURI
                     )
-                )
-            }
-            is GeneralResponse.Error -> {
-                when {
-                    result.message.contains("Count must be") -> {
-                        ResponseEntity.badRequest().body(
-                            ApiResponse.error(
-                                message = result.message,
-                                path = request.servletPath
-                            )
-                        )
-                    }
-                    else -> {
-                        ResponseEntity.internalServerError().body(
-                            ApiResponse.error(
-                                message = result.message,
-                                path = request.servletPath
-                            )
-                        )
-                    }
-                }
-            }
-        }
     }
-
 }

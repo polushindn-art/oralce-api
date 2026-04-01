@@ -1,6 +1,5 @@
 package com.example.oracleapi.controller
 
-import com.example.oracleapi.common.GeneralResponse
 import com.example.oracleapi.dto.common.ApiResponse
 import com.example.oracleapi.dto.mark.MarkFindRequest
 import com.example.oracleapi.dto.mark.MarkFindResponse
@@ -9,10 +8,11 @@ import com.example.oracleapi.dto.mark.MarkUpdResponse
 import com.example.oracleapi.service.mark.MarkProcedureService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 import jakarta.validation.Valid
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -31,67 +31,34 @@ class MarkController(
     @PostMapping("/upd")
     @Operation(summary = "PKG_MARK.UPD", description = "Обновление записи")
     fun upd(
-        @Valid @RequestBody request: MarkUpdRequest
-    ): ResponseEntity<ApiResponse<MarkUpdResponse>> {
+        @Valid @RequestBody request: MarkUpdRequest,
+        httpRequest: HttpServletRequest
+    ): ApiResponse<MarkUpdResponse> {
         log.info("PKG_MARK.UPD: km={}", request.km)
-        return when (val result = markProcedureService.upd(request)) {
-            is GeneralResponse.Success -> {
-                ResponseEntity.ok(
-                    ApiResponse(
-                        success = true,
-                        message = "Код маркировки успешно обновлен",
-                        data = result.data
-                    )
-                )
-            }
+        val result = markProcedureService.upd(request)
+        return ApiResponse.success(
+            result,
+            "Код маркировки успешно обновлен",
+            httpRequest.requestURI,
+        )
 
-            is GeneralResponse.Error -> {
-                ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(
-                        ApiResponse(
-                            success = false,
-                            message = result.message
-                        )
-                    )
-            }
-        }
+
     }
 
     @GetMapping("/find")
     @Operation(summary = "Поиск по КМ", description = "Поиск кода маркировки в представлении v_mark_find")
     fun find(
-        @RequestParam km: String
-    ): ResponseEntity<ApiResponse<MarkFindResponse>> {
+        @RequestParam km: String,
+        httpRequest: HttpServletRequest
+    ): ApiResponse<MarkFindResponse> {
         log.info("Поиск по КМ: km={}", km)
         val request = MarkFindRequest(km = km)
+        val result = markProcedureService.find(request)
+        return ApiResponse.success(
+            data = result,
+            message = "Код маркировки найден",
+            httpRequest.requestURI
+        )
 
-        return when (val result = markProcedureService.find(request)) {
-            is GeneralResponse.Success -> {
-                ResponseEntity.ok(
-                    ApiResponse(
-                        success = true,
-                        message = "Код маркировки найден",
-                        data = result.data
-                    )
-                )
-            }
-
-            is GeneralResponse.Error -> {
-                val status = if (result.message.contains("не найден")) {
-                    HttpStatus.NOT_FOUND
-                } else {
-                    HttpStatus.INTERNAL_SERVER_ERROR
-                }
-
-                ResponseEntity.status(status)
-                    .body(
-                        ApiResponse(
-                            success = false,
-                            message = result.message
-                        )
-                    )
-            }
-        }
     }
-
 }

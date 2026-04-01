@@ -11,7 +11,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 /**
  * Базовый класс для всех процедур Oracle
  */
-abstract class BaseProcedure(
+abstract class BasePkgFunc(
     protected val entityManager: EntityManager,
     protected val objectMapper: ObjectMapper
 ) {
