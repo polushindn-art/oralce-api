@@ -138,7 +138,7 @@ class PictureController(
         response.status = HttpStatus.NOT_FOUND.value()
         response.contentType = "application/json;charset=UTF-8"
 
-        val errorResponse = ApiResponse.error(
+        val errorResponse = ApiResponse.error<Nothing>(
             message = message,
             path = path
         )
