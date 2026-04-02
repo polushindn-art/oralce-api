@@ -1,22 +1,22 @@
 package com.example.oracleapi.handler
 
 import com.example.oracleapi.dto.common.ApiResponse
+import jakarta.persistence.EntityNotFoundException
 import jakarta.servlet.http.HttpServletRequest
 import org.slf4j.LoggerFactory
+import org.springframework.dao.DataAccessException
+import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.security.access.AccessDeniedException
+import org.springframework.web.HttpRequestMethodNotSupportedException
 import org.springframework.web.bind.MissingServletRequestParameterException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
 import org.springframework.web.servlet.NoHandlerFoundException
 import org.springframework.web.servlet.resource.NoResourceFoundException
-import org.springframework.dao.DataAccessException
-import org.springframework.dao.EmptyResultDataAccessException
-import jakarta.persistence.EntityNotFoundException
-import org.springframework.web.HttpRequestMethodNotSupportedException
 import javax.naming.AuthenticationException
 
 @RestControllerAdvice
@@ -241,7 +241,25 @@ class GlobalExceptionHandler {
             )
     }
 
-    // 14. Все остальные ошибки (500)
+    // 14. Обработчик RuntimeException
+    @ExceptionHandler(RuntimeException::class)
+    fun handleRuntimeException(
+        e: RuntimeException,
+        request: HttpServletRequest
+    ): ResponseEntity<ApiResponse<Nothing>> {
+        logger.error("RuntimeException: ${e.message}", e)
+
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(
+                ApiResponse.error(
+                    message = e.message ?: "Внутренняя ошибка сервера",
+                    path = request.requestURI
+                )
+            )
+    }
+
+    // 15. Все остальные ошибки (500)
     @ExceptionHandler(Exception::class)
     fun handleGeneralException(
         e: Exception,

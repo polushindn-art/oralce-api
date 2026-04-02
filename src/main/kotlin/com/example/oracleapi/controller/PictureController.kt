@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/pictures")
-@Tag(name = "Изображения", description = "Работа с изображениями")
+@Tag(name = "pkg_picture", description = "Работа с изображениями")
 class PictureController(
     private val pictureService: PictureService,
     private val objectMapper: ObjectMapper
