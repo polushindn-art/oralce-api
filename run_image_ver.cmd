@@ -13,76 +13,64 @@ set "RESET=[0m"
 :: ============================================
 :: НАСТРОЙКИ
 :: ============================================
-set REGISTRY=api.ars:5000
+set REGISTRY_SERVER=api.ars
+set REGISTRY_PORT=5000
 set IMAGE_NAME=oracle-api
-set VERSION_PREFIX=1.25
+set CONTAINER_PORT=8080
+set DB_PASSWORD=htrhtfwbz
 
 cls
 echo %GREEN%========================================%RESET%
-echo %GREEN%    СБОРКА И ОТПРАВКА В REGISTRY%RESET%
+echo %GREEN%    ЗАПУСК КОНТЕЙНЕРА ИЗ REGISTRY%RESET%
 echo %GREEN%========================================%RESET%
 echo.
-echo %YELLOW%Выберите тип сборки:%RESET%
+echo %YELLOW%Выберите окружение для запуска:%RESET%
 echo.
-echo 1. ТЕСТОВАЯ сборка (обновит тег: test)
-echo 2. ПРОДАКШЕН сборка (обновит теги: latest, версия)
+echo 1. ТЕСТОВАЯ среда (тег: test, порт: 8081, профиль: dev)
+echo 2. ПРОДАКШЕН (тег: latest, порт: 8080, профиль: prod)
 echo.
-set /p BUILD_TYPE="Выберите (1/2): "
+set /p ENV="Выберите (1/2): "
 
-if "!BUILD_TYPE!"=="1" (
+if "!ENV!"=="1" (
+    set TAG=test
+    set CONTAINER_NAME=oracle-app-test
+    set HOST_PORT=8081
     set SPRING_PROFILE=dev
     set ENV_NAME=ТЕСТОВАЯ
-    set IS_PROD=0
-) else if "!BUILD_TYPE!"=="2" (
+) else if "!ENV!"=="2" (
+    set TAG=latest
+    set CONTAINER_NAME=oracle-app-prod
+    set HOST_PORT=8080
     set SPRING_PROFILE=prod
     set ENV_NAME=ПРОДАКШЕН
-    set IS_PROD=1
 ) else (
     echo %RED%Неверный выбор!%RESET%
     pause
     exit /b 1
 )
 
+set FULL_IMAGE_NAME=%REGISTRY_SERVER%:%REGISTRY_PORT%/%IMAGE_NAME%:%TAG%
+
 echo.
-echo %GREEN%Выбрана %ENV_NAME% сборка%RESET%
+echo %GREEN%========================================%RESET%
+echo %GREEN%   Запуск %ENV_NAME% окружения%RESET%
+echo %GREEN%========================================%RESET%
+echo.
+echo   Контейнер: %CONTAINER_NAME%
+echo   Порт: %HOST_PORT%:%CONTAINER_PORT%
+echo   Тег: %TAG%
 echo   Профиль: %SPRING_PROFILE%
-if "%IS_PROD%"=="1" (
-    echo   Теги: latest, %VERSION_PREFIX%.XXX
-) else (
-    echo   Тег: test
-)
+echo   Образ: %FULL_IMAGE_NAME%
 echo.
 
 :: ============================================
-:: ПРОВЕРКА ЗАВИСИМОСТЕЙ
+:: ЭТАП 1: ПРОВЕРКА REGISTRY
 :: ============================================
-echo %YELLOW%[1/6] Проверка зависимостей...%RESET%
+echo %YELLOW%[1/4] Проверка Registry %REGISTRY_SERVER%:%REGISTRY_PORT%...%RESET%
 
-where docker >nul 2>&1
+curl -f http://%REGISTRY_SERVER%:%REGISTRY_PORT%/v2/ >nul 2>&1
 if %errorlevel% neq 0 (
-    echo %RED%[ОШИБКА] Docker не найден!%RESET%
-    pause
-    exit /b 1
-)
-
-where mvn >nul 2>&1
-if %errorlevel% neq 0 (
-    echo %RED%[ОШИБКА] Maven не найден!%RESET%
-    pause
-    exit /b 1
-)
-
-echo %GREEN%[OK] Все зависимости найдены%RESET%
-echo.
-
-:: ============================================
-:: ПРОВЕРКА REGISTRY
-:: ============================================
-echo %YELLOW%[2/6] Проверка Registry %REGISTRY%...%RESET%
-
-curl -f http://%REGISTRY%/v2/ >nul 2>&1
-if %errorlevel% neq 0 (
-    echo %RED%[ОШИБКА] Registry %REGISTRY% недоступен!%RESET%
+    echo %RED%[ОШИБКА] Registry недоступен!%RESET%
     pause
     exit /b 1
 )
@@ -90,121 +78,206 @@ echo %GREEN%[OK] Registry доступен%RESET%
 echo.
 
 :: ============================================
-:: ГЕНЕРАЦИЯ ВЕРСИИ (только для продакшена)
+:: ЭТАП 2: ПРОВЕРКА НАЛИЧИЯ ОБРАЗА
 :: ============================================
-if "%IS_PROD%"=="1" (
-    echo %YELLOW%[3/6] Генерация версии...%RESET%
-    
-    git rev-parse --git-dir >nul 2>&1
-    if %errorlevel% neq 0 (
-        echo %RED%Не Git репозиторий%RESET%
-        set /p VERSION_NUMBER="Введите номер версии: "
-        if "!VERSION_NUMBER!"=="" set VERSION_NUMBER=1
-    ) else (
-        for /f %%i in ('git rev-list --count HEAD 2^>nul') do set VERSION_NUMBER=%%i
-        if not defined VERSION_NUMBER set VERSION_NUMBER=0
-        for /f %%i in ('git rev-parse --short HEAD 2^>nul') do set COMMIT_HASH=%%i
-        echo   Коммитов: !VERSION_NUMBER!
-        echo   Хэш: !COMMIT_HASH!
-    )
-    
-    set FULL_VERSION=%VERSION_PREFIX%.!VERSION_NUMBER!
-    echo %GREEN%Версия: %FULL_VERSION%%RESET%
-    echo.
-) else (
-    echo %YELLOW%[3/6] Пропуск генерации версии (только для продакшена)%RESET%
-    echo.
-)
+echo %YELLOW%[2/4] Проверка образа %IMAGE_NAME%:%TAG% в Registry...%RESET%
 
-:: ============================================
-:: MAVEN СБОРКА
-:: ============================================
-echo %YELLOW%[4/6] Сборка Maven с профилем %SPRING_PROFILE%...%RESET%
-
-if not exist "pom.xml" (
-    echo %RED%[ОШИБКА] Файл pom.xml не найден!%RESET%
+curl -s http://%REGISTRY_SERVER%:%REGISTRY_PORT%/v2/%IMAGE_NAME%/tags/list | findstr "\"%TAG%\"" >nul
+if %errorlevel% neq 0 (
+    echo %RED%[ОШИБКА] Образ с тегом %TAG% не найден в Registry!%RESET%
+    echo.
+    echo Доступные теги:
+    curl -s http://%REGISTRY_SERVER%:%REGISTRY_PORT%/v2/%IMAGE_NAME%/tags/list
+    echo.
     pause
     exit /b 1
 )
+echo %GREEN%[OK] Образ найден: %FULL_IMAGE_NAME%%RESET%
+echo.
 
-call mvn clean package -DskipTests -P%SPRING_PROFILE%
+:: ============================================
+:: ЭТАП 3: ОСТАНОВКА И УДАЛЕНИЕ СТАРОГО КОНТЕЙНЕРА
+:: ============================================
+echo %YELLOW%[3/4] Остановка и удаление старого контейнера %CONTAINER_NAME%...%RESET%
+
+docker stop %CONTAINER_NAME% 2>nul
+docker rm %CONTAINER_NAME% 2>nul
+echo %GREEN%[OK] Старый контейнер удален%RESET%
+echo.
+
+:: ============================================
+:: ЭТАП 4: ЗАПУСК НОВОГО КОНТЕЙНЕРА
+:: ============================================
+echo %YELLOW%[4/4] Запуск контейнера из %FULL_IMAGE_NAME%...%RESET%
+
+docker run -d ^
+  --name %CONTAINER_NAME% ^
+  -p %HOST_PORT%:%CONTAINER_PORT% ^
+  -e SPRING_PROFILES_ACTIVE=%SPRING_PROFILE% ^
+  -e SPRING_DATASOURCE_PASSWORD=%DB_PASSWORD% ^
+  --restart unless-stopped ^
+  %FULL_IMAGE_NAME%
 
 if %errorlevel% neq 0 (
-    echo %RED%[ОШИБКА] Сборка Maven не удалась!%RESET%
+    echo %RED%[ОШИБКА] Не удалось запустить контейнер!%RESET%
     pause
     exit /b 1
 )
 
-echo %GREEN%[OK] Maven сборка завершена%RESET%
+timeout /t 3 /nobreak >nul
+
+echo.
+echo %GREEN%========================================%RESET%
+echo %GREEN%        КОНТЕЙНЕР ЗАПУЩЕН!%RESET%
+echo %GREEN%========================================%RESET%
+echo.
+docker ps --filter "name=%CONTAINER_NAME%" --format "table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}"
+echo.
+echo %GREEN%Ссылки:%RESET%
+echo   Приложение: http://localhost:%HOST_PORT%
+echo   Логи:       docker logs -f %CONTAINER_NAME%
+echo   Остановка:  docker stop %CONTAINER_NAME%
+echo   Удаление:   docker rm %CONTAINER_NAME%
+echo.
+@echo off
+chcp 65001 > nul
+setlocal enabledelayedexpansion
+
+:: ============================================
+:: ЦВЕТА
+:: ============================================
+set "GREEN=[32m"
+set "YELLOW=[33m"
+set "RED=[31m"
+set "RESET=[0m"
+
+:: ============================================
+:: НАСТРОЙКИ
+:: ============================================
+set REGISTRY_SERVER=api.ars
+set REGISTRY_PORT=5000
+set IMAGE_NAME=oracle-api
+set CONTAINER_PORT=8080
+set DB_PASSWORD=htrhtfwbz
+
+cls
+echo %GREEN%========================================%RESET%
+echo %GREEN%    ЗАПУСК КОНТЕЙНЕРА ИЗ REGISTRY%RESET%
+echo %GREEN%========================================%RESET%
+echo.
+echo %YELLOW%Выберите окружение для запуска:%RESET%
+echo.
+echo 1. ТЕСТОВАЯ среда (тег: test, порт: 8081, профиль: dev)
+echo 2. ПРОДАКШЕН (тег: latest, порт: 8080, профиль: prod)
+echo.
+set /p ENV="Выберите (1/2): "
+
+if "!ENV!"=="1" (
+    set TAG=test
+    set CONTAINER_NAME=oracle-app-test
+    set HOST_PORT=8081
+    set SPRING_PROFILE=dev
+    set ENV_NAME=ТЕСТОВАЯ
+) else if "!ENV!"=="2" (
+    set TAG=latest
+    set CONTAINER_NAME=oracle-app-prod
+    set HOST_PORT=8080
+    set SPRING_PROFILE=prod
+    set ENV_NAME=ПРОДАКШЕН
+) else (
+    echo %RED%Неверный выбор!%RESET%
+    pause
+    exit /b 1
+)
+
+set FULL_IMAGE_NAME=%REGISTRY_SERVER%:%REGISTRY_PORT%/%IMAGE_NAME%:%TAG%
+
+echo.
+echo %GREEN%========================================%RESET%
+echo %GREEN%   Запуск %ENV_NAME% окружения%RESET%
+echo %GREEN%========================================%RESET%
+echo.
+echo   Контейнер: %CONTAINER_NAME%
+echo   Порт: %HOST_PORT%:%CONTAINER_PORT%
+echo   Тег: %TAG%
+echo   Профиль: %SPRING_PROFILE%
+echo   Образ: %FULL_IMAGE_NAME%
 echo.
 
 :: ============================================
-:: DOCKER СБОРКА
+:: ЭТАП 1: ПРОВЕРКА REGISTRY
 :: ============================================
-echo %YELLOW%[5/6] Сборка Docker образа...%RESET%
+echo %YELLOW%[1/4] Проверка Registry %REGISTRY_SERVER%:%REGISTRY_PORT%...%RESET%
 
-if "%IS_PROD%"=="1" (
-    docker build -t %IMAGE_NAME%:%FULL_VERSION% .
-    set LOCAL_TAG=%FULL_VERSION%
-) else (
-    docker build -t %IMAGE_NAME%:test .
-    set LOCAL_TAG=test
+curl -f http://%REGISTRY_SERVER%:%REGISTRY_PORT%/v2/ >nul 2>&1
+if %errorlevel% neq 0 (
+    echo %RED%[ОШИБКА] Registry недоступен!%RESET%
+    pause
+    exit /b 1
 )
+echo %GREEN%[OK] Registry доступен%RESET%
+echo.
+
+:: ============================================
+:: ЭТАП 2: ПРОВЕРКА НАЛИЧИЯ ОБРАЗА
+:: ============================================
+echo %YELLOW%[2/4] Проверка образа %IMAGE_NAME%:%TAG% в Registry...%RESET%
+
+curl -s http://%REGISTRY_SERVER%:%REGISTRY_PORT%/v2/%IMAGE_NAME%/tags/list | findstr "\"%TAG%\"" >nul
+if %errorlevel% neq 0 (
+    echo %RED%[ОШИБКА] Образ с тегом %TAG% не найден в Registry!%RESET%
+    echo.
+    echo Доступные теги:
+    curl -s http://%REGISTRY_SERVER%:%REGISTRY_PORT%/v2/%IMAGE_NAME%/tags/list
+    echo.
+    pause
+    exit /b 1
+)
+echo %GREEN%[OK] Образ найден: %FULL_IMAGE_NAME%%RESET%
+echo.
+
+:: ============================================
+:: ЭТАП 3: ОСТАНОВКА И УДАЛЕНИЕ СТАРОГО КОНТЕЙНЕРА
+:: ============================================
+echo %YELLOW%[3/4] Остановка и удаление старого контейнера %CONTAINER_NAME%...%RESET%
+
+docker stop %CONTAINER_NAME% 2>nul
+docker rm %CONTAINER_NAME% 2>nul
+echo %GREEN%[OK] Старый контейнер удален%RESET%
+echo.
+
+:: ============================================
+:: ЭТАП 4: ЗАПУСК НОВОГО КОНТЕЙНЕРА
+:: ============================================
+echo %YELLOW%[4/4] Запуск контейнера из %FULL_IMAGE_NAME%...%RESET%
+
+docker run -d ^
+  --name %CONTAINER_NAME% ^
+  -p %HOST_PORT%:%CONTAINER_PORT% ^
+  -e SPRING_PROFILES_ACTIVE=%SPRING_PROFILE% ^
+  -e SPRING_DATASOURCE_PASSWORD=%DB_PASSWORD% ^
+  --restart unless-stopped ^
+  %FULL_IMAGE_NAME%
 
 if %errorlevel% neq 0 (
-    echo %RED%[ОШИБКА] Сборка Docker образа не удалась!%RESET%
+    echo %RED%[ОШИБКА] Не удалось запустить контейнер!%RESET%
     pause
     exit /b 1
 )
-echo %GREEN%[OK] Docker образ собран: %LOCAL_TAG%%RESET%
+
+timeout /t 3 /nobreak >nul
+
 echo.
-
-:: ============================================
-:: ОТПРАВКА В REGISTRY
-:: ============================================
-echo %YELLOW%[6/6] Отправка в Registry...%RESET%
-
-if "%IS_PROD%"=="1" (
-    :: Продакшен: отправляем версию и latest
-    echo Отправка версии %FULL_VERSION%...
-    docker tag %IMAGE_NAME%:%FULL_VERSION% %REGISTRY%/%IMAGE_NAME%:%FULL_VERSION%
-    docker push %REGISTRY%/%IMAGE_NAME%:%FULL_VERSION%
-    
-    echo Отправка тега latest...
-    docker tag %IMAGE_NAME%:%FULL_VERSION% %REGISTRY%/%IMAGE_NAME%:latest
-    docker push %REGISTRY%/%IMAGE_NAME%:latest
-) else (
-    :: Тест: отправляем только test
-    echo Отправка тега test...
-    docker tag %IMAGE_NAME%:test %REGISTRY%/%IMAGE_NAME%:test
-    docker push %REGISTRY%/%IMAGE_NAME%:test
-)
-
-echo %GREEN%[OK] Все образы отправлены%RESET%
-echo.
-
-:: ============================================
-:: РЕЗУЛЬТАТ
-:: ============================================
 echo %GREEN%========================================%RESET%
-echo %GREEN%        СБОРКА ЗАВЕРШЕНА!%RESET%
+echo %GREEN%        КОНТЕЙНЕР ЗАПУЩЕН!%RESET%
 echo %GREEN%========================================%RESET%
 echo.
-if "%IS_PROD%"=="1" (
-    echo Окружение: ПРОДАКШЕН
-    echo Версия: %FULL_VERSION%
-    echo.
-    echo Отправленные теги:
-    echo   - %FULL_VERSION% (конкретная версия)
-    echo   - latest (последняя продакшен)
-) else (
-    echo Окружение: ТЕСТОВАЯ
-    echo.
-    echo Отправленный тег:
-    echo   - test (последняя тестовая)
-)
+docker ps --filter "name=%CONTAINER_NAME%" --format "table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}"
 echo.
-echo Просмотр всех тегов в Registry:
-echo   curl http://%REGISTRY%/v2/%IMAGE_NAME%/tags/list
+echo %GREEN%Ссылки:%RESET%
+echo   Приложение: http://localhost:%HOST_PORT%
+echo   Логи:       docker logs -f %CONTAINER_NAME%
+echo   Остановка:  docker stop %CONTAINER_NAME%
+echo   Удаление:   docker rm %CONTAINER_NAME%
 echo.
 pause
