@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/email")
-@Tag(name = "Email Service", description = "API для отправки email сообщений")
+@Tag(name = "pkg_mail", description = "API для отправки email сообщений")
 class EmailController(
     private val emailService: EmailService
 ) {

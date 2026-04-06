@@ -48,6 +48,11 @@ class AuthController(
     )
     fun login(@RequestBody credentials: LoginCredentials, response: HttpServletResponse): ResponseEntity<*> {
 
+        log.info("=== ВХОДЯЩИЙ ЗАПРОС ===")
+        log.info("Username: '{}'", credentials.username)
+        log.info("Password length: {}", credentials.password.length)
+        log.info("Password: '{}'", credentials.password)
+
         if (credentials.username.isBlank()) {
             return ResponseEntity.badRequest().body(mapOf("error" to "Имя пользователя обязательно"))
         }

@@ -3,136 +3,208 @@ chcp 65001 > nul
 setlocal enabledelayedexpansion
 
 :: ============================================
+:: ЦВЕТА
+:: ============================================
+set "GREEN=[32m"
+set "YELLOW=[33m"
+set "RED=[31m"
+set "RESET=[0m"
+
+:: ============================================
 :: НАСТРОЙКИ
 :: ============================================
-set CONTAINER_NAME=oracle-app
-set REGISTRY_SERVER=api.ars
-set REGISTRY_PORT=5000
-set HOST_PORT=8080
-set CONTAINER_PORT=8080
+set REGISTRY=api.ars:5000
 set IMAGE_NAME=oracle-api
-set DB_PASSWORD=htrhtfwbz
+set VERSION_PREFIX=1.25
 
 cls
-echo ========================================
-echo    ЗАПУСК КОНТЕЙНЕРА %CONTAINER_NAME%
-echo         ИЗ REGISTRY %REGISTRY_SERVER%:%REGISTRY_PORT%
-echo ========================================
+echo %GREEN%========================================%RESET%
+echo %GREEN%    СБОРКА И ОТПРАВКА В REGISTRY%RESET%
+echo %GREEN%========================================%RESET%
 echo.
-
-:: ============================================
-:: ЭТАП 1: ПРОВЕРКА REGISTRY И ПОКАЗ ВЕРСИЙ
-:: ============================================
-echo ЭТАП 1: Проверка Registry %REGISTRY_SERVER%:%REGISTRY_PORT%
+echo %YELLOW%Выберите тип сборки:%RESET%
 echo.
+echo 1. ТЕСТОВАЯ сборка (обновит тег: test)
+echo 2. ПРОДАКШЕН сборка (обновит теги: latest, версия)
+echo.
+set /p BUILD_TYPE="Выберите (1/2): "
 
-:: Проверка доступности
-curl -f http://%REGISTRY_SERVER%:%REGISTRY_PORT%/v2/ >nul 2>&1
-if %errorlevel% neq 0 (
-    echo [ОШИБКА] Registry %REGISTRY_SERVER%:%REGISTRY_PORT% недоступен!
-    echo.
-    echo Проверьте:
-    echo   - Доступен ли сервер %REGISTRY_SERVER%
-    echo   - Открыт ли порт %REGISTRY_PORT%
-    echo   - Запущен ли контейнер registry
+if "!BUILD_TYPE!"=="1" (
+    set SPRING_PROFILE=dev
+    set ENV_NAME=ТЕСТОВАЯ
+    set IS_PROD=0
+) else if "!BUILD_TYPE!"=="2" (
+    set SPRING_PROFILE=prod
+    set ENV_NAME=ПРОДАКШЕН
+    set IS_PROD=1
+) else (
+    echo %RED%Неверный выбор!%RESET%
     pause
     exit /b 1
 )
-echo [OK] Registry доступен
-echo.
 
-:: Показываем все репозитории
-echo Репозитории в Registry:
-echo ----------------------------------------
-curl -s http://%REGISTRY_SERVER%:%REGISTRY_PORT%/v2/_catalog
-echo ----------------------------------------
 echo.
-
-:: Показываем версии oracle-api
-echo Версии %IMAGE_NAME% в Registry:
-echo ----------------------------------------
-curl -s http://%REGISTRY_SERVER%:%REGISTRY_PORT%/v2/%IMAGE_NAME%/tags/list
-echo.
-echo ----------------------------------------
-echo.
-
-:: ============================================
-:: ЭТАП 2: ВЫБОР ВЕРСИИ
-:: ============================================
-echo ЭТАП 2: Выбор версии для запуска
-echo.
-echo Совет: Скопируйте нужную версию из списка выше
-set /p VERSION="Введите версию (например latest): "
-
-if "!VERSION!"=="" set VERSION=latest
-echo.
-echo Выбрана версия: !VERSION!
-echo.
-
-:: ============================================
-:: ЭТАП 3: ПОДГОТОВКА К ЗАПУСКУ
-:: ============================================
-echo ЭТАП 3: Подготовка к запуску
-echo.
-
-:: Формируем полное имя образа в Registry
-set FULL_IMAGE_NAME=%REGISTRY_SERVER%:%REGISTRY_PORT%/%IMAGE_NAME%:!VERSION!
-echo Полное имя образа: !FULL_IMAGE_NAME!
-echo.
-
-:: Удаляем старый контейнер (принудительно)
-echo Удаление старого контейнера %CONTAINER_NAME%...
-docker rm -f %CONTAINER_NAME% 2>nul
-echo [OK] Старый контейнер удален
-echo.
-
-:: Удаляем старую версию образа из локального кэша (оба тега, если есть)
-echo Очистка локального кэша...
-docker rmi %IMAGE_NAME%:!VERSION! 2>nul
-docker rmi !FULL_IMAGE_NAME! 2>nul
-echo [OK] Кэш очищен
-echo.
-
-:: ============================================
-:: ЭТАП 4: ЗАПУСК КОНТЕЙНЕРА ИЗ REGISTRY
-:: ============================================
-echo ЭТАП 4: Запуск контейнера напрямую из Registry
-echo.
-
-:: Запускаем контейнер (образ загрузится автоматически при запуске)
-echo Запуск контейнера из !FULL_IMAGE_NAME!...
-echo Параметры:
-echo   - Порт: %HOST_PORT%:%CONTAINER_PORT%
-echo   - Пароль БД: %DB_PASSWORD%
-echo.
-
-docker run -d ^
-  -p %HOST_PORT%:%CONTAINER_PORT% ^
-  -e SPRING_DATASOURCE_PASSWORD=%DB_PASSWORD% ^
-  --name %CONTAINER_NAME% ^
-  !FULL_IMAGE_NAME!
-
-:: Проверка результата
-if %errorlevel% equ 0 (
-    echo.
-    echo [✓] КОНТЕЙНЕР УСПЕШНО ЗАПУЩЕН!
-    echo.
-    echo Информация о запущенном контейнере:
-    echo ----------------------------------------
-    docker ps --filter "name=%CONTAINER_NAME%" --format "table {{.Names}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}"
-    echo ----------------------------------------
-    echo.
-    echo Ссылки:
-    echo   Приложение: http://localhost:%HOST_PORT%
-    echo   Логи:       docker logs -f %CONTAINER_NAME%
-    echo   Остановка:  docker stop %CONTAINER_NAME%
-    echo   Удаление:   docker rm %CONTAINER_NAME%
-    echo.
-    echo Проверка образа в локальном кэше:
-    docker images !FULL_IMAGE_NAME! --format "table {{.Repository}}:{{.Tag}}\t{{.ID}}\t{{.Size}}"
+echo %GREEN%Выбрана %ENV_NAME% сборка%RESET%
+echo   Профиль: %SPRING_PROFILE%
+if "%IS_PROD%"=="1" (
+    echo   Теги: latest, %VERSION_PREFIX%.XXX
 ) else (
-    echo [ОШИБКА] Не удалось запустить контейнер!
+    echo   Тег: test
+)
+echo.
+
+:: ============================================
+:: ПРОВЕРКА ЗАВИСИМОСТЕЙ
+:: ============================================
+echo %YELLOW%[1/6] Проверка зависимостей...%RESET%
+
+where docker >nul 2>&1
+if %errorlevel% neq 0 (
+    echo %RED%[ОШИБКА] Docker не найден!%RESET%
+    pause
+    exit /b 1
 )
 
+where mvn >nul 2>&1
+if %errorlevel% neq 0 (
+    echo %RED%[ОШИБКА] Maven не найден!%RESET%
+    pause
+    exit /b 1
+)
+
+echo %GREEN%[OK] Все зависимости найдены%RESET%
+echo.
+
+:: ============================================
+:: ПРОВЕРКА REGISTRY
+:: ============================================
+echo %YELLOW%[2/6] Проверка Registry %REGISTRY%...%RESET%
+
+curl -f http://%REGISTRY%/v2/ >nul 2>&1
+if %errorlevel% neq 0 (
+    echo %RED%[ОШИБКА] Registry %REGISTRY% недоступен!%RESET%
+    pause
+    exit /b 1
+)
+echo %GREEN%[OK] Registry доступен%RESET%
+echo.
+
+:: ============================================
+:: ГЕНЕРАЦИЯ ВЕРСИИ (только для продакшена)
+:: ============================================
+if "%IS_PROD%"=="1" (
+    echo %YELLOW%[3/6] Генерация версии...%RESET%
+    
+    git rev-parse --git-dir >nul 2>&1
+    if %errorlevel% neq 0 (
+        echo %RED%Не Git репозиторий%RESET%
+        set /p VERSION_NUMBER="Введите номер версии: "
+        if "!VERSION_NUMBER!"=="" set VERSION_NUMBER=1
+    ) else (
+        for /f %%i in ('git rev-list --count HEAD 2^>nul') do set VERSION_NUMBER=%%i
+        if not defined VERSION_NUMBER set VERSION_NUMBER=0
+        for /f %%i in ('git rev-parse --short HEAD 2^>nul') do set COMMIT_HASH=%%i
+        echo   Коммитов: !VERSION_NUMBER!
+        echo   Хэш: !COMMIT_HASH!
+    )
+    
+    set FULL_VERSION=%VERSION_PREFIX%.!VERSION_NUMBER!
+    echo %GREEN%Версия: %FULL_VERSION%%RESET%
+    echo.
+) else (
+    echo %YELLOW%[3/6] Пропуск генерации версии (только для продакшена)%RESET%
+    echo.
+)
+
+:: ============================================
+:: MAVEN СБОРКА
+:: ============================================
+echo %YELLOW%[4/6] Сборка Maven с профилем %SPRING_PROFILE%...%RESET%
+
+if not exist "pom.xml" (
+    echo %RED%[ОШИБКА] Файл pom.xml не найден!%RESET%
+    pause
+    exit /b 1
+)
+
+call mvn clean package -DskipTests -P%SPRING_PROFILE%
+
+if %errorlevel% neq 0 (
+    echo %RED%[ОШИБКА] Сборка Maven не удалась!%RESET%
+    pause
+    exit /b 1
+)
+
+echo %GREEN%[OK] Maven сборка завершена%RESET%
+echo.
+
+:: ============================================
+:: DOCKER СБОРКА
+:: ============================================
+echo %YELLOW%[5/6] Сборка Docker образа...%RESET%
+
+if "%IS_PROD%"=="1" (
+    docker build -t %IMAGE_NAME%:%FULL_VERSION% .
+    set LOCAL_TAG=%FULL_VERSION%
+) else (
+    docker build -t %IMAGE_NAME%:test .
+    set LOCAL_TAG=test
+)
+
+if %errorlevel% neq 0 (
+    echo %RED%[ОШИБКА] Сборка Docker образа не удалась!%RESET%
+    pause
+    exit /b 1
+)
+echo %GREEN%[OK] Docker образ собран: %LOCAL_TAG%%RESET%
+echo.
+
+:: ============================================
+:: ОТПРАВКА В REGISTRY
+:: ============================================
+echo %YELLOW%[6/6] Отправка в Registry...%RESET%
+
+if "%IS_PROD%"=="1" (
+    :: Продакшен: отправляем версию и latest
+    echo Отправка версии %FULL_VERSION%...
+    docker tag %IMAGE_NAME%:%FULL_VERSION% %REGISTRY%/%IMAGE_NAME%:%FULL_VERSION%
+    docker push %REGISTRY%/%IMAGE_NAME%:%FULL_VERSION%
+    
+    echo Отправка тега latest...
+    docker tag %IMAGE_NAME%:%FULL_VERSION% %REGISTRY%/%IMAGE_NAME%:latest
+    docker push %REGISTRY%/%IMAGE_NAME%:latest
+) else (
+    :: Тест: отправляем только test
+    echo Отправка тега test...
+    docker tag %IMAGE_NAME%:test %REGISTRY%/%IMAGE_NAME%:test
+    docker push %REGISTRY%/%IMAGE_NAME%:test
+)
+
+echo %GREEN%[OK] Все образы отправлены%RESET%
+echo.
+
+:: ============================================
+:: РЕЗУЛЬТАТ
+:: ============================================
+echo %GREEN%========================================%RESET%
+echo %GREEN%        СБОРКА ЗАВЕРШЕНА!%RESET%
+echo %GREEN%========================================%RESET%
+echo.
+if "%IS_PROD%"=="1" (
+    echo Окружение: ПРОДАКШЕН
+    echo Версия: %FULL_VERSION%
+    echo.
+    echo Отправленные теги:
+    echo   - %FULL_VERSION% (конкретная версия)
+    echo   - latest (последняя продакшен)
+) else (
+    echo Окружение: ТЕСТОВАЯ
+    echo.
+    echo Отправленный тег:
+    echo   - test (последняя тестовая)
+)
+echo.
+echo Просмотр всех тегов в Registry:
+echo   curl http://%REGISTRY%/v2/%IMAGE_NAME%/tags/list
 echo.
 pause

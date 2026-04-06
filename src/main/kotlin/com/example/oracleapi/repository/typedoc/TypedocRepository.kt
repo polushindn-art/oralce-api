@@ -1,0 +1,29 @@
+package com.example.oracleapi.repository.typedoc
+
+import com.example.oracleapi.entity.typedoc.Typedoc
+import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
+import org.springframework.stereotype.Repository
+
+@Repository
+interface TypedocRepository : JpaRepository<Typedoc, Long> {
+
+    // Поиск по мнемокоду документа
+    fun findByDoccode(doccode: String): Typedoc?
+
+    // Проверка существования по мнемокоду
+    fun existsByDoccode(doccode: String): Boolean
+
+    // Поиск по мнемокоду и разделу
+    @Query("SELECT t FROM Typedoc t WHERE t.doccode = :doccode AND t.division = :division")
+    fun findByDoccodeAndDivision(@Param("doccode") doccode: String, @Param("division") division: Long): Typedoc?
+
+    // Поиск по названию документа (частичное совпадение)
+    @Query("SELECT t FROM Typedoc t WHERE t.docname LIKE %:name%")
+    fun findByDocnameContaining(@Param("name") name: String): List<Typedoc>
+
+    // Поиск активных типов документов (учет ведется)
+    @Query("SELECT t FROM Typedoc t WHERE t.accounting = 1")
+    fun findAllActive(): List<Typedoc>
+}

@@ -19,10 +19,29 @@
     <properties>
         <java.version>21</java.version>
         <kotlin.version>1.9.24</kotlin.version>
-        <springdoc.version>2.1.0</springdoc.version>
+        <springdoc.version>2.3.0</springdoc.version>
         <jjwt.version>0.11.5</jjwt.version>
         <oracle.version>23.2.0.0</oracle.version>
     </properties>
+
+    <!-- ПРОФИЛИ -->
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <spring.profiles.active>dev</spring.profiles.active>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <spring.profiles.active>prod</spring.profiles.active>
+            </properties>
+        </profile>
+    </profiles>
 
     <dependencies>
 

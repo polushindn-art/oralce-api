@@ -2,6 +2,8 @@ knife4j:
   enable: true
   setting:
     language: en
+    enable-group: true
+    enable-swagger-models: false
   documents:
     - group: main-api
       name: Документация
@@ -12,7 +14,27 @@ knife4j:
     - group: main-api
       name: GitLab
       locations: classpath:markdown/gitlab/*
-logging:
-  charset:
-    console: UTF-8
-    file: UTF-8
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    groups-order: asc
+    try-it-out-enabled: true
+  show-actuator: false
+  group-configs:
+    - group: oracle-packages
+      display-name: Пакеты PKG_Oracle
+      paths-to-match:
+        - /mark/**
+        - /tsdlist/**
+        - /mail/**
+        - /pictures/**
+        - /public/**
+        - /email/**
+    - group: 1c-packages
+      display-name: API 1C
+      paths-to-match:
+        - /api/1c/**
