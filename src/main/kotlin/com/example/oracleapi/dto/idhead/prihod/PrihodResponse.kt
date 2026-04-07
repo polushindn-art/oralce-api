@@ -1,4 +1,4 @@
-package com.example.oracleapi.dto.prihod
+package com.example.oracleapi.dto.idhead.prihod
 
 import io.swagger.v3.oas.annotations.media.Schema
 

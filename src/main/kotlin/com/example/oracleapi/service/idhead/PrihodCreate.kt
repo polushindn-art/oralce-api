@@ -1,6 +1,6 @@
-package com.example.oracleapi.service.prihord
+package com.example.oracleapi.service.idhead
 
-import com.example.oracleapi.dto.prihod.PrihodRequest
+import com.example.oracleapi.dto.idhead.prihod.PrihodRequest
 import com.example.oracleapi.repository.agnlist.AgnlistRepository
 import com.example.oracleapi.repository.store.StoreRepository
 import com.example.oracleapi.repository.typedoc.TypedocRepository
@@ -8,11 +8,11 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.persistence.EntityManager
 import jakarta.persistence.ParameterMode
 import org.slf4j.LoggerFactory
-import org.springframework.stereotype.Service
+import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
-@Service
-class PrihodService(
+@Component
+class PrihodCreate(
     private val entityManager: EntityManager,
     private val objectMapper: ObjectMapper,
     private val storeRepository: StoreRepository,
