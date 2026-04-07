@@ -8,9 +8,6 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import com.fasterxml.jackson.module.kotlin.readValue
 
-/**
- * Базовый класс для всех процедур Oracle
- */
 abstract class BasePkgFunc(
     protected val entityManager: EntityManager,
     protected val objectMapper: ObjectMapper
@@ -114,7 +111,8 @@ abstract class BasePkgFunc(
         functionName: String,
         vararg params: Any?
     ): List<T> {
-        return callFunction<List<T>>(functionName, *params)
+        val result = callFunction<List<T>?>(functionName, *params)
+        return result ?: emptyList()
     }
 
     /**

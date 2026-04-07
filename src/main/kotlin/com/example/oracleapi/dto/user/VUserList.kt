@@ -7,7 +7,7 @@ import jakarta.persistence.Table
 
 @Entity
 @Table(name = "V_USER")
-data class UserList(
+data class VUserList(
     @Id
     @Column(name = "RN")
     val rn: Long,

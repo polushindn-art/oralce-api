@@ -13,4 +13,6 @@ class JsonResponseView<T>(
 
     @get:Schema(description = "Данные ответа")
     val row: List<T>,
+
+    val message: String? = null  // добавляем опциональное сообщение
 )

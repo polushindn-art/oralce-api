@@ -1,5 +1,6 @@
 package com.example.oracleapi.controller
 
+import com.example.oracleapi.Helper
 import com.example.oracleapi.dto.common.ApiResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -12,6 +13,9 @@ import javax.sql.DataSource
 // DTO для ответа
 data class DbInfoResponse(
     val url: String,
+    val host: String,
+    val port: String,
+    val databaseName: String,
     val user: String,
     val databaseProductName: String,
     val databaseProductVersion: String,
@@ -53,8 +57,13 @@ class InfoController(
     fun getDbInfo(): ApiResponse<DbInfoResponse> {
         return try {
             val connection = dataSource.connection
+            val jdbcUrl = connection.metaData.url ?: "unknown"
+            val (host, port, dbName) = Helper.parseOracleJdbcUrl(jdbcUrl)
             val dbInfo = DbInfoResponse(
                 url = connection.metaData.url ?: "unknown",
+                host = host,
+                port = port,
+                databaseName = dbName,
                 user = connection.metaData.userName ?: "unknown",
                 databaseProductName = connection.metaData.databaseProductName ?: "unknown",
                 databaseProductVersion = connection.metaData.databaseProductVersion ?: "unknown",
@@ -73,4 +82,5 @@ class InfoController(
             )
         }
     }
+
 }

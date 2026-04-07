@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.env.Environment
+import org.springframework.core.env.getProperty
 import java.awt.EventQueue
 import java.awt.GraphicsEnvironment
 import java.io.File
@@ -38,11 +39,11 @@ class OracleConfig(private val env: Environment) {
             this.password = password
             this.driverClassName = env.getProperty("spring.datasource.driver-class-name", "oracle.jdbc.OracleDriver")
 
-            this.maximumPoolSize = env.getProperty("spring.datasource.hikari.maximum-pool-size", Int::class.java) ?: 20
-            this.minimumIdle = env.getProperty("spring.datasource.hikari.minimum-idle", Int::class.java) ?: 10
-            this.connectionTimeout = env.getProperty("spring.datasource.hikari.connection-timeout", Long::class.java) ?: 30000
-            this.idleTimeout = env.getProperty("spring.datasource.hikari.idle-timeout", Long::class.java) ?: 600000
-            this.maxLifetime = env.getProperty("spring.datasource.hikari.max-lifetime", Long::class.java) ?: 1800000
+            this.maximumPoolSize = env.getProperty<Int>("spring.datasource.hikari.maximum-pool-size") ?: 20
+            this.minimumIdle = env.getProperty<Int>("spring.datasource.hikari.minimum-idle") ?: 10
+            this.connectionTimeout = env.getProperty<Long>("spring.datasource.hikari.connection-timeout") ?: 30000
+            this.idleTimeout = env.getProperty<Long>("spring.datasource.hikari.idle-timeout") ?: 600000
+            this.maxLifetime = env.getProperty<Long>("spring.datasource.hikari.max-lifetime") ?: 1800000
 
             this.connectionTestQuery = "SELECT 1 FROM DUAL"
             this.poolName = "OracleArsPool"

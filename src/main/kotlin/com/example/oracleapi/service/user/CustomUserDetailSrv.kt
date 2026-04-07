@@ -1,6 +1,6 @@
 package com.example.oracleapi.service.user
 
-import com.example.oracleapi.dto.user.UserList
+import com.example.oracleapi.dto.user.VUserList
 import com.example.oracleapi.repository.user.UserRepository
 import org.slf4j.LoggerFactory
 import org.springframework.security.authentication.AuthenticationServiceException
@@ -11,19 +11,18 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Service
 import java.sql.SQLException
 import java.util.*
-import javax.sql.DataSource
 
 private val log = LoggerFactory.getLogger(CustomUserDetailSrv::class.java)
 
 @Service
 class CustomUserDetailSrv(private val employeeRepository: UserRepository): UserDetailsService {
 
-    fun getAllUser(): List<UserList> {
+    fun getAllUser(): List<VUserList> {
         val res = employeeRepository.findAll()
         return res
     }
 
-    fun getOneUserByUserCode(usercode: String): Optional<UserList> {
+    fun getOneUserByUserCode(usercode: String): Optional<VUserList> {
         return employeeRepository.findByusercode(usercode)
     }
 
