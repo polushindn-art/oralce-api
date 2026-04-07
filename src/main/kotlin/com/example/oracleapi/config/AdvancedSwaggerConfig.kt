@@ -23,7 +23,7 @@ class AdvancedSwaggerConfig {
         return OpenAPI()
             .info(
                 Info()
-                    .title("\uD83D\uDE80 API АРСЕНАЛ $host")
+                    .title("🚀 API АРСЕНАЛ - $host")
                     .description("Выполните /auth/token для выполения запросов api")
                     .version("1.0.0")
             )
