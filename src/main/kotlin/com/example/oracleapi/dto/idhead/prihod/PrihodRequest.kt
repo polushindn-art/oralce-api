@@ -1,9 +1,9 @@
-package com.example.oracleapi.dto.prihod
+package com.example.oracleapi.dto.idhead.prihod
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.v3.oas.annotations.media.Schema
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 @Schema(description = "Запрос на создание приходного ордера")
 data class PrihodRequest(
@@ -43,7 +43,7 @@ data class PrihodRequest(
 
         @Schema(description = "Дата документа основания", example = "10.10.2026")
         @JsonFormat(pattern = "dd.MM.yyyy")
-        val basisdocdate: LocalDateTime? = null,
+        val basisdocdate: LocalDate? = null,
 
         @Schema(description = "Номер ТТН", example = "СФ00-000046")
         val numbttn: String?

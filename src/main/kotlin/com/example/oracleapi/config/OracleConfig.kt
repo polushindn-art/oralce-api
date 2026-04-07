@@ -143,39 +143,21 @@ class OracleConfig(private val env: Environment) {
     }
 
     private fun getPassword(): String {
-        // 1. ПРОВЕРЯЕМ ПЕРЕМЕННЫЕ ОКРУЖЕНИЯ (для Docker)
-        env.getProperty("spring.datasource.password")?.let {
-            if (it.isNotBlank()) {
-                logger.info("✅ Using password from environment variable")
-                return it
-            }
-        }
+        // Просто берем пароль из конфигурации
+        val password = env.getProperty("spring.datasource.password")
 
-        // 2. Проверяем, не в Docker ли мы (чтобы дать понятную ошибку)
-        if (isRunningInDocker()) {
+        if (password.isNullOrBlank()) {
             val errorMsg = """
-            ❌ DATABASE PASSWORD NOT FOUND IN DOCKER ENVIRONMENT
-            
-            Please set the password using:
-            -e SPRING_DATASOURCE_PASSWORD=your_password
-            
-            Example:
-            docker run -e SPRING_DATASOURCE_PASSWORD=htrhtfwbz -p 8080:8080 oracle-api
+        ❌ DATABASE PASSWORD NOT FOUND!
+        
+        Please set spring.datasource.password in your application-{profile}.properties
         """.trimIndent()
-
             logger.error(errorMsg)
-            throw IllegalStateException("SPRING_DATASOURCE_PASSWORD environment variable is required in Docker")
+            throw IllegalStateException("spring.datasource.password is required")
         }
 
-        // 3. Для тестового окружения
-        if (isTestEnvironment()) {
-            logger.warn("TEST ENVIRONMENT: Using test password")
-            return "test_password"
-        }
-
-        // 4. Вне Docker - запрашиваем пароль интерактивно
-        passwordHolder.get()?.let { return it }
-        return requestPassword()
+        logger.info("✅ Using password from configuration")
+        return password
     }
 
     private fun requestPassword(): String {

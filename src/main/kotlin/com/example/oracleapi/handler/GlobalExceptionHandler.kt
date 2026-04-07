@@ -1,6 +1,7 @@
 package com.example.oracleapi.handler
 
 import com.example.oracleapi.dto.common.ApiResponse
+import com.example.oracleapi.exception.DocumentNotFoundException
 import jakarta.persistence.EntityNotFoundException
 import jakarta.servlet.http.HttpServletRequest
 import org.slf4j.LoggerFactory
@@ -278,6 +279,22 @@ class GlobalExceptionHandler {
             .body(
                 ApiResponse.error(
                     message = message,
+                    path = request.requestURI
+                )
+            )
+    }
+
+    @ExceptionHandler(DocumentNotFoundException::class)
+    fun handleDocumentNotFound(
+        e: DocumentNotFoundException,
+        request: HttpServletRequest
+    ): ResponseEntity<ApiResponse<Nothing>> {
+        logger.info("Документ не найден: ${e.message}")
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(
+                ApiResponse.error(
+                    message = e.message ?: "Документ не найден",
                     path = request.requestURI
                 )
             )
