@@ -12,11 +12,14 @@ import org.springframework.util.AntPathMatcher
 import org.springframework.web.filter.OncePerRequestFilter
 import java.time.Instant
 
-class JwtAuthenticationFilter( private val jwtHelper: JwtHelper,
-                               private val objectMapper: ObjectMapper) : OncePerRequestFilter() {
+class JwtAuthenticationFilter(
+    private val jwtHelper: JwtHelper,
+    private val objectMapper: ObjectMapper
+) : OncePerRequestFilter() {
 
     private val log = LoggerFactory.getLogger(JwtAuthenticationFilter::class.java)
     private val pathMatcher = AntPathMatcher()
+
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
@@ -46,18 +49,37 @@ class JwtAuthenticationFilter( private val jwtHelper: JwtHelper,
             return
         }
 
-        // Извлекаем username из токена (заодно проверяем валидность)
-        val username = jwtHelper.extractUsername(token)
-        if (username == null) {
+        // Проверяем валидность токена
+        if (!jwtHelper.validateToken(token)) {
             log.debug("Invalid token for path: $path")
             sendErrorResponse(response, HttpStatus.UNAUTHORIZED.value(), "Неверный или просроченный токен")
             return
         }
 
-        // Устанавливаем аутентификацию в контекст Spring Security
-        val authentication = UsernamePasswordAuthenticationToken(username, null, emptyList())
+        // Извлекаем данные из токена
+        val username = jwtHelper.extractUsername(token)
+        val userRn = jwtHelper.extractUserRn(token)
+        val userAgn = jwtHelper.extractUserAgn(token)
+
+        if (username == null) {
+            log.debug("No username in token for path: $path")
+            sendErrorResponse(response, HttpStatus.UNAUTHORIZED.value(), "Неверный токен")
+            return
+        }
+
+        // Создаем объект с данными пользователя
+        val userDetails = UserDetailsFromToken(
+            username = username,
+            userRn = userRn,
+            userAgn = userAgn
+        )
+
+        // Устанавливаем аутентификацию в контекст Spring Security с дополнительными данными
+        val authentication = UsernamePasswordAuthenticationToken(userDetails, null, emptyList())
         SecurityContextHolder.getContext().authentication = authentication
-        log.info("User '{}' successfully authenticated for path: {}", username, path)
+
+        log.info("User '{}' successfully authenticated for path: {} (userRn={}, userAgn={})",
+            username, path, userRn, userAgn)
 
         // Продолжаем цепочку фильтров
         filterChain.doFilter(request, response)
@@ -125,5 +147,13 @@ class JwtAuthenticationFilter( private val jwtHelper: JwtHelper,
             log.error("Failed to send error response", e)
         }
     }
-
 }
+
+/**
+ * Класс с данными пользователя из токена
+ */
+data class UserDetailsFromToken(
+    val username: String,
+    val userRn: Long?,
+    val userAgn: Long?
+)

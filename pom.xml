@@ -45,6 +45,29 @@
 
     <dependencies>
 
+        <!-- Дополнительные зависимости для работы с изображениями -->
+        <dependency>
+            <groupId>com.twelvemonkeys.imageio</groupId>
+            <artifactId>imageio-jpeg</artifactId>
+            <version>3.10.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.twelvemonkeys.imageio</groupId>
+            <artifactId>imageio-core</artifactId>
+            <version>3.10.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.twelvemonkeys.common</groupId>
+            <artifactId>common-lang</artifactId>
+            <version>3.10.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.oracle.database.nls</groupId>
+            <artifactId>orai18n</artifactId>
+            <version>23.2.0.0</version>
+        </dependency>
+
         <!-- Spring Cache -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

@@ -93,7 +93,9 @@ class SecurityConfig(
             "http://127.0.0.1:8080",
             "https://localhost:8080",
             "https://127.0.0.1:8080",
-            "https://sdl-arsenal.ru"
+            "https://sdl-arsenal.ru",
+            "https://ya.ars",
+            "https://ya.ars:443"
         )
 
         // Разрешаем все необходимые методы
