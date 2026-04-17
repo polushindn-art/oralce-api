@@ -9,8 +9,8 @@ import org.springframework.stereotype.Repository
 @Repository
 interface TypedocRepository : JpaRepository<Typedoc, Long> {
 
-    // Поиск по мнемокоду документа
-    fun findByDoccode(doccode: String): Typedoc?
+    // Поиск ВСЕХ записей с таким doccode (а не одной)
+    fun findByDoccode(doccode: String): List<Typedoc>?  // Изменено с Typedoc? на List<Typedoc>?
 
     // Проверка существования по мнемокоду
     fun existsByDoccode(doccode: String): Boolean

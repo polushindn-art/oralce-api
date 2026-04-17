@@ -80,7 +80,7 @@ class GlobalExceptionHandler {
             .status(HttpStatus.BAD_REQUEST)
             .body(
                 ApiResponse.error(
-                    message = "Некорректный формат запроса. Проверьте тело запроса.",
+                    message = "Некорректный формат запроса. Проверьте тело запроса. \n$e",
                     path = request.requestURI
                 )
             )
