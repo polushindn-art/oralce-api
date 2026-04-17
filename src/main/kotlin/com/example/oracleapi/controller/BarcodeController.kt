@@ -28,14 +28,16 @@ class BarcodeController(
         @Valid @RequestBody request: BarcodeGenerateRequest,
         response: HttpServletResponse
     ) {
-        log.info("Скачивание GS1 DataMatrix: data={}, size={}x{}",
-            request.data.take(50), request.width, request.height)
+        log.info(
+            "Скачивание GS1 DataMatrix: data={}, size={}x{}",
+            request.data.take(50), request.width, request.height
+        )
 
         try {
             val imageBytes = barcodeService.generateGs1DataMatrix(
-                formattedData = request.data,  // ← правильное имя параметра
-                width = request.width,
-                height = request.height
+                 request.data,  // ← правильное имя параметра
+                 request.width,
+                 request.height
             )
 
             val filename = "gs1_barcode_${System.currentTimeMillis()}.png"
@@ -63,14 +65,16 @@ class BarcodeController(
         @RequestParam(defaultValue = "300") height: Int,
         response: HttpServletResponse
     ) {
-        log.info("Скачивание GS1 DataMatrix (GET): data={}, size={}x{}",
-            data.take(50), width, height)
+        log.info(
+            "Скачивание GS1 DataMatrix (GET): data={}, size={}x{}",
+            data.take(50), width, height
+        )
 
         try {
             val imageBytes = barcodeService.generateGs1DataMatrix(
-                formattedData = data,  // ← правильное имя параметра
-                width = width,
-                height = height
+                data,  // ← правильное имя параметра
+                width,
+                height
             )
 
             val filename = "gs1_barcode_${System.currentTimeMillis()}.png"
@@ -96,14 +100,16 @@ class BarcodeController(
         @Valid @RequestBody request: BarcodeGenerateRequest,
         response: HttpServletResponse
     ) {
-        log.info("Просмотр GS1 DataMatrix: data={}, size={}x{}",
-            request.data.take(50), request.width, request.height)
+        log.info(
+            "Просмотр GS1 DataMatrix: data={}, size={}x{}",
+            request.data.take(50), request.width, request.height
+        )
 
         try {
             val imageBytes = barcodeService.generateGs1DataMatrix(
-                formattedData = request.data,  // ← правильное имя параметра
-                width = request.width,
-                height = request.height
+                request.data,  // ← правильное имя параметра
+                request.width,
+                request.height
             )
 
             response.contentType = "image/png"
@@ -129,14 +135,16 @@ class BarcodeController(
         @RequestParam(defaultValue = "300") height: Int,
         response: HttpServletResponse
     ) {
-        log.info("Просмотр GS1 DataMatrix (GET): data={}, size={}x{}",
-            data.take(50), width, height)
+        log.info(
+            "Просмотр GS1 DataMatrix (GET): data={}, size={}x{}",
+            data.take(50), width, height
+        )
 
         try {
             val imageBytes = barcodeService.generateGs1DataMatrix(
-                formattedData = data,  // ← правильное имя параметра
-                width = width,
-                height = height
+                data,  // ← правильное имя параметра
+                width,
+                height
             )
 
             response.contentType = "image/png"
@@ -163,9 +171,9 @@ class BarcodeController(
         log.info("Информация о GS1 DataMatrix: data={}", request.data.take(50))
 
         val imageBytes = barcodeService.generateGs1DataMatrix(
-            formattedData = request.data,  // ← правильное имя параметра
-            width = request.width,
-            height = request.height
+            request.data,  // ← правильное имя параметра
+            request.width,
+            request.height
         )
 
         val info = mapOf(
