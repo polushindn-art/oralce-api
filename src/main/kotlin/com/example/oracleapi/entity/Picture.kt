@@ -1,4 +1,4 @@
-package com.example.oracleapi.entity.picture
+package com.example.oracleapi.entity
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity

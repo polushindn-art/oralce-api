@@ -1,6 +1,6 @@
 package com.example.oracleapi.service.picture
 
-import com.example.oracleapi.entity.picture.Picture
+import com.example.oracleapi.entity.Picture
 import com.example.oracleapi.repository.picture.PictureRepository
 import org.springframework.stereotype.Service
 
@@ -10,5 +10,11 @@ class PictureService(
 ) {
     fun getPictureByRn(rn: Long): Picture? {
         return pictureRepository.findById(rn).orElse(null)
+    }
+
+    fun getRnListByTablernNotDeleted(tablern: Long): List<Long> {
+        return  pictureRepository.findRnByTablern(tablern)
+            .filter { it.deleted == null }
+            .map { it.rn }
     }
 }
