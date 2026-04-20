@@ -21,47 +21,61 @@ echo 9. Очистить старые образы
 echo.
 set /p ACTION="Выберите (1-9): "
 
-cd /d "%COMPOSE_DIR%"
+cd /d "%COMPOSE_DIR%" 2>nul
 
 if "%ACTION%"=="1" (
     echo Запуск ВСЕХ сервисов...
     docker compose up -d
     echo [OK] Запущено: registry (5000), dev (8081), prod (8080)
-) else if "%ACTION%"=="2" (
+)
+if "%ACTION%"=="2" (
     echo Запуск DEV...
     docker compose up -d app-dev
     echo [OK] DEV на http://localhost:8081
-) else if "%ACTION%"=="3" (
+)
+if "%ACTION%"=="3" (
     echo Запуск PROD...
     docker compose up -d app-prod
     echo [OK] PROD на http://localhost:8080
-) else if "%ACTION%"=="4" (
+)
+if "%ACTION%"=="4" (
     echo Запуск Registry...
     docker compose up -d registry
     echo [OK] Registry на http://localhost:5000
-) else if "%ACTION%"=="5" (
+)
+if "%ACTION%"=="5" (
     echo Остановка...
     docker compose down
     echo [OK] Остановлено
-) else if "%ACTION%"=="6" (
+)
+if "%ACTION%"=="6" (
     echo Обновление PROD...
     docker compose pull app-prod
     docker compose up -d app-prod
     echo [OK] PROD обновлён
-) else if "%ACTION%"=="7" (
+)
+if "%ACTION%"=="7" (
     echo Обновление DEV...
     docker compose pull app-dev
     docker compose up -d app-dev
     echo [OK] DEV обновлён
-) else if "%ACTION%"=="8" (
-    echo Логи...
+)
+if "%ACTION%"=="8" (
+    echo Логи (Ctrl+C для выхода)...
     docker compose logs -f
-) else if "%ACTION%"=="9" (
-    echo Очистка...
+)
+if "%ACTION%"=="9" (
+    echo Очистка старых образов...
     docker exec docker-registry bin/registry garbage-collect /etc/docker/registry/config.yml
     echo [OK] Очистка выполнена
-) else (
-    echo Неверный выбор!
 )
+if "%ACTION%" lss "1" goto :error
+if "%ACTION%" gtr "9" goto :error
+goto :end
 
+:error
+echo [ОШИБКА] Неверный выбор: %ACTION%
+
+:end
+echo.
 pause
