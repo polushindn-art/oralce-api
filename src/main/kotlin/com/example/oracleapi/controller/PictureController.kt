@@ -2,7 +2,7 @@ package com.example.oracleapi.controller
 
 import com.example.oracleapi.dto.common.ApiResponse
 import com.example.oracleapi.dto.picture.PictureMetadata
-import com.example.oracleapi.entity.picture.Picture
+import com.example.oracleapi.entity.Picture
 import com.example.oracleapi.service.picture.PictureService
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.swagger.v3.oas.annotations.Operation
@@ -128,6 +128,20 @@ class PictureController(
         response.setHeader("Content-Disposition", "attachment; filename=\"$filename\"")
         response.outputStream.write(picture.preview)
         response.outputStream.flush()
+    }
+
+    @GetMapping("/by-tablern/{tablern}")
+    @Operation(summary = "Получить список RN изображений по tablern")
+    fun getRnListByTablern(
+        @PathVariable tablern: Long,
+        request: HttpServletRequest
+    ): ApiResponse<List<Long>> {
+        val rnList = pictureService.getRnListByTablernNotDeleted(tablern)
+        return ApiResponse.success(
+            data = rnList,
+            message = "Найдено ${rnList.size} изображений",
+            path = request.requestURI
+        )
     }
 
     private fun sendErrorResponse(

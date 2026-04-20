@@ -1,5 +1,6 @@
 package com.example.oracleapi.config
 
+import com.example.oracleapi.repository.userlist.UserlistRepository
 import io.jsonwebtoken.*
 import io.jsonwebtoken.security.Keys
 import org.slf4j.LoggerFactory
@@ -9,7 +10,8 @@ import javax.crypto.SecretKey
 
 @Component
 class JwtHelper(
-    private val jwtConfig: JwtConfigProperties  // Внедряем конфиг вместо @Value
+    private val jwtConfig: JwtConfigProperties,  // Внедряем конфиг вместо @Value
+    private val userlistRepository: UserlistRepository
 ) {
 
     companion object {
@@ -43,19 +45,77 @@ class JwtHelper(
     }
 
     fun createToken(subject: String): String {
+
+        // Получаем данные пользователя из Userlist
+        val userRn = userlistRepository.findRnByUsercode(subject)
+        val userAgn = userlistRepository.findUserAgnByUsercode(subject)
+
         val now = Date()
         val expiry = Date(now.time + jwtConfig.expiration)  // Используем из конфига
 
         return Jwts.builder()
             .setSubject(subject)
+            .claim("userRn", userRn)
+            .claim("userAgn", userAgn)
             .setIssuedAt(now)
             .setExpiration(expiry)
             .signWith(key, SignatureAlgorithm.HS256)
             .compact()
     }
 
+    /**
+     * Извлечение userRn из токена
+     */
     fun extractUsername(token: String): String? {
         return parseClaims(token)?.subject
+    }
+
+    /**
+     * Извлечение userAgn из токена
+     */
+    fun extractUserAgn(token: String): Long? {
+        return try {
+            val claims = parseClaims(token) ?: return null
+            when (val value = claims["userAgn"]) {
+                is Number -> value.toLong()
+                is String -> value.toLongOrNull()
+                else -> null
+            }
+        } catch (e: Exception) {
+            log.debug("Failed to extract userAgn: ${e.message}")
+            null
+        }
+    }
+
+    /**
+     * Извлечение произвольного claim
+     */
+    fun extractClaim(token: String, claimName: String): Any? {
+        return parseClaims(token)?.get(claimName)
+    }
+
+    /**
+     * Извлечение userRn из токена
+     */
+    fun extractUserRn(token: String): Long? {
+        return try {
+            val claims = parseClaims(token) ?: return null
+            when (val value = claims["userRn"]) {
+                is Number -> value.toLong()
+                is String -> value.toLongOrNull()
+                else -> null
+            }
+        } catch (e: Exception) {
+            log.debug("Failed to extract userRn: ${e.message}")
+            null
+        }
+    }
+
+    /**
+     * Проверка валидности токена
+     */
+    fun validateToken(token: String): Boolean {
+        return parseClaims(token) != null
     }
 
     private fun parseClaims(token: String): Claims? {
