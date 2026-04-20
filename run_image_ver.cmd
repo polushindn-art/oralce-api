@@ -3,12 +3,24 @@ chcp 65001 > nul
 setlocal enabledelayedexpansion
 
 :: ============================================
-:: ЦВЕТА
+:: ЦВЕТА (работают в Windows 10/11)
 :: ============================================
-set "GREEN=[32m"
-set "YELLOW=[33m"
-set "RED=[31m"
-set "RESET=[0m"
+:: Включаем поддержку ANSI
+reg query HKCU\Console /v VirtualTerminalLevel >nul 2>&1
+if %errorlevel% neq 0 (
+    reg add HKCU\Console /v VirtualTerminalLevel /t REG_DWORD /d 1 /f >nul 2>&1
+)
+
+set "GREEN="
+set "YELLOW="
+set "RED="
+set "RESET="
+
+:: Простая цветная печать через powershell
+set "GREEN_C=92m"
+set "YELLOW_C=93m"
+set "RED_C=91m"
+set "RESET_C=0m"
 
 :: ============================================
 :: НАСТРОЙКИ
@@ -17,11 +29,11 @@ set COMPOSE_DIR=C:\OracleAPI\docker
 set COMPOSE_FILE=%COMPOSE_DIR%\docker-compose.yml
 
 cls
-echo %GREEN%========================================%RESET%
-echo %GREEN%    УПРАВЛЕНИЕ ЧЕРЕЗ DOCKER COMPOSE%RESET%
-echo %GREEN%========================================%RESET%
+echo ========================================
+echo     УПРАВЛЕНИЕ ЧЕРЕЗ DOCKER COMPOSE
+echo ========================================
 echo.
-echo %YELLOW%Выберите действие:%RESET%
+echo Выберите действие:
 echo.
 echo 1. Запустить ВСЁ (registry + dev + prod)
 echo 2. Запустить только DEV (тестовая, порт 8081)
@@ -33,12 +45,12 @@ echo 7. Перезапустить DEV (после обновления обра
 echo 8. Посмотреть логи (всех сервисов)
 echo 9. Очистить старые образы в registry (GC)
 echo.
-set /p ACTION="Выберите (1-9): "
+set /p "ACTION=Выберите (1-9): "
 
 :: Переходим в папку с docker-compose.yml
 cd /d "%COMPOSE_DIR%" 2>nul
 if %errorlevel% neq 0 (
-    echo %RED%[ОШИБКА] Папка %COMPOSE_DIR% не найдена!%RESET%
+    echo [ОШИБКА] Папка %COMPOSE_DIR% не найдена!
     pause
     exit /b 1
 )
@@ -47,101 +59,101 @@ if %errorlevel% neq 0 (
 :: ДЕЙСТВИЯ
 :: ============================================
 
-if "!ACTION!"=="1" (
+if "%ACTION%"=="1" (
     echo.
-    echo %YELLOW%Запуск ВСЕХ сервисов...%RESET%
+    echo Запуск ВСЕХ сервисов...
     docker compose up -d
     echo.
-    echo %GREEN%[OK] Запущено:%RESET%
+    echo [OK] Запущено:
     echo   - Registry:  http://localhost:5000
     echo   - DEV:       http://localhost:8081
     echo   - PROD:      http://localhost:8080
     goto :end
 )
 
-if "!ACTION!"=="2" (
+if "%ACTION%"=="2" (
     echo.
-    echo %YELLOW%Запуск DEV окружения (тестовая)...%RESET%
+    echo Запуск DEV окружения (тестовая)...
     docker compose up -d app-dev
     echo.
-    echo %GREEN%[OK] DEV приложение запущено на http://localhost:8081%RESET%
+    echo [OK] DEV приложение запущено на http://localhost:8081
     goto :end
 )
 
-if "!ACTION!"=="3" (
+if "%ACTION%"=="3" (
     echo.
-    echo %YELLOW%Запуск PROD окружения (рабочая)...%RESET%
+    echo Запуск PROD окружения (рабочая)...
     docker compose up -d app-prod
     echo.
-    echo %GREEN%[OK] PROD приложение запущено на http://localhost:8080%RESET%
+    echo [OK] PROD приложение запущено на http://localhost:8080
     goto :end
 )
 
-if "!ACTION!"=="4" (
+if "%ACTION%"=="4" (
     echo.
-    echo %YELLOW%Запуск Registry...%RESET%
+    echo Запуск Registry...
     docker compose up -d registry
     echo.
-    echo %GREEN%[OK] Registry запущен на http://localhost:5000%RESET%
+    echo [OK] Registry запущен на http://localhost:5000
     goto :end
 )
 
-if "!ACTION!"=="5" (
+if "%ACTION%"=="5" (
     echo.
-    echo %YELLOW%Остановка ВСЕХ сервисов...%RESET%
+    echo Остановка ВСЕХ сервисов...
     docker compose down
     echo.
-    echo %GREEN%[OK] Все сервисы остановлены%RESET%
+    echo [OK] Все сервисы остановлены
     goto :end
 )
 
-if "!ACTION!"=="6" (
+if "%ACTION%"=="6" (
     echo.
-    echo %YELLOW%Обновление PROD из registry...%RESET%
+    echo Обновление PROD из registry...
     echo.
-    echo %YELLOW%[1/2] Скачивание нового образа...%RESET%
+    echo [1/2] Скачивание нового образа...
     docker compose pull app-prod
     echo.
-    echo %YELLOW%[2/2] Перезапуск контейнера...%RESET%
+    echo [2/2] Перезапуск контейнера...
     docker compose up -d app-prod
     echo.
-    echo %GREEN%[OK] PROD обновлён и перезапущен%RESET%
+    echo [OK] PROD обновлён и перезапущен
     goto :end
 )
 
-if "!ACTION!"=="7" (
+if "%ACTION%"=="7" (
     echo.
-    echo %YELLOW%Обновление DEV из registry...%RESET%
+    echo Обновление DEV из registry...
     echo.
-    echo %YELLOW%[1/2] Скачивание нового образа...%RESET%
+    echo [1/2] Скачивание нового образа...
     docker compose pull app-dev
     echo.
-    echo %YELLOW%[2/2] Перезапуск контейнера...%RESET%
+    echo [2/2] Перезапуск контейнера...
     docker compose up -d app-dev
     echo.
-    echo %GREEN%[OK] DEV обновлён и перезапущен%RESET%
+    echo [OK] DEV обновлён и перезапущен
     goto :end
 )
 
-if "!ACTION!"=="8" (
+if "%ACTION%"=="8" (
     echo.
-    echo %YELLOW%Логи (Ctrl+C для выхода)...%RESET%
+    echo Логи (Ctrl+C для выхода)...
     echo.
     docker compose logs -f
     goto :end
 )
 
-if "!ACTION!"=="9" (
+if "%ACTION%"=="9" (
     echo.
-    echo %YELLOW%Очистка старых образов в registry...%RESET%
+    echo Очистка старых образов в registry...
     docker exec docker-registry bin/registry garbage-collect /etc/docker/registry/config.yml
     echo.
-    echo %GREEN%[OK] Очистка выполнена%RESET%
+    echo [OK] Очистка выполнена
     goto :end
 )
 
 echo.
-echo %RED%Неверный выбор!%RESET%
+echo [ОШИБКА] Неверный выбор!
 
 :end
 echo.
