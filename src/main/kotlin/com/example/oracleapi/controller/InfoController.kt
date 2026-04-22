@@ -1,7 +1,7 @@
 package com.example.oracleapi.controller
 
 import com.example.oracleapi.Helper
-import com.example.oracleapi.dto.common.ApiResponse
+import com.example.oracleapi.dto.common.MyApiResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.core.env.Environment
@@ -40,9 +40,9 @@ class InfoController(
 
     @GetMapping("/profile")
     @Operation(summary = "Текущий профиль", description = "Возвращает активный профиль Spring")
-    fun getProfile(): ApiResponse<ProfileResponse> {
+    fun getProfile(): MyApiResponse<ProfileResponse> {
         val profiles = environment.activeProfiles.joinToString(", ")
-        return ApiResponse.success(
+        return MyApiResponse.success(
             data = ProfileResponse(
                 activeProfiles = profiles,
                 isDev = environment.activeProfiles.contains("dev"),
@@ -54,7 +54,7 @@ class InfoController(
 
     @GetMapping("/db-info")
     @Operation(summary = "Информация о БД", description = "Возвращает информацию о подключении к БД")
-    fun getDbInfo(): ApiResponse<DbInfoResponse> {
+    fun getDbInfo(): MyApiResponse<DbInfoResponse> {
         return try {
             val connection = dataSource.connection
             val jdbcUrl = connection.metaData.url ?: "unknown"
@@ -72,12 +72,12 @@ class InfoController(
                 activeProfile = environment.activeProfiles.firstOrNull() ?: "unknown"
             )
             connection.close()
-            ApiResponse.success(
+            MyApiResponse.success(
                 data = dbInfo,
                 message = "Информация о БД получена"
             )
         } catch (e: Exception) {
-            ApiResponse.error(
+            MyApiResponse.error(
                 message = "Ошибка получения информации о БД: ${e.message}"
             )
         }

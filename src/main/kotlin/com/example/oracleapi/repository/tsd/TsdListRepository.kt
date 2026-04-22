@@ -1,10 +1,19 @@
 package com.example.oracleapi.repository.tsd
 
-import com.example.oracleapi.handler.com.example.oracleapi.entity.tsd.TsdList
+import com.example.oracleapi.entity.Tsdlist
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 
 @Repository
-interface TsdListRepository : JpaRepository<TsdList, Long> {
+interface TsdListRepository : JpaRepository<Tsdlist, Long> {
     fun existsBySn(sn: String): Boolean
+
+    @Query("""
+    SELECT t FROM Tsdlist t
+    LEFT JOIN FETCH t.params
+    WHERE t.sn = :sn
+    """)
+    fun findTerminalWithParams(@Param("sn") sn: String): Tsdlist?
 }

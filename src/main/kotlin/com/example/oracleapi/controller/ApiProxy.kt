@@ -1,6 +1,6 @@
 package com.example.oracleapi.controller
 
-import com.example.oracleapi.dto.common.ApiResponse
+import com.example.oracleapi.dto.common.MyApiResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletRequest
@@ -117,7 +117,7 @@ class ApiProxyController(
         summary = "Сброс статистики",
         description = "Сбрасывает всю накопленную статистику"
     )
-    fun resetStats(): ResponseEntity<ApiResponse<Unit>> {
+    fun resetStats(): ResponseEntity<MyApiResponse<Unit>> {
         requestCount.set(0)
         successCount.set(0)
         errorCount.set(0)
@@ -128,7 +128,7 @@ class ApiProxyController(
         log.info("Proxy statistics has been reset")
 
         return ResponseEntity.ok(
-            ApiResponse.success(
+            MyApiResponse.success(
                 data = Unit,
                 message = "Statistics has been reset"
             )
@@ -198,7 +198,7 @@ class ApiProxyController(
             return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(ApiResponse.error<Unit>(message = "Endpoint not found"))
+                .body(MyApiResponse.error<Unit>(message = "Endpoint not found"))
         }
 
         // Проверяем, что путь не пустой
@@ -210,7 +210,7 @@ class ApiProxyController(
                 .status(HttpStatus.BAD_REQUEST)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(
-                    ApiResponse.error<Unit>(
+                    MyApiResponse.error<Unit>(
                         message = "Please specify the target path. Example: /api/1c/UT_2025_TEST_1/hs/TokenRequest/UninvoicedGoods",
                         path = request.servletPath
                     )
@@ -324,7 +324,7 @@ class ApiProxyController(
             ResponseEntity
                 .status(HttpStatus.BAD_GATEWAY)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(ApiResponse.error<Unit>(message = "Proxy error: ${e.message}"))
+                .body(MyApiResponse.error<Unit>(message = "Proxy error: ${e.message}"))
         }
     }
 }

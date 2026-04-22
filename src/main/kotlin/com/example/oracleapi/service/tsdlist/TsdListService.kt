@@ -1,37 +1,86 @@
 package com.example.oracleapi.service.tsdlist
 
-
 import com.example.oracleapi.dto.JsonResponseView
 import com.example.oracleapi.dto.tsdlist.Registeredjson
+import com.example.oracleapi.dto.tsdlist.StoreInfo
 import com.example.oracleapi.dto.tsdlist.UsedJson
+import com.example.oracleapi.dto.tsdparam.ParamDto
+import com.example.oracleapi.repository.agnlist.AgnlistRepository
 import com.example.oracleapi.repository.pbe.PbeRepository
-import com.example.oracleapi.repository.user.TsdUsedRepository
+import com.example.oracleapi.repository.store.StoreRepository
+import com.example.oracleapi.repository.tsd.TsdListHistoryRepository
+import com.example.oracleapi.repository.tsd.TsdListRepository
+import com.example.oracleapi.service.StoreService
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+import java.time.format.DateTimeFormatter
 
 @Service
 class TsdListService(
-    private val getRegisteredSessionsProcedure: TsdListGetRegistered,
-    private val getTsdUsedView: TsdUsedRepository,
-    private val pbeRepository: PbeRepository
+    private val tsdHistoryRepository: TsdListHistoryRepository,
+    private val pbeRepository: PbeRepository,
+    private val agnListRepository: AgnlistRepository,
+    private val storeService: StoreService,
+    private val tsdlistRepository: TsdListRepository
 ) {
 
+    private val log = LoggerFactory.getLogger(javaClass)
+
+    @Transactional(readOnly = true)
     fun getRegisteredSessions(sn: String?): JsonResponseView<Registeredjson> {
-        return getRegisteredSessionsProcedure.execute(sn)
+        val startTime = System.currentTimeMillis()
+        val data = tsdHistoryRepository.findRegisteredSessions(sn)
+
+        // Догружаем склады для каждого PBE
+        val enrichedData = data.map { session ->
+            val stores = if (session.pbern != null) {
+                storeService.getStoresByPbeRnAndNote(session.pbern)
+            } else {
+                emptyList()
+            }
+
+            val params = if (session.sn != null) {
+                val terminal = tsdlistRepository.findTerminalWithParams(session.sn)
+                terminal?.params?.map { param ->
+                    ParamDto(
+                        name = param.paramname,
+                        value = param.paramvalue,
+                        description = param.description
+                    )
+                } ?: emptyList()
+            } else {
+                emptyList()
+            }
+
+            session.copy(
+                store = stores,
+                param = params
+            )
+        }
+
+
+        log.debug("Found {} registered sessions for SN: {}", data.size, sn)
+
+        return JsonResponseView(
+            enrichedData.size,
+            System.currentTimeMillis() - startTime,
+            enrichedData
+        )
     }
 
+    @Transactional(readOnly = true)
     fun getUsedTsd(pbe: Long?): JsonResponseView<UsedJson> {
         val startTime = System.currentTimeMillis()
 
-        // Валидация
-        if (pbe == null) {
-            throw IllegalArgumentException("Параметр 'pbe' не может быть null")
-        }
-
-        if (!pbeRepository.existsById(pbe)) {
+        // Валидация PBE если передан
+        if (pbe != null && !pbeRepository.existsById(pbe)) {
             throw IllegalArgumentException("Подразделение с rn = $pbe не существует")
         }
 
-        val data = getTsdUsedView.findTsdUsed(pbe)
+        val data = tsdHistoryRepository.findActiveUsers(pbe)
+
+        log.debug("Found {} active users for PBE: {}", data.size, pbe)
 
         return JsonResponseView(
             data.size,
@@ -41,26 +90,167 @@ class TsdListService(
     }
 
     /**
-     * Получить информацию о пользователе по SN терминала
-     * @return UserInfo или null, если терминал не активен
+     * Получить информацию о пользователе по SN терминала (для авторизации)
      */
+    @Transactional(readOnly = true)
     fun getUserByTerminalSn(sn: String): UserInfo? {
-        val result = getRegisteredSessionsProcedure.execute(sn)
-        // Берем первую активную сессию для этого терминала
-        return result.row.firstOrNull()?.let { session ->
-                        UserInfo(
-                            usercode = session.usercode ?: return null,
-                            username = session.agnname ?: session.usercode,
-                            pin = session.pin
-                        )
-                    }
+        log.debug("Looking for active session by SN: {}", sn)
 
+        val activeSession = tsdHistoryRepository.findActiveSessionBySn(sn)
+
+        return activeSession?.let { history ->
+            val userList = history.userList
+
+            // Проверяем что usercode не null и не пустой
+            val usercode = userList?.usercode
+            if (usercode.isNullOrBlank()) {
+                log.warn("UserList has no usercode for terminal SN: {}", sn)
+                return null
+            }
+
+            // Получаем имя из AGNLIST
+            val agnName = userList.useragn?.let { agnListRepository.findById(it).orElse(null)?.agnname }
+
+            UserInfo(
+                usercode = usercode,
+                username = agnName ?: usercode,
+                pin = userList.pin?.toLong(),
+                parole = userList.parole ?: "",
+                userList.useragn ?: 0L
+            )
+        }
+    }
+
+    /**
+     * Проверка активности терминала
+     */
+    @Transactional(readOnly = true)
+    fun isTerminalActive(sn: String): Boolean {
+        return tsdHistoryRepository.existsActiveSessionBySn(sn)
+    }
+
+    /**
+     * Получить информацию о пользователе по Device ID терминала (для авторизации)
+     */
+    @Transactional(readOnly = true)
+    fun getUserByTerminalDeviceId(deviceId: String): UserInfo? {
+        log.debug("Looking for active session by Device ID: {}", deviceId)
+
+        val activeSession = tsdHistoryRepository.findActiveSessionByDeviceId(deviceId)
+
+        return activeSession?.let { history ->
+            val userList = history.userList
+
+            // Проверяем что usercode не null и не пустой
+            val usercode = userList?.usercode
+            if (usercode.isNullOrBlank()) {
+                log.warn("UserList has no usercode for Device ID: {}", deviceId)
+                return null
+            }
+
+            // Получаем имя из AGNLIST
+            val agnName = userList.useragn?.let { agnListRepository.findById(it).orElse(null)?.agnname }
+
+            UserInfo(
+                usercode = usercode,
+                username = agnName ?: usercode,
+                pin = userList.pin?.toLong(),
+                parole = userList.parole ?: "",
+                userList.useragn ?: 0L
+            )
+        }
+    }
+
+    /**
+     * Проверка активности терминала по Device ID
+     */
+    @Transactional(readOnly = true)
+    fun isTerminalActiveByDeviceId(deviceId: String): Boolean {
+        return tsdHistoryRepository.existsActiveSessionByDeviceId(deviceId)
+    }
+
+    /**
+     * Получить информацию о терминале по Device ID
+     */
+    @Transactional(readOnly = true)
+    fun getTerminalByDeviceId(deviceId: String): com.example.oracleapi.entity.Tsdlist? {
+        return tsdHistoryRepository.findTerminalByDeviceId(deviceId)
+    }
+
+    /**
+     * Получить полную информацию о терминале в формате Registeredjson
+     */
+    @Transactional(readOnly = true)
+    fun getTerminalFullInfoAsRegisteredjson(deviceId: String): Registeredjson? {
+        log.debug("Getting full info for Device ID: {}", deviceId)
+
+        // 1. Находим активную сессию
+        val activeSession = tsdHistoryRepository.findActiveSessionByDeviceId(deviceId)
+        if (activeSession == null) {
+            log.warn("No active session for Device ID: {}", deviceId)
+            return null
+        }
+
+        val tsdList = activeSession.tsdList
+        val userList = activeSession.userList
+
+        // 2. Получаем имя агента
+        val agnName = userList?.useragn?.let { agnListRepository.findById(it).orElse(null)?.agnname }
+
+        // 3. Получаем PBE информацию
+        val pbe = tsdList?.pbe
+        val pbecode = pbe?.pbecode
+        val pbern = pbe?.rn
+
+        // 4. Получаем склады для PBE
+        val stores = if (pbern != null) {
+            storeService.getStoresByPbeRnAndNote(pbern).map { store ->
+                StoreInfo(
+                    rn = store.rn,
+                    storecode = store.storecode,
+                    eschema = store.eschema,
+                    usesas = store.usesas
+                )
+            }
+        } else {
+            emptyList()
+        }
+
+        // 5. Получаем параметры терминала
+        val params = if (tsdList?.sn != null) {
+            val terminalWithParams = tsdlistRepository.findTerminalWithParams(tsdList.sn!!)
+            terminalWithParams?.params?.map { param ->
+                ParamDto(
+                    name = param.paramname,
+                    value = param.paramvalue,
+                    description = param.description
+                )
+            } ?: emptyList()
+        } else {
+            emptyList()
+        }
+
+        // 6. Формируем Registeredjson
+        return Registeredjson(
+            sn = tsdList?.sn,
+            timestart = activeSession.timestart?.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+            usercode = userList?.usercode,
+            agnname = agnName,
+            parole = userList?.parole,
+            dscbarnumb = userList?.dscbarnumb,
+            pin = userList?.pin?.toLong(),
+            pbecode = pbecode,
+            pbern = pbern,
+            store = stores,
+            param = params
+        )
     }
 
     data class UserInfo(
         val usercode: String,
         val username: String,
-        val pin: Long?
+        val pin: Long?,
+        val parole: String,
+        val userAgn: Long
     )
-
 }

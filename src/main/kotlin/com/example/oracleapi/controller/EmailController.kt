@@ -1,6 +1,6 @@
 package com.example.oracleapi.controller
 
-import com.example.oracleapi.dto.common.ApiResponse
+import com.example.oracleapi.dto.common.MyApiResponse
 import com.example.oracleapi.dto.sendmail.SimpleEmailRequest
 import com.example.oracleapi.dto.sendmail.SimpleEmailResponse
 import com.example.oracleapi.service.sendmail.EmailService
@@ -34,11 +34,11 @@ class EmailController(
     fun sendSimpleEmail(
         @Valid @RequestBody request: SimpleEmailRequest,
         httpRequest: HttpServletRequest
-    ): ApiResponse<SimpleEmailResponse> {
+    ): MyApiResponse<SimpleEmailResponse> {
 
         val mailRn = emailService.sendSimpleEmail(request)
 
-        return ApiResponse.success(
+        return MyApiResponse.success(
             data = SimpleEmailResponse(
                 success = true,
                 message = "Письмо успешно отправлено",

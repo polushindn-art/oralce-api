@@ -1,4 +1,4 @@
-package com.example.oracleapi.entity.userlist
+package com.example.oracleapi.entity
 
 import com.example.oracleapi.Helper
 import jakarta.persistence.Column
@@ -7,7 +7,7 @@ import jakarta.persistence.Id
 import jakarta.persistence.Table
 
 @Entity
-@Table(name = "USERLIST", schema = Helper.SCHEME)
+@Table(name = "USERLIST", schema = Helper.Companion.SCHEME)
 open class Userlist {
     @Id
     @Column(name = "RN", columnDefinition = "unknown")

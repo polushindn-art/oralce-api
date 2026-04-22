@@ -8,7 +8,7 @@ import java.time.LocalDateTime
  * Универсальный ответ API для всех эндпоинтов
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-data class ApiResponse<T> (
+data class MyApiResponse<T> (
     val success: Boolean,
     val message: String,
     val data: T? = null,
@@ -23,8 +23,8 @@ data class ApiResponse<T> (
             data: T,
             message: String = "Операция выполнена успешно",
             path: String? = null
-        ): ApiResponse<T> {
-            return ApiResponse(
+        ): MyApiResponse<T> {
+            return MyApiResponse(
                 success = true,
                 message = message,
                 data = data,
@@ -35,8 +35,8 @@ data class ApiResponse<T> (
         fun <T> success(
             message: String = "Операция выполнена успешно",
             path: String? = null
-        ): ApiResponse<Unit> {
-            return ApiResponse(
+        ): MyApiResponse<Unit> {
+            return MyApiResponse(
                 success = true,
                 message = message,
                 data = null,
@@ -48,8 +48,8 @@ data class ApiResponse<T> (
             message: String,
             data: T? = null,
             path: String? = null
-        ): ApiResponse<T> {
-            return ApiResponse(
+        ): MyApiResponse<T> {
+            return MyApiResponse(
                 success = false,
                 message = message,
                 data = data,
@@ -60,8 +60,8 @@ data class ApiResponse<T> (
         fun <T> error(
             exception: Exception,
             path: String? = null
-        ): ApiResponse<T> {
-            return ApiResponse(
+        ): MyApiResponse<T> {
+            return MyApiResponse(
                 success = false,
                 message = exception.message ?: "Внутренняя ошибка сервера",
                 data = null,

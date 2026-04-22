@@ -2,19 +2,18 @@ package com.example.oracleapi.controller
 
 import com.example.oracleapi.config.JwtConfigProperties
 import com.example.oracleapi.config.JwtHelper
-import com.example.oracleapi.dto.common.ApiResponse
-import com.example.oracleapi.repository.userlist.UserlistRepository
+import com.example.oracleapi.dto.common.MyApiResponse
 import com.example.oracleapi.service.tsdlist.TsdListService
 import com.example.oracleapi.service.userlist.UserService
 import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.media.Content
-import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse as SwaggerApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import jakarta.validation.Valid
+import jakarta.validation.constraints.NotBlank
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -49,10 +48,10 @@ class AuthController(
         ]
     )
     fun login(
-        @RequestBody credentials: LoginCredentials,
+        @Valid @RequestBody credentials: LoginCredentials,
         request: HttpServletRequest,
         response: HttpServletResponse
-    ): ResponseEntity<ApiResponse<Map<String, Any>>> {
+    ): ResponseEntity<MyApiResponse<Map<String, Any>>> {
 
         log.info("Login attempt for user: {}", credentials.username)
 
@@ -61,7 +60,7 @@ class AuthController(
             return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
                 .body(
-                    ApiResponse.error(
+                    MyApiResponse.error(
                         message = "Пользователь не найден",
                         path = request.requestURI
                     )
@@ -72,7 +71,7 @@ class AuthController(
             return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(
-                    ApiResponse.error(
+                    MyApiResponse.error(
                         message = "Имя пользователя обязательно",
                         path = request.requestURI
                     )
@@ -82,7 +81,7 @@ class AuthController(
             return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(
-                    ApiResponse.error(
+                    MyApiResponse.error(
                         message = "Пароль обязателен",
                         path = request.requestURI
                     )
@@ -105,7 +104,7 @@ class AuthController(
             response.addCookie(cookie)
 
             return ResponseEntity.ok(
-                ApiResponse.success(
+                MyApiResponse.success(
                     data = mapOf(
                         "username" to credentials.username,
                         "token" to token,
@@ -121,7 +120,7 @@ class AuthController(
             return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
                 .body(
-                    ApiResponse.error(
+                    MyApiResponse.error(
                         message = "Неверные логин или пароль",
                         path = request.requestURI
                     )
@@ -131,7 +130,7 @@ class AuthController(
             return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(
-                    ApiResponse.error(
+                    MyApiResponse.error(
                         message = "Внутренняя ошибка сервера: ${ex.message}",
                         path = request.requestURI
                     )
@@ -142,7 +141,7 @@ class AuthController(
     /**
      * Аутентификация терминала по SN - возвращает токен пользователя терминала
      */
-    @GetMapping("/tsdtoken")
+    @GetMapping("/tokenBySN")
     @Operation(
         summary = "Получить токен пользователя по терминалу",
         description = "Получение токена авторизации для пользователя, работающего с терминалом"
@@ -159,13 +158,13 @@ class AuthController(
         @RequestParam(required = false) sn: String?,
         request: HttpServletRequest,
         response: HttpServletResponse
-    ): ResponseEntity<ApiResponse<Map<String, Any>>> {
+    ): ResponseEntity<MyApiResponse<Map<String, Any>>> {
 
         if (sn.isNullOrBlank()) {
             return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(
-                    ApiResponse.error(
+                    MyApiResponse.error(
                         message = "Серийный номер обязателен",
                         path = request.requestURI
                     )
@@ -180,7 +179,7 @@ class AuthController(
                 return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
                     .body(
-                        ApiResponse.error(
+                        MyApiResponse.error(
                             message = "ТСД не зарегистрирован. Для данного терминала не найдена активная сессия",
                             path = request.requestURI
                         )
@@ -199,7 +198,7 @@ class AuthController(
             response.addCookie(cookie)
 
             return ResponseEntity.ok(
-                ApiResponse.success(
+                MyApiResponse.success(
                     data = mapOf(
                         "sn" to sn,
                         "usercode" to userInfo.usercode,
@@ -217,7 +216,7 @@ class AuthController(
             return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(
-                    ApiResponse.error(
+                    MyApiResponse.error(
                         message = "Внутренняя ошибка сервера: ${ex.message}",
                         path = request.requestURI
                     )
@@ -230,7 +229,7 @@ class AuthController(
     fun logout(
         request: HttpServletRequest,
         response: HttpServletResponse
-    ): ResponseEntity<ApiResponse<Map<String, String>>> {
+    ): ResponseEntity<MyApiResponse<Map<String, String>>> {
 
         val expiredCookie = Cookie(jwtConfig.cookieName, "").apply {
             maxAge = 0
@@ -243,7 +242,7 @@ class AuthController(
         log.info("User logged out successfully")
 
         return ResponseEntity.ok(
-            ApiResponse.success(
+            MyApiResponse.success(
                 data = mapOf("message" to "Вы вышли из системы"),
                 message = "Выход выполнен",
                 path = request.requestURI
@@ -251,8 +250,121 @@ class AuthController(
         )
     }
 
+    @GetMapping("/tokenByDeviceId")
+    @Operation(
+        summary = "Получить токен пользователя по Device ID терминала",
+        description = "Получение токена авторизации по deviceid терминала (только для активных терминалов)"
+    )
+    fun loginByDeviceId(
+        @RequestParam(required = false) deviceId: String?,
+        request: HttpServletRequest,
+        response: HttpServletResponse
+    ): ResponseEntity<MyApiResponse<Map<String, Any?>>> {  // ← Any? вместо Any
+
+        if (deviceId.isNullOrBlank()) {
+            return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(
+                    MyApiResponse.error(
+                        message = "Device ID обязателен",
+                        path = request.requestURI
+                    )
+                )
+        }
+
+        try {
+            // Проверяем существование терминала
+            val terminal = tsdListService.getTerminalByDeviceId(deviceId)
+
+            if (terminal == null) {
+                log.warn("Terminal with Device ID {} not found", deviceId)
+                return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(
+                        MyApiResponse.error(
+                            message = "Терминал с Device ID=$deviceId не найден",
+                            path = request.requestURI
+                        )
+                    )
+            }
+
+            // Проверяем активность терминала
+            if (!tsdListService.isTerminalActiveByDeviceId(deviceId)) {
+                log.warn("Terminal with Device ID {} is not active", deviceId)
+                return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(
+                        MyApiResponse.error(
+                            message = "Терминал неактивен. Активная сессия не найдена",
+                            path = request.requestURI
+                        )
+                    )
+            }
+
+            // Получаем информацию о пользователе
+            val userInfo = tsdListService.getUserByTerminalDeviceId(deviceId)
+
+            if (userInfo == null) {
+                log.warn("No user associated with active terminal Device ID: {}", deviceId)
+                return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(
+                        MyApiResponse.error(
+                            message = "Для данного терминала не найден активный пользователь",
+                            path = request.requestURI
+                        )
+                    )
+            }
+
+            // Получаем полную информацию о терминале
+            val terminalFullInfo = tsdListService.getTerminalFullInfoAsRegisteredjson(deviceId)
+
+            val token = jwtHelper.createToken(userInfo.usercode)
+            log.info("Terminal authenticated by Device ID: {} as user {}", deviceId, userInfo.usercode)
+
+            val cookie = Cookie(jwtConfig.cookieName, token).apply {
+                isHttpOnly = true
+                secure = jwtConfig.secure
+                path = "/"
+                maxAge = jwtConfig.cookieMaxAgeSeconds
+            }
+            response.addCookie(cookie)
+
+            return ResponseEntity.ok(
+                MyApiResponse.success(
+                    data = mapOf(
+                        "deviceId" to deviceId,
+                        "usercode" to userInfo.usercode,
+                        "parole" to userInfo.parole,
+                        "username" to userInfo.username,
+                        "useragn" to userInfo.userAgn,
+                        "token" to token,
+                        "expiresIn" to jwtConfig.expiration,
+                        "terminalInfo" to terminalFullInfo
+                    ),
+                    message = "Терминал авторизован по Device ID",
+                    path = request.requestURI
+                )
+            )
+
+        } catch (ex: Exception) {
+            log.error("Terminal authentication error for Device ID: {}", deviceId, ex)
+            return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(
+                    MyApiResponse.error(
+                        message = "Внутренняя ошибка сервера: ${ex.message}",
+                        path = request.requestURI
+                    )
+                )
+        }
+    }
+
     data class LoginCredentials(
+        @field:NotBlank(message = "Имя пользователя обязательно")
         val username: String,
+
+        @field:NotBlank(message = "Пароль обязателен")
         val password: String
     )
 }

@@ -1,6 +1,6 @@
 package com.example.oracleapi.repository.userlist
 
-import com.example.oracleapi.entity.userlist.Userlist
+import com.example.oracleapi.entity.Userlist
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param

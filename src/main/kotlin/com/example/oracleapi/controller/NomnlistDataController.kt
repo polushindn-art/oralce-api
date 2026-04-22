@@ -1,6 +1,6 @@
 package com.example.oracleapi.controller
 
-import com.example.oracleapi.dto.common.ApiResponse
+import com.example.oracleapi.dto.common.MyApiResponse
 import com.example.oracleapi.dto.nomnlistdata.NomnlistdataMetadata
 import com.example.oracleapi.entity.nomnlistdata.Nomnlistdata
 import com.example.oracleapi.service.nomnlistdata.NomnlistdataService
@@ -29,10 +29,10 @@ class NomnlistDataController(
     fun getInfoByNomen(
         @PathVariable nomen: Long,
         request: HttpServletRequest
-    ): ApiResponse<List<NomnlistdataMetadata>> {
+    ): MyApiResponse<List<NomnlistdataMetadata>> {
         val photos = service.getByNomen(nomen)
         val metadata = photos.map { NomnlistdataMetadata.fromEntity(it) }
-        return ApiResponse.success(
+        return MyApiResponse.success(
             data = metadata,
             message = "Найдено ${metadata.size} фото",
             path = request.requestURI
@@ -45,13 +45,13 @@ class NomnlistDataController(
         @PathVariable nomen: Long,
         @PathVariable photonum: Int,
         request: HttpServletRequest
-    ): ApiResponse<NomnlistdataMetadata> {
+    ): MyApiResponse<NomnlistdataMetadata> {
         val photo = service.getByNomenAndPhotonum(nomen, photonum)
-            ?: return ApiResponse.error(
+            ?: return MyApiResponse.error(
                 message = "Фото для номенклатуры $nomen (№$photonum) не найдено",
                 path = request.requestURI
             )
-        return ApiResponse.success(
+        return MyApiResponse.success(
             data = NomnlistdataMetadata.fromEntity(photo),
             message = "Информация получена",
             path = request.requestURI
@@ -228,20 +228,20 @@ class NomnlistDataController(
         @RequestParam nomen: Long,
         @RequestParam file: MultipartFile,
         @RequestParam(required = false) needDownload: Boolean?
-    ): ApiResponse<NomnlistdataMetadata> {
+    ): MyApiResponse<NomnlistdataMetadata> {
         return try {
             val photo = service.uploadPhoto(
                 nomen = nomen,
                 file = file,
                 needDownload = needDownload
             )
-            ApiResponse.success(
+            MyApiResponse.success(
                 data = NomnlistdataMetadata.fromEntity(photo),
                 message = "Фото загружено (№${photo.photonum})",
                 path = "/nomen-photos"
             )
         } catch (e: IllegalArgumentException) {
-            ApiResponse.error(
+            MyApiResponse.error(
                 message = e.message ?: "Ошибка загрузки",
                 path = "/nomen-photos"
             )
@@ -254,13 +254,13 @@ class NomnlistDataController(
         @PathVariable nomen: Long,
         @PathVariable photonum: Int,
         request: HttpServletRequest
-    ): ApiResponse<Unit> {
-        val photo = service.getByNomenAndPhotonum(nomen, photonum) ?: return ApiResponse.error(
+    ): MyApiResponse<Unit> {
+        val photo = service.getByNomenAndPhotonum(nomen, photonum) ?: return MyApiResponse.error(
             message = "Фото для номенклатуры $nomen (№$photonum) не найдено",
             path = request.requestURI
         )
         service.softDelete(photo.rn)
-        return ApiResponse.success<Nomnlistdata>(
+        return MyApiResponse.success<Nomnlistdata>(
             message = "Фото для номенклатуры $nomen (№$photonum) удалено",
             path = request.requestURI
         )
@@ -271,9 +271,9 @@ class NomnlistDataController(
     fun deleteAllByNomen(
         @PathVariable nomen: Long,
         request: HttpServletRequest
-    ): ApiResponse<Unit> {
+    ): MyApiResponse<Unit> {
         service.softDeleteByNomen(nomen)
-        return ApiResponse.success<Nomnlistdata>(
+        return MyApiResponse.success<Nomnlistdata>(
             message = "Все фото для номенклатуры $nomen удалены",
             path = request.requestURI
         )
@@ -289,7 +289,7 @@ class NomnlistDataController(
         response.status = HttpStatus.NOT_FOUND.value()
         response.contentType = "application/json;charset=UTF-8"
 
-        val errorResponse = ApiResponse.error<Nothing>(
+        val errorResponse = MyApiResponse.error<Nothing>(
             message = message,
             path = path
         )

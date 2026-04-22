@@ -1,12 +1,15 @@
-package com.example.oracleapi.entity.agnlist
+package com.example.oracleapi.entity
 
 import com.example.oracleapi.Helper
-import jakarta.persistence.*
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.Id
+import jakarta.persistence.Table
 import java.time.LocalDateTime
 
 @Entity
-@Table(name = "AGNLIST", schema = Helper.SCHEME)
-class Agnlist(
+@Table(name = "AGNLIST", schema = Helper.Companion.SCHEME)
+data class AgnList(
     @Id
     @Column(name = "RN", nullable = false)
     var rn: Long = 0,
@@ -161,7 +164,7 @@ class Agnlist(
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
-        other as Agnlist
+        other as AgnList
         return rn == other.rn
     }
 

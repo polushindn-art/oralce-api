@@ -1,6 +1,6 @@
 package com.example.oracleapi.controller
 
-import com.example.oracleapi.dto.common.ApiResponse
+import com.example.oracleapi.dto.common.MyApiResponse
 import com.example.oracleapi.dto.public.GenIdResponse
 import com.example.oracleapi.dto.public.GetNomenByBarcodeRequest
 import com.example.oracleapi.dto.public.GetNomenByBarcodeResponse
@@ -9,8 +9,6 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.validation.Valid
-import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -32,9 +30,9 @@ class PublicController(
     fun getNomenByBarcode(
         @Valid @RequestBody(required = true) request: GetNomenByBarcodeRequest,
         httpRequest: HttpServletRequest
-    ): ApiResponse<GetNomenByBarcodeResponse> {
+    ): MyApiResponse<GetNomenByBarcodeResponse> {
         val result = publicProcedureService.getNomenByBarcode(request)
-        return ApiResponse.success(
+        return MyApiResponse.success(
             data = result,
             message = "Идентификатор получен",
             httpRequest.requestURI
@@ -48,9 +46,9 @@ class PublicController(
     )
     fun genIdRn(
         httpRequest: HttpServletRequest
-    ): ApiResponse<GenIdResponse> {
+    ): MyApiResponse<GenIdResponse> {
         val result = publicProcedureService.getIdRn()
-        return ApiResponse.success(
+        return MyApiResponse.success(
             data = result,
             message = "Идентификатор RN получен",
             httpRequest.requestURI
@@ -62,9 +60,9 @@ class PublicController(
     fun generateMultipleRn(
         @RequestParam(defaultValue = "3") count: Int,
         httpRequest: HttpServletRequest
-    ): ApiResponse<GenIdResponse> {
+    ): MyApiResponse<GenIdResponse> {
         val result = publicProcedureService.generateMultipleRn(count)
-        return  ApiResponse.success(
+        return  MyApiResponse.success(
                         data = result,
                         message = "Сгенерировано $count идентификаторов",
                         httpRequest.requestURI

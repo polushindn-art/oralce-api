@@ -1,6 +1,6 @@
 package com.example.oracleapi.controller
 
-import com.example.oracleapi.dto.common.ApiResponse
+import com.example.oracleapi.dto.common.MyApiResponse
 import com.example.oracleapi.dto.picture.PictureMetadata
 import com.example.oracleapi.entity.Picture
 import com.example.oracleapi.service.picture.PictureService
@@ -25,9 +25,9 @@ class PictureController(
     fun getInfo(
         @PathVariable rn: Long,
         request: HttpServletRequest
-    ): ApiResponse<PictureMetadata> {
+    ): MyApiResponse<PictureMetadata> {
         val picture = getPictureOrThrow(rn)
-        return ApiResponse.success(
+        return MyApiResponse.success(
             data = PictureMetadata.fromEntity(picture),
             message = "Информация получена",
             path = request.requestURI
@@ -135,9 +135,9 @@ class PictureController(
     fun getRnListByTablern(
         @PathVariable tablern: Long,
         request: HttpServletRequest
-    ): ApiResponse<List<Long>> {
+    ): MyApiResponse<List<Long>> {
         val rnList = pictureService.getRnListByTablernNotDeleted(tablern)
-        return ApiResponse.success(
+        return MyApiResponse.success(
             data = rnList,
             message = "Найдено ${rnList.size} изображений",
             path = request.requestURI
@@ -152,7 +152,7 @@ class PictureController(
         response.status = HttpStatus.NOT_FOUND.value()
         response.contentType = "application/json;charset=UTF-8"
 
-        val errorResponse = ApiResponse.error<Nothing>(
+        val errorResponse = MyApiResponse.error<Nothing>(
             message = message,
             path = path
         )

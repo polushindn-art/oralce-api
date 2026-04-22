@@ -1,6 +1,6 @@
 package com.example.oracleapi.handler
 
-import com.example.oracleapi.dto.common.ApiResponse
+import com.example.oracleapi.dto.common.MyApiResponse
 import com.example.oracleapi.exception.DocumentNotFoundException
 import jakarta.persistence.EntityNotFoundException
 import jakarta.servlet.http.HttpServletRequest
@@ -30,7 +30,7 @@ class GlobalExceptionHandler {
     fun handleTypeMismatch(
         e: MethodArgumentTypeMismatchException,
         request: HttpServletRequest
-    ): ResponseEntity<ApiResponse<Nothing>> {
+    ): ResponseEntity<MyApiResponse<Nothing>> {
         val paramName = e.name
         val requiredType = e.requiredType?.simpleName ?: "число"
         val wrongValue = e.value
@@ -47,7 +47,7 @@ class GlobalExceptionHandler {
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .body(
-                ApiResponse.error(
+                MyApiResponse.error(
                     message = message,
                     path = request.requestURI
                 )
@@ -59,11 +59,11 @@ class GlobalExceptionHandler {
     fun handleMissingParam(
         e: MissingServletRequestParameterException,
         request: HttpServletRequest
-    ): ResponseEntity<ApiResponse<Nothing>> {
+    ): ResponseEntity<MyApiResponse<Nothing>> {
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .body(
-                ApiResponse.error(
+                MyApiResponse.error(
                     message = "Отсутствует обязательный параметр: ${e.parameterName}",
                     path = request.requestURI
                 )
@@ -75,11 +75,11 @@ class GlobalExceptionHandler {
     fun handleHttpMessageNotReadable(
         e: HttpMessageNotReadableException,
         request: HttpServletRequest
-    ): ResponseEntity<ApiResponse<Nothing>> {
+    ): ResponseEntity<MyApiResponse<Nothing>> {
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .body(
-                ApiResponse.error(
+                MyApiResponse.error(
                     message = "Некорректный формат запроса. Проверьте тело запроса. \n$e",
                     path = request.requestURI
                 )
@@ -91,11 +91,11 @@ class GlobalExceptionHandler {
     fun handleMethodNotSupported(
         e: HttpRequestMethodNotSupportedException,
         request: HttpServletRequest
-    ): ResponseEntity<ApiResponse<Nothing>> {
+    ): ResponseEntity<MyApiResponse<Nothing>> {
         return ResponseEntity
             .status(HttpStatus.METHOD_NOT_ALLOWED)
             .body(
-                ApiResponse.error(
+                MyApiResponse.error(
                     message = "Метод ${e.method} не поддерживается для этого эндпоинта. Поддерживаемые методы: ${e.supportedMethods?.joinToString(", ")}",
                     path = request.requestURI
                 )
@@ -107,11 +107,11 @@ class GlobalExceptionHandler {
     fun handleAuthenticationException(
         e: AuthenticationException,
         request: HttpServletRequest
-    ): ResponseEntity<ApiResponse<Nothing>> {
+    ): ResponseEntity<MyApiResponse<Nothing>> {
         return ResponseEntity
             .status(HttpStatus.UNAUTHORIZED)
             .body(
-                ApiResponse.error(
+                MyApiResponse.error(
                     message = "Требуется авторизация: ${e.message ?: "пожалуйста, войдите в систему"}",
                     path = request.requestURI
                 )
@@ -123,11 +123,11 @@ class GlobalExceptionHandler {
     fun handleAccessDeniedException(
         e: AccessDeniedException,
         request: HttpServletRequest
-    ): ResponseEntity<ApiResponse<Nothing>> {
+    ): ResponseEntity<MyApiResponse<Nothing>> {
         return ResponseEntity
             .status(HttpStatus.FORBIDDEN)
             .body(
-                ApiResponse.error(
+                MyApiResponse.error(
                     message = "Недостаточно прав для доступа к ресурсу: ${e.message ?: "доступ запрещен"}",
                     path = request.requestURI
                 )
@@ -139,7 +139,7 @@ class GlobalExceptionHandler {
     fun handleNoHandlerFound(
         e: NoHandlerFoundException,
         request: HttpServletRequest
-    ): ResponseEntity<ApiResponse<Nothing>> {
+    ): ResponseEntity<MyApiResponse<Nothing>> {
         logger.info("Эндпоинт не найден: {} {}", request.method, request.requestURI)
         return createNotFoundResponse(request)
     }
@@ -149,7 +149,7 @@ class GlobalExceptionHandler {
     fun handleNoResourceFound(
         e: NoResourceFoundException,
         request: HttpServletRequest
-    ): ResponseEntity<ApiResponse<Nothing>> {
+    ): ResponseEntity<MyApiResponse<Nothing>> {
         logger.debug("Статический ресурс не найден: {}", request.requestURI)
         return createNotFoundResponse(request)
     }
@@ -159,11 +159,11 @@ class GlobalExceptionHandler {
     fun handleEntityNotFound(
         e: EntityNotFoundException,
         request: HttpServletRequest
-    ): ResponseEntity<ApiResponse<Nothing>> {
+    ): ResponseEntity<MyApiResponse<Nothing>> {
         return ResponseEntity
             .status(HttpStatus.NOT_FOUND)
             .body(
-                ApiResponse.error(
+                MyApiResponse.error(
                     message = e.message ?: "Запись не найдена",
                     path = request.requestURI
                 )
@@ -175,7 +175,7 @@ class GlobalExceptionHandler {
     fun handleDataAccessException(
         e: DataAccessException,
         request: HttpServletRequest
-    ): ResponseEntity<ApiResponse<Nothing>> {
+    ): ResponseEntity<MyApiResponse<Nothing>> {
         logger.error("Ошибка базы данных: ${e.message}", e)
 
         val message = if (isDevelopment()) {
@@ -187,7 +187,7 @@ class GlobalExceptionHandler {
         return ResponseEntity
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body(
-                ApiResponse.error(
+                MyApiResponse.error(
                     message = message,
                     path = request.requestURI
                 )
@@ -199,11 +199,11 @@ class GlobalExceptionHandler {
     fun handleEmptyResult(
         e: EmptyResultDataAccessException,
         request: HttpServletRequest
-    ): ResponseEntity<ApiResponse<Nothing>> {
+    ): ResponseEntity<MyApiResponse<Nothing>> {
         return ResponseEntity
             .status(HttpStatus.NOT_FOUND)
             .body(
-                ApiResponse.error(
+                MyApiResponse.error(
                     message = "Запись не найдена для удаления/обновления",
                     path = request.requestURI
                 )
@@ -215,11 +215,11 @@ class GlobalExceptionHandler {
     fun handleIllegalArgument(
         e: IllegalArgumentException,
         request: HttpServletRequest
-    ): ResponseEntity<ApiResponse<Nothing>> {
+    ): ResponseEntity<MyApiResponse<Nothing>> {
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .body(
-                ApiResponse.error(
+                MyApiResponse.error(
                     message = e.message ?: "Неверный параметр запроса",
                     path = request.requestURI
                 )
@@ -231,11 +231,11 @@ class GlobalExceptionHandler {
     fun handleInvalidToken(
         e: InvalidTokenException,
         request: HttpServletRequest
-    ): ResponseEntity<ApiResponse<Nothing>> {
+    ): ResponseEntity<MyApiResponse<Nothing>> {
         return ResponseEntity
             .status(HttpStatus.UNAUTHORIZED)
             .body(
-                ApiResponse.error(
+                MyApiResponse.error(
                     message = e.message ?: "Неверный или истекший токен",
                     path = request.requestURI
                 )
@@ -247,13 +247,13 @@ class GlobalExceptionHandler {
     fun handleRuntimeException(
         e: RuntimeException,
         request: HttpServletRequest
-    ): ResponseEntity<ApiResponse<Nothing>> {
+    ): ResponseEntity<MyApiResponse<Nothing>> {
         logger.error("RuntimeException: ${e.message}", e)
 
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .body(
-                ApiResponse.error(
+                MyApiResponse.error(
                     message = e.message ?: "Внутренняя ошибка сервера",
                     path = request.requestURI
                 )
@@ -265,7 +265,7 @@ class GlobalExceptionHandler {
     fun handleGeneralException(
         e: Exception,
         request: HttpServletRequest
-    ): ResponseEntity<ApiResponse<Nothing>> {
+    ): ResponseEntity<MyApiResponse<Nothing>> {
         logger.error("Необработанное исключение: ${e.message}", e)
 
         val message = if (isDevelopment()) {
@@ -277,7 +277,7 @@ class GlobalExceptionHandler {
         return ResponseEntity
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body(
-                ApiResponse.error(
+                MyApiResponse.error(
                     message = message,
                     path = request.requestURI
                 )
@@ -288,12 +288,12 @@ class GlobalExceptionHandler {
     fun handleDocumentNotFound(
         e: DocumentNotFoundException,
         request: HttpServletRequest
-    ): ResponseEntity<ApiResponse<Nothing>> {
+    ): ResponseEntity<MyApiResponse<Nothing>> {
         logger.info("Документ не найден: ${e.message}")
         return ResponseEntity
             .status(HttpStatus.NOT_FOUND)
             .body(
-                ApiResponse.error(
+                MyApiResponse.error(
                     message = e.message ?: "Документ не найден",
                     path = request.requestURI
                 )
@@ -301,11 +301,11 @@ class GlobalExceptionHandler {
     }
 
     // Вспомогательный метод для создания ответа 404
-    private fun createNotFoundResponse(request: HttpServletRequest): ResponseEntity<ApiResponse<Nothing>> {
+    private fun createNotFoundResponse(request: HttpServletRequest): ResponseEntity<MyApiResponse<Nothing>> {
         return ResponseEntity
             .status(HttpStatus.NOT_FOUND)
             .body(
-                ApiResponse.error(
+                MyApiResponse.error(
                     message = "Ресурс не найден: ${request.requestURI}",
                     path = request.requestURI
                 )

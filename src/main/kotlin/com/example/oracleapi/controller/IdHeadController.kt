@@ -1,6 +1,6 @@
 package com.example.oracleapi.controller
 
-import com.example.oracleapi.dto.common.ApiResponse
+import com.example.oracleapi.dto.common.MyApiResponse
 import com.example.oracleapi.dto.common.PageResponse
 import com.example.oracleapi.dto.idhead.IdheadResponse
 import com.example.oracleapi.dto.idhead.del.IdHeadDeleteRequest
@@ -9,7 +9,6 @@ import com.example.oracleapi.dto.idhead.prihod.PrihodResponse
 import com.example.oracleapi.dto.idhead.prihod.PrihodRequest
 import com.example.oracleapi.dto.idhead.status.StatusUpdateRequest
 import com.example.oracleapi.dto.idhead.status.StatusUpdateResponse
-import com.example.oracleapi.entity.Idhead
 import com.example.oracleapi.service.idhead.IdHeadService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
@@ -43,28 +42,28 @@ class IdHeadController(
             SwaggerApiResponse(
                 responseCode = "200",
                 description = "Успешное создание",
-                content = [Content(schema = Schema(implementation = ApiResponse::class))]
+                content = [Content(schema = Schema(implementation = MyApiResponse::class))]
             ),
             SwaggerApiResponse(
                 responseCode = "400",
                 description = "Ошибка валидации",
-                content = [Content(schema = Schema(implementation = ApiResponse::class))]
+                content = [Content(schema = Schema(implementation = MyApiResponse::class))]
             ),
             SwaggerApiResponse(
                 responseCode = "500",
                 description = "Ошибка при создании документа",
-                content = [Content(schema = Schema(implementation = ApiResponse::class))]
+                content = [Content(schema = Schema(implementation = MyApiResponse::class))]
             )
         ]
     )
     fun createPrihod(
         @Valid @RequestBody request: PrihodRequest,
         httpRequest: HttpServletRequest
-    ): ApiResponse<PrihodResponse> {
+    ): MyApiResponse<PrihodResponse> {
 
         val rn = idHeadService.prihodCreate(request)
 
-        return ApiResponse.success(
+        return MyApiResponse.success(
             data = PrihodResponse(
                 success = true,
                 message = "Приходный ордер успешно создан",
@@ -90,11 +89,11 @@ class IdHeadController(
     fun updateStatus(
         @Valid @RequestBody request: StatusUpdateRequest,
         httpRequest: HttpServletRequest
-    ): ApiResponse<StatusUpdateResponse> {
+    ): MyApiResponse<StatusUpdateResponse> {
 
         idHeadService.updateStatus(request)
 
-        return ApiResponse.success(
+        return MyApiResponse.success(
             data = StatusUpdateResponse(
                 success = true,
                 message = "Статус документа успешно обновлен",
@@ -121,9 +120,9 @@ class IdHeadController(
     fun delete(
         @Valid @RequestBody request: IdHeadDeleteRequest,
         httpRequest: HttpServletRequest
-    ): ApiResponse<IdHeadDeleteResponse> {
+    ): MyApiResponse<IdHeadDeleteResponse> {
         idHeadService.delete(request)
-        return ApiResponse.success(
+        return MyApiResponse.success(
             data = IdHeadDeleteResponse(
                 success = true,
                 message = "Документ успешно удален",
@@ -135,10 +134,10 @@ class IdHeadController(
     }
 
     @GetMapping("/status/{status}")
-    fun getByStatus(@PathVariable status: Long, httpRequest: HttpServletRequest): ResponseEntity<ApiResponse<List<IdheadResponse>>> {
+    fun getByStatus(@PathVariable status: Long, httpRequest: HttpServletRequest): ResponseEntity<MyApiResponse<List<IdheadResponse>>> {
         val list = idHeadService.getByStatus(status)
         return ResponseEntity.ok(
-            ApiResponse.success(
+            MyApiResponse.success(
                 data = list,
                 message = "Найдено ${list.size} документов со статусом $status",
                 path = httpRequest.requestURI
@@ -158,10 +157,10 @@ class IdHeadController(
         @RequestParam(required = false) status: Long?,
         @RequestParam(required = false) doctype: String?,
         httpRequest: HttpServletRequest
-    ): ResponseEntity<ApiResponse<List<IdheadResponse>>> {
+    ): ResponseEntity<MyApiResponse<List<IdheadResponse>>> {
         val list = idHeadService.getByFilters(status, doctype)
         return ResponseEntity.ok(
-            ApiResponse.success(
+            MyApiResponse.success(
                 data = list,
                 message = "Найдено ${list.size} документов",
                 path = httpRequest.requestURI
@@ -183,10 +182,10 @@ class IdHeadController(
     fun getDocumentWithSpecs(
         @PathVariable rn: Long,
         httpRequest: HttpServletRequest
-    ): ResponseEntity<ApiResponse<com.example.oracleapi.dto.idspec.IdheadWithSpecTsdResponse>> {
+    ): ResponseEntity<MyApiResponse<com.example.oracleapi.dto.idspec.IdheadWithSpecTsdResponse>> {
         val result = idHeadService.getDocumentWithSpecs(rn)
         return ResponseEntity.ok(
-            ApiResponse.success(
+            MyApiResponse.success(
                 data = result,
                 message = "Документ ${result.docpref}${result.docnumb} от ${result.docdate}, позиций: ${result.specs.size}",
                 path = httpRequest.requestURI
@@ -199,10 +198,10 @@ class IdHeadController(
     fun getAllWithPagination(
         @PageableDefault(size = 20, sort = ["docdate"], direction = Sort.Direction.DESC) pageable: Pageable,
         httpRequest: HttpServletRequest
-    ): ResponseEntity<ApiResponse<PageResponse<IdheadResponse>>> {
+    ): ResponseEntity<MyApiResponse<PageResponse<IdheadResponse>>> {
         val result = idHeadService.getAllWithPagination(pageable)
         return ResponseEntity.ok(
-            ApiResponse.success(
+            MyApiResponse.success(
                 data = result,
                 message = "Найдено ${result.totalElements} документов, показано ${result.content.size}",
                 path = httpRequest.requestURI
@@ -216,10 +215,10 @@ class IdHeadController(
         @PathVariable status: Long,
         @PageableDefault(size = 20, sort = ["docdate"], direction = Sort.Direction.DESC) pageable: Pageable,
         httpRequest: HttpServletRequest
-    ): ResponseEntity<ApiResponse<PageResponse<IdheadResponse>>> {
+    ): ResponseEntity<MyApiResponse<PageResponse<IdheadResponse>>> {
         val result = idHeadService.getByStatusWithPagination(status, pageable)
         return ResponseEntity.ok(
-            ApiResponse.success(
+            MyApiResponse.success(
                 data = result,
                 message = "Найдено ${result.totalElements} документов со статусом $status",
                 path = httpRequest.requestURI
@@ -234,10 +233,10 @@ class IdHeadController(
         @RequestParam(required = false) doccode: String?,
         @PageableDefault(size = 20, sort = ["docdate"], direction = Sort.Direction.DESC) pageable: Pageable,
         httpRequest: HttpServletRequest
-    ): ResponseEntity<ApiResponse<PageResponse<IdheadResponse>>> {
+    ): ResponseEntity<MyApiResponse<PageResponse<IdheadResponse>>> {
         val result = idHeadService.getByFiltersWithPagination(status, doccode, pageable)
         return ResponseEntity.ok(
-            ApiResponse.success(
+            MyApiResponse.success(
                 data = result,
                 message = "Найдено ${result.totalElements} документов",
                 path = httpRequest.requestURI

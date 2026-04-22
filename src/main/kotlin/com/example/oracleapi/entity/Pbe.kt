@@ -1,14 +1,11 @@
-package com.example.oracleapi.entity.pbe
+package com.example.oracleapi.entity
 
 import com.example.oracleapi.Helper
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.Id
-import jakarta.persistence.Table
+import jakarta.persistence.*
 
 @Entity
 @Table(name = "pbe", schema = Helper.SCHEME)
-data class PBE(
+data class Pbe(
     @Id
     @Column(name = "rn")
     val rn: Long,
