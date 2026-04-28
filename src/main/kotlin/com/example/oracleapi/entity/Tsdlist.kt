@@ -16,13 +16,14 @@ import org.hibernate.annotations.ColumnDefault
 import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Entity
 @Table(name = "TSDLIST", schema = Helper.SCHEME)
 open class Tsdlist {
     @Id
     @Column(name = "RN", nullable = false)
-    open var id: Long? = null
+    open var rn: Long? = null
 
     @Size(max = 50)
     @NotNull
@@ -70,7 +71,7 @@ open class Tsdlist {
 
     @ColumnDefault("null")
     @Column(name = "DATESTART")
-    open var datestart: LocalDate? = null
+    open var datestart: LocalDateTime? = null
 
     @Size(max = 100)
     @ColumnDefault("null")

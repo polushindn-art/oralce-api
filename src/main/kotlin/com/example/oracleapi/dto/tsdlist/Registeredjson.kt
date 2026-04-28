@@ -11,6 +11,9 @@ data class Registeredjson(
     @field:Schema(description = "Время начала сессии", example = "2024-11-19 09:22:52")
     val timestart: String?,
 
+    @field:Schema(description = "RN пользователя")
+    val userrn: Long?,
+
     @field:Schema(description = "Код пользователя")
     val usercode: String?,
 

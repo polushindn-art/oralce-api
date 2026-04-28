@@ -1,19 +1,22 @@
 package com.example.oracleapi.service.tsdlist
 
+import com.example.oracleapi.RfidGenerator
 import com.example.oracleapi.dto.JsonResponseView
-import com.example.oracleapi.dto.tsdlist.Registeredjson
-import com.example.oracleapi.dto.tsdlist.StoreInfo
-import com.example.oracleapi.dto.tsdlist.UsedJson
+import com.example.oracleapi.dto.tsdlist.*
 import com.example.oracleapi.dto.tsdparam.ParamDto
+import com.example.oracleapi.dto.userpart.PartInfo
+import com.example.oracleapi.entity.Tsdlist
 import com.example.oracleapi.repository.agnlist.AgnlistRepository
 import com.example.oracleapi.repository.pbe.PbeRepository
-import com.example.oracleapi.repository.store.StoreRepository
 import com.example.oracleapi.repository.tsd.TsdListHistoryRepository
 import com.example.oracleapi.repository.tsd.TsdListRepository
+import com.example.oracleapi.repository.userpart.UserpartRepository
 import com.example.oracleapi.service.StoreService
+import com.example.oracleapi.service.public.PublicProcedureService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @Service
@@ -22,7 +25,9 @@ class TsdListService(
     private val pbeRepository: PbeRepository,
     private val agnListRepository: AgnlistRepository,
     private val storeService: StoreService,
-    private val tsdlistRepository: TsdListRepository
+    private val tsdlistRepository: TsdListRepository,
+    private val publicProcedureService: PublicProcedureService,
+    private val userpartRepository: UserpartRepository
 ) {
 
     private val log = LoggerFactory.getLogger(javaClass)
@@ -111,22 +116,21 @@ class TsdListService(
             // Получаем имя из AGNLIST
             val agnName = userList.useragn?.let { agnListRepository.findById(it).orElse(null)?.agnname }
 
+            // 🔥 Получаем ВСЕ роли пользователя
+            val userRn = userList.rn
+            val parts = userRn?.let { getPartsByUserRn(it) } ?: emptyList()
+
             UserInfo(
+                rn = userList.rn ?: 0L,
                 usercode = usercode,
                 username = agnName ?: usercode,
                 pin = userList.pin?.toLong(),
                 parole = userList.parole ?: "",
-                userList.useragn ?: 0L
+                userList.useragn ?: 0L,
+                dscbarnumb = userList.dscbarnumb ?: "",
+                parts = parts
             )
         }
-    }
-
-    /**
-     * Проверка активности терминала
-     */
-    @Transactional(readOnly = true)
-    fun isTerminalActive(sn: String): Boolean {
-        return tsdHistoryRepository.existsActiveSessionBySn(sn)
     }
 
     /**
@@ -151,12 +155,19 @@ class TsdListService(
             // Получаем имя из AGNLIST
             val agnName = userList.useragn?.let { agnListRepository.findById(it).orElse(null)?.agnname }
 
+            // 🔥 Получаем ВСЕ роли пользователя
+            val userRn = userList.rn
+            val parts = userRn?.let { getPartsByUserRn(it) } ?: emptyList()
+
             UserInfo(
+                rn = userList.rn ?: 0L,
                 usercode = usercode,
                 username = agnName ?: usercode,
                 pin = userList.pin?.toLong(),
                 parole = userList.parole ?: "",
-                userList.useragn ?: 0L
+                userList.useragn ?: 0L,
+                dscbarnumb = userList.dscbarnumb ?: "",
+                parts = parts
             )
         }
     }
@@ -234,6 +245,7 @@ class TsdListService(
         return Registeredjson(
             sn = tsdList?.sn,
             timestart = activeSession.timestart?.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+            userrn = userList?.rn,
             usercode = userList?.usercode,
             agnname = agnName,
             parole = userList?.parole,
@@ -246,11 +258,127 @@ class TsdListService(
         )
     }
 
-    data class UserInfo(
-        val usercode: String,
-        val username: String,
-        val pin: Long?,
-        val parole: String,
-        val userAgn: Long
-    )
+    /**
+     * Обновить существующий терминал или создать новый, если его нет
+     * При создании нового терминала генерирует случайный RFID
+     */
+    @Transactional
+    fun upsertTerminal(request: TsdUpsertRequest): TsdUpsertResponse {
+        log.debug("UPSERT терминал с Device ID: {}", request.deviceId)
+
+        // Ищем существующий терминал по Device ID
+        val existingTerminal = tsdlistRepository.findByDeviceid(request.deviceId)
+
+        return if (existingTerminal == null) {
+            // Создаем новый терминал
+            createNewTerminal(request)
+        } else {
+            // Обновляем существующий
+            updateExistingTerminal(existingTerminal, request)
+        }
+    }
+
+    private fun createNewTerminal(request: TsdUpsertRequest): TsdUpsertResponse {
+        // Генерируем новый RN через хранимую процедуру
+        val genIdResponse = publicProcedureService.getIdRn()
+        val newRn = genIdResponse.id ?: throw RuntimeException("Не удалось сгенерировать RN")
+
+        // Генерируем случайный RFID
+        val randomRfid = RfidGenerator.generateRandomRfid()
+
+        // Если SN не передан, передаем 014.0000
+        val terminalSn = request.sn ?: "014.0000"
+
+        val terminal = Tsdlist().apply {
+            rn = newRn
+            sn = terminalSn
+            deviceid = request.deviceId  // Устанавливаем Device ID
+            rfid = randomRfid
+            pbe = request.pbe?.let { pbeRepository.findById(it).orElse(null) }
+            note = request.note
+            tsdprogram = request.tsdprogram
+            curversion = request.curversion
+            tsdip = request.tsdip
+            tsdname = request.tsdname
+            versioncode = request.versioncode ?: 0
+            datestart = LocalDateTime.now()
+            newversion = null
+            deleted = null
+            updateversion = 0
+        }
+
+        tsdlistRepository.save(terminal)
+        log.info("Создан новый терминал с RN: {}, SN: {}, RFID: {}", newRn, request.sn, randomRfid)
+
+        return TsdUpsertResponse(
+            rn = terminal.rn!!,
+            deviceId = request.deviceId,
+            sn = terminalSn,
+            operation = "INSERT",
+            isNew = true,
+            generatedRfid = randomRfid
+        )
+    }
+
+    private fun updateExistingTerminal(
+        terminal: Tsdlist,
+        request: TsdUpsertRequest
+    ): TsdUpsertResponse {
+        // Обновляем только те поля, которые переданы (не null)
+        terminal.apply {
+            request.sn?.let { newSn ->
+                if (sn != newSn) {
+                    sn = newSn
+                    log.debug("Обновлен SN для Device ID {}: {} -> {}", deviceid, sn, newSn)
+                }
+            }
+            request.curversion?.let { curversion = it }
+            datestart = LocalDateTime.now()
+            request.tsdprogram?.let { tsdprogram = it }
+            request.tsdip?.let { tsdip = it }
+            request.tsdname?.let { tsdname = it }
+            request.versioncode?.let { versioncode = it }
+            request.note?.let { note = it }
+        }
+
+        tsdlistRepository.save(terminal)
+        log.info("Обновлен терминал с RN: {}, Device ID: {}, SN: {}", terminal.rn, request.deviceId, terminal.sn)
+
+        return TsdUpsertResponse(
+            rn = terminal.rn!!,
+            deviceId = request.deviceId,
+            sn = terminal.sn,
+            operation = "UPDATE",
+            isNew = false,
+            generatedRfid = terminal.rfid ?: "D0"
+        )
+    }
+
+    /**
+     * Получить все роли (part) для пользователя
+     */
+    @Transactional(readOnly = true)
+    fun getPartsByUserRn(userRn: Long): List<PartInfo> {
+        val userParts = userpartRepository.findByUserrnRn(userRn)
+        return userParts.mapNotNull { userpart ->
+            userpart.part?.let { part ->
+                PartInfo(
+                    rn = part.rn ?: 0,
+                    partcode = part.partcode ?: "",
+                    partname = part.partname ?: ""
+                )
+            }
+        }
+    }
 }
+
+data class UserInfo(
+    val rn: Long,
+    val usercode: String,
+    val username: String,
+    val pin: Long?,
+    val parole: String,
+    val userAgn: Long,
+    val dscbarnumb: String,
+    val parts: List<PartInfo>
+)

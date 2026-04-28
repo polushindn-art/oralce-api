@@ -2,6 +2,7 @@ package com.example.oracleapi.controller
 
 import com.example.oracleapi.config.JwtConfigProperties
 import com.example.oracleapi.config.JwtHelper
+import com.example.oracleapi.dto.*
 import com.example.oracleapi.dto.common.MyApiResponse
 import com.example.oracleapi.service.tsdlist.TsdListService
 import com.example.oracleapi.service.userlist.UserService
@@ -259,7 +260,7 @@ class AuthController(
         @RequestParam(required = false) deviceId: String?,
         request: HttpServletRequest,
         response: HttpServletResponse
-    ): ResponseEntity<MyApiResponse<Map<String, Any?>>> {  // ← Any? вместо Any
+    ): ResponseEntity<MyApiResponse<AuthResponse>> {
 
         if (deviceId.isNullOrBlank()) {
             return ResponseEntity
@@ -275,7 +276,6 @@ class AuthController(
         try {
             // Проверяем существование терминала
             val terminal = tsdListService.getTerminalByDeviceId(deviceId)
-
             if (terminal == null) {
                 log.warn("Terminal with Device ID {} not found", deviceId)
                 return ResponseEntity
@@ -301,9 +301,8 @@ class AuthController(
                     )
             }
 
-            // Получаем информацию о пользователе
+            // Получаем информацию о пользователе с ролями
             val userInfo = tsdListService.getUserByTerminalDeviceId(deviceId)
-
             if (userInfo == null) {
                 log.warn("No user associated with active terminal Device ID: {}", deviceId)
                 return ResponseEntity
@@ -319,9 +318,11 @@ class AuthController(
             // Получаем полную информацию о терминале
             val terminalFullInfo = tsdListService.getTerminalFullInfoAsRegisteredjson(deviceId)
 
+            // Создаем токен
             val token = jwtHelper.createToken(userInfo.usercode)
             log.info("Terminal authenticated by Device ID: {} as user {}", deviceId, userInfo.usercode)
 
+            // Устанавливаем cookie
             val cookie = Cookie(jwtConfig.cookieName, token).apply {
                 isHttpOnly = true
                 secure = jwtConfig.secure
@@ -330,18 +331,43 @@ class AuthController(
             }
             response.addCookie(cookie)
 
+            // Формируем структурированный ответ
+            val authResponse = AuthResponse(
+                device = DeviceInfo(
+                    deviceId = deviceId,
+                    sn = terminal.sn ?: ""
+                ),
+                user = UserAuthInfo(
+                    rn = userInfo.rn,
+                    usercode = userInfo.usercode,
+                    username = userInfo.username,
+                    parole = userInfo.parole,
+                    userAgn = userInfo.userAgn,
+                    dscbarnumb = userInfo.dscbarnumb,
+                    roles = userInfo.parts  // ← роли пользователя
+                ),
+                terminal = terminalFullInfo?.let {
+                    TerminalAuthInfo(
+                        timestart = it.timestart,
+                        pbecode = it.pbecode,
+                        pbern = it.pbern,
+                        stores = it.store?: emptyList(),
+                        params = it.param?.map { param ->
+                            ParamBriefInfo(
+                                name = param.name,
+                                value = param.value,
+                                description = param.description
+                            )
+                        } ?: emptyList()
+                    )
+                },
+                token = token,
+                expiresIn = jwtConfig.expiration
+            )
+
             return ResponseEntity.ok(
                 MyApiResponse.success(
-                    data = mapOf(
-                        "deviceId" to deviceId,
-                        "usercode" to userInfo.usercode,
-                        "parole" to userInfo.parole,
-                        "username" to userInfo.username,
-                        "useragn" to userInfo.userAgn,
-                        "token" to token,
-                        "expiresIn" to jwtConfig.expiration,
-                        "terminalInfo" to terminalFullInfo
-                    ),
+                    data = authResponse,
                     message = "Терминал авторизован по Device ID",
                     path = request.requestURI
                 )
