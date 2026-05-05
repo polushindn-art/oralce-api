@@ -231,7 +231,7 @@ class IdHeadController(
     fun getByFiltersWithPagination(
         @RequestParam(required = false) status: Long?,
         @RequestParam(required = false) doccode: String?,
-        @PageableDefault(size = 20, sort = ["docdate"], direction = Sort.Direction.DESC) pageable: Pageable,
+        @PageableDefault(size = 20, sort = ["rn"], direction = Sort.Direction.DESC) pageable: Pageable,
         httpRequest: HttpServletRequest
     ): ResponseEntity<MyApiResponse<PageResponse<IdheadResponse>>> {
         val result = idHeadService.getByFiltersWithPagination(status, doccode, pageable)

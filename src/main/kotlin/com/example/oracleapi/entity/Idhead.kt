@@ -1,10 +1,16 @@
 package com.example.oracleapi.entity
 
 import com.example.oracleapi.Helper
+import com.example.oracleapi.entity.Typedoc
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.FetchType
 import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
+import org.hibernate.annotations.OnDelete
+import org.hibernate.annotations.OnDeleteAction
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
@@ -18,8 +24,10 @@ open class Idhead {
     @Column(name = "CRN", nullable = false)
     open var crn: Long? = null
 
-    @Column(name = "DOCTYPE", nullable = false)
-    open var doctype: Long? = null
+    @OnDelete(action = OnDeleteAction.RESTRICT)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "DOCTYPE")
+    open var doctypeEntity: Typedoc? = null
 
     @Column(name = "DOCPREF", nullable = false, length = 10)
     open var docpref: String? = null
@@ -27,14 +35,18 @@ open class Idhead {
     @Column(name = "DOCDATE", nullable = false)
     open var docdate: LocalDateTime? = null
 
-    @Column(name = "STOREOUT")
-    open var storeout: Long? = null
+    @OnDelete(action = OnDeleteAction.RESTRICT)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "STOREOUT")
+    open var storeOutEntity: Store? = null
 
     @Column(name = "PROVIDER")
     open var provider: Long? = null
 
-    @Column(name = "STOREIN")
-    open var storein: Long? = null
+    @OnDelete(action = OnDeleteAction.RESTRICT)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "STOREIN")
+    open var storeInEntity: Store? = null
 
     @Column(name = "NOTE", length = 80)
     open var note: String? = null

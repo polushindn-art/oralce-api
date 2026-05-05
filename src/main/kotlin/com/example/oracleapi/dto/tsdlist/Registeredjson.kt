@@ -1,5 +1,6 @@
 package com.example.oracleapi.dto.tsdlist
 
+import com.example.oracleapi.dto.store.StoreSimpleResponse
 import com.example.oracleapi.dto.tsdparam.ParamDto
 import io.swagger.v3.oas.annotations.media.Schema
 
@@ -36,7 +37,7 @@ data class Registeredjson(
     val pbern: Long?,
 
     @field:Schema(description = "Склад")
-    val store: List<StoreInfo>? = null,
+    val store: List<StoreSimpleResponse>? = null,
 
     @field:Schema(description = "Параметры ТСД")
     val param: List<ParamDto>? = null

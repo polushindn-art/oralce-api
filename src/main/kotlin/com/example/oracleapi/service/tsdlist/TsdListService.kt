@@ -1,7 +1,7 @@
 package com.example.oracleapi.service.tsdlist
 
 import com.example.oracleapi.RfidGenerator
-import com.example.oracleapi.dto.JsonResponseView
+import com.example.oracleapi.dto.store.StoreSimpleResponse
 import com.example.oracleapi.dto.tsdlist.*
 import com.example.oracleapi.dto.tsdparam.ParamDto
 import com.example.oracleapi.dto.userpart.PartInfo
@@ -33,14 +33,13 @@ class TsdListService(
     private val log = LoggerFactory.getLogger(javaClass)
 
     @Transactional(readOnly = true)
-    fun getRegisteredSessions(sn: String?): JsonResponseView<Registeredjson> {
-        val startTime = System.currentTimeMillis()
+    fun getRegisteredSessions(sn: String?): List<Registeredjson> {
         val data = tsdHistoryRepository.findRegisteredSessions(sn)
 
         // Догружаем склады для каждого PBE
-        val enrichedData = data.map { session ->
+        return data.map { session ->
             val stores = if (session.pbern != null) {
-                storeService.getStoresByPbeRnAndNote(session.pbern)
+                storeService.getStoresByPbeAndNote(session.pbern, "#ТСД")
             } else {
                 emptyList()
             }
@@ -63,35 +62,16 @@ class TsdListService(
                 param = params
             )
         }
-
-
-        log.debug("Found {} registered sessions for SN: {}", data.size, sn)
-
-        return JsonResponseView(
-            enrichedData.size,
-            System.currentTimeMillis() - startTime,
-            enrichedData
-        )
     }
 
     @Transactional(readOnly = true)
-    fun getUsedTsd(pbe: Long?): JsonResponseView<UsedJson> {
-        val startTime = System.currentTimeMillis()
-
+    fun getUsedTsd(pbe: Long?): List<UsedJson> {
         // Валидация PBE если передан
         if (pbe != null && !pbeRepository.existsById(pbe)) {
             throw IllegalArgumentException("Подразделение с rn = $pbe не существует")
         }
 
-        val data = tsdHistoryRepository.findActiveUsers(pbe)
-
-        log.debug("Found {} active users for PBE: {}", data.size, pbe)
-
-        return JsonResponseView(
-            data.size,
-            System.currentTimeMillis() - startTime,
-            data
-        )
+        return tsdHistoryRepository.findActiveUsers(pbe)
     }
 
     /**
@@ -116,7 +96,7 @@ class TsdListService(
             // Получаем имя из AGNLIST
             val agnName = userList.useragn?.let { agnListRepository.findById(it).orElse(null)?.agnname }
 
-            // 🔥 Получаем ВСЕ роли пользователя
+            // Получаем ВСЕ роли пользователя
             val userRn = userList.rn
             val parts = userRn?.let { getPartsByUserRn(it) } ?: emptyList()
 
@@ -126,7 +106,7 @@ class TsdListService(
                 username = agnName ?: usercode,
                 pin = userList.pin?.toLong(),
                 parole = userList.parole ?: "",
-                userList.useragn ?: 0L,
+                userAgn = userList.useragn ?: 0L,
                 dscbarnumb = userList.dscbarnumb ?: "",
                 parts = parts
             )
@@ -155,7 +135,7 @@ class TsdListService(
             // Получаем имя из AGNLIST
             val agnName = userList.useragn?.let { agnListRepository.findById(it).orElse(null)?.agnname }
 
-            // 🔥 Получаем ВСЕ роли пользователя
+            // Получаем ВСЕ роли пользователя
             val userRn = userList.rn
             val parts = userRn?.let { getPartsByUserRn(it) } ?: emptyList()
 
@@ -165,7 +145,7 @@ class TsdListService(
                 username = agnName ?: usercode,
                 pin = userList.pin?.toLong(),
                 parole = userList.parole ?: "",
-                userList.useragn ?: 0L,
+                userAgn = userList.useragn ?: 0L,
                 dscbarnumb = userList.dscbarnumb ?: "",
                 parts = parts
             )
@@ -184,7 +164,7 @@ class TsdListService(
      * Получить информацию о терминале по Device ID
      */
     @Transactional(readOnly = true)
-    fun getTerminalByDeviceId(deviceId: String): com.example.oracleapi.entity.Tsdlist? {
+    fun getTerminalByDeviceId(deviceId: String): Tsdlist? {
         return tsdHistoryRepository.findTerminalByDeviceId(deviceId)
     }
 
@@ -215,12 +195,14 @@ class TsdListService(
 
         // 4. Получаем склады для PBE
         val stores = if (pbern != null) {
-            storeService.getStoresByPbeRnAndNote(pbern).map { store ->
-                StoreInfo(
+            storeService.getStoresByPbeAndNote(pbern, "#ТСД").map { store ->
+                StoreSimpleResponse(
                     rn = store.rn,
                     storecode = store.storecode,
+                    storename = store.storename,
                     eschema = store.eschema,
-                    usesas = store.usesas
+                    usesas = store.usesas,
+                    note = store.note
                 )
             }
         } else {
@@ -292,7 +274,7 @@ class TsdListService(
         val terminal = Tsdlist().apply {
             rn = newRn
             sn = terminalSn
-            deviceid = request.deviceId  // Устанавливаем Device ID
+            deviceid = request.deviceId
             rfid = randomRfid
             pbe = request.pbe?.let { pbeRepository.findById(it).orElse(null) }
             note = request.note
@@ -324,7 +306,6 @@ class TsdListService(
         terminal: Tsdlist,
         request: TsdUpsertRequest
     ): TsdUpsertResponse {
-        // Обновляем только те поля, которые переданы (не null)
         terminal.apply {
             request.sn?.let { newSn ->
                 if (sn != newSn) {

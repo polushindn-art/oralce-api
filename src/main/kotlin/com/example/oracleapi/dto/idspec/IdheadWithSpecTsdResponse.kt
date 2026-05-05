@@ -11,8 +11,8 @@ data class IdheadWithSpecTsdResponse(
     val docpref: String?,
     val idStatus: Long,
     val provider: Long?,
-    val storein: Long?,
-    val storeout: Long?,
+    val storeinCode: String?,
+    val storeoutCode: String?,
     val note: String?,
     val sumprice: BigDecimal?,
     val specs: List<IdspecTsdResponse>

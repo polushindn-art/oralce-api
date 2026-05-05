@@ -8,7 +8,7 @@ import java.time.LocalDateTime
 data class IdheadResponse(
     val rn: Long,
     val crn: Long,
-    val doctype: Long,
+    val doctypeCode: String,
     val docpref: String,
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -16,8 +16,8 @@ data class IdheadResponse(
     val docnumb: BigDecimal?,
     val sumprice: BigDecimal?,
     val idStatus: Long,
-    val storein: Long?,
-    val storeout: Long?,
+    val storeinCode: String?,
+    val storeoutCode: String?,
     val provider: Long?,
     val note: String?,
     val manager: Long?,
@@ -27,14 +27,14 @@ data class IdheadResponse(
 fun Idhead.toResponse(): IdheadResponse = IdheadResponse(
     rn = this.rn!!,
     crn = this.crn!!,
-    doctype = this.doctype!!,
+    doctypeCode = this.doctypeEntity!!.doccode,
     docpref = this.docpref!!,
     docdate = this.docdate,
     docnumb = this.docnumb,
     sumprice = this.sumprice,
     idStatus = this.idStatus!!,
-    storein = this.storein,
-    storeout = this.storeout,
+    storeinCode = this.storeInEntity?.storecode,
+    storeoutCode = this.storeOutEntity?.storecode,
     provider = this.provider,
     note = this.note,
     manager = this.manager,

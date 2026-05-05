@@ -1,0 +1,13 @@
+# Собрать проект один раз с интернетом (скачать всё)
+call mvnw dependency:go-offline
+
+# Затем запускать в офлайн-режиме
+call mvnw spring-boot:run -o -Dspring-boot.run.jvmArguments="-Dfile.encoding=UTF-8"
+# Флаг -o означает --offline (работа без интернета)
+
+
+# Профиль "dev"
+call mvnw spring-boot:run -o -Dspring-boot.run.profiles=dev -Dspring-boot.run.jvmArguments="-Dfile.encoding=UTF-8"
+
+# Профиль "prod"
+call mvnw spring-boot:run -o -Dspring-boot.run.profiles=prod -Dspring-boot.run.jvmArguments="-Dfile.encoding=UTF-8"

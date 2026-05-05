@@ -47,7 +47,7 @@ class IdHeadService(
     fun getCount(): Long = idheadRepository.count()
 
     fun getByStatusAndDoctype(status: Long, doctype: Long): List<IdheadResponse> {
-        return idheadRepository.findByIdStatusAndDoctype(status, doctype)
+        return idheadRepository.findByIdStatusAndDoctypeEntity_Rn(status, doctype)
             .map { it.toResponse() }
     }
 
@@ -58,7 +58,7 @@ class IdHeadService(
 
     fun getByStatusAndDoccode(status: Long, doccode: String): List<IdheadResponse> {
         val doctypeRns = getDoctypeRnsByDoccode(doccode)
-        return idheadRepository.findByIdStatusAndDoctypeIn(status, doctypeRns)
+        return idheadRepository.findByIdStatusAndDoctypeEntity_RnIn(status, doctypeRns)
             .map { it.toResponse() }
     }
 
@@ -77,8 +77,8 @@ class IdHeadService(
             docpref = head.docpref,
             idStatus = head.idStatus!!,
             provider = head.provider,
-            storein = head.storein,
-            storeout = head.storeout,
+            storeinCode = head.storeInEntity?.storecode,
+            storeoutCode = head.storeOutEntity?.storecode,
             note = head.note,
             sumprice = head.sumprice,
             specs = specs
@@ -102,7 +102,7 @@ class IdHeadService(
         doctype: Long,
         pageable: Pageable
     ): PageResponse<IdheadResponse> {
-        val page: Page<Idhead> = idheadRepository.findByIdStatusAndDoctype(status, doctype, pageable)
+        val page: Page<Idhead> = idheadRepository.findByIdStatusAndDoctypeEntity_Rn(status, doctype, pageable)
         return PageResponse.fromPage(page.map { it.toResponse() })
     }
 

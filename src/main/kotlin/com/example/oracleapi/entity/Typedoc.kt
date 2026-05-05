@@ -1,7 +1,15 @@
-package com.example.oracleapi.entity.typedoc
+package com.example.oracleapi.entity
 
 import com.example.oracleapi.Helper
-import jakarta.persistence.*
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.FetchType
+import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
+import jakarta.persistence.Table
+import org.hibernate.annotations.OnDelete
+import org.hibernate.annotations.OnDeleteAction
 
 @Entity
 @Table(name = "TYPEDOC", schema = Helper.SCHEME)
@@ -16,8 +24,10 @@ class Typedoc(
     @Column(name = "DOCNAME", nullable = false, length = 80)
     var docname: String = "",
 
-    @Column(name = "DIVISION", nullable = false)
-    var division: Long = 0,
+    @OnDelete(action = OnDeleteAction.RESTRICT)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "DIVISION")
+    open var divisionEntity: Division? = null,
 
     @Column(name = "NOTE", length = 80)
     var note: String? = null,

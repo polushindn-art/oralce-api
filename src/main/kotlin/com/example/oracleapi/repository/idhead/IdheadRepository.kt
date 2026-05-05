@@ -10,8 +10,8 @@ interface IdheadRepository : JpaRepository<Idhead, Long>, JpaSpecificationExecut
     fun existsByRn(rn: Long): Boolean
     fun findByIdStatus(idStatus: Long): List<Idhead>
     fun countAllBy(): Long
-    fun findByIdStatusAndDoctype(status: Long, doctype: Long): List<Idhead>
-    fun findByIdStatusAndDoctypeIn(status: Long, doctypes: List<Long>): List<Idhead>
+    fun findByIdStatusAndDoctypeEntity_Rn(status: Long, doctype: Long): List<Idhead>
+    fun findByIdStatusAndDoctypeEntity_RnIn(status: Long, doctypes: List<Long>): List<Idhead>
 
     // Переопределяем метод из JpaRepository для пагинации
     override fun findAll(pageable: Pageable): Page<Idhead>
@@ -20,5 +20,5 @@ interface IdheadRepository : JpaRepository<Idhead, Long>, JpaSpecificationExecut
     fun findByIdStatus(idStatus: Long, pageable: Pageable): Page<Idhead>
 
     // Поиск по статусу и типу документа с пагинацией
-    fun findByIdStatusAndDoctype(status: Long, doctype: Long, pageable: Pageable): Page<Idhead>
+    fun findByIdStatusAndDoctypeEntity_Rn(status: Long, doctype: Long, pageable: Pageable): Page<Idhead>
 }

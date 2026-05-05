@@ -1,5 +1,6 @@
 package com.example.oracleapi.dto
 
+import com.example.oracleapi.dto.store.StoreSimpleResponse
 import com.example.oracleapi.dto.tsdlist.StoreInfo
 import com.example.oracleapi.dto.userpart.PartInfo
 
@@ -37,7 +38,7 @@ data class TerminalAuthInfo(
     val timestart: String?,
     val pbecode: String?,
     val pbern: Long?,
-    val stores: List<StoreInfo>,
+    val stores: List<StoreSimpleResponse>,
     val params: List<ParamBriefInfo>
 )
 

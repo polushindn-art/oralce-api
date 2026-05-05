@@ -1,6 +1,5 @@
 package com.example.oracleapi.controller
 
-import com.example.oracleapi.dto.JsonResponseView
 import com.example.oracleapi.dto.common.MyApiResponse
 import com.example.oracleapi.dto.tsdlist.Registeredjson
 import com.example.oracleapi.dto.tsdlist.TsdUpsertRequest
@@ -28,7 +27,7 @@ class TsdListController(
     fun registeredjson(
         @RequestParam(required = false) sn: String?,
         request: HttpServletRequest
-    ): MyApiResponse<JsonResponseView<Registeredjson>> {
+    ): MyApiResponse<List<Registeredjson>> {
         val result = tsdListService.getRegisteredSessions(sn)
         return MyApiResponse.success(
             data = result,
@@ -45,7 +44,7 @@ class TsdListController(
     fun usedTsd(
         @RequestParam(required = false) pbe: Long?,
         request: HttpServletRequest
-    ): MyApiResponse<JsonResponseView<UsedJson>> {
+    ): MyApiResponse<List<UsedJson>> {
         val data = tsdListService.getUsedTsd(pbe)
         return MyApiResponse.success(
             data = data,
