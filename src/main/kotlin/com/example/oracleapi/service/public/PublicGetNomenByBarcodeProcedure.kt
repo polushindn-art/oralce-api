@@ -18,9 +18,7 @@ class PublicGetNomenByBarcodeProcedure(
         val startTime = System.currentTimeMillis()
         try {
             // Используем нативный SQL для вызова функции
-            val query = entityManager.createNativeQuery(
-                "SELECT PKG_PUBLIC.GETNOMENBYBARCODE(:barcode) FROM DUAL"
-            )
+            val query = entityManager.createNativeQuery(("SELECT PKG_PUBLIC.GETNOMENBYBARCODE(:barcode) FROM DUAL"))
             query.setParameter("barcode", barcode)
 
             val resultNumber = query.singleResult as? Number
@@ -28,11 +26,6 @@ class PublicGetNomenByBarcodeProcedure(
 
             val resultId = resultNumber.toLong()
             val executionTime = System.currentTimeMillis() - startTime
-
-            // Проверяем, что идентификатор валидный (например, не 0 или не отрицательный)
-            if (resultId <= 0) {
-                throw IllegalArgumentException("Ошибка GETNOMENBYBARCODE")
-            }
 
             return GetNomenByBarcodeResponse(
                 nomen = resultId,

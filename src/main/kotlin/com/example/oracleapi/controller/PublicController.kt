@@ -17,55 +17,38 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/public")
+@RequestMapping("/v1/public")
 @Tag(name = "pkg_public", description = "Процедуры пакета PKG_PUBLIC")
 class PublicController(
     private val publicProcedureService: PublicProcedureService
-) {
+) : BaseController() {
     @PostMapping("/getNomenByBarcode")
     @Operation(
         summary = "pkg_public.getnomenbybarcode",
         description = "Получить идентификатор номенклатуры по штрих-коду"
     )
     fun getNomenByBarcode(
-        @Valid @RequestBody(required = true) request: GetNomenByBarcodeRequest,
-        httpRequest: HttpServletRequest
+        @Valid @RequestBody(required = true) request: GetNomenByBarcodeRequest
     ): MyApiResponse<GetNomenByBarcodeResponse> {
-        val result = publicProcedureService.getNomenByBarcode(request)
-        return MyApiResponse.success(
-            data = result,
-            message = "Идентификатор получен",
-            httpRequest.requestURI
+        return success(
+            publicProcedureService.getNomenByBarcode(request)
         )
     }
 
-    @GetMapping("/genIdRn")
+    @GetMapping("/gen-rn")
     @Operation(
         summary = "pkg_public.genidrn",
         description = "Получить уникальный идентификатор RN"
     )
-    fun genIdRn(
-        httpRequest: HttpServletRequest
-    ): MyApiResponse<GenIdResponse> {
-        val result = publicProcedureService.getIdRn()
-        return MyApiResponse.success(
-            data = result,
-            message = "Идентификатор RN получен",
-            httpRequest.requestURI
-        )
+    fun genIdRn(): MyApiResponse<GenIdResponse> {
+        return success(publicProcedureService.getIdRn())
     }
 
-    @GetMapping("/genIdRn/multiple")
+    @GetMapping("/gen-rn/multiple")
     @Operation(summary = "Получить несколько RN", description = "Генерирует несколько уникальных идентификаторов")
     fun generateMultipleRn(
-        @RequestParam(defaultValue = "3") count: Int,
-        httpRequest: HttpServletRequest
+        @RequestParam(defaultValue = "3") count: Int
     ): MyApiResponse<GenIdResponse> {
-        val result = publicProcedureService.generateMultipleRn(count)
-        return  MyApiResponse.success(
-                        data = result,
-                        message = "Сгенерировано $count идентификаторов",
-                        httpRequest.requestURI
-                    )
+        return success(publicProcedureService.generateMultipleRn(count))
     }
 }

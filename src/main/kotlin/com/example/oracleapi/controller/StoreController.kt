@@ -9,16 +9,16 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/store")
+@RequestMapping("/v1/stores")
 @Tag(name = "Store", description = "API для работы со складами")
 class StoreController(
     private val storeService: StoreService
-) {
+): BaseController() {
 
     @GetMapping("/all")
     @Operation(summary = "Получить все склады")
     fun getAllStores(): MyApiResponse<List<StoreResponse>> {
-        return MyApiResponse.success(storeService.getAllStores())
+        return success(storeService.getAllStores())
     }
 
     @GetMapping("/pbe/{pbeRn}")
@@ -26,7 +26,7 @@ class StoreController(
     fun getStoresByPbe(
         @PathVariable pbeRn: Long
     ): MyApiResponse<List<StoreResponse>> {
-        return MyApiResponse.success(storeService.getStoresByPbe(pbeRn))
+        return success(storeService.getStoresByPbe(pbeRn))
     }
 
     @GetMapping("/tsd")
@@ -34,8 +34,7 @@ class StoreController(
     fun getStoresForTsd(
         @RequestParam(required = true) pbeRn: Long
     ): MyApiResponse<List<StoreSimpleResponse>> {
-        return MyApiResponse.success(storeService.getStoresByPbeAndNote(pbeRn, "#ТСД"))
-
+        return successList(storeService.getStoresByPbeAndNote(pbeRn, "#ТСД"))
     }
 
     @GetMapping("/{rn}")
@@ -43,6 +42,6 @@ class StoreController(
     fun getStoreByRn(
         @PathVariable rn: Long
     ): MyApiResponse<StoreResponse> {
-        return MyApiResponse.success(storeService.getStoreByRn(rn))
+        return success(storeService.getStoreByRn(rn))
     }
 }

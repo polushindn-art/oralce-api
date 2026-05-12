@@ -13,39 +13,23 @@ import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/email")
+@RequestMapping("/v1/email")
 @Tag(name = "pkg_mail", description = "API для отправки email сообщений")
 class EmailController(
     private val emailService: EmailService
-) {
+) : BaseController() {
 
     @PostMapping("/send")
     @Operation(
         summary = "Отправить простое письмо",
         description = "Отправляет письмо через Oracle процедуру PKG_SENDMAIL.SIMPLE_TEXT"
     )
-    @ApiResponses(
-        value = [
-            SwaggerApiResponse(responseCode = "200", description = "Письмо успешно отправлено"),
-            SwaggerApiResponse(responseCode = "400", description = "Неверные параметры запроса"),
-            SwaggerApiResponse(responseCode = "500", description = "Ошибка сервера или ошибка отправки письма")
-        ]
-    )
     fun sendSimpleEmail(
-        @Valid @RequestBody request: SimpleEmailRequest,
-        httpRequest: HttpServletRequest
-    ): MyApiResponse<SimpleEmailResponse> {
-
-        val mailRn = emailService.sendSimpleEmail(request)
-
-        return MyApiResponse.success(
-            data = SimpleEmailResponse(
-                success = true,
-                message = "Письмо успешно отправлено",
-                mailRn
-            ),
-            message = "Письмо отправлено",
-            path = httpRequest.requestURI
+        @Valid @RequestBody request: SimpleEmailRequest
+    ): MyApiResponse<Long> {
+        return success(
+            emailService.sendSimpleEmail(request),
+            message = "Письмо успешно отправлено"
         )
     }
 }

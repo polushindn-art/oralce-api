@@ -31,18 +31,18 @@ data class ProfileResponse(
 )
 
 @RestController
-@RequestMapping("/info")
+@RequestMapping("/v1/info")
 @Tag(name = "Информация", description = "Информация о приложении")
 class InfoController(
     private val environment: Environment,
     private val dataSource: DataSource
-) {
+):BaseController() {
 
     @GetMapping("/profile")
     @Operation(summary = "Текущий профиль", description = "Возвращает активный профиль Spring")
     fun getProfile(): MyApiResponse<ProfileResponse> {
         val profiles = environment.activeProfiles.joinToString(", ")
-        return MyApiResponse.success(
+        return success(
             data = ProfileResponse(
                 activeProfiles = profiles,
                 isDev = environment.activeProfiles.contains("dev"),
@@ -72,12 +72,12 @@ class InfoController(
                 activeProfile = environment.activeProfiles.firstOrNull() ?: "unknown"
             )
             connection.close()
-            MyApiResponse.success(
+            success(
                 data = dbInfo,
                 message = "Информация о БД получена"
             )
         } catch (e: Exception) {
-            MyApiResponse.error(
+            error(
                 message = "Ошибка получения информации о БД: ${e.message}"
             )
         }

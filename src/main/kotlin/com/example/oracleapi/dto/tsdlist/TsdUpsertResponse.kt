@@ -21,4 +21,12 @@ data class TsdUpsertResponse(
 
     @Schema(description = "RFID терминала (при INSERT генерируется случайный)")
     val generatedRfid: String
-)
+) {
+    fun getSuccessMessage(): String {
+        return if (isNew) {
+            "Терминал успешно создан. Device ID: $deviceId, RFID: ${generatedRfid ?: "не указан"}"
+        } else {
+            "Терминал успешно обновлен. Device ID: $deviceId"
+        }
+    }
+}

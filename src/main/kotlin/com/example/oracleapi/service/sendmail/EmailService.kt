@@ -2,6 +2,8 @@ package com.example.oracleapi.service.sendmail
 
 import com.example.oracleapi.Helper
 import com.example.oracleapi.dto.sendmail.SimpleEmailRequest
+import com.example.oracleapi.service.ProtocolMailService
+import com.example.oracleapi.service.mark.MarkProcedureService
 import jakarta.persistence.EntityManager
 import jakarta.persistence.ParameterMode
 import org.springframework.stereotype.Service
@@ -9,15 +11,15 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class EmailService(
-    private val entityManager: EntityManager
+    private val entityManager: EntityManager,
+    private val protocolMailService: ProtocolMailService
 ) {
 
     @Transactional
     fun sendSimpleEmail(request: SimpleEmailRequest): Long {
-        val schema = Helper.SCHEME
 
         // 1. Вызываем процедуру и получаем RN
-        val storedProcedure = entityManager.createStoredProcedureQuery("$schema.PKG_SENDMAIL.SIMPLE_TEXT_WITH_OUT")
+        val storedProcedure = entityManager.createStoredProcedureQuery("${Helper.SCHEME}.PKG_SENDMAIL.SIMPLE_TEXT_WITH_OUT")
 
         storedProcedure.registerStoredProcedureParameter("title_", String::class.java, ParameterMode.IN)
         storedProcedure.registerStoredProcedureParameter("subject_", String::class.java, ParameterMode.IN)
@@ -38,25 +40,11 @@ class EmailService(
 
         val mailRn = storedProcedure.getOutputParameterValue("out_rn") as Long
 
-        print("select0")
-
-        // 2. Проверяем результат в PROTOCOL_MAIL
-        val sql = "SELECT RESULT, ERRNAME FROM $schema.PROTOCOL_MAIL WHERE RN = :rn"
-        val query = entityManager.createNativeQuery(sql)
-        query.setParameter("rn", mailRn)
-
-        print("select")
-
-        val result = query.singleResult as Array<*>
-        val resultStatus = result[0].toString().toInt()  // 0 - ошибка, 1 - успех
-        val errName = result[1] as? String
-
-        print(result[0])
-        print(result[1])
+        val resultStatus = protocolMailService.getInfoByRn(mailRn)
 
         // Если RESULT = 1 - значит ошибка
-        if (resultStatus == 0) {
-            val errorMessage = errName ?: "Неизвестная ошибка отправки письма"
+        if (resultStatus.result == 0L) {
+            val errorMessage = resultStatus.errName ?: "Неизвестная ошибка отправки письма"
             throw RuntimeException("Ошибка отправки письма: $errorMessage")
         }
 

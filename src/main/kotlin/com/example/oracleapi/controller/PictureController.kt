@@ -13,25 +13,20 @@ import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/pictures")
+@RequestMapping("/v1/pictures")
 @Tag(name = "pkg_picture", description = "Работа с изображениями")
 class PictureController(
     private val pictureService: PictureService,
     private val objectMapper: ObjectMapper
-) {
+) : BaseController() {
 
     @GetMapping("/{rn}/info")
     @Operation(summary = "Получить информацию об изображении")
     fun getInfo(
-        @PathVariable rn: Long,
-        request: HttpServletRequest
+        @PathVariable rn: Long
     ): MyApiResponse<PictureMetadata> {
         val picture = getPictureOrThrow(rn)
-        return MyApiResponse.success(
-            data = PictureMetadata.fromEntity(picture),
-            message = "Информация получена",
-            path = request.requestURI
-        )
+        return success(PictureMetadata.fromEntity(picture))
     }
 
     @GetMapping("/{rn}/view")
@@ -116,7 +111,11 @@ class PictureController(
         }
 
         if (picture.preview == null) {
-            sendErrorResponse(response, "Миниатюра для изображения с RN=$rn не найдена", "/pictures/$rn/preview/download")
+            sendErrorResponse(
+                response,
+                "Миниатюра для изображения с RN=$rn не найдена",
+                "/pictures/$rn/preview/download"
+            )
             return
         }
 
@@ -133,15 +132,9 @@ class PictureController(
     @GetMapping("/by-tablern/{tablern}")
     @Operation(summary = "Получить список RN изображений по tablern")
     fun getRnListByTablern(
-        @PathVariable tablern: Long,
-        request: HttpServletRequest
+        @PathVariable tablern: Long
     ): MyApiResponse<List<Long>> {
-        val rnList = pictureService.getRnListByTablernNotDeleted(tablern)
-        return MyApiResponse.success(
-            data = rnList,
-            message = "Найдено ${rnList.size} изображений",
-            path = request.requestURI
-        )
+        return successList(pictureService.getRnListByTablernNotDeleted(tablern))
     }
 
     private fun sendErrorResponse(

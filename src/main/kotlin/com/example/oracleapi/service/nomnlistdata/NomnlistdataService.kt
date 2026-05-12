@@ -96,7 +96,8 @@ class NomnlistdataService(
         val preview = imageService.generatePreview(data)
 
         // Генерируем RN
-        val newRn = genIdRnProcedur.generateRn().id
+        val newRn = genIdRnProcedur.generateRn().rn
+
 
         repository.insertNative(
             rn = newRn,

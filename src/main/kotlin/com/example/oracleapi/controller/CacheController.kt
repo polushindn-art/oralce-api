@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/cache")
+@RequestMapping("v1/cache")
 class CacheController(
     private val cacheManager: CacheManager
 ) {

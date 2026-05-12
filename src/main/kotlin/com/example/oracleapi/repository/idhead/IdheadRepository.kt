@@ -10,6 +10,7 @@ interface IdheadRepository : JpaRepository<Idhead, Long>, JpaSpecificationExecut
     fun existsByRn(rn: Long): Boolean
     fun findByIdStatus(idStatus: Long): List<Idhead>
     fun countAllBy(): Long
+    fun countByIdStatus(idStatus: Long): Long
     fun findByIdStatusAndDoctypeEntity_Rn(status: Long, doctype: Long): List<Idhead>
     fun findByIdStatusAndDoctypeEntity_RnIn(status: Long, doctypes: List<Long>): List<Idhead>
 

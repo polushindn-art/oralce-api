@@ -14,26 +14,20 @@ import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/tsdlist")
+@RequestMapping("v1/tsdlist")
 @Tag(name = "tsdlist", description = "Процедуры пакета PKG TSDLIST")
 class TsdListController(
     private val tsdListService: TsdListService,
-) {
+) : BaseController() {
     @GetMapping("/registeredjson")
     @Operation(
         summary = "pkg tsdlist.registeredjson",
         description = "Получить список зарегистрированных ТСД"
     )
     fun registeredjson(
-        @RequestParam(required = false) sn: String?,
-        request: HttpServletRequest
+        @RequestParam(required = false) sn: String?
     ): MyApiResponse<List<Registeredjson>> {
-        val result = tsdListService.getRegisteredSessions(sn)
-        return MyApiResponse.success(
-            data = result,
-            "Список получен",
-            path = request.requestURI
-        )
+        return successList(tsdListService.getRegisteredSessions(sn))
     }
 
     @GetMapping("/usedtsd")
@@ -42,15 +36,9 @@ class TsdListController(
         description = "Получить список активных пользователй ТСД"
     )
     fun usedTsd(
-        @RequestParam(required = false) pbe: Long?,
-        request: HttpServletRequest
+        @RequestParam(required = false) pbe: Long?
     ): MyApiResponse<List<UsedJson>> {
-        val data = tsdListService.getUsedTsd(pbe)
-        return MyApiResponse.success(
-            data = data,
-            message = "Список активных пользователей ТСД успешно получен",
-            path = request.requestURI
-        )
+        return successList(tsdListService.getUsedTsd(pbe))
     }
 
     @PostMapping("/upsert")
@@ -72,23 +60,10 @@ class TsdListController(
         """
     )
     fun upsertTerminal(
-        @Valid @RequestBody request: TsdUpsertRequest,
-        httpRequest: HttpServletRequest
+        @Valid @RequestBody request: TsdUpsertRequest
     ): MyApiResponse<TsdUpsertResponse> {
         val result = tsdListService.upsertTerminal(request)
-        val message = if (result.isNew) {
-            "Терминал успешно создан. Device ID: ${result.deviceId}, RFID: ${result.generatedRfid}"
-        } else {
-            "Терминал успешно обновлен. Device ID: ${result.deviceId}"
-        }
-
-        val response = MyApiResponse.success(
-            data = result,
-            message = message,
-            path = httpRequest.requestURI
-        )
-
-        return response
+        return success(result, result.getSuccessMessage())
     }
 
 }

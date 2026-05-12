@@ -263,7 +263,7 @@ class TsdListService(
     private fun createNewTerminal(request: TsdUpsertRequest): TsdUpsertResponse {
         // Генерируем новый RN через хранимую процедуру
         val genIdResponse = publicProcedureService.getIdRn()
-        val newRn = genIdResponse.id ?: throw RuntimeException("Не удалось сгенерировать RN")
+        val newRn = genIdResponse.rn ?: throw RuntimeException("Не удалось сгенерировать RN")
 
         // Генерируем случайный RFID
         val randomRfid = RfidGenerator.generateRandomRfid()

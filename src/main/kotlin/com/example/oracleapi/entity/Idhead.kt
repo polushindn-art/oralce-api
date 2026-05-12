@@ -24,9 +24,11 @@ open class Idhead {
     @Column(name = "CRN", nullable = false)
     open var crn: Long? = null
 
-    @OnDelete(action = OnDeleteAction.RESTRICT)
+    @Column(name = "DOCTYPE")
+    open var doctype: Long? = null
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "DOCTYPE")
+    @JoinColumn(name = "DOCTYPE", insertable = false, updatable = false)
     open var doctypeEntity: Typedoc? = null
 
     @Column(name = "DOCPREF", nullable = false, length = 10)
@@ -35,17 +37,21 @@ open class Idhead {
     @Column(name = "DOCDATE", nullable = false)
     open var docdate: LocalDateTime? = null
 
-    @OnDelete(action = OnDeleteAction.RESTRICT)
+    @Column(name = "STOREOUT")
+    open var storeout: Long? = null
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "STOREOUT")
+    @JoinColumn(name = "STOREOUT", insertable = false, updatable = false)
     open var storeOutEntity: Store? = null
 
     @Column(name = "PROVIDER")
     open var provider: Long? = null
 
-    @OnDelete(action = OnDeleteAction.RESTRICT)
+    @Column(name = "STOREIN")
+    open var storein: Long? = null
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "STOREIN")
+    @JoinColumn(name = "STOREIN", insertable = false, updatable = false)
     open var storeInEntity: Store? = null
 
     @Column(name = "NOTE", length = 80)

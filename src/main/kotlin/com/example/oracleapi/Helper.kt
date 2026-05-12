@@ -26,6 +26,8 @@ class Helper {
             }
         }
 
+        const val idStatus = "ID_STATUS"
+
     }
 
 }

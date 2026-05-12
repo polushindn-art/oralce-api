@@ -6,19 +6,19 @@ import java.time.format.DateTimeFormatter
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class GenIdResponse(
-    val id: Long? = null,                          // Основной идентификатор с понятным именем
-    val ids: List<Long>? = null,            // Для множественной генерации
+    val rn: Long? = null,                          // Основной идентификатор с понятным именем
+    val rns: List<Long>? = null,            // Для множественной генерации
     val count: Int? = null,                      // Количество сгенерированных ID
     val executionTimeMs: Long,               // Время выполнения в мс
     val timestamp: String                     // Временная метка
 ) {
     companion object {
         fun single(
-            id: Long,
+            rn: Long,
             executionTimeMs: Long
         ): GenIdResponse {
             return GenIdResponse(
-                id = id,
+                rn = rn,
                 executionTimeMs = executionTimeMs,
                 timestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
             )
@@ -29,7 +29,7 @@ data class GenIdResponse(
             executionTimeMs: Long
         ): GenIdResponse {
             return GenIdResponse(
-                ids = ids,
+                rns = ids,
                 count = ids.size,
                 executionTimeMs = executionTimeMs,
                 timestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)

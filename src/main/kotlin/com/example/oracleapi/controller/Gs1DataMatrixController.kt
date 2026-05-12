@@ -18,17 +18,14 @@ import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/barcode")
+@RequestMapping("/v1/barcode")
 @Tag(name = "Коды маркировки", description = "Генерация DataMatrix штрихкодов")
 class Gs1DataMatrixController(
     private val barcodeService: GS1DataMatrixService,
     private val markProcedureService: MarkProcedureService,
-    private val parserService: MarkingCodeParserService,
     private val objectMapper: ObjectMapper
-) {
+) : BaseController() {
     private val log = LoggerFactory.getLogger(Gs1DataMatrixController::class.java)
-
-
 
     // ==================== ГЕНЕРАЦИЯ (автоопределение формата) ====================
 
@@ -48,7 +45,10 @@ class Gs1DataMatrixController(
             )
 
             response.contentType = "image/png"
-            response.setHeader("Content-Disposition", "attachment; filename=\"barcode_${System.currentTimeMillis()}.png\"")
+            response.setHeader(
+                "Content-Disposition",
+                "attachment; filename=\"barcode_${System.currentTimeMillis()}.png\""
+            )
             response.outputStream.write(imageBytes)
             response.outputStream.flush()
 
@@ -63,20 +63,13 @@ class Gs1DataMatrixController(
     @GetMapping("/find")
     @Operation(summary = "Поиск по КМ", description = "Поиск кода маркировки в представлении v_mark_find")
     fun find(
-        @RequestParam km: String,
-        httpRequest: HttpServletRequest
+        @RequestParam km: String
     ): MyApiResponse<MarkFindResponse> {
         log.info("Поиск по КМ: km={}", km)
         val request = MarkFindRequest(km = km)
         val result = markProcedureService.find(request)
-        return MyApiResponse.success(
-            data = result,
-            message = "Код маркировки найден",
-            httpRequest.requestURI
-        )
+        return success(result, "Код маркировки найден")
     }
-
-    // ==================== ВСПОМОГАТЕЛЬНЫЕ ====================
 
     private fun sendErrorResponse(response: HttpServletResponse, message: String, path: String) {
         response.status = HttpStatus.BAD_REQUEST.value()

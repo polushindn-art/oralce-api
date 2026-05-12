@@ -26,8 +26,8 @@ import org.springframework.web.bind.annotation.*
 private val log = LoggerFactory.getLogger(AuthController::class.java)
 
 @RestController
-@RequestMapping("/auth")
-@Tag(name = "auth", description = "Контроллер авторизации")
+@RequestMapping("/v1/auth")
+@Tag(name = "Авторизация", description = "Контроллер авторизации")
 class AuthController(
     private val authenticationManager: AuthenticationManager,
     private val jwtHelper: JwtHelper,
@@ -40,13 +40,6 @@ class AuthController(
     @Operation(
         summary = "Получить токен",
         description = "Получение токена авторизации и загрузка cookie с токеном"
-    )
-    @ApiResponses(
-        value = [
-            SwaggerApiResponse(responseCode = "200", description = "Успешная авторизация"),
-            SwaggerApiResponse(responseCode = "400", description = "Неверные параметры запроса"),
-            SwaggerApiResponse(responseCode = "401", description = "Неверные логин или пароль")
-        ]
     )
     fun login(
         @Valid @RequestBody credentials: LoginCredentials,
@@ -142,7 +135,7 @@ class AuthController(
     /**
      * Аутентификация терминала по SN - возвращает токен пользователя терминала
      */
-    @GetMapping("/tokenBySN")
+    @GetMapping("/token/by-sn")
     @Operation(
         summary = "Получить токен пользователя по терминалу",
         description = "Получение токена авторизации для пользователя, работающего с терминалом"
@@ -251,7 +244,7 @@ class AuthController(
         )
     }
 
-    @GetMapping("/tokenByDeviceId")
+    @GetMapping("/token/by-id")
     @Operation(
         summary = "Получить токен пользователя по Device ID терминала",
         description = "Получение токена авторизации по deviceid терминала (только для активных терминалов)"

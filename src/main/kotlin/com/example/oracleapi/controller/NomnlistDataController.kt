@@ -15,46 +15,37 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 
 @RestController
-@RequestMapping("/nomen-photos")
+@RequestMapping("v1/nomnlistdata")
 @Tag(name = "NomnListData", description = "Работа с фотографиями номенклатуры")
 class NomnlistDataController(
     private val service: NomnlistdataService,
     private val objectMapper: ObjectMapper
-) {
+) : BaseController() {
 
     // ==================== INFO (получение информации) ====================
 
     @GetMapping("/by-nomen/{nomen}/info")
     @Operation(summary = "Получить список всех фото для номенклатуры")
     fun getInfoByNomen(
-        @PathVariable nomen: Long,
-        request: HttpServletRequest
+        @PathVariable nomen: Long
     ): MyApiResponse<List<NomnlistdataMetadata>> {
         val photos = service.getByNomen(nomen)
         val metadata = photos.map { NomnlistdataMetadata.fromEntity(it) }
-        return MyApiResponse.success(
-            data = metadata,
-            message = "Найдено ${metadata.size} фото",
-            path = request.requestURI
-        )
+        return successList(metadata)
     }
 
     @GetMapping("/by-nomen/{nomen}/info/{photonum}")
     @Operation(summary = "Получить информацию о конкретном фото номенклатуры")
     fun getPhotoInfoByNomen(
         @PathVariable nomen: Long,
-        @PathVariable photonum: Int,
-        request: HttpServletRequest
+        @PathVariable photonum: Int
     ): MyApiResponse<NomnlistdataMetadata> {
         val photo = service.getByNomenAndPhotonum(nomen, photonum)
-            ?: return MyApiResponse.error(
-                message = "Фото для номенклатуры $nomen (№$photonum) не найдено",
-                path = request.requestURI
+            ?: return error(
+                message = "Фото для номенклатуры $nomen (№$photonum) не найдено"
             )
-        return MyApiResponse.success(
-            data = NomnlistdataMetadata.fromEntity(photo),
-            message = "Информация получена",
-            path = request.requestURI
+        return success(
+            NomnlistdataMetadata.fromEntity(photo)
         )
     }
 
@@ -70,7 +61,11 @@ class NomnlistDataController(
         val photo = service.getByNomenAndPhotonum(nomen, photonum)
 
         if (photo == null) {
-            sendErrorResponse(response, "Фото для номенклатуры $nomen (№$photonum) не найдено", "/nomen-photos/by-nomen/$nomen/view/$photonum")
+            sendErrorResponse(
+                response,
+                "Фото для номенклатуры $nomen (№$photonum) не найдено",
+                "/nomen-photos/by-nomen/$nomen/view/$photonum"
+            )
             return
         }
 
@@ -95,7 +90,11 @@ class NomnlistDataController(
         val photo = service.getMainByNomen(nomen)
 
         if (photo == null) {
-            sendErrorResponse(response, "Главное фото для номенклатуры $nomen не найдено", "/nomen-photos/by-nomen/$nomen/main")
+            sendErrorResponse(
+                response,
+                "Главное фото для номенклатуры $nomen не найдено",
+                "/nomen-photos/by-nomen/$nomen/main"
+            )
             return
         }
 
@@ -148,7 +147,11 @@ class NomnlistDataController(
         val photo = service.getByNomenAndPhotonum(nomen, photonum)
 
         if (photo == null) {
-            sendErrorResponse(response, "Фото для номенклатуры $nomen (№$photonum) не найдено", "/nomen-photos/by-nomen/$nomen/download/$photonum")
+            sendErrorResponse(
+                response,
+                "Фото для номенклатуры $nomen (№$photonum) не найдено",
+                "/nomen-photos/by-nomen/$nomen/download/$photonum"
+            )
             return
         }
 
@@ -177,7 +180,11 @@ class NomnlistDataController(
         val photo = service.getByNomenAndPhotonum(nomen, photonum)
 
         if (photo == null) {
-            sendErrorResponse(response, "Фото для номенклатуры $nomen (№$photonum) не найдено", "/nomen-photos/by-nomen/$nomen/preview/$photonum")
+            sendErrorResponse(
+                response,
+                "Фото для номенклатуры $nomen (№$photonum) не найдено",
+                "/nomen-photos/by-nomen/$nomen/preview/$photonum"
+            )
             return
         }
 
@@ -203,13 +210,21 @@ class NomnlistDataController(
         val photo = service.getByNomenAndPhotonum(nomen, photonum)
 
         if (photo == null) {
-            sendErrorResponse(response, "Фото для номенклатуры $nomen (№$photonum) не найдено", "/nomen-photos/by-nomen/$nomen/preview/download/$photonum")
+            sendErrorResponse(
+                response,
+                "Фото для номенклатуры $nomen (№$photonum) не найдено",
+                "/nomen-photos/by-nomen/$nomen/preview/download/$photonum"
+            )
             return
         }
 
         val preview = photo.minidata
         if (preview == null || preview.isEmpty()) {
-            sendErrorResponse(response, "Превью для фото не найдено", "/nomen-photos/by-nomen/$nomen/preview/download/$photonum")
+            sendErrorResponse(
+                response,
+                "Превью для фото не найдено",
+                "/nomen-photos/by-nomen/$nomen/preview/download/$photonum"
+            )
             return
         }
 
@@ -235,16 +250,9 @@ class NomnlistDataController(
                 file = file,
                 needDownload = needDownload
             )
-            MyApiResponse.success(
-                data = NomnlistdataMetadata.fromEntity(photo),
-                message = "Фото загружено (№${photo.photonum})",
-                path = "/nomen-photos"
-            )
+            success(NomnlistdataMetadata.fromEntity(photo))
         } catch (e: IllegalArgumentException) {
-            MyApiResponse.error(
-                message = e.message ?: "Ошибка загрузки",
-                path = "/nomen-photos"
-            )
+            error(message = e.message.toString())
         }
     }
 
@@ -260,7 +268,7 @@ class NomnlistDataController(
             path = request.requestURI
         )
         service.softDelete(photo.rn)
-        return MyApiResponse.success<Nomnlistdata>(
+        return MyApiResponse.success(
             message = "Фото для номенклатуры $nomen (№$photonum) удалено",
             path = request.requestURI
         )
@@ -273,7 +281,7 @@ class NomnlistDataController(
         request: HttpServletRequest
     ): MyApiResponse<Unit> {
         service.softDeleteByNomen(nomen)
-        return MyApiResponse.success<Nomnlistdata>(
+        return MyApiResponse.success(
             message = "Все фото для номенклатуры $nomen удалены",
             path = request.requestURI
         )

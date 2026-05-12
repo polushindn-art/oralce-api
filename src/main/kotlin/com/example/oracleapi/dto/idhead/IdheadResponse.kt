@@ -2,15 +2,16 @@ package com.example.oracleapi.dto.idhead
 
 import com.example.oracleapi.entity.Idhead
 import com.fasterxml.jackson.annotation.JsonFormat
+import com.fasterxml.jackson.annotation.JsonPropertyOrder
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
+@JsonPropertyOrder("rn", "docpref") //порядок полей в ответе
 data class IdheadResponse(
     val rn: Long,
     val crn: Long,
     val doctypeCode: String,
     val docpref: String,
-
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     val docdate: LocalDateTime?,
     val docnumb: BigDecimal?,

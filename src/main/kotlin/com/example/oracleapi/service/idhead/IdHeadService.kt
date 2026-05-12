@@ -1,5 +1,6 @@
 package com.example.oracleapi.service.idhead
 
+import com.example.oracleapi.Helper
 import com.example.oracleapi.dto.common.PageResponse
 import com.example.oracleapi.dto.idhead.IdheadResponse
 import com.example.oracleapi.dto.idhead.del.IdHeadDeleteRequest
@@ -9,16 +10,16 @@ import com.example.oracleapi.dto.idhead.toResponse
 import com.example.oracleapi.dto.idspec.IdheadWithSpecTsdResponse
 import com.example.oracleapi.dto.idspec.toTsdResponse
 import com.example.oracleapi.repository.idhead.IdheadRepository
-import com.example.oracleapi.repository.idhead.IdheadSpecifications.byDoctypeRn
-import com.example.oracleapi.repository.idhead.IdheadSpecifications.byStatus
 import com.example.oracleapi.repository.idspec.IdspecRepository
 import com.example.oracleapi.repository.typedoc.TypedocRepository
-import org.springframework.data.jpa.domain.Specification.where
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.data.domain.Pageable
 import com.example.oracleapi.entity.Idhead
+import com.example.oracleapi.service.field.FieldService
+import jakarta.persistence.criteria.Predicate
 import org.springframework.data.domain.Page
+import org.springframework.data.jpa.domain.Specification
 
 @Service
 class IdHeadService(
@@ -27,10 +28,12 @@ class IdHeadService(
     val deleteFun: IdHeadDelete,
     val idheadRepository: IdheadRepository,
     val typedocRepository: TypedocRepository,
-    val idspecRepository: IdspecRepository
-) {fun prihodCreate(request: PrihodRequest): Long {
-    return prihodFunction.createPrihodByJson(request)
-}
+    val idspecRepository: IdspecRepository,
+    val fieldService: FieldService
+) {
+    fun prihodCreate(request: PrihodRequest): Long {
+        return prihodFunction.createPrihodByJson(request)
+    }
 
     fun updateStatus(request: StatusUpdateRequest) {
         return updateStatusFun.updateStatus(request)
@@ -44,23 +47,9 @@ class IdHeadService(
         return idheadRepository.findByIdStatus(status).map { it.toResponse() }
     }
 
-    fun getCount(): Long = idheadRepository.count()
+    fun getCount(): Long = idheadRepository.countAllBy()
 
-    fun getByStatusAndDoctype(status: Long, doctype: Long): List<IdheadResponse> {
-        return idheadRepository.findByIdStatusAndDoctypeEntity_Rn(status, doctype)
-            .map { it.toResponse() }
-    }
-
-    fun getByFilters(status: Long?, doccode: String?): List<IdheadResponse> {
-        val spec = buildSpecification(status, doccode)
-        return idheadRepository.findAll(spec).map { it.toResponse() }
-    }
-
-    fun getByStatusAndDoccode(status: Long, doccode: String): List<IdheadResponse> {
-        val doctypeRns = getDoctypeRnsByDoccode(doccode)
-        return idheadRepository.findByIdStatusAndDoctypeEntity_RnIn(status, doctypeRns)
-            .map { it.toResponse() }
-    }
+    fun getCountByStatus(status: Long): Long = idheadRepository.countByIdStatus(status)
 
     @Transactional(readOnly = true)
     fun getDocumentWithSpecs(rn: Long): IdheadWithSpecTsdResponse {
@@ -70,12 +59,15 @@ class IdHeadService(
         val specs = idspecRepository.findByPrnRnWithNomen(rn)
             .map { it.toTsdResponse() }
 
+        val statusCode = fieldService.getFieldValue(Helper.idStatus, head.idStatus ?: 0)?.fieldComment
+
         return IdheadWithSpecTsdResponse(
             rn = head.rn!!,
             docdate = head.docdate,
             docnumb = head.docnumb,
             docpref = head.docpref,
             idStatus = head.idStatus!!,
+            idStatusCode = statusCode,
             provider = head.provider,
             storeinCode = head.storeInEntity?.storecode,
             storeoutCode = head.storeOutEntity?.storecode,
@@ -97,33 +89,40 @@ class IdHeadService(
         return PageResponse.fromPage(page.map { it.toResponse() })
     }
 
-    fun getByStatusAndDoctypeWithPagination(
-        status: Long,
-        doctype: Long,
-        pageable: Pageable
-    ): PageResponse<IdheadResponse> {
-        val page: Page<Idhead> = idheadRepository.findByIdStatusAndDoctypeEntity_Rn(status, doctype, pageable)
-        return PageResponse.fromPage(page.map { it.toResponse() })
-    }
-
     fun getByFiltersWithPagination(
         status: Long?,
-        doccode: String?,
+        doctype: Long?,
+        storein: Long?,
+        storeout: Long?,
         pageable: Pageable
     ): PageResponse<IdheadResponse> {
-        val spec = buildSpecification(status, doccode)
-        val page: Page<Idhead> = idheadRepository.findAll(spec, pageable)
+        val spec = buildSpecification(status, doctype, storein, storeout)
+        val page = idheadRepository.findAll(spec, pageable)
         return PageResponse.fromPage(page.map { it.toResponse() })
     }
 
-    private fun getDoctypeRnsByDoccode(doccode: String): List<Long> {
-        val typedocList = typedocRepository.findByDoccode(doccode)
-            ?: throw IllegalArgumentException("Тип документа с кодом '$doccode' не найден")
-        return typedocList.map { it.rn }
+    private fun buildSpecification(status: Long?, doctypeRn: Long?, storeIn: Long?, storeOut: Long?): Specification<Idhead> {
+        return Specification { root, _, cb ->
+            val predicates = mutableListOf<Predicate>()
+
+            status?.let {
+                predicates.add(cb.equal(root.get<Long>("idStatus"), it))
+            }
+
+            storeIn?.let {
+                predicates.add(cb.equal(root.get<Long>("storein"), it))
+            }
+
+            storeOut?.let {
+                predicates.add(cb.equal(root.get<Long>("storeout"), it))
+            }
+
+            doctypeRn?.let {
+                predicates.add(cb.equal(root.get<Long>("doctype"), it))
+            }
+
+            cb.and(*predicates.toTypedArray())
+        }
     }
 
-    private fun buildSpecification(status: Long?, doccode: String?): org.springframework.data.jpa.domain.Specification<Idhead> {
-        val doctypeRns = doccode?.let { getDoctypeRnsByDoccode(it) }
-        return where(byStatus(status)).and(byDoctypeRn(doctypeRns))
-    }
 }
