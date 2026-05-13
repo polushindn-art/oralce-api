@@ -4,6 +4,8 @@ import com.example.oracleapi.dto.BarcodeGenerateRequest
 import com.example.oracleapi.dto.common.MyApiResponse
 import com.example.oracleapi.dto.mark.MarkFindRequest
 import com.example.oracleapi.dto.mark.MarkFindResponse
+import com.example.oracleapi.dto.mark.MarkUpdRequest
+import com.example.oracleapi.dto.mark.MarkUpdResponse
 import com.example.oracleapi.service.GS1DataMatrixService
 import com.example.oracleapi.service.MarkingCodeParserService
 import com.example.oracleapi.service.mark.MarkProcedureService
@@ -18,8 +20,8 @@ import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/v1/barcode")
-@Tag(name = "Коды маркировки", description = "Генерация DataMatrix штрихкодов")
+@RequestMapping("/v1/gs1")
+@Tag(name = "Маркировки", description = "Генерация DataMatrix штрихкодов")
 class Gs1DataMatrixController(
     private val barcodeService: GS1DataMatrixService,
     private val markProcedureService: MarkProcedureService,
@@ -76,6 +78,15 @@ class Gs1DataMatrixController(
         response.contentType = "application/json;charset=UTF-8"
         val errorResponse = MyApiResponse.error<Nothing>(message = message, path = path)
         response.writer.write(objectMapper.writeValueAsString(errorResponse))
+    }
+
+    @PostMapping("/upd")
+    @Operation(summary = "PKG_MARK.UPD", description = "Обновление записи")
+    fun upd(
+        @Valid @RequestBody request: MarkUpdRequest
+    ): MyApiResponse<MarkUpdResponse> {
+        log.info("PKG_MARK.UPD: km={}", request.km)
+        return success(markProcedureService.upd(request))
     }
 
 }

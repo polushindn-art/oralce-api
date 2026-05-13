@@ -12,17 +12,17 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/v1/typedoc")
-@Tag(name = "typedoc", description = "Типы документов Oracle")
+@Tag(name = "Типы документов", description = "Типы документов Oracle")
 class TypedocController(
     private val typedocService: TypedocService
 ) : BaseController() {
-    @GetMapping("/all")
+    @GetMapping("")
     @Operation(summary = "Получить все типы документов")
     fun getAll(): MyApiResponse<List<TypedocResponse>> {
         return success(typedocService.getAllTypedocs())
     }
 
-    @GetMapping("/byDivisionCode/{divisionCode}")
+    @GetMapping("/{divisionCode}")
     fun getByDivisionCode(@PathVariable divisionCode: String): MyApiResponse<List<TypedocResponse>> {
         return success(typedocService.getTypeDocByDivisionCode(divisionCode))
     }

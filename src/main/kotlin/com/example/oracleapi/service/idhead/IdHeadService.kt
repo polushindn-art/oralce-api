@@ -27,7 +27,6 @@ class IdHeadService(
     val updateStatusFun: UpdateStatus,
     val deleteFun: IdHeadDelete,
     val idheadRepository: IdheadRepository,
-    val typedocRepository: TypedocRepository,
     val idspecRepository: IdspecRepository,
     val fieldService: FieldService
 ) {
@@ -79,14 +78,12 @@ class IdHeadService(
 
     // ========== МЕТОДЫ С ПАГИНАЦИЕЙ ==========
 
-    fun getAllWithPagination(pageable: Pageable): PageResponse<IdheadResponse> {
-        val page: Page<Idhead> = idheadRepository.findAll(pageable)
-        return PageResponse.fromPage(page.map { it.toResponse() })
+    fun getAllWithPagination(pageable: Pageable): Page<IdheadResponse> {
+        return idheadRepository.findAll(pageable).map { it.toResponse() }
     }
 
-    fun getByStatusWithPagination(status: Long, pageable: Pageable): PageResponse<IdheadResponse> {
-        val page: Page<Idhead> = idheadRepository.findByIdStatus(status, pageable)
-        return PageResponse.fromPage(page.map { it.toResponse() })
+    fun getByStatusWithPagination(status: Long, pageable: Pageable): Page<IdheadResponse> {
+        return idheadRepository.findByIdStatus(status, pageable).map { it.toResponse() }
     }
 
     fun getByFiltersWithPagination(
@@ -95,13 +92,17 @@ class IdHeadService(
         storein: Long?,
         storeout: Long?,
         pageable: Pageable
-    ): PageResponse<IdheadResponse> {
+    ): Page<IdheadResponse> {
         val spec = buildSpecification(status, doctype, storein, storeout)
-        val page = idheadRepository.findAll(spec, pageable)
-        return PageResponse.fromPage(page.map { it.toResponse() })
+        return idheadRepository.findAll(spec, pageable).map { it.toResponse() }
     }
 
-    private fun buildSpecification(status: Long?, doctypeRn: Long?, storeIn: Long?, storeOut: Long?): Specification<Idhead> {
+    private fun buildSpecification(
+        status: Long?,
+        doctypeRn: Long?,
+        storeIn: Long?,
+        storeOut: Long?
+    ): Specification<Idhead> {
         return Specification { root, _, cb ->
             val predicates = mutableListOf<Predicate>()
 

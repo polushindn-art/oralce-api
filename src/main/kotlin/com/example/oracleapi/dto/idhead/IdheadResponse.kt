@@ -12,7 +12,7 @@ data class IdheadResponse(
     val crn: Long,
     val doctypeCode: String,
     val docpref: String,
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     val docdate: LocalDateTime?,
     val docnumb: BigDecimal?,
     val sumprice: BigDecimal?,

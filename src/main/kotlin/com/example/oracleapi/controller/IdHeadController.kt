@@ -13,7 +13,6 @@ import com.example.oracleapi.service.field.FieldService
 import com.example.oracleapi.service.idhead.IdHeadService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
-import jakarta.servlet.http.HttpServletRequest
 import jakarta.validation.Valid
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort

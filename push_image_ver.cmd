@@ -9,7 +9,7 @@ set "RED=[31m"
 set "RESET=[0m"
 
 :: Настройки
-set REGISTRY=api.ars:5000
+set REGISTRY=oracle-rest-api.ars:5000
 set IMAGE_NAME=oracle-api
 set VERSION_PREFIX=1.25
 

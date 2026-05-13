@@ -18,8 +18,7 @@ class JwtHelper(
         const val COOCKIENAME = "accessToken"
         val skipPaths = arrayOf(
             "/pictures/**",
-            "/api/health",
-            "/auth/token",
+            "/v*/api/health",
             "/login",
             "/swagger-ui/**",      // для всех вложенных путей
             "/v3/api-docs/**",
@@ -27,9 +26,9 @@ class JwtHelper(
             "/swagger-ui.html",
             "/doc.html",
             "/webjars/**",
-            "/error",
-            "/not-found",
-            "/auth/**",             // если нужно открыть все под auth
+            "/v*/error",
+            "/v*/not-found",
+            "/v*/auth/**",             // если нужно открыть все под auth
             "/knife4j/**")
     }
 

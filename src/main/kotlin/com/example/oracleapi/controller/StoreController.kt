@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/v1/stores")
-@Tag(name = "Store", description = "API для работы со складами")
+@Tag(name = "Склады", description = "API для работы со складами")
 class StoreController(
     private val storeService: StoreService
 ): BaseController() {
