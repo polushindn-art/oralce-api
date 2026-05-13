@@ -2,25 +2,22 @@
 chcp 65001 > nul
 setlocal enabledelayedexpansion
 
-:: Цветной вывод
 set "GREEN=[32m"
 set "YELLOW=[33m"
 set "RED=[31m"
 set "RESET=[0m"
 
-:: Настройки
 set REGISTRY=oracle-rest-api.ars:5001
 set IMAGE_NAME=oracle-api
-set VERSION_PREFIX=1.25
 
 cls
 echo %GREEN%========================================%RESET%
-echo %GREEN%    СБОРКА ВСЕХ ОБРАЗОВ%RESET%
+echo %GREEN%    СБОРКА DOCKER ОБРАЗА%RESET%
 echo %GREEN%========================================%RESET%
 echo.
 
 :: ============================================
-:: ПРОВЕРКА ЗАВИСИМОСТЕЙ
+:: 1. ПРОВЕРКА ЗАВИСИМОСТЕЙ
 :: ============================================
 echo %YELLOW%[1/5] Проверка зависимостей...%RESET%
 
@@ -42,76 +39,60 @@ echo %GREEN%[OK] Все зависимости найдены%RESET%
 echo.
 
 :: ============================================
-:: ГЕНЕРАЦИЯ ВЕРСИИ ДЛЯ PROD
+:: 2. ГЕНЕРАЦИЯ ВЕРСИИ
 :: ============================================
-echo %YELLOW%[2/5] Генерация версии для PROD...%RESET%
+echo %YELLOW%[2/5] Генерация версии...%RESET%
 
 for /f %%i in ('git rev-list --count HEAD 2^>nul') do set VERSION_NUMBER=%%i
 if not defined VERSION_NUMBER set VERSION_NUMBER=0
-set FULL_VERSION=%VERSION_PREFIX%.!VERSION_NUMBER!
-echo %GREEN%Версия PROD: %FULL_VERSION%%RESET%
+set FULL_VERSION=1.25.!VERSION_NUMBER!
+echo %GREEN%Версия: %FULL_VERSION%%RESET%
 echo.
 
 :: ============================================
-:: СБОРКА TEST (dev)
+:: 3. СБОРКА JAR
 :: ============================================
-echo %YELLOW%[3/5] Сборка TEST образа (dev)...%RESET%
+echo %YELLOW%[3/5] Сборка JAR...%RESET%
 
-call mvn clean package -DskipTests -Pdev
-
+call mvn clean package -DskipTests
 if %errorlevel% neq 0 (
-    echo %RED%[ОШИБКА] Сборка TEST не удалась!%RESET%
+    echo %RED%[ОШИБКА] Сборка Maven не удалась!%RESET%
     pause
     exit /b 1
 )
-
-docker build -t %IMAGE_NAME%:test .
-docker tag %IMAGE_NAME%:test %REGISTRY%/%IMAGE_NAME%:test
-docker push %REGISTRY%/%IMAGE_NAME%:test
-
-echo %GREEN%[OK] TEST образ отправлен%RESET%
+echo %GREEN%[OK] JAR собран%RESET%
 echo.
 
 :: ============================================
-:: СБОРКА PROD
+:: 4. СБОРКА DOCKER ОБРАЗА И PUSH
 :: ============================================
-echo %YELLOW%[4/5] Сборка PROD образа (prod)...%RESET%
-
-call mvn clean package -DskipTests -Pprod
-
-if %errorlevel% neq 0 (
-    echo %RED%[ОШИБКА] Сборка PROD не удалась!%RESET%
-    pause
-    exit /b 1
-)
+echo %YELLOW%[4/5] Сборка Docker образа и push...%RESET%
 
 docker build -t %IMAGE_NAME%:%FULL_VERSION% .
+if %errorlevel% neq 0 (
+    echo %RED%[ОШИБКА] Сборка Docker образа не удалась!%RESET%
+    pause
+    exit /b 1
+)
+
 docker tag %IMAGE_NAME%:%FULL_VERSION% %REGISTRY%/%IMAGE_NAME%:%FULL_VERSION%
 docker push %REGISTRY%/%IMAGE_NAME%:%FULL_VERSION%
 
-docker tag %IMAGE_NAME%:%FULL_VERSION% %REGISTRY%/%IMAGE_NAME%:latest
-docker push %REGISTRY%/%IMAGE_NAME%:latest
+if %errorlevel% neq 0 (
+    echo %RED%[ОШИБКА] Push в registry не удался!%RESET%
+    pause
+    exit /b 1
+)
 
-echo %GREEN%[OK] PROD образ отправлен%RESET%
+echo %GREEN%[OK] Образ %FULL_VERSION% отправлен в registry%RESET%
 echo.
 
 :: ============================================
-:: ОЧИСТКА СТАРЫХ ЛОКАЛЬНЫХ ОБРАЗОВ
+:: 5. ОЧИСТКА
 :: ============================================
 echo %YELLOW%[5/5] Очистка старых локальных образов...%RESET%
-
 docker image prune -f
 echo %GREEN%[OK] Очистка завершена%RESET%
-echo.
-
-:: ============================================
-:: ПРОВЕРКА REGISTRY
-:: ============================================
-echo %YELLOW%Проверка Registry...%RESET%
-echo.
-echo Теги для %IMAGE_NAME%:
-curl -s http://%REGISTRY%/v2/%IMAGE_NAME%/tags/list
-echo.
 echo.
 
 :: ============================================
@@ -121,17 +102,35 @@ echo %GREEN%========================================%RESET%
 echo %GREEN%        СБОРКА ЗАВЕРШЕНА!%RESET%
 echo %GREEN%========================================%RESET%
 echo.
-echo Отправленные образы:
-echo   - test (последняя тестовая)
-echo   - latest (последняя продакшен)
-echo   - %FULL_VERSION% (конкретная продакшен)
+echo Образ: %FULL_VERSION%
 echo.
-echo Остановить и удалить старый контейнер (если есть)
-echo   DEV: docker stop oracle-dev 2^>^&2 ^&^& docker rm oracle-dev 2^>^&2
-echo   PROD: docker stop oracle-prod 2^>^&2 ^&^& docker rm oracle-prod 2^>^&2
-echo Для запуска на сервере выполните:
+echo ============================================
+echo ЗАПУСК НА СЕРВЕРЕ
+echo ============================================
 echo.
-echo   DEV: docker run -d --name oracle-dev --restart=always -p 8091:8080 -e SPRING_PROFILES_ACTIVE=dev %REGISTRY%/%IMAGE_NAME%:test
-echo   PROD: docker run -d --name oracle-prod --restart=always -p 8090:8080 -e SPRING_PROFILES_ACTIVE=prod %REGISTRY%/%IMAGE_NAME%:latest
+echo 1. Остановить старые контейнеры:
+echo    docker stop oracle-dev oracle-prod-blue oracle-prod-green 2^>nul
+echo    docker rm oracle-dev oracle-prod-blue oracle-prod-green 2^>nul
+echo.
+echo 2. Запустить DEV (тестовая):
+echo    docker run -d --name oracle-dev --restart=always -p 8099:8080 -e SPRING_PROFILES_ACTIVE=dev %REGISTRY%/%IMAGE_NAME%:%FULL_VERSION%
+echo.
+echo 3. Запустить PROD BLUE (текущая рабочая):
+echo    docker run -d --name oracle-prod-blue --restart=always -p 8090:8080 -e SPRING_PROFILES_ACTIVE=prod %REGISTRY%/%IMAGE_NAME%:%FULL_VERSION%
+echo.
+echo 4. Запустить PROD GREEN (новая версия для теста):
+echo    docker run -d --name oracle-prod-green --restart=always -p 8091:8080 -e SPRING_PROFILES_ACTIVE=prod %REGISTRY%/%IMAGE_NAME%:%FULL_VERSION%
+echo.
+echo ============================================
+echo ПЕРЕКЛЮЧЕНИЕ BLUE ^<->^ GREEN
+echo ============================================
+echo.
+echo 1. Проверить green:  curl http://localhost:8081/actuator/health
+echo 2. Переключить nginx: sudo sed -i 's/8080/8081/' /etc/nginx/nginx.conf
+echo 3. Перезагрузить nginx: sudo nginx -t && sudo systemctl reload nginx
+echo 4. Остановить blue: docker stop oracle-prod-blue && docker rm oracle-prod-blue
+echo 5. Переименовать: docker rename oracle-prod-green oracle-prod-blue
+echo 6. Вернуть nginx на 8080: sudo sed -i 's/8081/8080/' /etc/nginx/nginx.conf
+echo 7. Перезагрузить nginx: sudo nginx -t && sudo systemctl reload nginx
 echo.
 pause

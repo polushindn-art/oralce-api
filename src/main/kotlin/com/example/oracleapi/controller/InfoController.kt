@@ -32,7 +32,7 @@ data class ProfileResponse(
 
 @RestController
 @RequestMapping("/v1/info")
-@Tag(name = "Информация о БД", description = "Информация о приложении")
+@Tag(name = "Информация о БД Oracle", description = "Информация о приложении")
 class InfoController(
     private val environment: Environment,
     private val dataSource: DataSource
