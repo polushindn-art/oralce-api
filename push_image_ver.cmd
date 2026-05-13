@@ -9,7 +9,7 @@ set "RED=[31m"
 set "RESET=[0m"
 
 :: Настройки
-set REGISTRY=oracle-rest-api.ars:5000
+set REGISTRY=oracle-rest-api.ars:5001
 set IMAGE_NAME=oracle-api
 set VERSION_PREFIX=1.25
 
@@ -22,7 +22,7 @@ echo.
 :: ============================================
 :: ПРОВЕРКА ЗАВИСИМОСТЕЙ
 :: ============================================
-echo %YELLOW%[1/6] Проверка зависимостей...%RESET%
+echo %YELLOW%[1/5] Проверка зависимостей...%RESET%
 
 where docker >nul 2>&1
 if %errorlevel% neq 0 (
@@ -44,7 +44,7 @@ echo.
 :: ============================================
 :: ГЕНЕРАЦИЯ ВЕРСИИ ДЛЯ PROD
 :: ============================================
-echo %YELLOW%[2/6] Генерация версии для PROD...%RESET%
+echo %YELLOW%[2/5] Генерация версии для PROD...%RESET%
 
 for /f %%i in ('git rev-list --count HEAD 2^>nul') do set VERSION_NUMBER=%%i
 if not defined VERSION_NUMBER set VERSION_NUMBER=0
@@ -55,7 +55,7 @@ echo.
 :: ============================================
 :: СБОРКА TEST (dev)
 :: ============================================
-echo %YELLOW%[3/6] Сборка TEST образа (dev)...%RESET%
+echo %YELLOW%[3/5] Сборка TEST образа (dev)...%RESET%
 
 call mvn clean package -DskipTests -Pdev
 
@@ -75,7 +75,7 @@ echo.
 :: ============================================
 :: СБОРКА PROD
 :: ============================================
-echo %YELLOW%[4/6] Сборка PROD образа (prod)...%RESET%
+echo %YELLOW%[4/5] Сборка PROD образа (prod)...%RESET%
 
 call mvn clean package -DskipTests -Pprod
 
@@ -96,9 +96,18 @@ echo %GREEN%[OK] PROD образ отправлен%RESET%
 echo.
 
 :: ============================================
-:: ПРОВЕРКА
+:: ОЧИСТКА СТАРЫХ ЛОКАЛЬНЫХ ОБРАЗОВ
 :: ============================================
-echo %YELLOW%[5/6] Проверка Registry...%RESET%
+echo %YELLOW%[5/5] Очистка старых локальных образов...%RESET%
+
+docker image prune -f
+echo %GREEN%[OK] Очистка завершена%RESET%
+echo.
+
+:: ============================================
+:: ПРОВЕРКА REGISTRY
+:: ============================================
+echo %YELLOW%Проверка Registry...%RESET%
 echo.
 echo Теги для %IMAGE_NAME%:
 curl -s http://%REGISTRY%/v2/%IMAGE_NAME%/tags/list
@@ -117,8 +126,12 @@ echo   - test (последняя тестовая)
 echo   - latest (последняя продакшен)
 echo   - %FULL_VERSION% (конкретная продакшен)
 echo.
-echo Запуск:
-echo   TEST: docker run -d -p 8081:8080 -e SPRING_PROFILES_ACTIVE=dev %REGISTRY%/%IMAGE_NAME%:test
-echo   PROD: docker run -d -p 8080:8080 -e SPRING_PROFILES_ACTIVE=prod %REGISTRY%/%IMAGE_NAME%:latest
+echo Остановить и удалить старый контейнер (если есть)
+echo   DEV: docker stop oracle-dev 2^>^&2 ^&^& docker rm oracle-dev 2^>^&2
+echo   PROD: docker stop oracle-prod 2^>^&2 ^&^& docker rm oracle-prod 2^>^&2
+echo Для запуска на сервере выполните:
+echo.
+echo   DEV: docker run -d --name oracle-dev --restart=always -p 8091:8080 -e SPRING_PROFILES_ACTIVE=dev %REGISTRY%/%IMAGE_NAME%:test
+echo   PROD: docker run -d --name oracle-prod --restart=always -p 8090:8080 -e SPRING_PROFILES_ACTIVE=prod %REGISTRY%/%IMAGE_NAME%:latest
 echo.
 pause

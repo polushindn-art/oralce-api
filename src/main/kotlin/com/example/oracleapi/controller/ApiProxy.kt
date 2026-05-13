@@ -33,7 +33,6 @@ import java.util.concurrent.atomic.AtomicLong
 class ApiProxyController(
     private val restTemplateBuilder: RestTemplateBuilder
 ) {
-
     // Статистика
     private val requestCount = AtomicLong(0)
     private val successCount = AtomicLong(0)
