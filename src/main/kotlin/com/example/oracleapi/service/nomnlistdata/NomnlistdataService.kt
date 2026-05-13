@@ -18,7 +18,6 @@ class NomnlistdataService(
     private val genIdRnProcedur: PublicGenIdRnProcedur,
     private val imageService: ImageService
 ) {
-
     /**
      * Получить userAgn из SecurityContext (из токена)
      */
