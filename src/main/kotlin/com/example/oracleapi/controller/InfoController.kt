@@ -32,7 +32,7 @@ data class ProfileResponse(
 
 @RestController
 @RequestMapping("/v1/info")
-@Tag(name = "Информация", description = "Информация о приложении")
+@Tag(name = "Информация о БД", description = "Информация о приложении")
 class InfoController(
     private val environment: Environment,
     private val dataSource: DataSource
@@ -53,7 +53,7 @@ class InfoController(
     }
 
     @GetMapping("/db-info")
-    @Operation(summary = "Информация о БД", description = "Возвращает информацию о подключении к БД")
+    @Operation(summary = "База данных", description = "Возвращает информацию о подключении к БД")
     fun getDbInfo(): MyApiResponse<DbInfoResponse> {
         return try {
             val connection = dataSource.connection
