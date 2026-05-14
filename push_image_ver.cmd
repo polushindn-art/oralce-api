@@ -111,6 +111,7 @@ echo.
 echo 1. Остановить старые контейнеры:
 echo    docker stop oracle-dev oracle-prod-blue oracle-prod-green 2^>nul
 echo    docker rm oracle-dev oracle-prod-blue oracle-prod-green 2^>nul
+echo    Или через Web http://oracle-rest-api.ars:9000
 echo.
 echo 2. Запустить DEV (тестовая):
 echo    docker run -d --name oracle-dev --restart=always -p 8099:8080 -e SPRING_PROFILES_ACTIVE=dev %REGISTRY%/%IMAGE_NAME%:%FULL_VERSION%
@@ -118,19 +119,16 @@ echo.
 echo 3. Запустить PROD BLUE (текущая рабочая):
 echo    docker run -d --name oracle-prod-blue --restart=always -p 8090:8080 -e SPRING_PROFILES_ACTIVE=prod %REGISTRY%/%IMAGE_NAME%:%FULL_VERSION%
 echo.
+echo    Перед запуском проверить свободные порты и запустить на нем. Например: 8092
 echo 4. Запустить PROD GREEN (новая версия для теста):
-echo    docker run -d --name oracle-prod-green --restart=always -p 8091:8080 -e SPRING_PROFILES_ACTIVE=prod %REGISTRY%/%IMAGE_NAME%:%FULL_VERSION%
+echo    docker run -d --name oracle-prod-green --restart=always -p 8092:8080 -e SPRING_PROFILES_ACTIVE=prod %REGISTRY%/%IMAGE_NAME%:%FULL_VERSION%
 echo.
-echo ============================================
-echo ПЕРЕКЛЮЧЕНИЕ BLUE ^<->^ GREEN
-echo ============================================
-echo.
-echo 1. Проверить green:  curl http://localhost:8081/actuator/health
-echo 2. Переключить nginx: sudo sed -i 's/8080/8081/' /etc/nginx/nginx.conf
-echo 3. Перезагрузить nginx: sudo nginx -t && sudo systemctl reload nginx
-echo 4. Остановить blue: docker stop oracle-prod-blue && docker rm oracle-prod-blue
-echo 5. Переименовать: docker rename oracle-prod-green oracle-prod-blue
-echo 6. Вернуть nginx на 8080: sudo sed -i 's/8081/8080/' /etc/nginx/nginx.conf
-echo 7. Перезагрузить nginx: sudo nginx -t && sudo systemctl reload nginx
+echo    После проверки green версии перенаправить запросы на нужный порт
+echo    Изменить порт в nginx.conf (nano /etc/nginx/nginx.conf) server 127.0.0.1:8092;  # Внутренний порт контейнера (blue)
+echo    Проверить config: nginx -t
+echo    Перечитать config: systemctl reload nginx
+echo    Остановить blue: docker stop oracle-prod-blue
+echo    Удалить blue: docker rm oracle-prod-blue или через Web http://oracle-rest-api.ars:9000
+echo    Переименовать: docker rename oracle-prod-green oracle-prod-blue
 echo.
 pause
