@@ -30,3 +30,7 @@
 ### Остановить blue: docker stop oracle-prod-blue
 ### Удалить blue: docker rm oracle-prod-blue или через Web http://oracle-rest-api.ars:9000
 ### Переименовать: docker rename oracle-prod-green oracle-prod-blue
+##    Если удалить старые image в Docker REGISTRY Web http://oracle-rest-api.ars:7000
+###    Место очистится по задаче в cron или вручную запустить сборщик мусора
+###    cd /docker/registry
+###    docker compose exec registry registry garbage-collect --delete-untagged /etc/docker/registry/config.yml
