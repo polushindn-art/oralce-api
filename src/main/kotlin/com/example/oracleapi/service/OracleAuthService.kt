@@ -1,5 +1,6 @@
 package com.example.oracleapi.service
 
+import com.example.oracleapi.config.JwtConfigProperties
 import com.example.oracleapi.config.JwtHelper
 import com.google.common.cache.CacheBuilder
 import org.slf4j.LoggerFactory
@@ -12,7 +13,8 @@ import java.util.concurrent.TimeUnit
 @Service
 class OracleAuthService(
     private val dataSource: DataSource,
-    private val jwtHelper: JwtHelper
+    private val jwtHelper: JwtHelper,
+    private val jwtConfig: JwtConfigProperties
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -34,7 +36,7 @@ class OracleAuthService(
                 message = "Авторизация успешна (из кеша)",
                 token = token,
                 username = username,
-                expiresIn = jwtHelper.getExpiration(token)
+                expiresIn = jwtConfig.expiration(token)
             )
         }
 
