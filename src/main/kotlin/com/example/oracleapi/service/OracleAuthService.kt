@@ -36,19 +36,23 @@ class OracleAuthService(
                 message = "Авторизация успешна (из кеша)",
                 token = token,
                 username = username,
-                expiresIn = jwtConfig.expiration(token)
+                expiresIn = jwtConfig.expiration
             )
         }
 
         // Полная проверка через Oracle
         return try {
             val jdbcUrl = dataSource.connection.metaData.url
-            DriverManager.getConnection(jdbcUrl, username, password).use { conn ->
+            DriverManager.getConnection(jdbcUrl, username, password).use { _ ->
                 // Успешное подключение
+                val token = jwtHelper.createToken(username)
                 authCache.put(key, true)
                 ResultAuth(
                     state = true,
                     message = "Успешная аутентификация",
+                    token = token,
+                    username = username,
+                    expiresIn = jwtConfig.expiration,
                     oracleMessage = "Подключение к Oracle установлено"
                 )
             }
