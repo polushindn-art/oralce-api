@@ -44,7 +44,12 @@
     </profiles>
 
     <dependencies>
-
+        <!-- Google Guava для CacheBuilder -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>33.0.0-jre</version>
+        </dependency>
         <!-- Core - основная библиотека ZXing -->
         <dependency>
             <groupId>com.google.zxing</groupId>

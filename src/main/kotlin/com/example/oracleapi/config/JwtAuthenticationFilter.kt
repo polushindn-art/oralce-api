@@ -8,9 +8,11 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.util.AntPathMatcher
 import org.springframework.web.filter.OncePerRequestFilter
 import java.time.Instant
+import org.springframework.security.core.userdetails.User
 
 class JwtAuthenticationFilter(
     private val jwtHelper: JwtHelper,
@@ -58,8 +60,6 @@ class JwtAuthenticationFilter(
 
         // Извлекаем данные из токена
         val username = jwtHelper.extractUsername(token)
-        val userRn = jwtHelper.extractUserRn(token)
-        val userAgn = jwtHelper.extractUserAgn(token)
 
         if (username == null) {
             log.debug("No username in token for path: $path")
@@ -67,20 +67,22 @@ class JwtAuthenticationFilter(
             return
         }
 
-        // Создаем объект с данными пользователя
-        val userDetails = UserDetailsFromToken(
-            username = username,
-            userRn = userRn,
-            userAgn = userAgn
-        )
+        // Создаем UserDetails
+        val userDetails: UserDetails = User.builder()
+            .username(username)
+            .password("")
+            .authorities(emptyList())
+            .build()
 
         // Устанавливаем аутентификацию в контекст Spring Security с дополнительными данными
-        val authentication = UsernamePasswordAuthenticationToken(userDetails, null, emptyList())
+        val authentication = UsernamePasswordAuthenticationToken(
+            userDetails,
+            null,
+            userDetails.authorities
+        )
         SecurityContextHolder.getContext().authentication = authentication
 
-        log.info("User '{}' successfully authenticated for path: {} (userRn={}, userAgn={})",
-            username, path, userRn, userAgn)
-
+        log.info("User '{}' authenticated for path: {}", username, path)
         // Продолжаем цепочку фильтров
         filterChain.doFilter(request, response)
     }

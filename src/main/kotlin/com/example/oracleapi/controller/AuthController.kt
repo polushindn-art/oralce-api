@@ -4,6 +4,7 @@ import com.example.oracleapi.config.JwtConfigProperties
 import com.example.oracleapi.config.JwtHelper
 import com.example.oracleapi.dto.*
 import com.example.oracleapi.dto.common.MyApiResponse
+import com.example.oracleapi.service.OracleAuthService
 import com.example.oracleapi.service.tsdlist.TsdListService
 import com.example.oracleapi.service.userlist.UserService
 import io.swagger.v3.oas.annotations.Operation
@@ -33,8 +34,9 @@ class AuthController(
     private val jwtHelper: JwtHelper,
     private val jwtConfig: JwtConfigProperties,
     private val tsdListService: TsdListService,
+    private val oracleAuthService: OracleAuthService,
     private val userService: UserService
-) {
+) : BaseController() {
 
     @PostMapping("/token")
     @Operation(
@@ -42,24 +44,12 @@ class AuthController(
         description = "Получение токена авторизации и загрузка cookie с токеном"
     )
     fun login(
-        @Valid @RequestBody credentials: LoginCredentials,
+        @RequestBody credentials: LoginCredentials,
         request: HttpServletRequest,
         response: HttpServletResponse
-    ): ResponseEntity<MyApiResponse<Map<String, Any>>> {
+    ): ResponseEntity<MyApiResponse<OracleAuthService.ResultAuth>> {
 
         log.info("Login attempt for user: {}", credentials.username)
-
-        // Дополнительная проверка существования пользователя
-        if (!userService.checkUserExists(credentials.username)) {
-            return ResponseEntity
-                .status(HttpStatus.UNAUTHORIZED)
-                .body(
-                    MyApiResponse.error(
-                        message = "Пользователь не найден",
-                        path = request.requestURI
-                    )
-                )
-        }
 
         if (credentials.username.isBlank()) {
             return ResponseEntity
@@ -71,6 +61,7 @@ class AuthController(
                     )
                 )
         }
+
         if (credentials.password.isBlank()) {
             return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
@@ -82,54 +73,31 @@ class AuthController(
                 )
         }
 
-        try {
-            val authToken = UsernamePasswordAuthenticationToken(credentials.username, credentials.password)
-            authenticationManager.authenticate(authToken)
-
-            val token = jwtHelper.createToken(credentials.username)
-            log.info("User {} authenticated successfully", credentials.username)
-
-            val cookie = Cookie(jwtConfig.cookieName, token).apply {
-                isHttpOnly = true
-                secure = jwtConfig.secure
-                path = "/"
-                maxAge = jwtConfig.cookieMaxAgeSeconds
-            }
-            response.addCookie(cookie)
-
-            return ResponseEntity.ok(
-                MyApiResponse.success(
-                    data = mapOf(
-                        "username" to credentials.username,
-                        "token" to token,
-                        "expiresIn" to jwtConfig.expiration
-                    ),
-                    message = "Авторизация успешна",
-                    path = request.requestURI
-                )
-            )
-
-        } catch (_: BadCredentialsException) {
-            log.warn("Invalid login attempt for user: {}", credentials.username)
+        // Проверка через Oracle
+        val stateAuth = oracleAuthService.authenticate(credentials.username, credentials.password)
+        if (!stateAuth.state) {
             return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
-                .body(
-                    MyApiResponse.error(
-                        message = "Неверные логин или пароль",
-                        path = request.requestURI
-                    )
-                )
-        } catch (ex: Exception) {
-            log.error("Authentication error", ex)
-            return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(
-                    MyApiResponse.error(
-                        message = "Внутренняя ошибка сервера: ${ex.message}",
-                        path = request.requestURI
-                    )
-                )
+                .body(success(stateAuth))
         }
+
+        // Создание токена
+        val token = jwtHelper.createToken(credentials.username)
+        log.info("Oracle user {} authenticated successfully", credentials.username)
+
+        // Cookie
+        val cookie = Cookie(jwtConfig.cookieName, token).apply {
+            isHttpOnly = true
+            secure = jwtConfig.secure
+            path = "/"
+            maxAge = jwtConfig.cookieMaxAgeSeconds
+        }
+        response.addCookie(cookie)
+
+        return ResponseEntity.ok(
+            success(stateAuth, message = "Авторизация успешна")
+        )
+
     }
 
     /**
@@ -344,7 +312,7 @@ class AuthController(
                         timestart = it.timestart,
                         pbecode = it.pbecode,
                         pbern = it.pbern,
-                        stores = it.store?: emptyList(),
+                        stores = it.store ?: emptyList(),
                         params = it.param?.map { param ->
                             ParamBriefInfo(
                                 name = param.name,
