@@ -197,7 +197,7 @@ class ApiProxyController(
             return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(MyApiResponse.error<Unit>(message = "Endpoint not found"))
+                .body(MyApiResponse.unsuccess<Unit>(message = "Endpoint not found"))
         }
 
         // Проверяем, что путь не пустой
@@ -209,7 +209,7 @@ class ApiProxyController(
                 .status(HttpStatus.BAD_REQUEST)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(
-                    MyApiResponse.error<Unit>(
+                    MyApiResponse.unsuccess<Unit>(
                         message = "Please specify the target path. Example: /api/1c/UT_2025_TEST_1/hs/TokenRequest/UninvoicedGoods",
                         path = request.servletPath
                     )
@@ -323,7 +323,7 @@ class ApiProxyController(
             ResponseEntity
                 .status(HttpStatus.BAD_GATEWAY)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(MyApiResponse.error<Unit>(message = "Proxy error: ${e.message}"))
+                .body(MyApiResponse.unsuccess<Unit>(message = "Proxy error: ${e.message}"))
         }
     }
 }

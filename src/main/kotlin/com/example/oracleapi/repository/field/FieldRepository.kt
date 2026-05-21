@@ -21,4 +21,6 @@ interface FieldRepository: JpaRepository<Field, Long> {
         @Param("fieldValue") fieldValue: Long
     ): Field?
 
+    fun findByFieldNameIgnoreCaseOrderByFieldComment(fieldName: String): MutableList<Field>
+
 }

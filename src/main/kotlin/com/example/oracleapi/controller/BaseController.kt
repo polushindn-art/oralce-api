@@ -40,6 +40,6 @@ abstract class BaseController {
 
     // Для ошибок
     protected fun <T> error(message: String, data: T? = null): MyApiResponse<T> {
-        return MyApiResponse.error(message, data)
+        return MyApiResponse.unsuccess(message, data)
     }
 }

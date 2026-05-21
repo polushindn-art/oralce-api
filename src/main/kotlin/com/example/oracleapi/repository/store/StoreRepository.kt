@@ -9,6 +9,9 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface StoreRepository : JpaRepository<Store, Long> {
+
+    fun findAllByOrderByStorecodeAsc(): List<Store>
+
     fun existsByRn(rn: Long): Boolean
 
     fun findByStorepbe(pbeRn: Long): List<Store>

@@ -47,7 +47,7 @@ class GlobalExceptionHandler {
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .body(
-                MyApiResponse.error(
+                MyApiResponse.unsuccess(
                     message = message,
                     path = request.requestURI
                 )
@@ -63,7 +63,7 @@ class GlobalExceptionHandler {
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .body(
-                MyApiResponse.error(
+                MyApiResponse.unsuccess(
                     message = "Отсутствует обязательный параметр: ${e.parameterName}",
                     path = request.requestURI
                 )
@@ -79,7 +79,7 @@ class GlobalExceptionHandler {
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .body(
-                MyApiResponse.error(
+                MyApiResponse.unsuccess(
                     message = "Некорректный формат запроса. Проверьте тело запроса. \n$e",
                     path = request.requestURI
                 )
@@ -95,7 +95,7 @@ class GlobalExceptionHandler {
         return ResponseEntity
             .status(HttpStatus.METHOD_NOT_ALLOWED)
             .body(
-                MyApiResponse.error(
+                MyApiResponse.unsuccess(
                     message = "Метод ${e.method} не поддерживается для этого эндпоинта. Поддерживаемые методы: ${e.supportedMethods?.joinToString(", ")}",
                     path = request.requestURI
                 )
@@ -111,7 +111,7 @@ class GlobalExceptionHandler {
         return ResponseEntity
             .status(HttpStatus.UNAUTHORIZED)
             .body(
-                MyApiResponse.error(
+                MyApiResponse.unsuccess(
                     message = "Требуется авторизация: ${e.message ?: "пожалуйста, войдите в систему"}",
                     path = request.requestURI
                 )
@@ -127,7 +127,7 @@ class GlobalExceptionHandler {
         return ResponseEntity
             .status(HttpStatus.FORBIDDEN)
             .body(
-                MyApiResponse.error(
+                MyApiResponse.unsuccess(
                     message = "Недостаточно прав для доступа к ресурсу: ${e.message ?: "доступ запрещен"}",
                     path = request.requestURI
                 )
@@ -163,7 +163,7 @@ class GlobalExceptionHandler {
         return ResponseEntity
             .status(HttpStatus.NOT_FOUND)
             .body(
-                MyApiResponse.error(
+                MyApiResponse.unsuccess(
                     message = e.message ?: "Запись не найдена",
                     path = request.requestURI
                 )
@@ -187,7 +187,7 @@ class GlobalExceptionHandler {
         return ResponseEntity
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body(
-                MyApiResponse.error(
+                MyApiResponse.unsuccess(
                     message = message,
                     path = request.requestURI
                 )
@@ -203,7 +203,7 @@ class GlobalExceptionHandler {
         return ResponseEntity
             .status(HttpStatus.NOT_FOUND)
             .body(
-                MyApiResponse.error(
+                MyApiResponse.unsuccess(
                     message = "Запись не найдена для удаления/обновления",
                     path = request.requestURI
                 )
@@ -219,7 +219,7 @@ class GlobalExceptionHandler {
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .body(
-                MyApiResponse.error(
+                MyApiResponse.unsuccess(
                     message = e.message ?: "Неверный параметр запроса",
                     path = request.requestURI
                 )
@@ -235,7 +235,7 @@ class GlobalExceptionHandler {
         return ResponseEntity
             .status(HttpStatus.UNAUTHORIZED)
             .body(
-                MyApiResponse.error(
+                MyApiResponse.unsuccess(
                     message = e.message ?: "Неверный или истекший токен",
                     path = request.requestURI
                 )
@@ -253,7 +253,7 @@ class GlobalExceptionHandler {
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .body(
-                MyApiResponse.error(
+                MyApiResponse.unsuccess(
                     message = e.message ?: "Внутренняя ошибка сервера",
                     path = request.requestURI
                 )
@@ -277,7 +277,7 @@ class GlobalExceptionHandler {
         return ResponseEntity
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body(
-                MyApiResponse.error(
+                MyApiResponse.unsuccess(
                     message = message,
                     path = request.requestURI
                 )
@@ -293,7 +293,7 @@ class GlobalExceptionHandler {
         return ResponseEntity
             .status(HttpStatus.NOT_FOUND)
             .body(
-                MyApiResponse.error(
+                MyApiResponse.unsuccess(
                     message = e.message ?: "Документ не найден",
                     path = request.requestURI
                 )
@@ -305,7 +305,7 @@ class GlobalExceptionHandler {
         return ResponseEntity
             .status(HttpStatus.NOT_FOUND)
             .body(
-                MyApiResponse.error(
+                MyApiResponse.unsuccess(
                     message = "Ресурс не найден: ${request.requestURI}",
                     path = request.requestURI
                 )

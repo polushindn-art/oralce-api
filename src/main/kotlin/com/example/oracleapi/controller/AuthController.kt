@@ -4,6 +4,7 @@ import com.example.oracleapi.config.JwtConfigProperties
 import com.example.oracleapi.config.JwtHelper
 import com.example.oracleapi.dto.*
 import com.example.oracleapi.dto.common.MyApiResponse
+import com.example.oracleapi.dto.common.MyApiResponse.Companion.unsuccess
 import com.example.oracleapi.service.OracleAuthService
 import com.example.oracleapi.service.tsdlist.TsdListService
 import io.swagger.v3.oas.annotations.Operation
@@ -32,7 +33,6 @@ class AuthController(
     @Operation(summary = "Получить токен", description = "Получение токена авторизации")
     fun login(
         @RequestBody credentials: LoginCredentials,
-        request: HttpServletRequest,
         response: HttpServletResponse
     ): ResponseEntity<MyApiResponse<OracleAuthService.ResultAuth>> {
 
@@ -42,22 +42,13 @@ class AuthController(
         if (credentials.username.isBlank()) {
             return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(
-                    MyApiResponse.error(
-                        message = "Имя пользователя обязательно",
-                        path = request.requestURI
-                    )
-                )
+                .body(unsuccess(message = "Имя пользователя обязательно"))
         }
+
         if (credentials.password.isBlank()) {
             return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(
-                    MyApiResponse.error(
-                        message = "Пароль обязателен",
-                        path = request.requestURI
-                    )
-                )
+                .body(unsuccess(message = "Пароль обязателен"))
         }
 
         // Аутентификация
@@ -67,9 +58,9 @@ class AuthController(
             return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
                 .body(
-                    MyApiResponse.error(
-                        message = authResult.message,
-                        path = request.requestURI
+                    unsuccess(
+                        "Ошибка авторизации",
+                        authResult
                     )
                 )
         }
@@ -90,7 +81,6 @@ class AuthController(
     @Operation(summary = "Получить токен по Device ID терминала")
     fun loginByDeviceId(
         @RequestParam deviceId: String,
-        request: HttpServletRequest,
         response: HttpServletResponse
     ): ResponseEntity<MyApiResponse<AuthResponse>> {
 
@@ -148,10 +138,9 @@ class AuthController(
         )
 
         return ResponseEntity.ok(
-            MyApiResponse.success(
+            success(
                 data = authResponse,
-                message = "Терминал авторизован по Device ID",
-                path = request.requestURI
+                message = "Терминал авторизован по Device ID"
             )
         )
     }

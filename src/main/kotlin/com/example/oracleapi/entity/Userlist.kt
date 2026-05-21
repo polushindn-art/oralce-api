@@ -3,11 +3,14 @@ package com.example.oracleapi.entity
 import com.example.oracleapi.Helper
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.FetchType
 import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
 
 @Entity
-@Table(name = "USERLIST", schema = Helper.Companion.SCHEME)
+@Table(name = "USERLIST", schema = Helper.SCHEME)
 open class Userlist {
     @Id
     @Column(name = "RN", columnDefinition = "unknown")
@@ -18,6 +21,10 @@ open class Userlist {
 
     @Column(name = "USERAGN", columnDefinition = "unknown")
     open var useragn: Long? = null
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "USERAGN", insertable = false, updatable = false)
+    var agnListEntry: AgnList? = null
 
     @Column(name = "PAROLE", columnDefinition = "unknown")
     open var parole: String? = null

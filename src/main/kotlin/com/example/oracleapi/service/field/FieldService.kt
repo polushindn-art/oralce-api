@@ -14,7 +14,7 @@ class FieldService(
 
     @Transactional(readOnly = true)
     fun getFieldValues(fieldName: String): List<FieldResponse> {
-        return fieldRepository.findByFieldNameIgnoreCaseOrderByFieldValue(fieldName)
+        return fieldRepository.findByFieldNameIgnoreCaseOrderByFieldComment(fieldName)
             .map { FieldResponse.fromEntity(it) }
     }
 

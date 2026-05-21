@@ -1,6 +1,6 @@
 package com.example.oracleapi.service.tsdlist
 
-import com.example.oracleapi.RfidGenerator
+import com.example.oracleapi.Helper
 import com.example.oracleapi.dto.store.StoreSimpleResponse
 import com.example.oracleapi.dto.tsdlist.*
 import com.example.oracleapi.dto.tsdparam.ParamDto
@@ -72,45 +72,6 @@ class TsdListService(
         }
 
         return tsdHistoryRepository.findActiveUsers(pbe)
-    }
-
-    /**
-     * Получить информацию о пользователе по SN терминала (для авторизации)
-     */
-    @Transactional(readOnly = true)
-    fun getUserByTerminalSn(sn: String): UserInfo? {
-        log.debug("Looking for active session by SN: {}", sn)
-
-        val activeSession = tsdHistoryRepository.findActiveSessionBySn(sn)
-
-        return activeSession?.let { history ->
-            val userList = history.userList
-
-            // Проверяем что usercode не null и не пустой
-            val usercode = userList?.usercode
-            if (usercode.isNullOrBlank()) {
-                log.warn("UserList has no usercode for terminal SN: {}", sn)
-                return null
-            }
-
-            // Получаем имя из AGNLIST
-            val agnName = userList.useragn?.let { agnListRepository.findById(it).orElse(null)?.agnname }
-
-            // Получаем ВСЕ роли пользователя
-            val userRn = userList.rn
-            val parts = userRn?.let { getPartsByUserRn(it) } ?: emptyList()
-
-            UserInfo(
-                rn = userList.rn ?: 0L,
-                usercode = usercode,
-                username = agnName ?: usercode,
-                pin = userList.pin?.toLong(),
-                parole = userList.parole ?: "",
-                userAgn = userList.useragn ?: 0L,
-                dscbarnumb = userList.dscbarnumb ?: "",
-                parts = parts
-            )
-        }
     }
 
     /**
@@ -266,7 +227,7 @@ class TsdListService(
         val newRn = genIdResponse.rn ?: throw RuntimeException("Не удалось сгенерировать RN")
 
         // Генерируем случайный RFID
-        val randomRfid = RfidGenerator.generateRandomRfid()
+        val randomRfid = Helper.generateRandomRfid()
 
         // Если SN не передан, передаем 014.0000
         val terminalSn = request.sn ?: "014.0000"

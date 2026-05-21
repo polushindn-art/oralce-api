@@ -112,7 +112,7 @@ data class MyApiResponse<T> (
 
         // ========== ERROR METHODS ==========
 
-        fun <T> error(
+        fun <T> unsuccess(
             message: String,
             data: T? = null,
             path: String? = null
@@ -125,7 +125,7 @@ data class MyApiResponse<T> (
             )
         }
 
-        fun <T> error(
+        fun <T> unsuccess(
             exception: Exception,
             path: String? = null
         ): MyApiResponse<T> {

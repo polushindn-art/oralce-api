@@ -7,7 +7,6 @@ import com.example.oracleapi.service.picture.PictureService
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
-import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
@@ -145,7 +144,7 @@ class PictureController(
         response.status = HttpStatus.NOT_FOUND.value()
         response.contentType = "application/json;charset=UTF-8"
 
-        val errorResponse = MyApiResponse.error<Nothing>(
+        val errorResponse = MyApiResponse.unsuccess<Nothing>(
             message = message,
             path = path
         )

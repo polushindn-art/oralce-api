@@ -1,7 +1,6 @@
 package com.example.oracleapi.service.idhead
 
 import com.example.oracleapi.Helper
-import com.example.oracleapi.dto.common.PageResponse
 import com.example.oracleapi.dto.idhead.IdheadResponse
 import com.example.oracleapi.dto.idhead.del.IdHeadDeleteRequest
 import com.example.oracleapi.dto.idhead.prihod.PrihodRequest
@@ -11,7 +10,6 @@ import com.example.oracleapi.dto.idspec.IdheadWithSpecTsdResponse
 import com.example.oracleapi.dto.idspec.toTsdResponse
 import com.example.oracleapi.repository.idhead.IdheadRepository
 import com.example.oracleapi.repository.idspec.IdspecRepository
-import com.example.oracleapi.repository.typedoc.TypedocRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.data.domain.Pageable
@@ -20,6 +18,8 @@ import com.example.oracleapi.service.field.FieldService
 import jakarta.persistence.criteria.Predicate
 import org.springframework.data.domain.Page
 import org.springframework.data.jpa.domain.Specification
+import java.math.BigDecimal
+import java.time.LocalDate
 
 @Service
 class IdHeadService(
@@ -58,10 +58,10 @@ class IdHeadService(
         val specs = idspecRepository.findByPrnRnWithNomen(rn)
             .map { it.toTsdResponse() }
 
-        val statusCode = fieldService.getFieldValue(Helper.idStatus, head.idStatus ?: 0)?.fieldComment
+        val statusCode = fieldService.getFieldValue(Helper.IDSTATUS, head.idStatus ?: 0).fieldComment
 
         return IdheadWithSpecTsdResponse(
-            rn = head.rn!!,
+            rn = head.rn,
             docdate = head.docdate,
             docnumb = head.docnumb,
             docpref = head.docpref,
@@ -87,42 +87,60 @@ class IdHeadService(
     }
 
     fun getByFiltersWithPagination(
-        status: Long?,
+        status: String?,
         doctype: Long?,
+        docnumb: BigDecimal?,
         storein: Long?,
         storeout: Long?,
+        dateFrom: LocalDate?,
+        dateTo: LocalDate?,
         pageable: Pageable
     ): Page<IdheadResponse> {
-        val spec = buildSpecification(status, doctype, storein, storeout)
+        val spec = buildSpecification(status, doctype,docnumb, storein, storeout, dateFrom, dateTo)
         return idheadRepository.findAll(spec, pageable).map { it.toResponse() }
     }
 
     private fun buildSpecification(
-        status: Long?,
+        status: String?,
         doctypeRn: Long?,
+        docnumb: BigDecimal?,
         storeIn: Long?,
-        storeOut: Long?
+        storeOut: Long?,
+        dateFrom: LocalDate?,
+        dateTo: LocalDate?
     ): Specification<Idhead> {
         return Specification { root, _, cb ->
             val predicates = mutableListOf<Predicate>()
 
-            status?.let {
-                predicates.add(cb.equal(root.get<Long>("idStatus"), it))
+            // Обработка нескольких статусов
+            status?.let { statusStr ->
+                val statusIds = statusStr.split(",")
+                    .mapNotNull { it.trim().toLongOrNull() }
+
+                when (statusIds.size) {
+                    0 -> { /* Ничего не делаем */ }
+                    1 -> predicates.add(cb.equal(root.get<Long>("idStatus"), statusIds.first()))
+                    else -> predicates.add(root.get<Long>("idStatus").`in`(statusIds))
+                }
             }
 
-            storeIn?.let {
-                predicates.add(cb.equal(root.get<Long>("storein"), it))
+            storeIn?.let { predicates.add(cb.equal(root.get<Long>("storein"), it)) }
+            storeOut?.let { predicates.add(cb.equal(root.get<Long>("storeout"), it)) }
+            doctypeRn?.let { predicates.add(cb.equal(root.get<Long>("doctype"), it)) }
+            docnumb?.let { predicates.add(cb.equal(root.get<BigDecimal>("docnumb"), it)) }
+
+            // ✅ Фильтр по дате "от" (docdate >= dateFrom)
+            dateFrom?.let { from ->
+                predicates.add(cb.greaterThanOrEqualTo(root.get("docdate"), from.atStartOfDay()))
             }
 
-            storeOut?.let {
-                predicates.add(cb.equal(root.get<Long>("storeout"), it))
-            }
-
-            doctypeRn?.let {
-                predicates.add(cb.equal(root.get<Long>("doctype"), it))
+            // ✅ Фильтр по дате "до" (docdate <= dateTo)
+            dateTo?.let { to ->
+                predicates.add(cb.lessThanOrEqualTo(root.get("docdate"), to.atTime(23, 59, 59)))
             }
 
             cb.and(*predicates.toTypedArray())
+
         }
     }
 

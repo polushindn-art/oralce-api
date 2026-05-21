@@ -1,28 +1,21 @@
 package com.example.oracleapi.entity
 
 import com.example.oracleapi.Helper
-import com.example.oracleapi.entity.Typedoc
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.FetchType
-import jakarta.persistence.Id
-import jakarta.persistence.JoinColumn
-import jakarta.persistence.ManyToOne
-import jakarta.persistence.Table
-import org.hibernate.annotations.OnDelete
-import org.hibernate.annotations.OnDeleteAction
+import jakarta.persistence.*
+import org.hibernate.annotations.JoinColumnOrFormula
+import org.hibernate.annotations.JoinFormula
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
 @Entity
-@Table(name = "IDHEAD", schema = Helper.Companion.SCHEME)
+@Table(name = "IDHEAD", schema = Helper.SCHEME)
 open class Idhead {
     @Id
     @Column(name = "RN", nullable = false)
-    open var rn: Long? = null
+    open var rn: Long = 0
 
     @Column(name = "CRN", nullable = false)
-    open var crn: Long? = null
+    open var crn: Long = 0
 
     @Column(name = "DOCTYPE")
     open var doctype: Long? = null
@@ -60,6 +53,11 @@ open class Idhead {
     @Column(name = "ID_STATUS", nullable = false)
     open var idStatus: Long? = null
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumnOrFormula(column = JoinColumn(name = "ID_STATUS", referencedColumnName = "FIELD_VALUE", insertable = false, updatable = false))
+    @JoinColumnOrFormula(formula = JoinFormula(value = "'ID_STATUS'", referencedColumnName = "FIELD_NAME"))
+    var statusEntity: Field? = null
+
     @Column(name = "DOCNUMB", nullable = false, precision = 17, scale = 2)
     open var docnumb: BigDecimal? = null
 
@@ -68,6 +66,10 @@ open class Idhead {
 
     @Column(name = "MANAGER", nullable = false)
     open var manager: Long? = null
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "MANAGER", insertable = false, updatable = false)
+    var userListEntity: Userlist? = null
 
     @Column(name = "STOREOPER", nullable = false)
     open var storeoper: Long? = null

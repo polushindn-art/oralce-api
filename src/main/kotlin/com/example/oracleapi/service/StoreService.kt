@@ -16,10 +16,13 @@ class StoreService(
         return storeRepository.findAll().map { StoreResponse.fromEntity(it) }
     }
 
+    fun getAllSortedByStorecodeAsc(): List<StoreResponse> {
+        return storeRepository.findAllByOrderByStorecodeAsc().map { StoreResponse.fromEntity(it) }
+    }
+
     fun getStoresByPbe(pbeRn: Long): List<StoreResponse> {
-        return storeRepository.findByStorepbe(pbeRn).map {
-            it.toResponse()
-        }
+        return storeRepository.findByStorepbe(pbeRn)
+            .map { it.toResponse() }
     }
 
     fun getStoresByPbeAndNote(pbeRn: Long, note: String): List<StoreSimpleResponse> {

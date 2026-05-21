@@ -1,7 +1,6 @@
 package com.example.oracleapi.dto.idhead
 
 import com.example.oracleapi.entity.Idhead
-import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonPropertyOrder
 import java.math.BigDecimal
 import java.time.LocalDateTime
@@ -12,32 +11,35 @@ data class IdheadResponse(
     val crn: Long,
     val doctypeCode: String,
     val docpref: String,
-    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     val docdate: LocalDateTime?,
     val docnumb: BigDecimal?,
     val sumprice: BigDecimal?,
     val idStatus: Long,
+    val statusCode: String?,
     val storeinCode: String?,
     val storeoutCode: String?,
     val provider: Long?,
     val note: String?,
     val manager: Long?,
     val storeoper: Long?,
+    val usercode: String?
 )
 
 fun Idhead.toResponse(): IdheadResponse = IdheadResponse(
-    rn = this.rn!!,
-    crn = this.crn!!,
+    rn = this.rn,
+    crn = this.crn,
     doctypeCode = this.doctypeEntity!!.doccode,
     docpref = this.docpref!!,
     docdate = this.docdate,
     docnumb = this.docnumb,
     sumprice = this.sumprice,
     idStatus = this.idStatus!!,
+    statusCode = this.statusEntity?.fieldComment,
     storeinCode = this.storeInEntity?.storecode,
     storeoutCode = this.storeOutEntity?.storecode,
     provider = this.provider,
     note = this.note,
     manager = this.manager,
-    storeoper = this.storeoper
+    storeoper = this.storeoper,
+    usercode = this.userListEntity?.agnListEntry?.agncode,
 )

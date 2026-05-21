@@ -33,7 +33,6 @@ class OracleAuthService(
             val token = jwtHelper.createToken(username)
             return ResultAuth(
                 state = true,
-                message = "Авторизация успешна (из кеша)",
                 token = token,
                 username = username,
                 expiresIn = jwtConfig.expiration
@@ -49,11 +48,9 @@ class OracleAuthService(
                 authCache.put(key, true)
                 ResultAuth(
                     state = true,
-                    message = "Успешная аутентификация",
                     token = token,
                     username = username,
-                    expiresIn = jwtConfig.expiration,
-                    oracleMessage = "Подключение к Oracle установлено"
+                    expiresIn = jwtConfig.expiration
                 )
             }
         } catch (e: SQLException) {
@@ -63,9 +60,7 @@ class OracleAuthService(
 
             ResultAuth(
                 state = false,
-                message = oracleError.userMessage,
-                oracleMessage = oracleError.rawMessage,
-                oracleCode = oracleError.errorCode
+                oracleError = oracleError,
             )
         }
     }
@@ -106,9 +101,7 @@ class OracleAuthService(
         val token: String? = null,
         val username: String? = null,
         val expiresIn: Long? = null,
-        val message: String,
-        val oracleMessage: String? = null,
-        val oracleCode: Int? = null
+        val oracleError: OracleError? = null
     )
 
     data class OracleError(

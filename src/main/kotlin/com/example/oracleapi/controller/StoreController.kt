@@ -18,7 +18,7 @@ class StoreController(
     @GetMapping("/all")
     @Operation(summary = "Получить все склады")
     fun getAllStores(): MyApiResponse<List<StoreResponse>> {
-        return success(storeService.getAllStores())
+        return success(storeService.getAllSortedByStorecodeAsc())
     }
 
     @GetMapping("/pbe/{pbeRn}")

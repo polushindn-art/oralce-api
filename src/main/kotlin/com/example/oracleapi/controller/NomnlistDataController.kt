@@ -2,7 +2,6 @@ package com.example.oracleapi.controller
 
 import com.example.oracleapi.dto.common.MyApiResponse
 import com.example.oracleapi.dto.nomnlistdata.NomnlistdataMetadata
-import com.example.oracleapi.entity.nomnlistdata.Nomnlistdata
 import com.example.oracleapi.service.nomnlistdata.NomnlistdataService
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.swagger.v3.oas.annotations.Operation
@@ -263,7 +262,7 @@ class NomnlistDataController(
         @PathVariable photonum: Int,
         request: HttpServletRequest
     ): MyApiResponse<Unit> {
-        val photo = service.getByNomenAndPhotonum(nomen, photonum) ?: return MyApiResponse.error(
+        val photo = service.getByNomenAndPhotonum(nomen, photonum) ?: return MyApiResponse.unsuccess(
             message = "Фото для номенклатуры $nomen (№$photonum) не найдено",
             path = request.requestURI
         )
@@ -297,7 +296,7 @@ class NomnlistDataController(
         response.status = HttpStatus.NOT_FOUND.value()
         response.contentType = "application/json;charset=UTF-8"
 
-        val errorResponse = MyApiResponse.error<Nothing>(
+        val errorResponse = MyApiResponse.unsuccess<Nothing>(
             message = message,
             path = path
         )

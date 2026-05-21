@@ -18,6 +18,8 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.web.PageableDefault
 import org.springframework.web.bind.annotation.*
+import java.math.BigDecimal
+import java.time.LocalDate
 
 @RestController
 @RequestMapping("/v1/idhead")
@@ -113,7 +115,7 @@ class IdHeadController(
     ): MyApiResponse<Map<String, Any>> {
         val total = idHeadService.getCount()
         val statusCount = idHeadService.getCountByStatus(status)
-        val statusCode = fieldService.getFieldValue(Helper.idStatus, status).fieldComment
+        val statusCode = fieldService.getFieldValue(Helper.IDSTATUS, status).fieldComment
         return success(
             mapOf(
                 "total" to total,
@@ -156,13 +158,16 @@ class IdHeadController(
     @GetMapping("/filter/page")
     @Operation(summary = "Фильтрация документов с пагинацией")
     fun getByFiltersWithPagination(
-        @RequestParam(required = false) status: Long?,
+        @RequestParam(required = false) status: String?,
         @RequestParam(required = false) doctype: Long?,
+        @RequestParam(required = false) docnumb: BigDecimal?,
         @RequestParam(required = false) storein: Long?,
         @RequestParam(required = false) storeout: Long?,
+        @RequestParam(required = false) dateFrom: LocalDate?,
+        @RequestParam(required = false) dateTo: LocalDate?,
         @PageableDefault(size = 20, sort = ["docdate", "rn"], direction = Sort.Direction.DESC) pageable: Pageable
     ): MyApiResponse<List<IdheadResponse>> {
-        return success(idHeadService.getByFiltersWithPagination(status, doctype, storein, storeout, pageable))
+        return success(idHeadService.getByFiltersWithPagination(status, doctype, docnumb, storein, storeout, dateFrom, dateTo, pageable))
     }
 
 }

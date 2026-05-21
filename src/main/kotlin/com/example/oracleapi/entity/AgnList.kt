@@ -8,7 +8,7 @@ import jakarta.persistence.Table
 import java.time.LocalDateTime
 
 @Entity
-@Table(name = "AGNLIST", schema = Helper.Companion.SCHEME)
+@Table(name = "AGNLIST", schema = Helper.SCHEME)
 data class AgnList(
     @Id
     @Column(name = "RN", nullable = false)

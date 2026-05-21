@@ -7,12 +7,10 @@ import com.example.oracleapi.dto.mark.MarkFindResponse
 import com.example.oracleapi.dto.mark.MarkUpdRequest
 import com.example.oracleapi.dto.mark.MarkUpdResponse
 import com.example.oracleapi.service.GS1DataMatrixService
-import com.example.oracleapi.service.MarkingCodeParserService
 import com.example.oracleapi.service.mark.MarkProcedureService
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
-import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import jakarta.validation.Valid
 import org.slf4j.LoggerFactory
@@ -76,7 +74,7 @@ class Gs1DataMatrixController(
     private fun sendErrorResponse(response: HttpServletResponse, message: String, path: String) {
         response.status = HttpStatus.BAD_REQUEST.value()
         response.contentType = "application/json;charset=UTF-8"
-        val errorResponse = MyApiResponse.error<Nothing>(message = message, path = path)
+        val errorResponse = MyApiResponse.unsuccess<Nothing>(message = message, path = path)
         response.writer.write(objectMapper.writeValueAsString(errorResponse))
     }
 
