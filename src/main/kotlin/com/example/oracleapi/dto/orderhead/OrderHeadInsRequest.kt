@@ -20,6 +20,7 @@ data class OrderHeadInsRequest(
     @Schema(description = "Номер документа (опционально, если null - генерируется)", example = "12345")
     val docnumb: BigDecimal? = null,
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     @Schema(description = "Дата документа", required = true, example = "2026-05-20")
     val docdate: LocalDate? = null,
 
