@@ -184,6 +184,13 @@ class OrderHeadInsProcedure(
                         // 29. isUpdate (последний параметр)
                         stmt.setBoolean(index++, request.isUpdate)
 
+                        println("=== ПАРАМЕТРЫ ВЫЗОВА ===")
+                        println("docdate = ${request.docdate}")
+                        println("arrivaldate = ${request.arrivaldate}")
+                        println("basisdocdate = ${request.basisdocdate}")
+                        println("planArrivalDate = ${request.planArrivalDate}")
+                        println("======================")
+
                         // Выполняем
                         stmt.execute()
 
