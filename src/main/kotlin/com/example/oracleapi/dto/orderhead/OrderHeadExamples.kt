@@ -3,7 +3,7 @@ package com.example.oracleapi.dto.orderhead
 object OrderHeadExamples {
     const val FULL = """
         {
-            "crn": 3333333318230596520,
+            "crn": 18230596520,
             "doctype": 12451594,
             "docpref": "ЗАКАЗ_26",
             "docnumb": 12345,
@@ -15,7 +15,7 @@ object OrderHeadExamples {
             "note": "Тестовый заказ",
             "basisdoctype": 1,
             "basisdocpref": "",
-            "basisdocnumb": ,
+            "basisdocnumb": 0,
             "basisdocdate": "",
             "numbttn": 0,
             "ttip": 1,

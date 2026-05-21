@@ -2,11 +2,12 @@ package com.example.oracleapi.dto.orderhead
 
 import io.swagger.v3.oas.annotations.media.Schema
 import java.math.BigDecimal
+import java.time.LocalDateTime
 
 @Schema(description = "Ответ после создания заказа")
 data class OrderHeadInsResponse(
     @Schema(description = "Сгенерированный номер документа")
-    val docnumb: BigDecimal,
+    val docnumb: BigDecimal? = null,
 
     @Schema(description = "Сгенерированный RN записи")
     val rn: Long,
@@ -15,5 +16,5 @@ data class OrderHeadInsResponse(
     val executionTimeMs: Long,
 
     @Schema(description = "Временная метка операции")
-    val timestamp: String = java.time.LocalDateTime.now().toString()
+    val timestamp: String = LocalDateTime.now().toString()
 )

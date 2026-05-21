@@ -1,4 +1,3 @@
-// service/orderhead/OrderHeadInsProcedure.kt (исправленная версия)
 package com.example.oracleapi.service.orderhead
 
 import com.example.oracleapi.common.BasePkgProc
@@ -25,6 +24,7 @@ class OrderHeadInsProcedure(
         var resultRn = 0L
 
         execute("ins") {
+            // 28 параметров (согласно Toad примеру)
             val sql =
                 "{call $packageName.INS(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}"
 
@@ -34,134 +34,162 @@ class OrderHeadInsProcedure(
                     connection.prepareCall(sql).use { stmt ->
                         var index = 1
 
-                        // IN параметры
-                        stmt.setLong(index++, request.crn)
-                        stmt.setLong(index++, request.doctype)
-                        stmt.setString(index++, request.docpref)
+                        // 1. crn_
+                        stmt.setLong(index++, request.crn ?: 0L)
 
+                        // 2. doctype_
+                        stmt.setLong(index++, request.doctype ?: 0L)
+
+                        // 3. docpref_
+                        stmt.setString(index++, request.docpref ?: "")
+
+                        // 4. docnumb_ (IN/OUT)
+                        val docNumbParam = index++
+                        stmt.registerOutParameter(docNumbParam, Types.FLOAT)
                         if (request.docnumb != null) {
-                            stmt.setLong(index++, request.docnumb)
+                            stmt.setBigDecimal(docNumbParam, request.docnumb)
+                        } else {
+                            stmt.setNull(docNumbParam, Types.FLOAT)
+                        }
+
+                        // 5. docdate_
+                        if (request.docdate != null) {
+                            stmt.setDate(index++, java.sql.Date.valueOf(request.docdate))
+                        } else {
+                            stmt.setNull(index++, Types.DATE)
+                        }
+
+                        // 6. storein_
+                        stmt.setLong(index++, request.storein ?: 0L)
+
+                        // 7. provider_
+                        stmt.setLong(index++, request.provider ?: 0L)
+
+                        // 8. ul_
+                        stmt.setLong(index++, request.ul ?: 0L)
+
+                        // 9. overhead_
+                        stmt.setBigDecimal(index++, request.overhead ?: BigDecimal.ZERO)
+
+                        // 10. note_
+                        stmt.setString(index++, request.note ?: "")
+
+                        // 11. basisdoctype_
+                        if (request.basisdoctype != null) {
+                            stmt.setLong(index++, request.basisdoctype)
                         } else {
                             stmt.setNull(index++, Types.DOUBLE)
                         }
 
-                        stmt.setDate(index++, java.sql.Date.valueOf(request.docdate))
-                        stmt.setLong(index++, request.storein)
-                        stmt.setLong(index++, request.provider)
-                        stmt.setLong(index++, request.ul)
-                        stmt.setBigDecimal(index++, request.overhead ?: BigDecimal.ZERO)
-                        stmt.setString(index++, request.note)
-
-                        // BASISDOCTYPE
-                        if (request.basisdoctype != null && request.basisdoctype != 0L) {
-                            stmt.setLong(index++, request.basisdoctype)
-                        } else {
-                            stmt.setNull(index++, Types.BIGINT)
-                        }
-
+                        // 12. basisdocpref_
                         stmt.setString(index++, request.basisdocpref)
 
-                        // BASISDOCNUMB
-                        if (request.basisdocnumb != null && request.basisdocnumb != BigDecimal.ZERO) {
+                        // 13. basisdocnumb_
+                        if (request.basisdocnumb != null) {
                             stmt.setBigDecimal(index++, request.basisdocnumb)
                         } else {
-                            stmt.setNull(index++, Types.DECIMAL)
+                            stmt.setNull(index++, Types.DOUBLE)
                         }
 
-                        // BASISDOCDATE
+                        // 14. basisdocdate_
                         if (request.basisdocdate != null) {
                             stmt.setDate(index++, java.sql.Date.valueOf(request.basisdocdate))
                         } else {
                             stmt.setNull(index++, Types.DATE)
                         }
 
-                        // NUMBTTN
-                        stmt.setLong(index++, request.numbttn)
+                        // 15. numbttn_
+                        if (request.numbttn != null) {
+                            stmt.setLong(index++, request.numbttn)
+                        } else {
+                            stmt.setNull(index++, Types.DOUBLE)
+                        }
 
-                        // TTIP
-                        if (request.ttip != null && request.ttip != 0L) {
+                        // 16. ttip_
+                        if (request.ttip != null) {
                             stmt.setLong(index++, request.ttip)
                         } else {
-                            stmt.setNull(index++, Types.BIGINT)
+                            stmt.setNull(index++, Types.DOUBLE)
                         }
 
+                        // 17. nvagon_
                         stmt.setString(index++, request.nvagon)
 
-                        // TOPERATION
+                        // 18. toperation_
                         if (request.toperation != null) {
                             stmt.setLong(index++, request.toperation)
+                        } else {
+                            stmt.setNull(index++, Types.DOUBLE)
                         }
 
+                        // 19. notelogist_
                         stmt.setString(index++, request.notelogist)
 
-                        // SPECIALMARK
-                        if (request.specialmark != null && request.specialmark != 0L) {
+                        // 20. specialmark_
+                        if (request.specialmark != null) {
                             stmt.setLong(index++, request.specialmark)
                         } else {
-                            stmt.setNull(index++, Types.BIGINT)
+                            stmt.setNull(index++, Types.DOUBLE)
                         }
 
-                        // ARRIVALDATE
+                        // 21. arrivaldate_
                         if (request.arrivaldate != null) {
                             stmt.setDate(index++, java.sql.Date.valueOf(request.arrivaldate))
                         } else {
                             stmt.setNull(index++, Types.DATE)
                         }
 
-                        // STOREGATE
-                        if (request.storegate != null && request.storegate != 0L) {
+                        // 22. storegate_
+                        if (request.storegate != null) {
                             stmt.setLong(index++, request.storegate)
                         } else {
                             stmt.setNull(index++, Types.BIGINT)
                         }
 
-                        // NACL_RASH
-                        if (request.naclRash != null && request.naclRash != 0L) {
+                        // 23. NACL_RASH_
+                        if (request.naclRash != null) {
                             stmt.setLong(index++, request.naclRash)
                         } else {
                             stmt.setNull(index++, Types.BIGINT)
                         }
 
-                        // MAX_PCENT
-                        if (request.maxPcent != null && request.maxPcent != 0.0) {
+                        // 24. MAX_PCENT_
+                        if (request.maxPcent != null) {
                             stmt.setDouble(index++, request.maxPcent)
                         } else {
                             stmt.setNull(index++, Types.DOUBLE)
                         }
 
-                        // RN 25
-                        if (request.rn != null && request.rn != 0L) {
-                            stmt.setLong(index++, request.rn)
+                        // 25. rn_ (IN/OUT)
+                        val rnParam = index++
+                        if (request.rn != null) {
+                            stmt.setLong(rnParam, request.rn)
                         } else {
-                            stmt.setNull(index++, Types.BIGINT)
+                            stmt.setNull(rnParam, Types.BIGINT)
                         }
 
-                        //plan_arrival_date_
+                        // 26. plan_arrival_date_
                         if (request.planArrivalDate != null) {
                             stmt.setDate(index++, java.sql.Date.valueOf(request.planArrivalDate))
                         } else {
                             stmt.setNull(index++, Types.DATE)
                         }
 
-                        //nomentype_
+                        // 27. nomentype_
                         stmt.setString(index++, request.nomenType)
 
-                        //packtype_
+                        // 28. packtype_
                         stmt.setString(index++, request.packType)
 
-                        // ISUPDATE
+                        // 29. isUpdate (последний параметр)
                         stmt.setBoolean(index++, request.isUpdate)
 
-                        // РЕГИСТРИРУЕМ OUT параметры (ДО ВЫПОЛНЕНИЯ)
-                        stmt.registerOutParameter(4, Types.DECIMAL)  // docnumb OUT
-                        stmt.registerOutParameter(25, Types.BIGINT)   // rn OUT
-
-                        // ВЫПОЛНЯЕМ процедуру
+                        // Выполняем
                         stmt.execute()
 
-                        // ПОСЛЕ выполнения получаем OUT параметры
-                        resultDocnumb = stmt.getBigDecimal(4) ?: BigDecimal.ZERO
-                        resultRn = stmt.getLong(25)
+                        // Получаем OUT параметры
+                        resultDocnumb = stmt.getBigDecimal(docNumbParam)
+                        resultRn = stmt.getLong(rnParam)
                     }
                 }
         }

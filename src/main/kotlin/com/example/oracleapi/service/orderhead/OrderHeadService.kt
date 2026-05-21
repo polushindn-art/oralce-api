@@ -10,13 +10,13 @@ class OrderHeadService(
 ) {
     fun createOrder(request: OrderHeadInsRequest): OrderHeadInsResponse {
         // Валидация обязательных полей
-        require(request.crn > 0) { "CRN обязателен" }
-        require(request.doctype > 0) { "DOCTYPE обязателен" }
-        require(request.docpref.isNotBlank()) { "DOCPREF обязателен" }
+        request.crn?.let { require(it > 0) { "CRN обязателен" } }
+        request.doctype?.let { require(it > 0) { "DOCTYPE обязателен" } }
+        require(request.docpref?.isNotBlank() == true) { "DOCPREF обязателен" }
         require(request.docdate != null) { "DOCDATE обязательна" }
-        require(request.storein > 0) { "STOREIN обязателен" }
-        require(request.provider > 0) { "PROVIDER обязателен" }
-        require(request.ul > 0) { "UL обязателен" }
+        request.storein?.let { require(it > 0) { "STOREIN обязателен" } }
+        request.provider?.let { require(it > 0) { "PROVIDER обязателен" } }
+        request.ul?.let { require(it > 0) { "UL обязателен" } }
 
         return orderHeadInsProcedure.execute(request)
     }
