@@ -21,7 +21,7 @@ data class OrderHeadInsRequest(
     @Schema(description = "Дата документа", required = true)
     val docdate: LocalDate? = null,
 
-    @Schema(description = "Склад получения", required = true)
+    @Schema(description = "Склад получения", required = true, example = "47677")
     val storein: Long,
 
     @Schema(description = "Поставщик", required = true)

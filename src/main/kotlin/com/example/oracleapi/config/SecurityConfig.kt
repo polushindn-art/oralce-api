@@ -95,7 +95,9 @@ class SecurityConfig(
             "https://127.0.0.1:8080",
             "https://sdl-arsenal.ru",
             "https://ya.ars",
-            "https://ya.ars:443"
+            "https://ya.ars:443",
+            "http://oracle-rest-api.ars:3001",
+            "http://oracle-rest-api.ars:3000"
         )
 
         // Разрешаем все необходимые методы
