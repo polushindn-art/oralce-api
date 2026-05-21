@@ -7,7 +7,9 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.persistence.EntityManager
 import org.springframework.stereotype.Component
 import java.math.BigDecimal
+import java.sql.CallableStatement
 import java.sql.Types
+import java.time.LocalDate
 
 @Component
 class OrderHeadInsProcedure(
@@ -16,6 +18,15 @@ class OrderHeadInsProcedure(
 ) : BasePkgProc(entityManager, objectMapper) {
 
     override val packageName: String = ORDERHEAD
+
+    private fun setDateParam(stmt: CallableStatement, index: Int, date: LocalDate?) {
+        if (date != null) {
+            val formatter = java.time.format.DateTimeFormatter.ofPattern("dd.MM.yy")
+            stmt.setString(index, date.format(formatter))
+        } else {
+            stmt.setNull(index, Types.VARCHAR)
+        }
+    }
 
     fun execute(request: OrderHeadInsRequest): OrderHeadInsResponse {
         val startTime = System.currentTimeMillis()
@@ -54,7 +65,7 @@ class OrderHeadInsProcedure(
 
                         // 5. docdate_
                         if (request.docdate != null) {
-                            stmt.setDate(index++, java.sql.Date.valueOf(request.docdate))
+                            setDateParam(stmt, index++, request.docdate)
                         } else {
                             stmt.setNull(index++, Types.DATE)
                         }
@@ -93,7 +104,7 @@ class OrderHeadInsProcedure(
 
                         // 14. basisdocdate_
                         if (request.basisdocdate != null) {
-                            stmt.setDate(index++, java.sql.Date.valueOf(request.basisdocdate))
+                            setDateParam(stmt, index++, request.basisdocdate)
                         } else {
                             stmt.setNull(index++, Types.DATE)
                         }
@@ -134,7 +145,7 @@ class OrderHeadInsProcedure(
 
                         // 21. arrivaldate_
                         if (request.arrivaldate != null) {
-                            stmt.setDate(index++, java.sql.Date.valueOf(request.arrivaldate))
+                            setDateParam(stmt, index++, request.arrivaldate)
                         } else {
                             stmt.setNull(index++, Types.DATE)
                         }
@@ -170,7 +181,7 @@ class OrderHeadInsProcedure(
 
                         // 26. plan_arrival_date_
                         if (request.planArrivalDate != null) {
-                            stmt.setDate(index++, java.sql.Date.valueOf(request.planArrivalDate))
+                            setDateParam(stmt, index++, request.planArrivalDate)
                         } else {
                             stmt.setNull(index++, Types.DATE)
                         }
