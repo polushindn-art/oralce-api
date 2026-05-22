@@ -181,7 +181,7 @@ class OrderHeadInsProcedure(
 
                             // 26. plan_arrival_date_
                             if (request.planArrivalDate != null) {
-                                setDate(rnParam, java.sql.Date.valueOf(request.planArrivalDate))
+                                setDate(index++, java.sql.Date.valueOf(request.planArrivalDate))
                             } else {
                                 setNull(index++, Types.DATE)
                             }

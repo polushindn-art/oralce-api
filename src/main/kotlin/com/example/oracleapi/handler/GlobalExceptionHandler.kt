@@ -2,6 +2,8 @@ package com.example.oracleapi.handler
 
 import com.example.oracleapi.dto.common.MyApiResponse
 import com.example.oracleapi.exception.DocumentNotFoundException
+import com.example.oracleapi.exception.OracleException
+import com.example.oracleapi.util.OracleErrorParser
 import jakarta.persistence.EntityNotFoundException
 import jakarta.servlet.http.HttpServletRequest
 import org.slf4j.LoggerFactory
@@ -18,6 +20,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
 import org.springframework.web.servlet.NoHandlerFoundException
 import org.springframework.web.servlet.resource.NoResourceFoundException
+import java.sql.SQLException
+import java.time.LocalDateTime
 import javax.naming.AuthenticationException
 
 @RestControllerAdvice
@@ -316,6 +320,45 @@ class GlobalExceptionHandler {
     private fun isDevelopment(): Boolean {
         return System.getProperty("spring.profiles.active") == "dev" ||
                 System.getenv("SPRING_PROFILES_ACTIVE") == "dev"
+    }
+
+    @ExceptionHandler(SQLException::class)
+    fun handleSqlException(ex: SQLException): MyApiResponse<Map<String, Any?>> {
+        val oracleEx = OracleErrorParser.parse(ex)
+
+        return MyApiResponse(
+            success = false,
+            message = oracleEx.message,
+            timestamp = LocalDateTime.now(),
+            data = mapOf(
+                "code" to oracleEx.oracleCode
+            ).plus(
+                if (oracleEx.details != null) mapOf("details" to oracleEx.details) else emptyMap()
+            )
+        )
+    }
+
+    @ExceptionHandler(OracleException::class)
+    fun handleOracleException(
+        ex: OracleException,
+        request: HttpServletRequest
+    ): ResponseEntity<MyApiResponse<Map<String, Any?>>> {
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(
+                MyApiResponse(
+                    success = false,
+                    message = ex.message,
+                    timestamp = LocalDateTime.now(),
+                    path = request.requestURI,
+                    data = buildMap {
+                        put("oracleCode", ex.oracleCode)
+                        if (ex.sqlState != null) put("sqlState", ex.sqlState)
+                        if (ex.nestedErrors != null) put("errors", ex.nestedErrors)
+                        if (ex.details != null && isDevelopment()) put("details", ex.details)
+                    }
+                )
+            )
     }
 
     // Кастомное исключение для токенов
