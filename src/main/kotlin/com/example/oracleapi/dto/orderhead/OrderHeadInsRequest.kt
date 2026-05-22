@@ -17,7 +17,7 @@ data class OrderHeadInsRequest(
     @Schema(description = "Префикс документа", required = true, example = "ЗАКАЗ_26")
     val docpref: String? = null,
 
-    @Schema(description = "Номер документа (опционально, если null - генерируется)", example = "12345")
+    @Schema(description = "Номер документа (опционально, если null - генерируется)")
     val docnumb: BigDecimal? = null,
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy")
@@ -39,17 +39,17 @@ data class OrderHeadInsRequest(
     @Schema(description = "Примечание", example = "Тестовый заказ")
     val note: String? = null,
 
-    @Schema(description = "Тип документа основания", example = "1")
+    @Schema(description = "Тип документа основания")
     val basisdoctype: Long? = null,
 
-    @Schema(description = "Префикс документа основания", example = "INV")
+    @Schema(description = "Префикс документа основания")
     val basisdocpref: String? = null,
 
-    @Schema(description = "Номер документа основания", example = "100")
+    @Schema(description = "Номер документа основания")
     val basisdocnumb: BigDecimal? = null,
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy")
-    @Schema(description = "Дата документа основания", example = "19.05.2026")
+    @Schema(description = "Дата документа основания")
     val basisdocdate: LocalDate? = null,
 
     @Schema(description = "Количество вагонов", example = "2")
@@ -83,7 +83,7 @@ data class OrderHeadInsRequest(
     @Schema(description = "Максимальный процент", example = "99.9")
     val maxPcent: Double? = null,
 
-    @Schema(description = "RN", example = "123456789")
+    @Schema(description = "RN")
     val rn: Long? = null,
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy")

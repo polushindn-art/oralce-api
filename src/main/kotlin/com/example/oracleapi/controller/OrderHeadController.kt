@@ -23,6 +23,7 @@ class OrderHeadController(
     private val orderSpecService: OrderSpecService
 ) : BaseController() {
     @PostMapping("/ins_head")
+    @Operation(summary = "Создание заголовка")
     fun createOrder(
         @Valid @RequestBody request: OrderHeadInsRequest
     ): MyApiResponse<OrderHeadInsResponse> {
@@ -30,7 +31,7 @@ class OrderHeadController(
     }
 
     @PostMapping("/ins_spec")
-    @Operation(summary = "Создание/обновление спецификации")
+    @Operation(summary = "Создание спецификации")
     fun createOrderSpec(
         @Valid @RequestBody request: OrderSpecInsRequest
     ): MyApiResponse<OrderSpecInsResponse> {
