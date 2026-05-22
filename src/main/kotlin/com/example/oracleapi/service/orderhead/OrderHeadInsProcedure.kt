@@ -34,6 +34,7 @@ class OrderHeadInsProcedure(
         var resultDocnumb = BigDecimal.ZERO
         var resultRn = 0L
 
+
         execute("ins") {
             // 28 параметров (согласно Toad примеру)
             val sql =
@@ -42,6 +43,11 @@ class OrderHeadInsProcedure(
             entityManager.unwrap(EntityManager::class.java)
                 .unwrap(org.hibernate.Session::class.java)
                 .doWork { connection ->
+                    // ✅ Устанавливаем NLS_DATE_FORMAT для этой сессии
+                    connection.createStatement().use { nlsStmt ->
+                        nlsStmt.execute("ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD'")
+                        System.err.println("NLS_DATE_FORMAT set to YYYY-MM-DD")
+                    }
                     connection.prepareCall(sql).use { stmt ->
                         var index = 1
 
@@ -195,12 +201,12 @@ class OrderHeadInsProcedure(
                         // 29. isUpdate (последний параметр)
                         stmt.setBoolean(index++, request.isUpdate)
 
-                        println("=== ПАРАМЕТРЫ ВЫЗОВА ===")
-                        println("docdate = ${request.docdate}")
-                        println("arrivaldate = ${request.arrivaldate}")
-                        println("basisdocdate = ${request.basisdocdate}")
-                        println("planArrivalDate = ${request.planArrivalDate}")
-                        println("======================")
+                        System.err.println("=== ПАРАМЕТРЫ ВЫЗОВА ===")
+                        System.err.println("docdate = ${request.docdate}")
+                        System.err.println("arrivaldate = ${request.arrivaldate}")
+                        System.err.println("basisdocdate = ${request.basisdocdate}")
+                        System.err.println("planArrivalDate = ${request.planArrivalDate}")
+                        System.err.println("======================")
 
                         // Выполняем
                         stmt.execute()
