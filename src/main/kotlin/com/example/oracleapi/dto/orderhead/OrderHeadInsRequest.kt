@@ -20,8 +20,8 @@ data class OrderHeadInsRequest(
     @Schema(description = "Номер документа (опционально, если null - генерируется)", example = "12345")
     val docnumb: BigDecimal? = null,
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    @Schema(description = "Дата документа", required = true, example = "2026-05-20")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy")
+    @Schema(description = "Дата документа", required = true, example = "20.05.2026")
     val docdate: LocalDate? = null,
 
     @Schema(description = "Склад получения", required = true, example = "47677")
@@ -48,8 +48,8 @@ data class OrderHeadInsRequest(
     @Schema(description = "Номер документа основания", example = "100")
     val basisdocnumb: BigDecimal? = null,
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    @Schema(description = "Дата документа основания", example = "2026-05-19")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy")
+    @Schema(description = "Дата документа основания", example = "19.05.2026")
     val basisdocdate: LocalDate? = null,
 
     @Schema(description = "Количество вагонов", example = "2")
@@ -70,8 +70,8 @@ data class OrderHeadInsRequest(
     @Schema(description = "Специальная отметка", example = "1")
     val specialmark: Long? = null,
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    @Schema(description = "Дата прибытия", example = "2026-05-25")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy")
+    @Schema(description = "Дата прибытия", example = "25.05.2026")
     val arrivaldate: LocalDate? = null,
 
     @Schema(description = "Ворота склада", example = "5")
@@ -86,8 +86,8 @@ data class OrderHeadInsRequest(
     @Schema(description = "RN", example = "123456789")
     val rn: Long? = null,
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    @Schema(description = "Планируемая дата прихода", example = "2026-05-30")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy")
+    @Schema(description = "Планируемая дата прихода", example = "30.05.2026")
     val planArrivalDate: LocalDate? = null,
 
     @Schema(description = "Тип товара", example = "ELECTRONICS")

@@ -35,10 +35,10 @@ class OrderHeadInsProcedure(
                 .unwrap(org.hibernate.Session::class.java)
                 .doWork { connection ->
                     // ✅ Устанавливаем NLS_DATE_FORMAT для этой сессии
-                    connection.createStatement().use { nlsStmt ->
-                        nlsStmt.execute("ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD'")
-                        System.err.println("NLS_DATE_FORMAT set to YYYY-MM-DD")
-                    }
+                    /*connection.createStatement().use { nlsStmt ->
+                        nlsStmt.execute("ALTER SESSION SET NLS_DATE_FORMAT = 'DD-MM-YYYY'")
+                        System.err.println("NLS_DATE_FORMAT set to DD-MM-YYYY")
+                    }*/
                     connection.prepareCall(sql).use { stmt ->
                         with(stmt) {
 
