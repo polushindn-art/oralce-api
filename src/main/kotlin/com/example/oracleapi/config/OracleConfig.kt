@@ -46,6 +46,7 @@ class OracleConfig(private val env: Environment) {
             this.maxLifetime = env.getProperty<Long>("spring.datasource.hikari.max-lifetime") ?: 1800000
 
             this.connectionTestQuery = "SELECT 1 FROM DUAL"
+            this.connectionInitSql = "ALTER SESSION SET NLS_DATE_FORMAT = 'DD.MM.YYYY'"
             this.poolName = "OracleArsPool"
             this.initializationFailTimeout = -1
         })
@@ -160,32 +161,6 @@ class OracleConfig(private val env: Environment) {
         return password
     }
 
-    private fun requestPassword(): String {
-        return try {
-            if (GraphicsEnvironment.isHeadless()) {
-                requestPasswordFromConsole()
-            } else {
-                requestPasswordFromDialog()
-            }
-        } catch (e: Exception) {
-            logger.error("Error requesting password", e)
-            requestPasswordFromConsole()
-        }
-    }
-
-    private fun isRunningInDocker(): Boolean {
-        return File("/.dockerenv").exists() ||
-                System.getenv("DOCKER_CONTAINER") != null ||
-                System.getenv("RUNNING_IN_DOCKER") != null
-    }
-
-    private fun requestPasswordFromDialog(): String {
-        return (if (EventQueue.isDispatchThread()) {
-            showPasswordDialog()
-        } else {
-            SwingUtilities.invokeAndWait { showPasswordDialog() }
-        }) as String
-    }
 
     private fun showPasswordDialog(): String {
         val passwordField = JPasswordField(20)
@@ -244,9 +219,4 @@ class OracleConfig(private val env: Environment) {
         return password
     }
 
-    private fun isTestEnvironment(): Boolean {
-        return env.activeProfiles.any { it.contains("test") } ||
-                env.getProperty("spring.profiles.active") == "test" ||
-                System.getProperty("spring.profiles.active") == "test"
-    }
 }
