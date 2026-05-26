@@ -1,7 +1,7 @@
 // service/orderspec/OrderSpecInsProcedure.kt
 package com.example.oracleapi.service.orderspec
 
-import com.example.oracleapi.common.BasePkgProc
+import com.example.oracleapi.common.BasePkg
 import com.example.oracleapi.dto.orderspec.OrderSpecInsRequest
 import com.example.oracleapi.dto.orderspec.OrderSpecInsResponse
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -15,17 +15,19 @@ import java.sql.Types
 class OrderSpecInsProcedure(
     entityManager: EntityManager,
     objectMapper: ObjectMapper
-) : BasePkgProc(entityManager, objectMapper) {
+) : BasePkg(entityManager, objectMapper) {
 
-    override val packageName: String = "PKG_ORDERSPEC"
+    companion object {
+        const val ORDERSPEC = "PKG_ORDERSPEC.INS"
+    }
 
-    fun execute(request: OrderSpecInsRequest): OrderSpecInsResponse {
+    fun ins(request: OrderSpecInsRequest): OrderSpecInsResponse {
         val startTime = System.currentTimeMillis()
 
         var resultRn = 0L
 
-        execute("ins") {
-            val sql = "{call $packageName.INS(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}"
+        execute {
+            val sql = ORDERSPEC.toCallPrc(46)
 
             entityManager.unwrap(EntityManager::class.java)
                 .unwrap(org.hibernate.Session::class.java)

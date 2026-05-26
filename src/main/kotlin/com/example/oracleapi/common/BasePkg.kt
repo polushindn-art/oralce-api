@@ -1,6 +1,6 @@
-// common/BasePkgProc.kt
 package com.example.oracleapi.common
 
+import com.example.oracleapi.Helper
 import com.example.oracleapi.exception.OracleException
 import com.example.oracleapi.util.OracleErrorParser
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -9,31 +9,16 @@ import org.hibernate.JDBCException
 import org.slf4j.LoggerFactory
 import java.sql.SQLException
 
-abstract class BasePkgProc(
+abstract class BasePkg(
     protected val entityManager: EntityManager,
     protected val objectMapper: ObjectMapper
 ) {
-    companion object {
-        const val MARK: String = "PKG_MARK"
-        const val PUBLIC: String = "PKG_PUBLIC"
-        const val TSDLIST: String = "PKG_TSDLIST"
-        const val ORDERHEAD: String = "PKG_ORDERHEAD"
-    }
 
-    private val logger = LoggerFactory.getLogger(BasePkgProc::class.java)
+    private val logger = LoggerFactory.getLogger(BasePkg::class.java)
 
-    abstract val packageName: String
-
-    protected fun <T> execute(
-        procedureName: String,
-        block: () -> T
-    ): T {
-        val startTime = System.currentTimeMillis()
-
+    protected fun <T> execute(block: () -> T): T {
         return try {
-            val result = block()
-            val executionTime = System.currentTimeMillis() - startTime
-            result
+            block()
         } catch (e: JDBCException) {
             logger.error(e.message, e)
             val sqlEx = e.sqlException ?: (e.cause as? SQLException)
@@ -53,8 +38,22 @@ abstract class BasePkgProc(
             // Уже преобразованное исключение
             throw e
         } catch (e: Exception) {
-            val executionTime = System.currentTimeMillis() - startTime
             throw e
         }
     }
+
+    fun String.toCallPrc(parameterCount: Int): String {
+        val placeholders = (1..parameterCount).joinToString { "?" }
+        val result = "{call ${Helper.SCHEME}.$this($placeholders)}"
+        logger.error(result)
+        return result
+    }
+
+    fun String.toCallFnc(parameterCount: Int): String {
+        val placeholders = (1..parameterCount).joinToString { "?" }
+        val result = "{?=call ${Helper.SCHEME}.$this($placeholders)}"
+        logger.error(result)
+        return result
+    }
+
 }

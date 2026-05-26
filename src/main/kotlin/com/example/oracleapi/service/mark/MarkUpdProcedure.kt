@@ -1,6 +1,6 @@
 package com.example.oracleapi.service.mark
 
-import com.example.oracleapi.common.BasePkgFunc
+import com.example.oracleapi.common.BasePkg
 import com.example.oracleapi.dto.mark.MarkUpdRequest
 import com.example.oracleapi.dto.mark.MarkUpdResponse
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -17,46 +17,41 @@ class MarkUpdProcedure(
     entityManager: EntityManager,
     objectMapper: ObjectMapper,
     private val cacheManager: CacheManager
-) : BasePkgFunc(entityManager, objectMapper) {
-    override val packageName: String = MARK
-    //@Transactional
+) : BasePkg(entityManager, objectMapper) {
+
+    companion object {
+        const val MARK = "PKG_MARK.upd"
+    }
+
     fun execute(request: MarkUpdRequest): MarkUpdResponse {
-        return execute("UPD") {
-            val startTime = System.currentTimeMillis()
+        execute {
 
-            try {
-                val jsonString = objectMapper.writeValueAsString(request.json)
+            val sql = MARK.toCallPrc(6)
+            val jsonString = objectMapper.writeValueAsString(request.json)
 
-                // Используем именованную процедуру из entity
-                val query = entityManager.createNamedStoredProcedureQuery("MarkProcedure.UPD")
+            entityManager
+                .unwrap(org.hibernate.Session::class.java)
+                .doWork { connection ->
+                    connection.prepareCall(sql).use { statement ->
+                        with(statement) {
+                            setString(1, request.km)
+                            setString(2, jsonString)
+                            setString(3, request.table)
+                            setLong(4, request.tablern)
+                            setInt(5, request.status)
+                            setString(6, request.note)
+                            execute()
+                        }
+                    }
 
-                // Устанавливаем параметры
-                query.setParameter("KM_", request.km)
-                query.setParameter("JSON_", jsonString)
-                query.setParameter("TABLE_", request.table)
-                query.setParameter("TABLERN_", request.tablern.toLong())
-                query.setParameter("STATUS_", request.status)
-                query.setParameter("NOTE_", request.note)
 
-                // Выполняем
-                query.execute()
-
-                // Очищам КЭШ для запроса КМ
-                cacheManager.getCache("markCache")?.evict(request.km)
-
-                val executionTime = System.currentTimeMillis() - startTime
-
-                MarkUpdResponse(
-                        success = true,
-                        message = "Метка успешно обновлена",
-                        km = request.km,
-                        executionTimeMs = executionTime,
-                        timestamp = currentTimestamp()
-                    )
-
-            } catch (e: Exception) {
-                throw IllegalArgumentException("Ошибка в upd MarkCode $e")
-            }
+                }
         }
+        return MarkUpdResponse(
+            true,
+            "",
+            ""
+        )
     }
 }
+

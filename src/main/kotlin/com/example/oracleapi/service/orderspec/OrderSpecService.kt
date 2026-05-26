@@ -15,6 +15,6 @@ class OrderSpecService(
         require(request.summ != null) { "SUMM обязателен" }
         require(request.prquant != null) { "PRQUANT обязателен" }
 
-        return orderSpecInsProcedure.execute(request)
+        return orderSpecInsProcedure.ins(request)
     }
 }

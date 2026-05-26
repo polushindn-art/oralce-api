@@ -354,7 +354,8 @@ class GlobalExceptionHandler {
                     data = buildMap {
                         put("oracleCode", ex.oracleCode)
                         if (ex.sqlState != null) put("sqlState", ex.sqlState)
-                        if (ex.nestedErrors != null) put("errors", ex.nestedErrors)
+                        if (ex.businessErrors != null) { put("businessErrors", ex.businessErrors) }
+                        if (ex.technicalErrors != null) { put("technicalErrors", ex.technicalErrors) }
                         if (ex.details != null && isDevelopment()) put("details", ex.details)
                     }
                 )

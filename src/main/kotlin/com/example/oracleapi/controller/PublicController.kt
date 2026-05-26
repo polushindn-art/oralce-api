@@ -44,11 +44,4 @@ class PublicController(
         return success(publicProcedureService.getIdRn())
     }
 
-    @GetMapping("/gen-rn/multiple")
-    @Operation(summary = "Получить несколько RN", description = "Генерирует несколько уникальных идентификаторов")
-    fun generateMultipleRn(
-        @RequestParam(defaultValue = "3") count: Int
-    ): MyApiResponse<GenIdResponse> {
-        return success(publicProcedureService.generateMultipleRn(count))
-    }
 }

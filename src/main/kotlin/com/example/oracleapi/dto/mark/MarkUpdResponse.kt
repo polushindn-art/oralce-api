@@ -6,7 +6,5 @@ package com.example.oracleapi.dto.mark
 class MarkUpdResponse(
     val success: Boolean,
     val message: String,
-    val km: String,
-    val executionTimeMs: Long,
-    val timestamp: String
+    val km: String
 )

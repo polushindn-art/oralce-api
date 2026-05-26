@@ -17,7 +17,7 @@ data class MarkUpdRequest(
     val table: String,
 
     @field:NotNull(message = "Tablern обязателен")
-    val tablern: Number,
+    val tablern: Long,
 
     @field:NotNull(message = "Status обязателен")
     val status: Int,

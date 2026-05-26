@@ -8,8 +8,7 @@ import java.time.format.DateTimeFormatter
 data class GenIdResponse(
     val rn: Long? = null,                          // Основной идентификатор с понятным именем
     val rns: List<Long>? = null,            // Для множественной генерации
-    val count: Int? = null,                      // Количество сгенерированных ID
-    val executionTimeMs: Long,               // Время выполнения в мс
+    val count: Int? = null,                      // Количество сгенерированных RN
     val timestamp: String                     // Временная метка
 ) {
     companion object {
@@ -19,7 +18,6 @@ data class GenIdResponse(
         ): GenIdResponse {
             return GenIdResponse(
                 rn = rn,
-                executionTimeMs = executionTimeMs,
                 timestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
             )
         }
@@ -31,7 +29,6 @@ data class GenIdResponse(
             return GenIdResponse(
                 rns = ids,
                 count = ids.size,
-                executionTimeMs = executionTimeMs,
                 timestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
             )
         }

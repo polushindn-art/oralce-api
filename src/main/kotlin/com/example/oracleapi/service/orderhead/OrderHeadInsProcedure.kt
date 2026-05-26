@@ -1,23 +1,25 @@
 package com.example.oracleapi.service.orderhead
 
-import com.example.oracleapi.common.BasePkgProc
+import com.example.oracleapi.common.BasePkg
 import com.example.oracleapi.dto.orderhead.OrderHeadInsRequest
 import com.example.oracleapi.dto.orderhead.OrderHeadInsResponse
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.persistence.EntityManager
 import org.springframework.stereotype.Component
 import java.math.BigDecimal
-import java.sql.CallableStatement
 import java.sql.Types
-import java.time.LocalDate
 
 @Component
 class OrderHeadInsProcedure(
     entityManager: EntityManager,
     objectMapper: ObjectMapper
-) : BasePkgProc(entityManager, objectMapper) {
+) : BasePkg(entityManager, objectMapper) {
 
-    override val packageName: String = ORDERHEAD
+    //override val packageName: String = ORDERHEAD
+
+    companion object {
+        const val ORDERHEAD = "PKG_ORDERHEAD.INS"
+    }
 
     fun execute(request: OrderHeadInsRequest): OrderHeadInsResponse {
         val startTime = System.currentTimeMillis()
@@ -26,25 +28,17 @@ class OrderHeadInsProcedure(
         var resultRn = 0L
 
 
-        execute("ins") {
-            // 28 параметров (согласно Toad примеру)
-            val sql =
-                "{call $packageName.INS(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}"
+        execute {
 
-            entityManager.unwrap(EntityManager::class.java)
+            val sql = ORDERHEAD.toCallPrc(29)
+
+            entityManager
                 .unwrap(org.hibernate.Session::class.java)
                 .doWork { connection ->
-                    // ✅ Устанавливаем NLS_DATE_FORMAT для этой сессии
-                    /*connection.createStatement().use { nlsStmt ->
-                        nlsStmt.execute("ALTER SESSION SET NLS_DATE_FORMAT = 'DD-MM-YYYY'")
-                        System.err.println("NLS_DATE_FORMAT set to DD-MM-YYYY")
-                    }*/
                     connection.prepareCall(sql).use { stmt ->
                         with(stmt) {
 
-
                             var index = 1
-
                             // 1. crn_
                             setLong(index++, request.crn ?: 0L)
 

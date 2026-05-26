@@ -11,13 +11,8 @@ class PublicProcedureService(
     private val genIdRnProcedur: PublicGenIdRnProcedur
 ) {
     fun getNomenByBarcode(request: GetNomenByBarcodeRequest): GetNomenByBarcodeResponse =
-        getNomenByBarcodeProcedure.getNomen(request.barcode)
+        getNomenByBarcodeProcedure.getNomenByBarcodeProcedure(request.barcode)
 
     fun getIdRn(): GenIdResponse = genIdRnProcedur.generateRn()
-
-    fun generateMultipleRn(count: Int): GenIdResponse {
-        require(count in 1..100) { "Count must be between 1 and 100" }
-        return genIdRnProcedur.generateMultipleRn(count)
-    }
 
 }
