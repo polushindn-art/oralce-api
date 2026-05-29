@@ -1,8 +1,8 @@
 package com.example.oracleapi.service.orderhead
 
 import com.example.oracleapi.common.BasePkg
-import com.example.oracleapi.dto.orderhead.OrderHeadInsRequest
-import com.example.oracleapi.dto.orderhead.OrderHeadInsResponse
+import com.example.oracleapi.dto.orderhead.OrderHeadUpdRequest
+import com.example.oracleapi.dto.orderhead.OrderHeadUpdResponse
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.persistence.EntityManager
 import org.springframework.stereotype.Component
@@ -10,168 +10,166 @@ import java.math.BigDecimal
 import java.sql.Types
 
 @Component
-class OrderHeadInsProcedure(
+class OrderHeadUpdProcedure(
     entityManager: EntityManager,
     objectMapper: ObjectMapper
-) : BasePkg(entityManager, objectMapper) {
-
-    //override val packageName: String = ORDERHEAD
-
+) : BasePkg(
+    entityManager,
+    objectMapper
+) {
     companion object {
-        const val ORDERHEAD = "PKG_ORDERHEAD.INS"
-        const val PARAM_COUNT = 29
+        const val ORDERHEAD = "PKG_ORDERHEAD.UPD"
+        const val PARAM_COUNT = 28
     }
 
-    fun execute(request: OrderHeadInsRequest): OrderHeadInsResponse {
+    fun execute(request: OrderHeadUpdRequest): OrderHeadUpdResponse {
         val startTime = System.currentTimeMillis()
 
-        var resultDocnumb = BigDecimal.ZERO
         var resultRn = 0L
-
+        var resultDocnumb = BigDecimal.ZERO
 
         execute {
-
             val sql = ORDERHEAD.toCallPrc(PARAM_COUNT)
-
             entityManager
                 .unwrap(org.hibernate.Session::class.java)
                 .doWork { connection ->
                     connection.prepareCall(sql).use { stmt ->
                         with(stmt) {
-
                             var index = 1
-                            // 1. crn_
+
+                            // 1. rn_ (IN/OUT)
+                            val rnParam = index++
+                            if (request.rn != null) {
+                                setLong(rnParam, request.rn)
+                            } else {
+                                setNull(rnParam, Types.BIGINT)
+                            }
+                            registerOutParameter(rnParam, Types.BIGINT)
+
+                            // 2. crn_
                             setLong(index++, request.crn ?: 0L)
 
-                            // 2. doctype_
+                            // 3. doctype_
                             setLong(index++, request.doctype ?: 0L)
 
-                            // 3. docpref_
+                            // 4. docpref_
                             setString(index++, request.docpref ?: "")
 
-                            // 4. docnumb_ (IN/OUT)
+                            // 5. docnumb_ (IN/OUT)
                             val docNumbParam = index++
-                            registerOutParameter(docNumbParam, Types.FLOAT)
                             if (request.docnumb != null) {
                                 setBigDecimal(docNumbParam, request.docnumb)
                             } else {
-                                setNull(docNumbParam, Types.FLOAT)
+                                setNull(docNumbParam, Types.NUMERIC)
                             }
+                            registerOutParameter(docNumbParam, Types.NUMERIC)
 
-                            // 5. docdate_
+                            // 6. docdate_
                             if (request.docdate != null) {
                                 setDate(index++, java.sql.Date.valueOf(request.docdate))
                             } else {
                                 setNull(index++, Types.DATE)
                             }
 
-                            // 6. storein_
-                            stmt.setLong(index++, request.storein ?: 0L)
+                            // 7. storein_
+                            setLong(index++, request.storein ?: 0L)
 
-                            // 7. provider_
-                            stmt.setLong(index++, request.provider ?: 0L)
+                            // 8. provider_
+                            setLong(index++, request.provider ?: 0L)
 
-                            // 8. ul_
-                            stmt.setLong(index++, request.ul ?: 0L)
+                            // 9. ul_
+                            setLong(index++, request.ul ?: 0L)
 
-                            // 9. overhead_
-                            stmt.setBigDecimal(index++, request.overhead ?: BigDecimal.ZERO)
+                            // 10. overhead_
+                            setBigDecimal(index++, request.overhead ?: BigDecimal.ZERO)
 
-                            // 10. note_
-                            stmt.setString(index++, request.note ?: "")
+                            // 11. note_
+                            setString(index++, request.note ?: "")
 
-                            // 11. basisdoctype_
+                            // 12. basisdoctype_
                             if (request.basisdoctype != null) {
-                                stmt.setLong(index++, request.basisdoctype)
+                                setLong(index++, request.basisdoctype)
                             } else {
-                                stmt.setNull(index++, Types.DOUBLE)
+                                setNull(index++, Types.NUMERIC)
                             }
 
-                            // 12. basisdocpref_
-                            stmt.setString(index++, request.basisdocpref)
+                            // 13. basisdocpref_
+                            setString(index++, request.basisdocpref)
 
-                            // 13. basisdocnumb_
+                            // 14. basisdocnumb_
                             if (request.basisdocnumb != null) {
-                                stmt.setBigDecimal(index++, request.basisdocnumb)
+                                setBigDecimal(index++, request.basisdocnumb)
                             } else {
-                                stmt.setNull(index++, Types.DOUBLE)
+                                setNull(index++, Types.NUMERIC)
                             }
 
-                            // 14. basisdocdate_
+                            // 15. basisdocdate_
                             if (request.basisdocdate != null) {
                                 setDate(index++, java.sql.Date.valueOf(request.basisdocdate))
                             } else {
                                 setNull(index++, Types.DATE)
                             }
 
-                            // 15. numbttn_
+                            // 16. numbttn_
                             if (request.numbttn != null) {
                                 setLong(index++, request.numbttn)
                             } else {
-                                setNull(index++, Types.DOUBLE)
+                                setNull(index++, Types.NUMERIC)
                             }
 
-                            // 16. ttip_
+                            // 17. ttip_
                             if (request.ttip != null) {
                                 setLong(index++, request.ttip)
                             } else {
-                                setNull(index++, Types.DOUBLE)
+                                setNull(index++, Types.NUMERIC)
                             }
 
-                            // 17. nvagon_
+                            // 18. nvagon_
                             setString(index++, request.nvagon)
 
-                            // 18. toperation_
+                            // 19. toperation_
                             if (request.toperation != null) {
                                 setLong(index++, request.toperation)
                             } else {
-                                setNull(index++, Types.DOUBLE)
+                                setNull(index++, Types.NUMERIC)
                             }
 
-                            // 19. notelogist_
+                            // 20. notelogist_
                             setString(index++, request.notelogist)
 
-                            // 20. specialmark_
+                            // 21. specialmark_
                             if (request.specialmark != null) {
                                 setLong(index++, request.specialmark)
                             } else {
-                                setNull(index++, Types.DOUBLE)
+                                setNull(index++, Types.NUMERIC)
                             }
 
-                            // 21. arrivaldate_
+                            // 22. arrivaldate_
                             if (request.arrivaldate != null) {
                                 setDate(index++, java.sql.Date.valueOf(request.arrivaldate))
                             } else {
                                 setNull(index++, Types.DATE)
                             }
 
-                            // 22. storegate_
+                            // 23. storegate_
                             if (request.storegate != null) {
                                 setLong(index++, request.storegate)
                             } else {
                                 setNull(index++, Types.BIGINT)
                             }
 
-                            // 23. NACL_RASH_
+                            // 24. NACL_RASH_
                             if (request.naclRash != null) {
                                 setLong(index++, request.naclRash)
                             } else {
-                                setNull(index++, Types.BIGINT)
+                                setNull(index++, Types.NUMERIC)
                             }
 
-                            // 24. MAX_PCENT_
+                            // 25. MAX_PCENT_
                             if (request.maxPcent != null) {
                                 setDouble(index++, request.maxPcent)
                             } else {
                                 setNull(index++, Types.DOUBLE)
-                            }
-
-                            // 25. rn_ (IN/OUT)
-                            val rnParam = index++
-                            if (request.rn != null) {
-                                setLong(rnParam, request.rn)
-                            } else {
-                                setNull(rnParam, Types.BIGINT)
                             }
 
                             // 26. plan_arrival_date_
@@ -187,15 +185,12 @@ class OrderHeadInsProcedure(
                             // 28. packtype_
                             setString(index++, request.packType)
 
-                            // 29. isUpdate (последний параметр)
-                            setBoolean(index++, request.isUpdate)
-
                             // Выполняем
                             execute()
 
                             // Получаем OUT параметры
-                            resultDocnumb = stmt.getBigDecimal(docNumbParam)
-                            resultRn = stmt.getLong(rnParam)
+                            resultRn = getLong(rnParam)
+                            resultDocnumb = getBigDecimal(docNumbParam)
                         }
                     }
                 }
@@ -203,10 +198,11 @@ class OrderHeadInsProcedure(
 
         val executionTime = System.currentTimeMillis() - startTime
 
-        return OrderHeadInsResponse(
-            docnumb = resultDocnumb,
+        return OrderHeadUpdResponse(
             rn = resultRn,
-            executionTimeMs = executionTime
+            docnumb = resultDocnumb,
+            executionTime
         )
     }
+
 }

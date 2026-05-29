@@ -25,16 +25,21 @@ springdoc:
     try-it-out-enabled: true
   show-actuator: false
   group-configs:
-    - group: oracle-packages
-      display-name: Пакеты PKG_Oracle
+    - group: auth
+      display-name: Авторизация
       paths-to-match:
-        - /mark/**
-        - /tsdlist/**
-        - /mail/**
-        - /pictures/**
-        - /public/**
-        - /email/**
+        - /v1/auth/**
+    - group: oracle-packages
+      display-name: Пакеты Oracle
+      paths-to-match:
+        - /v1/pictures/**
+        - /v1/public/**
+        - /v1/email/**
     - group: 1c-packages
       display-name: API 1C
       paths-to-match:
-        - /api/1c/**
+        - /v1/api/1c/**
+    - group: mark
+      display-name: Маркировка
+      paths-to-match:
+        - /v1/mark/**

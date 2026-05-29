@@ -45,14 +45,14 @@ abstract class BasePkg(
     fun String.toCallPrc(parameterCount: Int): String {
         val placeholders = (1..parameterCount).joinToString { "?" }
         val result = "{call ${Helper.SCHEME}.$this($placeholders)}"
-        logger.error(result)
+        logger.info(result)
         return result
     }
 
     fun String.toCallFnc(parameterCount: Int): String {
         val placeholders = (1..parameterCount).joinToString { "?" }
         val result = "{?=call ${Helper.SCHEME}.$this($placeholders)}"
-        logger.error(result)
+        logger.info(result)
         return result
     }
 

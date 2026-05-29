@@ -22,7 +22,7 @@ import java.time.LocalDate
 open class Orderhead {
     @Id
     @Column(name = "RN", nullable = false)
-    open var id: Long? = null
+    open var rn: Long? = null
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -115,8 +115,11 @@ open class Orderhead {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.RESTRICT)
-    @JoinColumn(name = "BASISDOCTYPE")
-    open var basisdoctype: Typedoc? = null
+    @JoinColumn(name = "BASISDOCTYPE", insertable = false, updatable = false)
+    open var basisdoctypeEntity: Typedoc? = null
+
+    @Column(name = "BASISDOCTYPE", precision = 17)
+    open var basisdoctype: BigDecimal? = null
 
     @Size(max = 10)
     @Column(name = "BASISDOCPREF", length = 10)

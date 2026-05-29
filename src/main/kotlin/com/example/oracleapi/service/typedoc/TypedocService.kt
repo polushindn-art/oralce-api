@@ -11,25 +11,31 @@ import org.springframework.transaction.annotation.Transactional
 class TypedocService(
     private val typedocRepository: TypedocRepository
 ) {
-    private val log = LoggerFactory.getLogger(javaClass)
 
     /**
      * Получить все типы документов
      */
-    @Transactional(readOnly = true)
     fun getAllTypedocs(): List<TypedocResponse> {
         return typedocRepository.findAll()
             .map { it.toResponse() }
     }
 
-
     /**
      * Получить документы по divisionCode
      * */
-    @Transactional(readOnly = true)
     fun getTypeDocByDivisionCode(divisionCode: String): List<TypedocResponse> {
         return typedocRepository.findByDivision(divisionCode)
             .map { it.toResponse() }
+    }
+
+    fun existsById(rn: Long): Boolean {
+        return typedocRepository.existsById(rn)
+    }
+
+    fun validateExists(rn: Long, message: String = "Тип документа с RN=$rn не существует") {
+        if (!existsById(rn)) {
+            throw IllegalArgumentException(message)
+        }
     }
 
     fun Typedoc.toResponse(): TypedocResponse {

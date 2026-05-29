@@ -50,20 +50,4 @@ class AdvancedSwaggerConfig {
             .build()
     }
 
-    @Bean
-    fun qrealOpenApi(): GroupedOpenApi {
-        return GroupedOpenApi.builder()
-            .group("rest-api")
-            .pathsToMatch("/**")
-            .build()
-    }
-
-    //@Bean
-    fun publicGroupedOpenApi(): GroupedOpenApi {
-        return GroupedOpenApi.builder()
-            .group("public-api")
-            .pathsToMatch("/api/**")
-            .build()
-    }
-
 }

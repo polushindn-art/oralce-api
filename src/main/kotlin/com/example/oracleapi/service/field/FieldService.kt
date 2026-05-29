@@ -13,6 +13,12 @@ class FieldService(
 ) {
 
     @Transactional(readOnly = true)
+    fun validateFieldValue(fieldName: String, fieldValue: Long): Field {
+        return fieldRepository.findByFieldNameAndFieldValueIgnoreCase(fieldName, fieldValue)
+            ?: throw IllegalArgumentException("Значение $fieldValue не найдено в справочнике $fieldName")
+    }
+
+    @Transactional(readOnly = true)
     fun getFieldValues(fieldName: String): List<FieldResponse> {
         return fieldRepository.findByFieldNameIgnoreCaseOrderByFieldComment(fieldName)
             .map { FieldResponse.fromEntity(it) }

@@ -28,7 +28,7 @@ import java.util.*
 import java.util.concurrent.atomic.AtomicLong
 
 @RestController
-@RequestMapping("/api/1c")
+@RequestMapping("/v1/api/1c")
 @Tag(name = "API Proxy 1C", description = "Прокси для внешних API 1C")
 class ApiProxyController(
     private val restTemplateBuilder: RestTemplateBuilder

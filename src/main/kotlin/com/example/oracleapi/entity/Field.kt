@@ -33,4 +33,7 @@ open class Field {
     @Column(name = "NOTE", length = 80)
     open var note: String? = null
 
+    companion object {
+        const val ORDER_STATUS = "ORDER_STATUS"
+    }
 }
