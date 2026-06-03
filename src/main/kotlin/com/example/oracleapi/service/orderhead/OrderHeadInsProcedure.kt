@@ -1,8 +1,8 @@
 package com.example.oracleapi.service.orderhead
 
 import com.example.oracleapi.common.BasePkg
-import com.example.oracleapi.dto.orderhead.OrderHeadInsRequest
-import com.example.oracleapi.dto.orderhead.OrderHeadInsResponse
+import com.example.oracleapi.dto.orderhead.ins.OrderHeadInsRequest
+import com.example.oracleapi.dto.orderhead.ins.OrderHeadInsResponse
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.persistence.EntityManager
 import org.springframework.stereotype.Component

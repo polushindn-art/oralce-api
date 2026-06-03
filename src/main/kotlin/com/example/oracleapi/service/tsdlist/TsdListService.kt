@@ -6,7 +6,7 @@ import com.example.oracleapi.dto.tsdlist.*
 import com.example.oracleapi.dto.tsdparam.ParamDto
 import com.example.oracleapi.dto.userpart.PartInfo
 import com.example.oracleapi.entity.Tsdlist
-import com.example.oracleapi.repository.agnlist.AgnlistRepository
+import com.example.oracleapi.repository.agnlist.AgnListRepository
 import com.example.oracleapi.repository.pbe.PbeRepository
 import com.example.oracleapi.repository.tsd.TsdListHistoryRepository
 import com.example.oracleapi.repository.tsd.TsdListRepository
@@ -23,7 +23,7 @@ import java.time.format.DateTimeFormatter
 class TsdListService(
     private val tsdHistoryRepository: TsdListHistoryRepository,
     private val pbeRepository: PbeRepository,
-    private val agnListRepository: AgnlistRepository,
+    private val agnListRepository: AgnListRepository,
     private val storeService: StoreService,
     private val tsdlistRepository: TsdListRepository,
     private val publicProcedureService: PublicProcedureService,

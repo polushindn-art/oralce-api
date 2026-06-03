@@ -1,7 +1,7 @@
 package com.example.oracleapi.service.orderhead
 
 import com.example.oracleapi.dto.ResponseRN
-import com.example.oracleapi.dto.orderhead.OrderHeadBasisDocUpdateRequest
+import com.example.oracleapi.dto.orderhead.basisDoc.OrderHeadBasisDocUpdateRequest
 import com.example.oracleapi.repository.orderhead.OrderheadRepository
 import jakarta.transaction.Transactional
 import org.springframework.stereotype.Component

@@ -1,4 +1,4 @@
-package com.example.oracleapi.dto.orderhead
+package com.example.oracleapi.dto.orderhead.ins
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import io.swagger.v3.oas.annotations.media.Schema
@@ -55,7 +55,7 @@ data class OrderHeadInsRequest(
     @Schema(description = "Количество вагонов", example = "2")
     val numbttn: Long? = null,
 
-    @Schema(description = "Тип ТТН", example = "1")
+    @Schema(description = "Тип ТТН")
     val ttip: Long? = null,
 
     @Schema(description = "Номер вагона", example = "12345678")

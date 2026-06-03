@@ -13,17 +13,10 @@ import org.springframework.stereotype.Service
  */
 @Service
 class MarkProcedureService(
-    private val markUpdProcedure: MarkUpdProcedure,
-    private val markViewService: MarkViewService,
-    private val parseMark: ParseMark
+    private val markViewService: MarkViewService
 ) {
-    fun upd(request: MarkUpdRequest): MarkUpdResponse =
-        markUpdProcedure.execute(request)
 
     fun find(request: MarkFindRequest): MarkFindResponse =
         markViewService.findByKm(request)
 
-    fun parseMark(km: String): ParseMarkResponse = parseMark.parseMarkCode(km)
-
-    fun getNomenName(barcode: String): ParseMarkResponse = parseMark.getNomenName(barcode)
 }

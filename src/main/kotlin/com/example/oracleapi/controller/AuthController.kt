@@ -164,6 +164,12 @@ class AuthController(
         )
     }
 
+    @GetMapping
+    @Operation(summary = "Ссылка на Beta")
+    fun tsd():String {
+        return "https://www.rustore.ru/catalog/app/com.example.qshop?testingSubscription=beta"
+    }
+
     // ========== PRIVATE HELPERS ==========
 
     private fun addAuthCookie(response: HttpServletResponse, token: String) {

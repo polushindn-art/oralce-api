@@ -4,7 +4,6 @@ import com.example.oracleapi.Helper
 import com.example.oracleapi.exception.OracleException
 import com.example.oracleapi.util.OracleErrorParser
 import org.hibernate.JDBCException
-import org.intellij.lang.annotations.Language
 import org.slf4j.LoggerFactory
 import java.sql.CallableStatement
 import java.sql.SQLException
@@ -19,7 +18,6 @@ abstract class BasePackage(
     abstract val pkg: String?
     abstract val method: String
     abstract val count: Int
-
 
     protected fun <T> DataSource.executeFun(
         block: (CallableStatement) -> T
@@ -46,7 +44,6 @@ abstract class BasePackage(
                 }
             }
         }
-
     }
 
     protected fun <T> executeLogged(block: () -> T): T {

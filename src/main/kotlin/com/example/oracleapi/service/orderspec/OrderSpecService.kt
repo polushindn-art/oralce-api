@@ -1,12 +1,19 @@
 package com.example.oracleapi.service.orderspec
 
-import com.example.oracleapi.dto.orderspec.OrderSpecInsRequest
-import com.example.oracleapi.dto.orderspec.OrderSpecInsResponse
+import com.example.oracleapi.dto.orderspec.OrderSpecResponse
+import com.example.oracleapi.dto.orderspec.ins.OrderSpecInsRequest
+import com.example.oracleapi.dto.orderspec.ins.OrderSpecInsResponse
+import com.example.oracleapi.dto.orderspec.upd.OrderSpecUpdateRequest
+import com.example.oracleapi.dto.orderspec.upd.OrderSpecUpdateResponse
+import com.example.oracleapi.repository.orderspec.OrderspecRepository
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class OrderSpecService(
-    private val orderSpecInsProcedure: OrderSpecInsProcedure
+    private val orderSpecInsProcedure: OrderSpecInsProcedure,
+    private val orderspecRepository: OrderspecRepository,
+    private val orderSpecUpd: OrderSpecUpd
 ) {
     fun createOrderSpec(request: OrderSpecInsRequest): OrderSpecInsResponse {
         require(request.prn != null && request.prn > 0) { "PRN обязателен" }
@@ -17,4 +24,17 @@ class OrderSpecService(
 
         return orderSpecInsProcedure.ins(request)
     }
+
+    fun updateOrderSpec(request: OrderSpecUpdateRequest): OrderSpecUpdateResponse {
+        require(request.rn > 0) { "RN обязателен" }
+        return orderSpecUpd.take(request)
+    }
+
+    @Transactional(readOnly = true)
+    fun getByRn(rn: Long): OrderSpecResponse {
+        val orderSpec =
+            orderspecRepository.findByRn(rn) ?: throw IllegalArgumentException("OrderSpec с RN=$rn не найден")
+        return OrderSpecResponse.fromEntity(orderSpec)
+    }
+
 }

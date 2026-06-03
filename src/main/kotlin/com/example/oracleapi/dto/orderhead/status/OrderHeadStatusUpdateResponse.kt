@@ -1,4 +1,4 @@
-package com.example.oracleapi.dto.orderhead
+package com.example.oracleapi.dto.orderhead.status
 
 import com.example.oracleapi.dto.field.FieldResponse
 

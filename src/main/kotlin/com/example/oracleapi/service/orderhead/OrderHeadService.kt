@@ -1,18 +1,25 @@
 package com.example.oracleapi.service.orderhead
 
 import com.example.oracleapi.dto.ResponseRN
-import com.example.oracleapi.dto.orderhead.OrderHeadBasisDocUpdateRequest
-import com.example.oracleapi.dto.orderhead.OrderHeadInsRequest
-import com.example.oracleapi.dto.orderhead.OrderHeadInsResponse
-import com.example.oracleapi.dto.orderhead.OrderHeadStatusResponse
-import com.example.oracleapi.dto.orderhead.OrderHeadStatusUpdateRequest
-import com.example.oracleapi.dto.orderhead.OrderHeadStatusUpdateResponse
-import com.example.oracleapi.dto.orderhead.OrderHeadUpdRequest
-import com.example.oracleapi.dto.orderhead.OrderHeadUpdResponse
+import com.example.oracleapi.dto.orderhead.*
+import com.example.oracleapi.dto.orderhead.arrivalDate.OrderHeadUpdateArDateRequest
+import com.example.oracleapi.dto.orderhead.arrivalDate.OrderHeadUpdateArDateResponse
+import com.example.oracleapi.dto.orderhead.basisDoc.OrderHeadBasisDocUpdateRequest
+import com.example.oracleapi.dto.orderhead.note.OrderHeadUpdateNoteRequest
+import com.example.oracleapi.dto.orderhead.provider.OrderHeadProviderUpdateResponse
+import com.example.oracleapi.dto.orderhead.provider.OrderHeadUpdateProviderRequest
+import com.example.oracleapi.dto.orderhead.status.OrderHeadStatusUpdateRequest
+import com.example.oracleapi.dto.orderhead.status.OrderHeadStatusUpdateResponse
+import com.example.oracleapi.dto.orderhead.storein.OrderHeadUpdateStoreInRequest
+import com.example.oracleapi.dto.orderhead.storein.OrderHeadUpdateStoreInResponse
+import com.example.oracleapi.dto.orderhead.ul.OrderHeadUlUpdateRequest
+import com.example.oracleapi.dto.orderhead.ul.OrderHeadUlUpdateResponse
 import com.example.oracleapi.entity.Field
 import com.example.oracleapi.service.field.FieldService
 import com.example.oracleapi.service.typedoc.TypedocService
+import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class OrderHeadService(
@@ -22,10 +29,15 @@ class OrderHeadService(
     private val orderHeadStatusUpdate: OrderHeadStatusUpdate,
     private val orderHeadBasisDocClear: OrderHeadBasisDocClear,
     private val orderHeadBasisDocUpdate: OrderHeadBasisDocUpdate,
+    private val orderHeadUpdateProvider: OrderHeadUpdateProvider,
+    private val orderHeadUlUpdate: OrderHeadUlUpdate,
+    private val orderHeadUpdateStoreIn: OrderHeadUpdateStoreIn,
+    private val orderHeadUpdateArrivalDate: OrderHeadUpdateArrivalDate,
+    private val orderHeadUpdateNote: OrderHeadUpdateNote,
     private val fieldService: FieldService,
     private val typeDocService: TypedocService
 ) {
-    fun createOrder(request: OrderHeadInsRequest): OrderHeadInsResponse {
+    fun createOrder(request: com.example.oracleapi.dto.orderhead.ins.OrderHeadInsRequest): com.example.oracleapi.dto.orderhead.ins.OrderHeadInsResponse {
         // Валидация обязательных полей
         request.crn?.let { require(it > 0) { "CRN обязателен" } }
         request.doctype?.let { require(it > 0) { "DOCTYPE обязателен" } }
@@ -38,16 +50,19 @@ class OrderHeadService(
         return orderHeadInsProcedure.execute(request)
     }
 
+    @Transactional
     fun updateOrder(request: OrderHeadUpdRequest): OrderHeadUpdResponse {
         request.rn?.let { require(it > 0) { "RN обязательна для обновления" } }
         return orderHeadUpdProcedure.execute(request)
     }
 
-    fun getStatus(rn: Long?): OrderHeadStatusResponse {
+    @Transactional
+    fun getStatus(rn: Long?): com.example.oracleapi.dto.orderhead.status.OrderHeadStatusResponse {
         rn?.let { require(rn > 0L) { "RN обязательна" } }
         return orderHeadStatusGet.take(rn ?: 0)
     }
 
+    @Transactional
     fun updateStatus(request: OrderHeadStatusUpdateRequest): OrderHeadStatusUpdateResponse {
         require(request.rn > 0) { "RN обязательна" }
         require(request.status >= 0) { "Статус не может быть отрицательным" }
@@ -56,16 +71,53 @@ class OrderHeadService(
         return orderHeadStatusUpdate.take(request)
     }
 
+    @Transactional
     fun updateBasisDoc(request: OrderHeadBasisDocUpdateRequest): ResponseRN {
         require(request.rn > 0) { "RN обязательна" }
         typeDocService.validateExists(request.type)
         return orderHeadBasisDocUpdate.update(request)
     }
 
+    @Transactional
     fun clearBasisDocs(rn: Long): ResponseRN {
         require(rn > 0) { "RN обязательна" }
         return orderHeadBasisDocClear.clearBasisDoc(rn)
     }
 
+    @Transactional
+    fun updateProvider(request: OrderHeadUpdateProviderRequest): OrderHeadProviderUpdateResponse {
+        require(request.orderhead > 0) { "RN заказа обязательна" }
+        require(request.provider > 0) { "Поставщик обязателен" }
+        return orderHeadUpdateProvider.update(request)
+    }
+
+    @Transactional
+    fun updateUl(request: OrderHeadUlUpdateRequest): OrderHeadUlUpdateResponse {
+        require(request.orderhead > 0) { "RN заказа обязательна" }
+        require(request.ul > 0) { "Наше юридическое лицо обязательно" }
+        return orderHeadUlUpdate.update(request)
+    }
+
+    @Transactional
+    fun updateStoreIn(request: OrderHeadUpdateStoreInRequest): OrderHeadUpdateStoreInResponse {
+        request.orderhead?.let { require(it > 0) { "RN заказа обязательна" } }
+        request.storeIn?.let { require(it > 0) { "Склад обязателен" } }
+        return orderHeadUpdateStoreIn.update(request)
+    }
+
+    @Transactional
+    fun updateArDate(request: OrderHeadUpdateArDateRequest): OrderHeadUpdateArDateResponse {
+        request.orderhead?.let { require(it > 0) { "RN заказа обязательна" } }
+        require(request.arrivaldate != null) { "Дата обязательна" }
+        require(request.arrivaldate.isAfter(LocalDate.now())) { "Дата прибытия должна быть в будущем" }
+        return orderHeadUpdateArrivalDate.update(request)
+    }
+
+    @Transactional
+    fun updateNote(request: OrderHeadUpdateNoteRequest): ResponseRN {
+        request.orderhead?.let { require(it > 0) { "RN заказа обязательна" } }
+        request.note?.let { require(it.isNotBlank()) { "Отсутствует текст примечания" } }
+        return orderHeadUpdateNote.update(request)
+    }
 
 }

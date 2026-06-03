@@ -1,4 +1,4 @@
-package com.example.oracleapi.dto.orderspec
+package com.example.oracleapi.dto.orderspec.ins
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import io.swagger.v3.oas.annotations.media.Schema
@@ -47,46 +47,46 @@ data class OrderSpecInsRequest(
     @Schema(description = "Ставка НДС", example = "20")
     val ndsrate: BigDecimal? = null,
 
-    @Schema(description = "Страна", example = "58408262")
+    @Schema(description = "Страна", example = "58408172")
     val country: Long? = null,
 
-    @Schema(description = "ГТД", example = "10123456")
+    @Schema(description = "ГТД")
     val gtd: String? = null,
 
-    @Schema(description = "Цена CS", example = "0")
+    @Schema(description = "Цена CS", example = "100")
     val pdpricecs: BigDecimal? = null,
 
-    @Schema(description = "Цена 1", example = "0")
+    @Schema(description = "Цена 1", example = "100")
     val pdprice1: BigDecimal? = null,
 
-    @Schema(description = "Цена 2", example = "0")
+    @Schema(description = "Цена 2", example = "100")
     val pdprice2: BigDecimal? = null,
 
-    @Schema(description = "Цена 3", example = "0")
+    @Schema(description = "Цена 3", example = "100")
     val pdprice3: BigDecimal? = null,
 
-    @Schema(description = "Цена 4", example = "0")
+    @Schema(description = "Цена 4", example = "100")
     val pdprice4: BigDecimal? = null,
 
-    @Schema(description = "Цена 5", example = "0")
+    @Schema(description = "Цена 5", example = "100")
     val pdprice5: BigDecimal? = null,
 
-    @Schema(description = "Номинальный каталог CS", example = "0")
+    @Schema(description = "Индексы скидок ТМЦ CS", example = "109495925330")
     val pdnomncatcs: Long? = null,
 
-    @Schema(description = "Номинальный каталог 1", example = "0")
+    @Schema(description = "Индексы скидок ТМЦ 1", example = "109495925330")
     val pdnomncat1: Long? = null,
 
-    @Schema(description = "Номинальный каталог 2", example = "0")
+    @Schema(description = "Индексы скидок ТМЦ 2", example = "109495925330")
     val pdnomncat2: Long? = null,
 
-    @Schema(description = "Номинальный каталог 3", example = "0")
+    @Schema(description = "Индексы скидок ТМЦ 3", example = "109495925330")
     val pdnomncat3: Long? = null,
 
-    @Schema(description = "Номинальный каталог 4", example = "0")
+    @Schema(description = "Индексы скидок ТМЦ 4", example = "109495925330")
     val pdnomncat4: Long? = null,
 
-    @Schema(description = "Номинальный каталог 5", example = "0")
+    @Schema(description = "Индексы скидок ТМЦ 5", example = "109495925330")
     val pdnomncat5: Long? = null,
 
     @Schema(description = "Логистическое примечание", example = "")

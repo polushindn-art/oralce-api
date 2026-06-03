@@ -9,7 +9,7 @@ import java.sql.Clob
 import org.springframework.cache.annotation.Cacheable
 
 @Repository
-class MarkViewRepository {
+class MarkRepository {
 
     @PersistenceContext
     private lateinit var entityManager: EntityManager

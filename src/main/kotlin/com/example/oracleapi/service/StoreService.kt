@@ -35,11 +35,15 @@ class StoreService(
             .map { StoreResponse.fromEntity(it) }
     }
 
-    fun getStoreByRn(rn: Long): StoreResponse {
-        return storeRepository
-            .findById(rn)
-            .map { StoreResponse.fromEntity(it) }
-            .orElseThrow { IllegalArgumentException("Склад с RN=$rn не найден") }
+    fun getStoreByRn(rn: Long?): StoreResponse {
+        if (rn != null) {
+            return storeRepository
+                .findById(rn)
+                .map { StoreResponse.fromEntity(it) }
+                .orElseThrow { IllegalArgumentException("Склад с RN=$rn не найден") }
+        } else {
+            throw IllegalArgumentException("Пустое значение склада")
+        }
     }
 
     fun getStoresWithPagination(pageable: Pageable): Page<Store> {

@@ -1,7 +1,7 @@
 package com.example.oracleapi.service.idhead
 
 import com.example.oracleapi.dto.idhead.prihod.PrihodRequest
-import com.example.oracleapi.repository.agnlist.AgnlistRepository
+import com.example.oracleapi.repository.agnlist.AgnListRepository
 import com.example.oracleapi.repository.store.StoreRepository
 import com.example.oracleapi.repository.typedoc.TypedocRepository
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -17,7 +17,7 @@ class PrihodCreate(
     private val objectMapper: ObjectMapper,
     private val storeRepository: StoreRepository,
     private val typedocRepository: TypedocRepository,
-    private val agnlistRepository: AgnlistRepository
+    private val agnlistRepository: AgnListRepository
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
     @Transactional

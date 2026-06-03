@@ -9,6 +9,7 @@ import com.example.oracleapi.dto.mark.MarkUpdResponse
 import com.example.oracleapi.dto.mark.ParseMarkResponse
 import com.example.oracleapi.service.GS1DataMatrixService
 import com.example.oracleapi.service.mark.MarkProcedureService
+import com.example.oracleapi.service.mark.MarkService
 import com.example.oracleapi.service.mark.ParseMark
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.swagger.v3.oas.annotations.Operation
@@ -25,8 +26,8 @@ import org.springframework.web.bind.annotation.*
 class MarkController(
     private val barcodeService: GS1DataMatrixService,
     private val markProcedureService: MarkProcedureService,
-    private val parseMark: ParseMark,
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
+    private val markService: MarkService
 ) : BaseController() {
     private val log = LoggerFactory.getLogger(MarkController::class.java)
 
@@ -86,7 +87,8 @@ class MarkController(
     fun upd(
         @Valid @RequestBody request: MarkUpdRequest
     ): MyApiResponse<MarkUpdResponse> {
-        return success(markProcedureService.upd(request))
+        //return success(markProcedureService.upd(request))
+        return success(markService.updateMark(request))
     }
 
     @PostMapping("/parse")
@@ -94,17 +96,7 @@ class MarkController(
     fun parseMark(
         @RequestParam km: String
     ): MyApiResponse<ParseMarkResponse> {
-        log.error(km)
-        return success(markProcedureService.parseMark(km))
-    }
-
-    @PostMapping("/parse2")
-    @Operation(summary = "parse_marking_code(km_, p_cis_, p_gtin_)", description = "Получить из КМ gtin и sn")
-    fun parseMark2(
-        @RequestParam barcode: String
-    ): MyApiResponse<ParseMarkResponse> {
-        log.error(barcode)
-        return success(markProcedureService.getNomenName(barcode))
+        return success(markService.parseMarkCode(km))
     }
 
 }

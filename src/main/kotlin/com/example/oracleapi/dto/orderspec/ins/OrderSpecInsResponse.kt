@@ -1,4 +1,4 @@
-package com.example.oracleapi.dto.orderspec
+package com.example.oracleapi.dto.orderspec.ins
 
 import io.swagger.v3.oas.annotations.media.Schema
 import java.time.LocalDateTime

@@ -2,8 +2,8 @@
 package com.example.oracleapi.service.orderspec
 
 import com.example.oracleapi.common.BasePkg
-import com.example.oracleapi.dto.orderspec.OrderSpecInsRequest
-import com.example.oracleapi.dto.orderspec.OrderSpecInsResponse
+import com.example.oracleapi.dto.orderspec.ins.OrderSpecInsRequest
+import com.example.oracleapi.dto.orderspec.ins.OrderSpecInsResponse
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.persistence.EntityManager
 import org.springframework.stereotype.Component

@@ -1,8 +1,8 @@
 package com.example.oracleapi.service.orderhead
 
 import com.example.oracleapi.common.BasePackage
-import com.example.oracleapi.dto.orderhead.OrderHeadStatusUpdateRequest
-import com.example.oracleapi.dto.orderhead.OrderHeadStatusUpdateResponse
+import com.example.oracleapi.dto.orderhead.status.OrderHeadStatusUpdateRequest
+import com.example.oracleapi.dto.orderhead.status.OrderHeadStatusUpdateResponse
 import com.example.oracleapi.entity.Field
 import com.example.oracleapi.service.field.FieldService
 import org.springframework.stereotype.Component
@@ -18,16 +18,16 @@ class OrderHeadStatusUpdate(
     override val method = "Status_Update"
     override val count = 2
 
-    fun take(orderHeadStatusUpdateRequest: OrderHeadStatusUpdateRequest): OrderHeadStatusUpdateResponse {
+    fun take(request: OrderHeadStatusUpdateRequest): OrderHeadStatusUpdateResponse {
 
         return dataSource.executePrc {
-            it.setLong(1, orderHeadStatusUpdateRequest.rn ?: 0)
-            it.setLong(2, orderHeadStatusUpdateRequest.status ?: 0)
+            it.setLong(1, request.rn)
+            it.setLong(2, request.status)
             it.execute()
             val field = fieldService.getFieldValue(Field.ORDER_STATUS, 0)
             OrderHeadStatusUpdateResponse(
-                0L,
-                0L,
+                request.rn,
+                request.status,
                 field
             )
         }

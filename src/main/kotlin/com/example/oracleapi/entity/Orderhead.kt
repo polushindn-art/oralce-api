@@ -67,14 +67,22 @@ open class Orderhead {
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.RESTRICT)
-    @JoinColumn(name = "PROVIDER", nullable = false)
-    open var provider: AgnList? = null
+    @JoinColumn(name = "PROVIDER", nullable = false, updatable = false, insertable = false)
+    open var providerEntity: AgnList? = null
+
+    @NotNull
+    @Column(name = "PROVIDER")
+    open var provider: Long? = null
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.RESTRICT)
-    @JoinColumn(name = "STOREIN", nullable = false)
-    open var storein: Store? = null
+    @JoinColumn(name = "STOREIN", nullable = false, updatable = false, insertable = false)
+    open var storeinEntity: Store? = null
+
+    @NotNull
+    @Column(name = "STOREIN", nullable = false)
+    open var storein: Long ? = null
 
     @Size(max = 640)
     @Column(name = "NOTE", length = 640)
@@ -95,8 +103,12 @@ open class Orderhead {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.RESTRICT)
     @ColumnDefault("null")
-    @JoinColumn(name = "UL", nullable = false)
-    open var ul: AgnList? = null
+    @JoinColumn(name = "UL", nullable = false, updatable = false, insertable = false)
+    open var ulEntity: AgnList? = null
+
+    @NotNull
+    @Column(name = "UL", nullable = false)
+    open var ul: Long? = null
 
     @NotNull
     @ColumnDefault("1")

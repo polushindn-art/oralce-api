@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.core.env.Environment
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import javax.sql.DataSource
@@ -36,7 +37,7 @@ data class ProfileResponse(
 class InfoController(
     private val environment: Environment,
     private val dataSource: DataSource
-):BaseController() {
+) : BaseController() {
 
     @GetMapping("/profile")
     @Operation(summary = "Текущий профиль", description = "Возвращает активный профиль Spring")

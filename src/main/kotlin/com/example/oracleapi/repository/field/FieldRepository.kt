@@ -1,6 +1,5 @@
 package com.example.oracleapi.repository.field
 
-import com.example.oracleapi.dto.field.FieldResponse
 import com.example.oracleapi.entity.Field
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query

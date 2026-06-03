@@ -26,14 +26,22 @@ open class Orderspec {
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.RESTRICT)
-    @JoinColumn(name = "PRN", nullable = false)
-    open var prn: Orderhead? = null
+    @JoinColumn(name = "PRN", nullable = false, insertable = false, updatable = false)
+    open var prnEntity: Orderhead? = null
+
+    @NotNull
+    @Column(columnDefinition = "PRN", nullable = false)
+    open var prn: Long? = null
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.RESTRICT)
-    @JoinColumn(name = "NOMEN", nullable = false)
-    open var nomen: Nomnlist? = null
+    @JoinColumn(name = "NOMEN", nullable = false, updatable = false, insertable = false)
+    open var nomenEntity: Nomnlist? = null
+
+    @NotNull
+    @Column(columnDefinition = "NOMEN", nullable = false)
+    open var nomen: Long? = null
 
     @NotNull
     @Column(name = "QUANT", nullable = false, precision = 17, scale = 3)
@@ -62,8 +70,12 @@ open class Orderspec {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.RESTRICT)
-    @JoinColumn(name = "COUNTRY")
-    open var country: Country? = null
+    @JoinColumn(name = "COUNTRY", updatable = false, insertable = false)
+    open var countryEntity: Country? = null
+
+    @NotNull
+    @Column(columnDefinition = "COUNTRY", nullable = false)
+    open var country: Long? = null
 
     @NotNull
     @Column(name = "QUANTBREAK", nullable = false, precision = 17, scale = 3)
@@ -120,7 +132,7 @@ open class Orderspec {
     open var checkRoznPrice: String? = null
 
     @Column(name = "DIFFERENCE")
-    open var difference: Long? = null
+    open var difference: Int? = null
 
     @ColumnDefault("null")
     @Column(name = "PDNOMNCATCS")
@@ -153,8 +165,12 @@ open class Orderspec {
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.RESTRICT)
     @ColumnDefault("null")
-    @JoinColumn(name = "STOREIN")
-    open var storein: Store? = null
+    @JoinColumn(name = "STOREIN", updatable = false, insertable = false)
+    open var storeinEntity: Store? = null
+
+    @NotNull
+    @Column(name = "STOREIN")
+    open var storein: Long? = null
 
     @ColumnDefault("0")
     @Column(name = "AUTOZQUANT", precision = 17, scale = 3)
@@ -179,7 +195,7 @@ open class Orderspec {
 
     @ColumnDefault("0")
     @Column(name = "DLYAKOMPL")
-    open var dlyakompl: Long? = null
+    open var dlyakompl: Int? = null
 
     @ColumnDefault("0")
     @Column(name = "KOMPLRN")
@@ -187,7 +203,7 @@ open class Orderspec {
 
     @ColumnDefault("0")
     @Column(name = "KOMPLQTY")
-    open var komplqty: Long? = null
+    open var komplqty: Int? = null
 
     @ColumnDefault("0")
     @Column(name = "QTYVKOMPL", precision = 17, scale = 3)

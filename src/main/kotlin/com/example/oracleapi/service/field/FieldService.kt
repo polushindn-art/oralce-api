@@ -5,7 +5,6 @@ import com.example.oracleapi.entity.Field
 import com.example.oracleapi.repository.field.FieldRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import kotlin.jvm.Throws
 
 @Service
 class FieldService(

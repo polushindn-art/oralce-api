@@ -1,4 +1,4 @@
-package com.example.oracleapi.dto.orderhead
+package com.example.oracleapi.dto.orderhead.basisDoc
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import java.time.LocalDate
