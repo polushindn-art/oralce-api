@@ -317,7 +317,7 @@
 ### 1. Диаграмма компонентов
 
 ```mermaid
-flowchart TB
+graph TB
     subgraph "Серверная часть"
         REST["REST API<br/>Оркестратор<br/>Spring Boot + WebSocket"]
         ORACLE[("Oracle 19c+<br/>WMS-хранилище")]

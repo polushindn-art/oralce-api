@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>API Документация</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <!-- Thymeleaf может быть, а может не быть — не принципиально -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+        }
+        .sidebar {
+            width: 280px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .content {
+            flex: 1;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        .links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+        .link-card {
+            background: #f9f9f9;
+            padding: 12px;
+            border-radius: 5px;
+            border-left: 4px solid #4CAF50;
+            text-decoration: none;
+            color: #333;
+            transition: transform 0.2s;
+            display: block;
+        }
+        .link-card:hover {
+            transform: translateX(5px);
+            background: #e8f5e9;
+        }
+        .link-card h3 {
+            margin: 0 0 5px 0;
+            font-size: 16px;
+        }
+        .link-card p {
+            margin: 0;
+            font-size: 12px;
+            color: #666;
+        }
+        .badge {
+            display: inline-block;
+            background: #4CAF50;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            margin-left: 10px;
+        }
+        .warning {
+            border-left-color: #ff9800;
+        }
+        .file-list {
+            list-style: none;
+            padding: 0;
+        }
+        .file-list li {
+            margin: 10px 0;
+        }
+        .file-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #333;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .file-list a:hover {
+            background: #e0f2e0;
+        }
+        .active {
+            background: #4CAF50;
+            color: white;
+        }
+        .mermaid {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        pre {
+            background: #2d2d2d;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            color: #f8f8f2;
+        }
+        hr {
+            margin: 20px 0;
+            border: none;
+            border-top: 1px solid #eee;
+        }
+        .sidebar-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #4CAF50;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Боковая панель -->
+    <div class="sidebar">
+        <div class="sidebar-title">📚 ORACLE REST API</div>
+
+        <div class="links">
+            <a href="/doc.html" class="link-card">
+                <h3>📖 Knife4j <span class="badge">Рекомендуется</span></h3>
+                <p>Документация API</p>
+            </a>
+            <a href="/swagger-ui/index.html" class="link-card">
+                <h3>🦁 Swagger UI</h3>
+                <p>Классический интерфейс</p>
+            </a>
+            <a href="/doc.html#/main-api/Авторизация/login" class="link-card warning">
+                <h3>🔑 Авторизация</h3>
+                <p>Получение JWT токена</p>
+            </a>
+        </div>
+
+        <hr>
+
+        <div class="sidebar-title">📁 Документы</div>
+        <div id="file-list" class="file-list">Загрузка...</div>
+    </div>
+
+    <!-- Основной контент -->
+    <div class="content">
+        <div id="md-content" class="markdown-body">
+            <div class="loading">Выберите документ из списка слева...</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    mermaid.initialize({ startOnLoad: false, theme: 'default', securityLevel: 'loose' });
+
+    let currentFile = null;
+
+    fetch('/api/markdown/files')
+        .then(res => res.json())
+        .then(files => {
+            const fileListHtml = files.map(file => `
+                <li>
+                    <a href="#" data-file="${file}">
+                        📄 ${file.replace('.md', '')}
+                    </a>
+                </li>
+            `).join('');
+            document.getElementById('file-list').innerHTML = `<ul style="list-style: none; padding: 0;">${fileListHtml}</ul>`;
+
+            // Обработка кликов
+            document.querySelectorAll('.file-list a').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const file = link.dataset.file;
+                    loadFile(file);
+                    document.querySelectorAll('.file-list a').forEach(a => a.classList.remove('active'));
+                    link.classList.add('active');
+                });
+            });
+
+            if (files.length) loadFile(files[0]);
+        })
+        .catch(err => {
+            document.getElementById('file-list').innerHTML = '<p style="color:red;">Ошибка загрузки списка</p>';
+        });
+
+    function loadFile(filename) {
+        currentFile = filename;
+        document.getElementById('md-content').innerHTML = '<div class="loading">Загрузка...</div>';
+
+        fetch(`/markdown/${filename}`)
+            .then(res => {
+                if (!res.ok) throw new Error('Файл не найден');
+                return res.text();
+            })
+            .then(md => {
+                let html = marked.parse(md);
+                // Заменяем mermaid блоки
+                html = html.replace(/<pre><code class="language-mermaid">([\s\S]*?)<\/code><\/pre>/g, '<div class="mermaid">$1</div>');
+                document.getElementById('md-content').innerHTML = html;
+                mermaid.run({ querySelector: '.mermaid' }).catch(err => console.warn(err));
+            })
+            .catch(err => {
+                document.getElementById('md-content').innerHTML = `<p style="color:red;">❌ ${err.message}</p>`;
+            });
+    }
+</script>
+</body>
+</html>

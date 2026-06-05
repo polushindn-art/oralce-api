@@ -27,7 +27,8 @@ class AdvancedSwaggerConfig {
                     .description("Выполните /auth/token для выполения запросов api")
                     .version("1.0.0")
             )
-            .components(
+            /*Если нужна автризация в swugger по токену*/
+            /*.components(
                 Components()
                     .addSecuritySchemes("Укажите токен авторизации",
                         SecurityScheme()
@@ -36,7 +37,7 @@ class AdvancedSwaggerConfig {
                             .scheme("bearer")
                             .bearerFormat("JWT")
                     )
-            )
+            )*/
             .security(
                 listOf(SecurityRequirement().addList("bearer-key"))
             )

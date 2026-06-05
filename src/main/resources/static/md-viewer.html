@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>MD Viewer</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+        }
+        .sidebar {
+            width: 280px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            height: fit-content;
+        }
+        .content {
+            flex: 1;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .file-list {
+            list-style: none;
+            padding: 0;
+        }
+        .file-list li {
+            margin: 10px 0;
+        }
+        .file-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #333;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .file-list a:hover {
+            background: #e0e0e0;
+        }
+        .file-list .active {
+            background: #4CAF50;
+            color: white;
+        }
+        pre {
+            background: #2d2d2d;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        pre code {
+            color: #f8f8f2;
+        }
+        .mermaid {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #4CAF50;
+            text-decoration: none;
+        }
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+<a href="/" class="back-link">← На главную</a>
+
+<div class="container">
+    <div class="sidebar">
+        <h3>📁 Документы</h3>
+        <div id="file-list">Загрузка...</div>
+    </div>
+
+    <div class="content">
+        <div id="title" class="title"></div>
+        <div id="content"></div>
+    </div>
+</div>
+
+<script>
+    mermaid.initialize({
+        startOnLoad: false,
+        theme: 'default',
+        securityLevel: 'loose'
+    });
+
+    const params = new URLSearchParams(window.location.search);
+    let currentFile = params.get('file');
+
+    // Загрузка списка файлов
+    fetch('/api/markdown/files')
+        .then(res => res.json())
+        .then(files => {
+            const html = files.map(file => `
+                    <li>
+                        <a href="?file=${file}" data-file="${file}" class="${currentFile === file ? 'active' : ''}">
+                            📄 ${file.replace('.md', '')}
+                        </a>
+                    </li>
+                `).join('');
+            document.getElementById('file-list').innerHTML = `<ul class="file-list">${html}</ul>`;
+
+            if (!currentFile && files.length) {
+                currentFile = files[0];
+                history.pushState({}, '', `?file=${currentFile}`);
+                loadFile(currentFile);
+            } else if (currentFile) {
+                loadFile(currentFile);
+            }
+
+            // Обработка кликов по ссылкам
+            document.querySelectorAll('.file-list a').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const file = link.dataset.file;
+                    history.pushState({}, '', `?file=${file}`);
+                    loadFile(file);
+                    document.querySelectorAll('.file-list a').forEach(a => a.classList.remove('active'));
+                    link.classList.add('active');
+                });
+            });
+        });
+
+    function loadFile(filename) {
+        document.title = filename.replace('.md', '');
+        document.getElementById('title').innerText = filename.replace('.md', '');
+
+        fetch(`/markdown/${filename}`)
+            .then(res => {
+                if (!res.ok) throw new Error('Файл не найден');
+                return res.text();
+            })
+            .then(md => {
+                // Рендерим Markdown в HTML
+                let html = marked.parse(md);
+
+                // Заменяем блоки ```mermaid на div.mermaid
+                html = html.replace(/<pre><code class="language-mermaid">([\s\S]*?)<\/code><\/pre>/g, '<div class="mermaid">$1</div>');
+
+                document.getElementById('content').innerHTML = html;
+
+                // Рендерим Mermaid
+                mermaid.run({ querySelector: '.mermaid' }).catch(err => console.warn(err));
+            })
+            .catch(err => {
+                document.getElementById('content').innerHTML = `<p style="color:red;">❌ ${err.message}</p>`;
+            });
+    }
+</script>
+</body>
+</html>

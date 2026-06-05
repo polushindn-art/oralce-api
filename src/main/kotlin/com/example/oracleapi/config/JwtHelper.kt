@@ -24,12 +24,17 @@ class JwtHelper(
             "/v3/api-docs/**",
             "/favicon.ico",
             "/swagger-ui.html",
+            "/index.html",
+            "/",
+            "/md-viewer.html",
             "/doc.html",
             "/webjars/**",
             "/v*/error",
             "/v*/not-found",
             "/v*/auth/**",             // если нужно открыть все под auth
-            "/knife4j/**"
+            "/knife4j/**",
+            "/markdown/**",
+            "/api/markdown/**"
         )
     }
 
