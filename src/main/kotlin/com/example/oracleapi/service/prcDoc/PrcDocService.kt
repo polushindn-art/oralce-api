@@ -1,6 +1,8 @@
 package com.example.oracleapi.service.prcDoc
 
 import com.example.oracleapi.dto.ResponseRN
+import com.example.oracleapi.dto.prcDoc.head.PrcDocStatusRequest
+import com.example.oracleapi.dto.prcDoc.head.PrcDocStatusResponse
 import com.example.oracleapi.dto.prcDoc.head.PrcdocheadInsRequest
 import com.example.oracleapi.dto.prcDoc.head.PrcdocheadInsResponse
 import com.example.oracleapi.dto.prcDoc.spec.PrcdocspecInsRequest
@@ -14,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional
 class PrcDocService(
     private val prcDocHeadIns: PrcDocHeadIns,
     private val prcDocSpecIns: PrcDocSpecIns,
+    private val prcDocStatusUpdate: PrcDocStatusUpdate,
     private val prefixService: PrefixService,
     private val nomnCatService: NomnCatService,
     private val typePriceService: TypePriceService
@@ -66,6 +69,10 @@ class PrcDocService(
         }
 
         return prcDocSpecIns.take(request)
+    }
+
+    fun statusUpdate(request: PrcDocStatusRequest): PrcDocStatusResponse {
+        return prcDocStatusUpdate.take(request)
     }
 
 }

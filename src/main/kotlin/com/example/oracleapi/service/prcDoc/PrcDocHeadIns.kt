@@ -57,7 +57,6 @@ class PrcDocHeadIns(dataSource: DataSource ) : BasePackage(dataSource) {
             it.setBoolean(idx++, request.isCheckOnly)
             it.setBoolean(idx++, request.isUpdate)
 
-
             it.execute()
 
             val curData = mutableListOf<Map<String, Any?>>()

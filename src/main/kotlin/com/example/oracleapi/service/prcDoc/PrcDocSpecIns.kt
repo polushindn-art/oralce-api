@@ -73,7 +73,10 @@ class PrcDocSpecIns(dataSource: DataSource) : BasePackage(dataSource) {
             stmt.setBoolean(idx++, request.isWS)
 
             stmt.execute()
-            ResponseRN(rn = stmt.getLong(rnPos))
+
+            ResponseRN(
+                rn = stmt.getLong(rnPos)
+            )
         }
     }
 }

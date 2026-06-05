@@ -24,7 +24,7 @@ class OrderHeadStatusUpdate(
             it.setLong(1, request.rn)
             it.setLong(2, request.status)
             it.execute()
-            val field = fieldService.getFieldValue(Field.ORDER_STATUS, 0)
+            val field = fieldService.getFieldValue(Field.ORDER_STATUS, request.status)
             OrderHeadStatusUpdateResponse(
                 request.rn,
                 request.status,

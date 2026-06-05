@@ -23,7 +23,7 @@ class PrefixService(
 
     @Transactional(readOnly = true)
     fun getByDivicionCode(pageable: Pageable, divisionCode: String): Page<PrefixResponse> {
-        return prefixRepository.findByDivisionEntity_Divisioncode(divisionCode, pageable).map { Prefix.toResponse(it) }
+        return prefixRepository.findByDivisionEntity_DivisioncodeIgnoreCase(divisionCode, pageable).map { Prefix.toResponse(it) }
     }
 
 }

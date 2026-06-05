@@ -35,5 +35,6 @@ open class Field {
 
     companion object {
         const val ORDER_STATUS = "ORDER_STATUS"
+        const val PRCDOC_STATUS = "PRCDOC_STATUS"
     }
 }

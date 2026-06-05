@@ -9,5 +9,5 @@ import org.springframework.stereotype.Repository
 @Repository
 interface PrefixRepository : JpaRepository<Prefix, Long> {
     fun existsByDocpref(prefix: String): Boolean
-    fun findByDivisionEntity_Divisioncode(divisionCode: String, pageable: Pageable): Page<Prefix>
+    fun findByDivisionEntity_DivisioncodeIgnoreCase(divisionCode: String, pageable: Pageable): Page<Prefix>
 }

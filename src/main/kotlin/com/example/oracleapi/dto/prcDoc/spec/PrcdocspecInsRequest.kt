@@ -1,6 +1,7 @@
 package com.example.oracleapi.dto.prcDoc.spec
 
 import jakarta.validation.constraints.*
+import org.checkerframework.checker.units.qual.min
 import java.math.BigDecimal
 
 data class PrcdocspecInsRequest(
@@ -40,15 +41,23 @@ data class PrcdocspecInsRequest(
 
     // Параметры со значениями по умолчанию – могут отсутствовать, но если переданы, должны быть положительными или валидными
     @field:PositiveOrZero(message = "enabled должен быть >= 0")
+    @field:Min(0)
+    @field:Max(2)
     val enabled: Long = 1,
 
     @field:PositiveOrZero(message = "overhaul должен быть >= 0")
+    @field:Min(0)
+    @field:Max(1)
     val overhaul: Long = 0,
 
     @field:PositiveOrZero(message = "kopeck должен быть >= 0")
+    @field:Min(0)
+    @field:Max(1)
     val kopeck: Long = 0,
 
     @field:PositiveOrZero(message = "whsconst должен быть >= 0")
+    @field:Min(0)
+    @field:Max(1)
     val whsconst: Long = 1,
 
     @field:Pattern(regexp = "^\\d{6}$", message = "должен содержать 6 цифр")

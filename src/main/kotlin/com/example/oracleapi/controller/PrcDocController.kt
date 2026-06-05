@@ -2,6 +2,10 @@ package com.example.oracleapi.controller
 
 import com.example.oracleapi.dto.ResponseRN
 import com.example.oracleapi.dto.common.MyApiResponse
+import com.example.oracleapi.dto.idhead.status.StatusUpdateRequest
+import com.example.oracleapi.dto.idhead.status.StatusUpdateResponse
+import com.example.oracleapi.dto.prcDoc.head.PrcDocStatusRequest
+import com.example.oracleapi.dto.prcDoc.head.PrcDocStatusResponse
 import com.example.oracleapi.dto.prcDoc.head.PrcdocheadInsRequest
 import com.example.oracleapi.dto.prcDoc.head.PrcdocheadInsResponse
 import com.example.oracleapi.dto.prcDoc.spec.PrcdocspecInsRequest
@@ -31,4 +35,13 @@ class PrcDocController(
     ): MyApiResponse<ResponseRN> {
         return success(prcDocService.prcSpecIns(request))
     }
+
+    @PutMapping("/status_update")
+    @Operation(summary = "Обновить статус документа")
+    fun statusUpdate(
+        @Valid @RequestBody request: PrcDocStatusRequest
+    ): MyApiResponse<PrcDocStatusResponse> {
+        return success(prcDocService.statusUpdate(request))
+    }
+
 }
