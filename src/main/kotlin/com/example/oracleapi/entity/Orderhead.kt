@@ -1,6 +1,8 @@
 package com.example.oracleapi.entity
 
 import com.example.oracleapi.Helper
+import com.example.oracleapi.entity.table.Acatalog
+import com.example.oracleapi.entity.table.AgnList
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
@@ -68,7 +70,7 @@ open class Orderhead {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "PROVIDER", nullable = false, updatable = false, insertable = false)
-    open var providerEntity: AgnList? = null
+    open var providerEntity: com.example.oracleapi.entity.table.AgnList? = null
 
     @NotNull
     @Column(name = "PROVIDER")
@@ -146,7 +148,7 @@ open class Orderhead {
     @OneToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "PRCDOCHEAD")
-    open var prcdochead: Prcdochead? = null
+    open var prcdochead: com.example.oracleapi.entity.table.Prcdochead? = null
 
     @ColumnDefault("0")
     @Column(name = "STATUS_FLAG")

@@ -5,8 +5,10 @@ import com.example.oracleapi.exception.OracleException
 import com.example.oracleapi.util.OracleErrorParser
 import org.hibernate.JDBCException
 import org.slf4j.LoggerFactory
+import java.math.BigDecimal
 import java.sql.CallableStatement
 import java.sql.SQLException
+import java.sql.Types
 import javax.sql.DataSource
 
 abstract class BasePackage(
@@ -89,6 +91,14 @@ abstract class BasePackage(
         val result = "{?=call $schemeString$pkgString$method($placeholders)}"
         logger.debug(result)
         return result
+    }
+
+    fun setLongOrNull(stmt: CallableStatement, idx: Int, value: Long?) {
+        if (value != null) stmt.setLong(idx, value) else stmt.setNull(idx, Types.NUMERIC)
+    }
+
+    fun setBigDecimalOrNull(stmt: CallableStatement, idx: Int, value: BigDecimal?) {
+        if (value != null) stmt.setBigDecimal(idx, value) else stmt.setNull(idx, Types.DECIMAL)
     }
 
 }

@@ -61,7 +61,7 @@ open class Idspec {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "COUNTRY", nullable = false)
-    open var country: Country? = null
+    open var country: com.example.oracleapi.entity.table.Country? = null
 
     @Size(max = 40)
     @Column(name = "GTD", length = 40)

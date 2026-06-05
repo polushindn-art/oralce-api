@@ -2,7 +2,6 @@ package com.example.oracleapi.controller
 
 import com.example.oracleapi.dto.ResponseRN
 import com.example.oracleapi.dto.common.MyApiResponse
-import com.example.oracleapi.dto.orderhead.*
 import com.example.oracleapi.dto.orderhead.arrivalDate.OrderHeadUpdateArDateRequest
 import com.example.oracleapi.dto.orderhead.arrivalDate.OrderHeadUpdateArDateResponse
 import com.example.oracleapi.dto.orderhead.basisDoc.OrderHeadBasisDocUpdateRequest

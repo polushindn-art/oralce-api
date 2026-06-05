@@ -20,9 +20,9 @@ class ParseMark(
     fun take(km: String): ParseMarkResponse {
         return dataSource.executePrc {
             it.setString(1,km)
-            it.registerOutParameter(2, Types.VARCHAR)
-            it.registerOutParameter(3, Types.VARCHAR)
-            it.registerOutParameter(4, Types.VARCHAR)
+            it.registerOutParameter(2, Types.VARCHAR,4000)
+            it.registerOutParameter(3, Types.VARCHAR,4000)
+            it.registerOutParameter(4, Types.VARCHAR,4000)
             it.execute()
             ParseMarkResponse(
                 km,

@@ -1,21 +1,27 @@
-package com.example.oracleapi.entity
+package com.example.oracleapi.entity.table
 
+import com.example.oracleapi.Helper
 import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.Id
-import jakarta.persistence.Table
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 import org.hibernate.annotations.ColumnDefault
 import java.math.BigDecimal
-import java.time.LocalDate
+import java.time.LocalDateTime
 
-@Entity
-@Table(name = "PRCDOCHEAD", schema = "QREAL")
+@jakarta.persistence.Entity
+@jakarta.persistence.Table(name = "PRCDOCHEAD", schema = Helper.SCHEME)
 open class Prcdochead {
-    @Id
-    @Column(name = "RN", nullable = false)
-    open var id: Long? = null
+    @jakarta.persistence.Id
+    @jakarta.persistence.Column(name = "RN", nullable = false)
+    open var rn: Long? = null
+
+    @NotNull
+    @Column(name = "CRN", nullable = false)
+    open var crn: Long? = null
+
+    @NotNull
+    @Column(name = "DOCTYPE", nullable = false)
+    open var docType: Long? = null
 
     @Size(max = 10)
     @NotNull
@@ -24,7 +30,10 @@ open class Prcdochead {
 
     @NotNull
     @Column(name = "DOCDATE", nullable = false)
-    open var docdate: LocalDate? = null
+    open var docdate: LocalDateTime? = null
+
+    @Column(name = "MANAGER", nullable = true)
+    open var manager: Long? = null
 
     @Size(max = 80)
     @Column(name = "NOTE", length = 80)
@@ -43,6 +52,9 @@ open class Prcdochead {
     @ColumnDefault("1")
     @Column(name = "MODIFIED", nullable = false)
     open var modified: Long? = null
+
+    @Column(name = "ORDERHEAD", nullable = true)
+    var orderhead: Long? = null
 
     @Size(max = 6)
     @Column(name = "CHECK_ROZN_PRICE", length = 6)

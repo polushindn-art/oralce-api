@@ -7,6 +7,7 @@ import com.example.oracleapi.dto.mark.MarkFindResponse
 import com.example.oracleapi.dto.mark.MarkUpdRequest
 import com.example.oracleapi.dto.mark.MarkUpdResponse
 import com.example.oracleapi.dto.mark.ParseMarkResponse
+import com.example.oracleapi.dto.vMark.MarkSearchResponse
 import com.example.oracleapi.service.GS1DataMatrixService
 import com.example.oracleapi.service.mark.MarkProcedureService
 import com.example.oracleapi.service.mark.MarkService
@@ -73,6 +74,14 @@ class MarkController(
         val request = MarkFindRequest(km = km)
         val result = markProcedureService.find(request)
         return success(result, "Код маркировки найден")
+    }
+
+    @GetMapping("/search")
+    @Operation(summary = "Поиск КМ")
+    private fun search(
+        @Valid @RequestParam km: String
+    ):MyApiResponse<MarkSearchResponse> {
+        return success(markService.searchMark(km))
     }
 
     private fun sendErrorResponse(response: HttpServletResponse, message: String, path: String) {

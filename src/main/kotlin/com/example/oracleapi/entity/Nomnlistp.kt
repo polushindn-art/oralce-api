@@ -41,7 +41,7 @@ open class Nomnlistp {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "PROVIDER", nullable = false)
-    open var provider: AgnList? = null
+    open var provider: com.example.oracleapi.entity.table.AgnList? = null
 
     @Size(max = 80)
     @Column(name = "NOTE", length = 80)

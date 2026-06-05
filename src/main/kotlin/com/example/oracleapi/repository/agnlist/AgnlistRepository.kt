@@ -1,14 +1,14 @@
 package com.example.oracleapi.repository.agnlist
 
-import com.example.oracleapi.entity.AgnList
+import com.example.oracleapi.entity.table.AgnList
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface AgnListRepository : JpaRepository<AgnList, Long> {
+interface AgnListRepository : JpaRepository<com.example.oracleapi.entity.table.AgnList, Long> {
 
-    fun findByRn(rn: Long): AgnList?
+    fun findByRn(rn: Long): com.example.oracleapi.entity.table.AgnList?
     fun existsByAgncode(agncode: String): Boolean
-    fun findByRnAndAgntype(rn: Long, type: Long): AgnList?
+    fun findByRnAndAgntype(rn: Long, type: Long): com.example.oracleapi.entity.table.AgnList?
     fun existsByRnAndAgntype(rn: Long, agntype: Long): Boolean
 }

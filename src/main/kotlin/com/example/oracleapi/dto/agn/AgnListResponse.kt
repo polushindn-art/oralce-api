@@ -1,6 +1,6 @@
 package com.example.oracleapi.dto.agn
 
-import com.example.oracleapi.entity.AgnList
+import com.example.oracleapi.entity.table.AgnList
 
 data class AgnListResponse(
     val rn: Long,

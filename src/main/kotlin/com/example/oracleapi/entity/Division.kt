@@ -39,7 +39,7 @@ open class Division {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "CRN", nullable = false)
-    open var crn: Acatalog? = null
+    open var crn: com.example.oracleapi.entity.table.Acatalog? = null
 
     @NotNull
     @ColumnDefault("0")

@@ -14,9 +14,9 @@ import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.web.HttpRequestMethodNotSupportedException
+import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.MissingServletRequestParameterException
-import org.springframework.web.bind.annotation.ExceptionHandler
-import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
 import org.springframework.web.servlet.NoHandlerFoundException
 import org.springframework.web.servlet.resource.NoResourceFoundException
@@ -42,8 +42,10 @@ class GlobalExceptionHandler {
         val message = when (requiredType) {
             "Long", "Integer", "Int" ->
                 "Параметр '$paramName' должен быть целым числом. Получено: '$wrongValue'"
+
             "Boolean" ->
                 "Параметр '$paramName' должен быть true или false. Получено: '$wrongValue'"
+
             else ->
                 "Параметр '$paramName' имеет неверный тип. Ожидается: $requiredType"
         }
@@ -80,14 +82,52 @@ class GlobalExceptionHandler {
         e: HttpMessageNotReadableException,
         request: HttpServletRequest
     ): ResponseEntity<MyApiResponse<Nothing>> {
+        val msg = e.message ?: ""
+
+        // Пытаемся извлечь имя поля из сообщения Jackson
+        val fieldName = Regex("""at path \$\.([a-zA-Z0-9_]+)""").find(msg)?.groupValues?.get(1)
+
+        val errorDetail = when {
+            msg.contains("Cannot deserialize value of type `java.time.LocalDate` from Null value") ->
+                "Дата не может быть null. Пожалуйста, либо передайте корректную дату, либо уберите поле из запроса (если оно опционально)."
+            msg.contains("Cannot deserialize value of type `java.lang.Boolean`") ->
+                if (fieldName != null) "Поле '$fieldName' должно быть true или false"
+                else "Неверное булево значение. Ожидается true или false."
+            msg.contains("Cannot deserialize value of type `java.time.LocalDate`") ->
+                if (fieldName != null) "Поле '$fieldName' имеет неверный формат даты. Ожидается dd.MM.yyyy"
+                else "Неверный формат даты. Ожидается dd.MM.yyyy."
+            msg.contains("Cannot deserialize value of type `java.lang.Long`") ->
+                if (fieldName != null) "Поле '$fieldName' должно быть целым числом"
+                else "Неверный формат числа. Ожидается целое число."
+            msg.contains("Cannot construct instance") ->
+                "Неверная структура JSON. Проверьте корректность запроса (возможно, лишние кавычки или запятые)."
+            else ->
+                "Некорректный формат запроса. Проверьте тело запроса. (Все значения ключей должны быть заполнены. )"
+        }
+
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .body(
                 MyApiResponse.unsuccess(
-                    message = "Некорректный формат запроса. Проверьте тело запроса. \n$e",
+                    errorDetail,
                     path = request.requestURI
                 )
             )
+    }
+
+    private fun extractFieldName(message: String): String? {
+        // Паттерны для Jackson 2.x
+        val patterns = listOf(
+            Regex("at path \\$\\\\.([a-zA-Z0-9_]+)"),      // $.field
+            Regex("at path \\$\\['([^']+)'\\]"),           // $['field']
+            Regex("at path \\$\\.([a-zA-Z0-9_]+)\\[")      // $.field[
+        )
+        for (pattern in patterns) {
+            pattern.find(message)?.let { match ->
+                return match.groupValues[1]
+            }
+        }
+        return null
     }
 
     // 4. Неподдерживаемый HTTP метод
@@ -100,7 +140,11 @@ class GlobalExceptionHandler {
             .status(HttpStatus.METHOD_NOT_ALLOWED)
             .body(
                 MyApiResponse.unsuccess(
-                    message = "Метод ${e.method} не поддерживается для этого эндпоинта. Поддерживаемые методы: ${e.supportedMethods?.joinToString(", ")}",
+                    message = "Метод ${e.method} не поддерживается для этого эндпоинта. Поддерживаемые методы: ${
+                        e.supportedMethods?.joinToString(
+                            ", "
+                        )
+                    }",
                     path = request.requestURI
                 )
             )
@@ -323,19 +367,29 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(SQLException::class)
-    fun handleSqlException(ex: SQLException): MyApiResponse<Map<String, Any?>> {
+    fun handleSqlException(ex: SQLException): ResponseEntity<MyApiResponse<Map<String, Any?>>> {
         val oracleEx = OracleErrorParser.parse(ex)
 
-        return MyApiResponse(
-            success = false,
-            message = oracleEx.message,
-            timestamp = LocalDateTime.now(),
-            data = mapOf(
-                "code" to oracleEx.oracleCode
-            ).plus(
-                if (oracleEx.details != null) mapOf("details" to oracleEx.details) else emptyMap()
+        val status = when {
+            oracleEx.oracleCode in 20000..20999 -> HttpStatus.BAD_REQUEST   // бизнес-ошибки PL/SQL
+            oracleEx.oracleCode in 1..19999 -> HttpStatus.INTERNAL_SERVER_ERROR
+            else -> HttpStatus.BAD_REQUEST
+        }
+
+        return ResponseEntity
+            .status(status)
+            .body(
+                MyApiResponse(
+                    success = false,
+                    message = oracleEx.message,
+                    timestamp = LocalDateTime.now(),
+                    data = mapOf(
+                        "oracleCode" to oracleEx.oracleCode
+                    ).plus(
+                        if (oracleEx.details != null) mapOf("details" to oracleEx.details) else emptyMap()
+                    )
+                )
             )
-        )
     }
 
     @ExceptionHandler(OracleException::class)
@@ -343,8 +397,14 @@ class GlobalExceptionHandler {
         ex: OracleException,
         request: HttpServletRequest
     ): ResponseEntity<MyApiResponse<Map<String, Any?>>> {
+
+        val status = when {
+            ex.oracleCode in 20000..20999 -> HttpStatus.BAD_REQUEST
+            else -> HttpStatus.INTERNAL_SERVER_ERROR
+        }
+
         return ResponseEntity
-            .status(HttpStatus.BAD_REQUEST)
+            .status(status)
             .body(
                 MyApiResponse(
                     success = false,
@@ -354,12 +414,22 @@ class GlobalExceptionHandler {
                     data = buildMap {
                         put("oracleCode", ex.oracleCode)
                         if (ex.sqlState != null) put("sqlState", ex.sqlState)
-                        if (ex.businessErrors != null) { put("businessErrors", ex.businessErrors) }
-                        if (ex.technicalErrors != null) { put("technicalErrors", ex.technicalErrors) }
+                        if (ex.businessErrors != null) {
+                            put("businessErrors", ex.businessErrors)
+                        }
+                        if (ex.technicalErrors != null) {
+                            put("technicalErrors", ex.technicalErrors)
+                        }
                         if (ex.details != null && isDevelopment()) put("details", ex.details)
                     }
                 )
             )
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException::class)
+    fun handleValidation(ex: MethodArgumentNotValidException): MyApiResponse<Any> {
+        val errors = ex.bindingResult.fieldErrors.associate { it.field to it.defaultMessage }
+        return MyApiResponse.unsuccess("Ошибка валидации: $errors", null)
     }
 
     // Кастомное исключение для токенов

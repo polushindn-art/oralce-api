@@ -71,7 +71,7 @@ open class Orderspec {
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "COUNTRY", updatable = false, insertable = false)
-    open var countryEntity: Country? = null
+    open var countryEntity: com.example.oracleapi.entity.table.Country? = null
 
     @NotNull
     @Column(columnDefinition = "COUNTRY", nullable = false)

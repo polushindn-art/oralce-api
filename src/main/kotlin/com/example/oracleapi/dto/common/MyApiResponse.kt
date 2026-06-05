@@ -8,7 +8,6 @@ import java.time.LocalDateTime
 
 /**
  * Универсальный ответ API для всех эндпоинтов
- * data в конце для лучшей читаемости
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder("success", "message", "timestamp", "path", "meta", "total", "data")  // ← порядок полей
