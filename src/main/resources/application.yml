@@ -4,16 +4,6 @@ knife4j:
     language: en
     enable-group: true
     enable-swagger-models: false
-  documents:
-    - group: main-api
-      name: Документация
-      locations: classpath:markdown/*
-    - group: main-api
-      name: Описание
-      locations: classpath:markdown/description/*
-    - group: main-api
-      name: GitLab
-      locations: classpath:markdown/gitlab/*
 springdoc:
   api-docs:
     enabled: true

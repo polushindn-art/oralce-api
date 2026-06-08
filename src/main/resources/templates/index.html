@@ -2,141 +2,62 @@
 <html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>API Документация</title>
+
+    <!-- Стили -->
+    <link rel="stylesheet" href="/css/api-docs.css">
+
+    <!-- Скрипты -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
-    <!-- Thymeleaf может быть, а может не быть — не принципиально -->
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            display: flex;
-            gap: 20px;
-        }
-        .sidebar {
-            width: 280px;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .content {
-            flex: 1;
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #333;
-            border-bottom: 2px solid #4CAF50;
-            padding-bottom: 10px;
-        }
-        .links {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 30px;
-        }
-        .link-card {
-            background: #f9f9f9;
-            padding: 12px;
-            border-radius: 5px;
-            border-left: 4px solid #4CAF50;
-            text-decoration: none;
-            color: #333;
-            transition: transform 0.2s;
-            display: block;
-        }
-        .link-card:hover {
-            transform: translateX(5px);
-            background: #e8f5e9;
-        }
-        .link-card h3 {
-            margin: 0 0 5px 0;
-            font-size: 16px;
-        }
-        .link-card p {
-            margin: 0;
-            font-size: 12px;
-            color: #666;
-        }
-        .badge {
-            display: inline-block;
-            background: #4CAF50;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            margin-left: 10px;
-        }
-        .warning {
-            border-left-color: #ff9800;
-        }
-        .file-list {
-            list-style: none;
-            padding: 0;
-        }
-        .file-list li {
-            margin: 10px 0;
-        }
-        .file-list a {
-            display: block;
-            padding: 8px 12px;
-            text-decoration: none;
-            color: #333;
-            border-radius: 4px;
-            transition: background 0.2s;
-        }
-        .file-list a:hover {
-            background: #e0f2e0;
-        }
-        .active {
-            background: #4CAF50;
-            color: white;
-        }
-        .mermaid {
-            background: white;
-            padding: 20px;
-            margin: 20px 0;
-            text-align: center;
-        }
-        pre {
-            background: #2d2d2d;
-            padding: 15px;
-            border-radius: 5px;
-            overflow-x: auto;
-            color: #f8f8f2;
-        }
-        hr {
-            margin: 20px 0;
-            border: none;
-            border-top: 1px solid #eee;
-        }
-        .sidebar-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #4CAF50;
-        }
-        .loading {
-            text-align: center;
-            padding: 20px;
-            color: #666;
-        }
-    </style>
+
+    <!-- Передача данных с сервера -->
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        window.currentHost = {
+            host: /*[[${host.first}]]*/ '',
+            port: /*[[${host.second}]]*/ '',
+            sid: /*[[${host.third}]]*/ ''
+        };
+
+        // Для отладки
+        console.log('Host from server:', window.currentHost);
+        /*]]>*/
+    </script>
+
+    <script src="/js/api-docs.js"></script>
 </head>
 <body>
-<div class="container">
-    <!-- Боковая панель -->
-    <div class="sidebar">
-        <div class="sidebar-title">📚 ORACLE REST API</div>
+
+<div class="mobile-toggle" id="mobileToggle">☰ Меню</div>
+
+<div class="main-container">
+    <!-- Левая боковая панель -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-title">
+            📚 ORACLE REST API
+        </div>
+
+        <!-- Простые кнопки-ссылки -->
+        <div class="env-switch">
+            <button class="env-link prod" data-host="oracle-rest-api.ars" data-port="80">
+                🔵 Рабочая (порт 80)
+            </button>
+            <button class="env-link dev" data-host="oracle-rest-api.ars" data-port="3000">
+                🟠 Тестовая (порт 3000)
+            </button>
+            <button class="env-link unstable" data-host="oracle-rest-api.ars" data-port="3001">
+                ⚠️ Тестовая нестабильная (порт 3001)
+            </button>
+        </div>
+
+        <!-- Информация о текущем сервере -->
+        <div class="env-info">
+            <div>🌐 Текущий хост: <strong id="hostValue">-</strong></div>
+            <div>🔌 Порт: <strong id="portValue">-</strong></div>
+            <div>💾 SID: <strong id="sidValue">-</strong></div>
+        </div>
 
         <div class="links">
             <a href="/doc.html" class="link-card">
@@ -159,7 +80,7 @@
         <div id="file-list" class="file-list">Загрузка...</div>
     </div>
 
-    <!-- Основной контент -->
+    <!-- Правая область контента -->
     <div class="content">
         <div id="md-content" class="markdown-body">
             <div class="loading">Выберите документ из списка слева...</div>
@@ -168,59 +89,16 @@
 </div>
 
 <script>
-    mermaid.initialize({ startOnLoad: false, theme: 'default', securityLevel: 'loose' });
-
-    let currentFile = null;
-
-    fetch('/api/markdown/files')
-        .then(res => res.json())
-        .then(files => {
-            const fileListHtml = files.map(file => `
-                <li>
-                    <a href="#" data-file="${file}">
-                        📄 ${file.replace('.md', '')}
-                    </a>
-                </li>
-            `).join('');
-            document.getElementById('file-list').innerHTML = `<ul style="list-style: none; padding: 0;">${fileListHtml}</ul>`;
-
-            // Обработка кликов
-            document.querySelectorAll('.file-list a').forEach(link => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const file = link.dataset.file;
-                    loadFile(file);
-                    document.querySelectorAll('.file-list a').forEach(a => a.classList.remove('active'));
-                    link.classList.add('active');
-                });
-            });
-
-            if (files.length) loadFile(files[0]);
-        })
-        .catch(err => {
-            document.getElementById('file-list').innerHTML = '<p style="color:red;">Ошибка загрузки списка</p>';
-        });
-
-    function loadFile(filename) {
-        currentFile = filename;
-        document.getElementById('md-content').innerHTML = '<div class="loading">Загрузка...</div>';
-
-        fetch(`/markdown/${filename}`)
-            .then(res => {
-                if (!res.ok) throw new Error('Файл не найден');
-                return res.text();
-            })
-            .then(md => {
-                let html = marked.parse(md);
-                // Заменяем mermaid блоки
-                html = html.replace(/<pre><code class="language-mermaid">([\s\S]*?)<\/code><\/pre>/g, '<div class="mermaid">$1</div>');
-                document.getElementById('md-content').innerHTML = html;
-                mermaid.run({ querySelector: '.mermaid' }).catch(err => console.warn(err));
-            })
-            .catch(err => {
-                document.getElementById('md-content').innerHTML = `<p style="color:red;">❌ ${err.message}</p>`;
-            });
-    }
+    // Инициализация после загрузки страницы
+    document.addEventListener('DOMContentLoaded', () => {
+        // Передаем данные с сервера
+        if (window.currentHost) {
+            window.currentHostValue = window.currentHost;
+        }
+        if (typeof init === 'function') {
+            init();
+        }
+    });
 </script>
 </body>
 </html>
