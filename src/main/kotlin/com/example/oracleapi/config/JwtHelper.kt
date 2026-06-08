@@ -27,6 +27,10 @@ class JwtHelper(
             "/index.html",
             "/",
             "/md-viewer.html",
+            "/css/**",             // стили
+            "/js/**",              // скрипты
+            "/markdown/**",        // MD файлы
+            "/api/markdown/**",    // API для списка файлов
             "/doc.html",
             "/webjars/**",
             "/v*/error",

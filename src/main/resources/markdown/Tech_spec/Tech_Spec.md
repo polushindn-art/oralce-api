@@ -8,6 +8,17 @@
 
 ---
 
+## Словарь терминов
+
+| Термин | Определение |
+|--------|-------------|
+| **WMS** | Warehouse Management System - система управления складом |
+| **ТСД** | Терминал сбора данных - мобильное устройство для сканирования |
+| **WSS** | WebSocket Secure - защищённое WebSocket-соединение |
+| **XMPP** | Extensible Messaging and Presence Protocol - протокол обмена сообщениями |
+| **Offline-first** | Подход, при котором приложение работает с локальными данными и синхронизируется при появлении сети |
+| **Идемпотентность** | Свойство операции, при котором многократное выполнение даёт тот же результат, что и однократное |
+
 ## 1. Цель работы
 
 Реализовать распределённую систему, обеспечивающую:
@@ -343,25 +354,34 @@ graph TB
 
 ```mermaid
 sequenceDiagram
-    participant Operator as Оператор
-    participant TSD as ТСД Android
-    participant REST as REST API
-    participant Oracle as Oracle
-    participant OneC as 1С
+   autonumber
+   participant TSD as 📱 ТСД
+   participant API as 🌐 REST API
+   participant DB as 💾 Oracle
+   participant ERP as 📊 1С
 
-    Operator->>TSD: Открытие документа
-    TSD->>REST: GET /v1/sync/pull
-    REST->>Oracle: SELECT справочники
-    Oracle-->>REST: Данные
-    REST-->>TSD: Справочники + документ
-    Operator->>TSD: Сканирование
-    TSD->>REST: POST /v1/wms/receive
-    REST->>Oracle: UPDATE WMSHEAD
-    Operator->>TSD: Завершение
-    TSD->>REST: POST /v1/wms/complete
-    REST->>Oracle: UPDATE status = COMPLETED
-    REST->>OneC: Отправка результата
-    REST-->>TSD: 200 OK
+   Note over TSD,API: 1. Инициализация
+   TSD->>+API: GET /v1/sync/pull
+   API->>DB: SELECT справочники
+   DB-->>API: Данные
+   API-->>-TSD: 200 OK (JSON)
+
+   Note over TSD,DB: 2. Приемка (повторяется N раз)
+   loop По каждому товару
+      TSD->>+API: POST /v1/wms/receive
+      API->>DB: UPDATE wms_head (IN_PROGRESS)
+      API->>DB: INSERT wms_line
+      DB-->>API: OK
+      API-->>-TSD: 200 OK
+   end
+
+   Note over TSD,ERP: 3. Финализация
+   TSD->>+API: POST /v1/wms/complete
+   API->>DB: UPDATE status = 'COMPLETED'
+   DB-->>API: OK
+   API->>ERP: POST /webhook/wms
+   ERP-->>API: 200 OK
+   API-->>-TSD: 200 OK
 ```
 
 ### 3. Диаграмма состояний ТСД
@@ -390,42 +410,42 @@ stateDiagram-v2
 
 ```mermaid
 flowchart TB
-    subgraph DC[Дата-центр]
-        ORA_SRV["Oracle 19c<br/>WMS-хранилище<br/>Порт 1521"]
-        API_SRV["REST API<br/>Оркестратор<br/>Порты 443 (WSS/HTTPS)"]
-        OF_SRV["Openfire<br/>XMPP-сервер<br/>Порт 5222"]
-        ONEC_SRV["1С:Предприятие<br/>Учётная система<br/>Порт 443"]
-    end
+   subgraph DC["🏢 Дата-центр"]
+      ORA_SRV[("Oracle 19c<br/>WMS-хранилище")]
+      API_SRV["REST API<br/>Оркестратор"]
+      OF_SRV["Openfire<br/>XMPP-сервер"]
+      ONEC_SRV["1С:Предприятие<br/>Учётная система"]
+   end
 
-    subgraph WH[Склад]
-        TSD1["ТСД №1<br/>Android"]
-        TSD2["ТСД №2<br/>Android"]
-        TSDN["ТСД №N<br/>Android"]
-    end
+   subgraph WH["🏭 Склад"]
+      TSD1["ТСД №1"]
+      TSD2["ТСД №2"]
+      TSDN["ТСД №N"]
+   end
 
-    %% ТСД → REST API (WebSocket и HTTPS на 443)
-    TSD1 -->|"WSS / HTTPS :443"| API_SRV
-    TSD2 -->|"WSS / HTTPS :443"| API_SRV
-    TSDN -->|"WSS / HTTPS :443"| API_SRV
+%% ТСД → REST API
+   TSD1 -->|"WSS/HTTPS :443"| API_SRV
+   TSD2 -->|"WSS/HTTPS :443"| API_SRV
+   TSDN -->|"WSS/HTTPS :443"| API_SRV
 
-    %% ТСД → Openfire (XMPP на 5222) — только для получения уведомлений
-    TSD1 -->|"XMPP :5222<br/>подписка / получение"| OF_SRV
-    TSD2 -->|"XMPP :5222<br/>подписка / получение"| OF_SRV
-    TSDN -->|"XMPP :5222<br/>подписка / получение"| OF_SRV
+%% ТСД → Openfire (подписка)
+   TSD1 -->|"XMPP :5222<br/>(подписка)"| OF_SRV
+   TSD2 -->|"XMPP :5222<br/>(подписка)"| OF_SRV
+   TSDN -->|"XMPP :5222<br/>(подписка)"| OF_SRV
 
-    %% REST API → Openfire (отправка команд на пробуждение)
-    API_SRV -->|"XMPP :5222<br/>отправка команд"| OF_SRV
+%% REST → Openfire (команды)
+   API_SRV -->|"XMPP :5222<br/>(команды)"| OF_SRV
 
-    %% Openfire → ТСД (доставка уведомлений)
-    OF_SRV -.->|"XMPP :5222<br/>push / пробуждение"| TSD1
-    OF_SRV -.->|"XMPP :5222<br/>push / пробуждение"| TSD2
-    OF_SRV -.->|"XMPP :5222<br/>push / пробуждение"| TSDN
+%% Openfire → ТСД (уведомления)
+   OF_SRV -.->|"XMPP :5222<br/>(push)"| TSD1
+   OF_SRV -.->|"XMPP :5222<br/>(push)"| TSD2
+   OF_SRV -.->|"XMPP :5222<br/>(push)"| TSDN
 
-    %% REST API → Oracle
-    API_SRV -->|"JDBC Thin :1521"| ORA_SRV
+%% REST → Oracle
+   API_SRV -->|"JDBC :1521"| ORA_SRV
 
-    %% REST API → 1С
-    API_SRV -->|"HTTPS :443<br/>документы"| ONEC_SRV
-    API_SRV ---|"WSS :443<br/>уведомления"| ONEC_SRV
+%% REST → 1С
+   API_SRV -->|"HTTPS :443"| ONEC_SRV
+   API_SRV -.->|"WSS :443<br/>(уведомления)"| ONEC_SRV
 ```
 
