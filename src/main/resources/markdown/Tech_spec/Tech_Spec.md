@@ -329,25 +329,40 @@
 
 ```mermaid
 graph TB
-    subgraph "Серверная часть"
-        REST["REST API<br/>Оркестратор<br/>Spring Boot + WebSocket"]
-        ORACLE[("Oracle 19c+<br/>WMS-хранилище")]
-        ONEC["1С:Предприятие<br/>Учётная система"]
-        OPENFIRE["Openfire<br/>XMPP-сервер"]
-    end
+   subgraph "Серверная часть"
+      REST["REST API<br/>Оркестратор"]
+      ORACLE[("Oracle 19c+")]
+      ONEC["1С:Предприятие"]
+      OPENFIRE["Openfire"]
+   end
 
-    subgraph "Клиентская часть"
-        TSD["ТСД Android"]
-        OPERATOR["Оператор склада"]
-    end
+   subgraph "Офис"
+      Менеджер["Менеджер<br/>Создание номенклатуры"]
+      Товаровед["Товаровед<br/>Сопоставление"]
+   end
 
-    OPERATOR --> TSD
-    TSD -->|"WSS/HTTPS :443"| REST
-    TSD -->|"XMPP :5222"| OPENFIRE
-    REST -->|"JDBC :1521"| ORACLE
-    REST -->|"HTTPS :443"| ONEC
-    REST -->|"XMPP :5222"| OPENFIRE
-    OPENFIRE -.->|"XMPP :5222"| TSD
+   subgraph "Клиентская часть (ТСД)"
+      subgraph "Android"
+         TSD["ТСД"]
+         Room[("Room SQLite<br/>Локальная БД")]
+         WorkManager["WorkManager<br/>Фоновая синхронизация"]
+      end
+   end
+
+   Поставщик --> ONEC
+   ONEC --> Товаровед
+   Товаровед --> Менеджер
+   Менеджер --> ONEC
+
+   ONEC --> REST
+   REST --> OPENFIRE
+   OPENFIRE -.-> TSD
+
+   TSD --> Room
+   Room --> WorkManager
+   WorkManager --> REST
+   REST --> ORACLE
+   REST --> ONEC
 ```
 
 ### 2. Диаграмма последовательности

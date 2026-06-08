@@ -19,7 +19,7 @@ class PrcDocHeadIns(dataSource: DataSource ) : BasePackage(dataSource) {
         return dataSource.executePrc {
             var idx = 1
 
-            it.setLong(idx++, request.crn ?: 0)
+            it.setLong(idx++, request.crn)
             it.setLong(idx++, request.doctype)
             it.setString(idx++, request.docpref)
 

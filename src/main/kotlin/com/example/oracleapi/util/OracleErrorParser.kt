@@ -4,16 +4,33 @@ import com.example.oracleapi.exception.OracleError
 import com.example.oracleapi.exception.OracleException
 import org.slf4j.LoggerFactory
 import java.sql.SQLException
-import java.util.regex.Pattern
 
 object OracleErrorParser {
 
     private val log = LoggerFactory.getLogger(this.javaClass)
+
+    /**
+     * Получает полное сообщение из цепочки SQLException
+     */
+    private fun getFullMessage(sqlEx: SQLException): String {
+        val messages = mutableListOf<String>()
+        var currentEx: SQLException? = sqlEx
+
+        while (currentEx != null) {
+            currentEx.message?.let { messages.add(it) }
+            currentEx = currentEx.nextException
+        }
+
+        val result = messages.joinToString("\n")
+        log.debug("Full SQLException chain:\n$result")
+        return result
+    }
+
     fun parse(sqlEx: SQLException): OracleException {
         val errorCode = sqlEx.errorCode
-        val fullMessage = sqlEx.message ?: "Unknown error"
+        val fullMessage = getFullMessage(sqlEx)  // ← используем полное сообщение
 
-        // ✅ Если в сообщении есть ORA-20000 - это бизнес-ошибка
+        // Если в сообщении есть ORA-20000 - это бизнес-ошибка
         if (fullMessage.contains("ORA-20000")) {
             return parseBusinessError(fullMessage)
         }
@@ -32,7 +49,6 @@ object OracleErrorParser {
                 val allErrors = extractAllErrors(fullMessage)
                 val mainError = allErrors.firstOrNull()
 
-                // Разделяем на бизнес-ошибки (если вдруг) и технические
                 val businessErrors = allErrors.filter { it.code == 20000 }.takeIf { it.isNotEmpty() }
                 val technicalErrors = allErrors.filter { it.code != 20000 }.takeIf { it.isNotEmpty() }
 
@@ -40,7 +56,7 @@ object OracleErrorParser {
                     oracleCode = errorCode,
                     message = mainError?.message ?: "Ошибка базы данных",
                     sqlState = sqlEx.sqlState,
-                    details = fullMessage.take(500),
+                    details = fullMessage.take(1000),
                     businessErrors = businessErrors,
                     technicalErrors = technicalErrors,
                     nestedErrors = allErrors.takeIf { it.size > 1 }
@@ -50,37 +66,18 @@ object OracleErrorParser {
     }
 
     private fun parseBusinessError(fullMessage: String): OracleException {
-        val businessErrors = mutableListOf<OracleError>()
-        val technicalErrors = mutableListOf<OracleError>()
+        // Убираем технические ORA-коды, оставляем только ORA-20000 и текст после них
+        val businessText = fullMessage
+            .replace(Regex("ORA-06512:.*?(\n|$)"), "")  // убираем ORA-06512
+            .replace(Regex("ORA-20000:\\s*"), "")       // убираем маркеры ORA-20000
+            .replace(Regex("\\s+"), " ")                // нормализуем пробелы
+            .trim()
 
-        val pattern = Pattern.compile("ORA-(\\d{5}):\\s*(.+?)(?=\\r?\\n|ORA-|$)")
-        val matcher = pattern.matcher(fullMessage)
-
-        while (matcher.find()) {
-            val code = matcher.group(1).toInt()
-            val msg = matcher.group(2).trim().replace(Regex("\\s+"), " ")
-
-            if (code == 20000) {
-                businessErrors.add(OracleError(code = code, message = msg))
-            } else {
-                technicalErrors.add(OracleError(code = code, message = msg))
-            }
-        }
-
-        // Собираем ВСЕ бизнес-ошибки в одно сообщение
-        val userMessage = if (businessErrors.isNotEmpty()) {
-            businessErrors.joinToString("; ") { it.message }
-        } else {
-            "Ошибка бизнес-логики"
-        }
-
-        val allErrors = (businessErrors + technicalErrors).takeIf { it.isNotEmpty() }
+        log.info("Business error message: $businessText")
 
         return OracleException.business(
-            message = userMessage,
-            businessErrors = businessErrors.takeIf { it.isNotEmpty() },
-            technicalErrors = technicalErrors.takeIf { it.isNotEmpty() },
-            nestedErrors = allErrors
+            message = businessText,
+            businessErrors = listOf(OracleError(code = 20000, message = businessText))
         )
     }
 
