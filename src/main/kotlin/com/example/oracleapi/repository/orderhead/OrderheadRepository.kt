@@ -1,6 +1,7 @@
 package com.example.oracleapi.repository.orderhead
 
 import com.example.oracleapi.entity.Orderhead
+import com.example.oracleapi.entity.table.Ordernaklhead
 import org.intellij.lang.annotations.Language
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
@@ -10,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 
 interface OrderheadRepository : JpaRepository<Orderhead, Long> {
+
+    fun existsByRn(rn: Long): Boolean
 
     fun findByRn(rn: Long): Orderhead?
 

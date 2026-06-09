@@ -15,6 +15,7 @@ import com.example.oracleapi.dto.orderhead.storein.OrderHeadUpdateStoreInRespons
 import com.example.oracleapi.dto.orderhead.ul.OrderHeadUlUpdateRequest
 import com.example.oracleapi.dto.orderhead.ul.OrderHeadUlUpdateResponse
 import com.example.oracleapi.entity.Field
+import com.example.oracleapi.repository.orderhead.OrderheadRepository
 import com.example.oracleapi.service.field.FieldService
 import com.example.oracleapi.service.typedoc.TypedocService
 import jakarta.transaction.Transactional
@@ -35,7 +36,8 @@ class OrderHeadService(
     private val orderHeadUpdateArrivalDate: OrderHeadUpdateArrivalDate,
     private val orderHeadUpdateNote: OrderHeadUpdateNote,
     private val fieldService: FieldService,
-    private val typeDocService: TypedocService
+    private val typeDocService: TypedocService,
+    private val orderheadRepository: OrderheadRepository
 ) {
     fun createOrder(request: com.example.oracleapi.dto.orderhead.ins.OrderHeadInsRequest): com.example.oracleapi.dto.orderhead.ins.OrderHeadInsResponse {
         // Валидация обязательных полей
@@ -118,6 +120,10 @@ class OrderHeadService(
         request.orderhead?.let { require(it > 0) { "RN заказа обязательна" } }
         request.note?.let { require(it.isNotBlank()) { "Отсутствует текст примечания" } }
         return orderHeadUpdateNote.update(request)
+    }
+
+    fun existByRn(rn: Long): Boolean {
+        return orderheadRepository.existsByRn(rn)
     }
 
 }

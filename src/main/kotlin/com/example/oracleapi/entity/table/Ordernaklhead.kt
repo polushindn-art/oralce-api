@@ -3,13 +3,7 @@ package com.example.oracleapi.entity.table
 import com.example.oracleapi.Helper
 import com.example.oracleapi.entity.Orderhead
 import com.example.oracleapi.entity.Typedoc
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.FetchType
-import jakarta.persistence.Id
-import jakarta.persistence.JoinColumn
-import jakarta.persistence.ManyToOne
-import jakarta.persistence.Table
+import jakarta.persistence.*
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 import org.hibernate.annotations.ColumnDefault
@@ -23,7 +17,7 @@ import java.time.LocalDate
 open class Ordernaklhead {
     @Id
     @Column(name = "RN", nullable = false)
-    open var id: Long? = null
+    open var rn: Long? = null
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
