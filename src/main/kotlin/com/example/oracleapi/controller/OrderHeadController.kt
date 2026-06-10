@@ -17,6 +17,7 @@ import com.example.oracleapi.dto.orderhead.storein.OrderHeadUpdateStoreInRespons
 import com.example.oracleapi.dto.orderhead.ul.OrderHeadUlUpdateRequest
 import com.example.oracleapi.dto.orderhead.ul.OrderHeadUlUpdateResponse
 import com.example.oracleapi.dto.orderspec.OrderSpecResponse
+import com.example.oracleapi.dto.orderspec.del.OrderSpecDelRequest
 import com.example.oracleapi.dto.orderspec.ins.OrderSpecInsRequest
 import com.example.oracleapi.dto.orderspec.ins.OrderSpecInsResponse
 import com.example.oracleapi.dto.orderspec.upd.OrderSpecUpdateRequest
@@ -135,6 +136,14 @@ class OrderHeadController(
         @Valid @RequestBody request: OrderHeadUpdateNoteRequest
     ): MyApiResponse<ResponseRN> {
         return success(orderHeadService.updateNote(request))
+    }
+
+    @DeleteMapping("orderspec_del")
+    @Operation(summary = "Удалить спецификацию")
+    fun deleteSpec(
+        @Valid @RequestBody request: OrderSpecDelRequest
+    ): MyApiResponse<ResponseRN> {
+        return success(orderSpecService.del(request))
     }
 
 }

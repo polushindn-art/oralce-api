@@ -85,29 +85,60 @@ class GlobalExceptionHandler {
         val msg = e.message ?: ""
 
         // Пытаемся извлечь имя поля из сообщения Jackson
-        val fieldName = Regex("""at path \$\.([a-zA-Z0-9_]+)""").find(msg)?.groupValues?.get(1)
+        val fieldName =  extractFieldName(msg) ?: extractMissingFieldName(msg)
+
+        logger.debug(msg)
 
         val errorDetail = when {
+            // НОВОЕ: отсутствует обязательное non-nullable поле в JSON
+            msg.contains("missing (therefore NULL) value for creator parameter") -> {
+                val missingField = extractMissingFieldName(msg)
+                if (missingField != null) {
+                    "Поле '$missingField' обязательно для заполнения и не может быть пропущено"
+                } else {
+                    "Отсутствует обязательное поле. Проверьте тело запроса."
+                }
+            }
+
             msg.contains("Cannot deserialize value of type `java.time.LocalDate` from Null value") ->
                 "Дата не может быть null. Пожалуйста, либо передайте корректную дату, либо уберите поле из запроса (если оно опционально)."
+
             msg.contains("Cannot deserialize value of type `java.time.LocalDateTime` from Null value") ->
                 "Дата и время не могут быть null. Пожалуйста, либо передайте корректную дату/время, либо уберите поле из запроса (если оно опционально)."
+
+            msg.contains("Cannot deserialize value of type `long` from Boolean value") ->
+                if (fieldName != null) "Поле '$fieldName' должно быть числом, а не true/false"
+                else "Неверный тип данных. Ожидается число, получено true/false."
+
+            msg.contains("Cannot deserialize value of type `long` from String value") ->
+                if (fieldName != null) "Поле '$fieldName' должно быть числом, а не строкой"
+                else "Неверный тип данных. Ожидается число, получена строка."
+
             msg.contains("Cannot deserialize value of type `java.lang.Boolean`") ->
                 if (fieldName != null) "Поле '$fieldName' должно быть true или false"
                 else "Неверное булево значение. Ожидается true или false."
+
             msg.contains("Cannot deserialize value of type `java.time.LocalDate`") ->
                 if (fieldName != null) "Поле '$fieldName' имеет неверный формат даты. Ожидается dd.MM.yyyy"
                 else "Неверный формат даты. Ожидается dd.MM.yyyy"
+
             msg.contains("Cannot deserialize value of type `java.time.LocalDateTime`") ->
                 if (fieldName != null) "Поле '$fieldName' имеет неверный формат даты и времени. Ожидается dd.MM.yyyy HH:mm:ss"
                 else "Неверный формат даты и времени. Ожидается dd.MM.yyyy HH:mm:ss."
+
             msg.contains("Cannot deserialize value of type `java.lang.Long`") ->
                 if (fieldName != null) "Поле '$fieldName' должно быть целым числом"
                 else "Неверный формат числа. Ожидается целое число."
+
+            msg.contains("Cannot deserialize value of type `long` from number") ->
+                if (fieldName != null) "Поле '$fieldName' должно быть целым числом (без дробной части)"
+                else "Неверный формат числа. Ожидается целое число."
+
             msg.contains("Cannot construct instance") ->
                 "Неверная структура JSON. Проверьте корректность запроса (возможно, лишние кавычки или запятые)."
+
             else ->
-                "Некорректный формат запроса. Проверьте тело запроса. (Все значения ключей должны быть заполнены. )"
+                "Некорректный формат запроса. Проверьте тело запроса."
         }
 
         return ResponseEntity
@@ -120,19 +151,22 @@ class GlobalExceptionHandler {
             )
     }
 
-    private fun extractFieldName(message: String): String? {
-        // Паттерны для Jackson 2.x
-        val patterns = listOf(
-            Regex("at path \\$\\\\.([a-zA-Z0-9_]+)"),      // $.field
-            Regex("at path \\$\\['([^']+)'\\]"),           // $['field']
-            Regex("at path \\$\\.([a-zA-Z0-9_]+)\\[")      // $.field[
-        )
-        for (pattern in patterns) {
-            pattern.find(message)?.let { match ->
-                return match.groupValues[1]
-            }
-        }
+    private fun extractFieldName(msg: String): String? {
+        // Формат: "Cannot deserialize value of type ... for field name 'pricecs'"
+        val pattern1 = Regex("for field name '(.+?)'")
+        pattern1.find(msg)?.let { return it.groupValues[1] }
+
+        // Формат: "Cannot deserialize value of type ... from String value (token `JsonToken.VALUE_STRING`); nested exception is ..."
+        val pattern2 = Regex("Cannot deserialize value of type `.*` from .+ value for field name '(.+?)'")
+        pattern2.find(msg)?.let { return it.groupValues[1] }
+
         return null
+    }
+
+    private fun extractMissingFieldName(msg: String): String? {
+        // Формат: "missing (therefore NULL) value for creator parameter pricecs"
+        val pattern = Regex("creator parameter (.+?)(?: |\\)|$)")
+        return pattern.find(msg)?.groupValues?.get(1)
     }
 
     // 4. Неподдерживаемый HTTP метод

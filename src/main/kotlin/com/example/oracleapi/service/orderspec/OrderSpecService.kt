@@ -1,6 +1,8 @@
 package com.example.oracleapi.service.orderspec
 
+import com.example.oracleapi.dto.ResponseRN
 import com.example.oracleapi.dto.orderspec.OrderSpecResponse
+import com.example.oracleapi.dto.orderspec.del.OrderSpecDelRequest
 import com.example.oracleapi.dto.orderspec.ins.OrderSpecInsRequest
 import com.example.oracleapi.dto.orderspec.ins.OrderSpecInsResponse
 import com.example.oracleapi.dto.orderspec.upd.OrderSpecUpdateRequest
@@ -13,7 +15,8 @@ import org.springframework.transaction.annotation.Transactional
 class OrderSpecService(
     private val orderSpecInsProcedure: OrderSpecInsProcedure,
     private val orderspecRepository: OrderspecRepository,
-    private val orderSpecUpd: OrderSpecUpd
+    private val orderSpecUpd: OrderSpecUpd,
+    private val orderSpecDel: OrderSpecDel
 ) {
     fun createOrderSpec(request: OrderSpecInsRequest): OrderSpecInsResponse {
         require(request.prn != null && request.prn > 0) { "PRN обязателен" }
@@ -35,6 +38,10 @@ class OrderSpecService(
         val orderSpec =
             orderspecRepository.findByRn(rn) ?: throw IllegalArgumentException("OrderSpec с RN=$rn не найден")
         return OrderSpecResponse.fromEntity(orderSpec)
+    }
+
+    fun del(request: OrderSpecDelRequest): ResponseRN {
+        return orderSpecDel.delSpec(request)
     }
 
 }

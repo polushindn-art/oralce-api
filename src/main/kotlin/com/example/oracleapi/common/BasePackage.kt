@@ -18,6 +18,8 @@ abstract class BasePackage(
     companion object {
         const val MARK_BINDING = "PKG_MARK_BINDING"
         const val MARK = "PKG_MARK"
+        const val ORDERHEAD = "PKG_ORDERHEAD"
+        const val ORDERSPEC = "PKG_ORDERSPEC"
         const val PRCDOCHEAD = "PKG_PRCDOCHEAD"
         const val PRCDOCSPEC = "PKG_PRCDOCSPEC"
         const val ORDERNAKLHEAD = "PKG_ORDERNAKLHEAD"

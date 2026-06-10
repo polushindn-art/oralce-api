@@ -14,15 +14,17 @@ class MarkBindingIns(
 ) : BasePackage(dataSource) {
     override val pkg = MARK_BINDING
     override val method = "ins"
-    override val count = 4
+    override val count = 6
 
     fun take(request: MarkBindingRequest): MarkBindingResponse {
         return dataSource.executePrc {
             with(it) {
                 registerOutParameter(1,Types.NUMERIC)
-                setLong(2,request.prn)
+                setString(2,request.km)
                 setLong(3,request.docRn)
                 setString(4,request.docTableName)
+                setInt(5,request.status)
+                setString(6,request.note)
                 execute()
             }
 
@@ -30,7 +32,7 @@ class MarkBindingIns(
 
             MarkBindingResponse(
                 rn,
-                request.prn,
+                request.km,
                 request.docRn,
                 request.docTableName,
                 LocalDateTime.now(),
