@@ -90,12 +90,17 @@ class GlobalExceptionHandler {
         val errorDetail = when {
             msg.contains("Cannot deserialize value of type `java.time.LocalDate` from Null value") ->
                 "Дата не может быть null. Пожалуйста, либо передайте корректную дату, либо уберите поле из запроса (если оно опционально)."
+            msg.contains("Cannot deserialize value of type `java.time.LocalDateTime` from Null value") ->
+                "Дата и время не могут быть null. Пожалуйста, либо передайте корректную дату/время, либо уберите поле из запроса (если оно опционально)."
             msg.contains("Cannot deserialize value of type `java.lang.Boolean`") ->
                 if (fieldName != null) "Поле '$fieldName' должно быть true или false"
                 else "Неверное булево значение. Ожидается true или false."
             msg.contains("Cannot deserialize value of type `java.time.LocalDate`") ->
                 if (fieldName != null) "Поле '$fieldName' имеет неверный формат даты. Ожидается dd.MM.yyyy"
-                else "Неверный формат даты. Ожидается dd.MM.yyyy."
+                else "Неверный формат даты. Ожидается dd.MM.yyyy"
+            msg.contains("Cannot deserialize value of type `java.time.LocalDateTime`") ->
+                if (fieldName != null) "Поле '$fieldName' имеет неверный формат даты и времени. Ожидается dd.MM.yyyy HH:mm:ss"
+                else "Неверный формат даты и времени. Ожидается dd.MM.yyyy HH:mm:ss."
             msg.contains("Cannot deserialize value of type `java.lang.Long`") ->
                 if (fieldName != null) "Поле '$fieldName' должно быть целым числом"
                 else "Неверный формат числа. Ожидается целое число."

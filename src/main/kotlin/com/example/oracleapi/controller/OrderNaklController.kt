@@ -2,6 +2,7 @@ package com.example.oracleapi.controller
 
 import com.example.oracleapi.dto.ResponseRN
 import com.example.oracleapi.dto.common.MyApiResponse
+import com.example.oracleapi.dto.orderNakl.OrderNaklHeadDelRequest
 import com.example.oracleapi.dto.orderNakl.OrderNaklHeadRequest
 import com.example.oracleapi.dto.orderNakl.OrderNaklSpecRequest
 import com.example.oracleapi.dto.orderNakl.OrderNaklSpecResponse
@@ -9,6 +10,7 @@ import com.example.oracleapi.service.ordernaklhead.NaklHeadServise
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -31,6 +33,12 @@ class OrderNaklController(
     @Operation(summary = "Создать спецификацию")
     fun insSpec(@Valid @RequestBody request: OrderNaklSpecRequest): MyApiResponse<OrderNaklSpecResponse> {
         return success(naklHeadService.insNaklSpec(request))
+    }
+
+    @DeleteMapping("/del_head")
+    @Operation(summary = "Удаление документа")
+    fun delHead(@Valid @RequestBody request: OrderNaklHeadDelRequest): MyApiResponse<ResponseRN> {
+        return success(naklHeadService.delHead(request))
     }
 
 }

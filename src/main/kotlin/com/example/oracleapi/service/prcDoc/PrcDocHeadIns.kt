@@ -11,7 +11,7 @@ import javax.sql.DataSource
 @Component
 class PrcDocHeadIns(dataSource: DataSource ) : BasePackage(dataSource) {
 
-    override val pkg = "PKG_PRCDOCHEAD"
+    override val pkg = PRCDOCHEAD
     override val method = "ins"
     override val count = 12
 

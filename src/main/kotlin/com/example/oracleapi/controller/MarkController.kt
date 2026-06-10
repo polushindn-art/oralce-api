@@ -2,16 +2,14 @@ package com.example.oracleapi.controller
 
 import com.example.oracleapi.dto.BarcodeGenerateRequest
 import com.example.oracleapi.dto.common.MyApiResponse
-import com.example.oracleapi.dto.mark.MarkFindRequest
-import com.example.oracleapi.dto.mark.MarkFindResponse
-import com.example.oracleapi.dto.mark.MarkUpdRequest
-import com.example.oracleapi.dto.mark.MarkUpdResponse
-import com.example.oracleapi.dto.mark.ParseMarkResponse
+import com.example.oracleapi.dto.mark.*
+import com.example.oracleapi.dto.markBinding.MarkBindingRequest
+import com.example.oracleapi.dto.markBinding.MarkBindingResponse
 import com.example.oracleapi.dto.vMark.MarkSearchResponse
 import com.example.oracleapi.service.GS1DataMatrixService
 import com.example.oracleapi.service.mark.MarkProcedureService
 import com.example.oracleapi.service.mark.MarkService
-import com.example.oracleapi.service.mark.ParseMark
+import com.example.oracleapi.service.markBinding.MarkBindingService
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -28,7 +26,8 @@ class MarkController(
     private val barcodeService: GS1DataMatrixService,
     private val markProcedureService: MarkProcedureService,
     private val objectMapper: ObjectMapper,
-    private val markService: MarkService
+    private val markService: MarkService,
+    private val markBindingService: MarkBindingService
 ) : BaseController() {
     private val log = LoggerFactory.getLogger(MarkController::class.java)
 
@@ -37,22 +36,18 @@ class MarkController(
     @PostMapping("/generate")
     @Operation(summary = "Сгенерировать DataMatrix (автоопределение формата)")
     fun generate(
-        @Valid @RequestBody request: BarcodeGenerateRequest,
-        response: HttpServletResponse
+        @Valid @RequestBody request: BarcodeGenerateRequest, response: HttpServletResponse
     ) {
         log.info("Генерация: data={}, size={}x{}", request.data.take(50), request.width, request.height)
 
         try {
             val imageBytes = barcodeService.generateAutoDataMatrix(
-                request.data,
-                request.width,
-                request.height
+                request.data, request.width, request.height
             )
 
             response.contentType = "image/png"
             response.setHeader(
-                "Content-Disposition",
-                "attachment; filename=\"barcode_${System.currentTimeMillis()}.png\""
+                "Content-Disposition", "attachment; filename=\"barcode_${System.currentTimeMillis()}.png\""
             )
             response.outputStream.write(imageBytes)
             response.outputStream.flush()
@@ -80,7 +75,7 @@ class MarkController(
     @Operation(summary = "Поиск КМ")
     private fun search(
         @Valid @RequestParam km: String
-    ):MyApiResponse<MarkSearchResponse> {
+    ): MyApiResponse<MarkSearchResponse> {
         return success(markService.searchMark(km))
     }
 
@@ -96,7 +91,6 @@ class MarkController(
     fun upd(
         @Valid @RequestBody request: MarkUpdRequest
     ): MyApiResponse<MarkUpdResponse> {
-        //return success(markProcedureService.upd(request))
         return success(markService.updateMark(request))
     }
 
@@ -106,6 +100,14 @@ class MarkController(
         @RequestParam km: String
     ): MyApiResponse<ParseMarkResponse> {
         return success(markService.parseMarkCode(km))
+    }
+
+    @PostMapping("ins_binding")
+    @Operation(summary = "Создать связь КМ со спецификацией документа")
+    fun insBinding(
+        @Valid @RequestBody request: MarkBindingRequest
+    ): MyApiResponse<MarkBindingResponse> {
+        return success(markBindingService.ins(request))
     }
 
 }

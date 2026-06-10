@@ -5,12 +5,10 @@ import com.example.oracleapi.dto.prcDoc.head.PrcDocStatusRequest
 import com.example.oracleapi.dto.prcDoc.head.PrcDocStatusResponse
 import com.example.oracleapi.entity.Field
 import com.example.oracleapi.service.field.FieldService
-import com.example.oracleapi.service.orderhead.OrderHeadStatusUpdate
 import org.springframework.stereotype.Component
 import java.sql.ResultSet
 import java.sql.Types
 import javax.sql.DataSource
-import kotlin.use
 
 @Component
 class PrcDocStatusUpdate(
@@ -18,7 +16,7 @@ class PrcDocStatusUpdate(
     private val fieldService: FieldService
 ) : BasePackage(dataSource) {
 
-    override val pkg = "PKG_PRCDOCHEAD"
+    override val pkg = PRCDOCHEAD
     override val method = "STATUS_UPDATE"
     override val count = 3
 

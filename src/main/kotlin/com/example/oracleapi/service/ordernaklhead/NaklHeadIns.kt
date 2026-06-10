@@ -12,7 +12,7 @@ class NaklHeadIns(
     dataSource: DataSource
 ) : BasePackage(dataSource) {
 
-    override val pkg = "PKG_ORDERNAKLHEAD"
+    override val pkg = ORDERNAKLHEAD
     override val method = "ins"
     override val count = 9
 

@@ -14,7 +14,7 @@ class MarkUPD(
     val objectMapper: ObjectMapper
 ) : BasePackage(dataSource) {
 
-    override val pkg = "PKG_MARK"
+    override val pkg = MARK
     override val method = "UPD"
     override val count = 6
 

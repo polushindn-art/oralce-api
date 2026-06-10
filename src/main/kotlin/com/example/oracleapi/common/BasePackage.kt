@@ -15,6 +15,15 @@ abstract class BasePackage(
     protected val dataSource: DataSource
 ) {
 
+    companion object {
+        const val MARK_BINDING = "PKG_MARK_BINDING"
+        const val MARK = "PKG_MARK"
+        const val PRCDOCHEAD = "PKG_PRCDOCHEAD"
+        const val PRCDOCSPEC = "PKG_PRCDOCSPEC"
+        const val ORDERNAKLHEAD = "PKG_ORDERNAKLHEAD"
+        const val ORDERNAKLSPEC = "PKG_ORDERNAKLSPEC"
+    }
+
     private val logger = LoggerFactory.getLogger(BasePackage::class.java)
 
     abstract val pkg: String?

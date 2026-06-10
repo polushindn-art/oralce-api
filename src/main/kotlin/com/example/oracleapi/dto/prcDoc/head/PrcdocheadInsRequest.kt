@@ -3,8 +3,6 @@ package com.example.oracleapi.dto.prcDoc.head
 import com.fasterxml.jackson.annotation.JsonFormat
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.*
-import jakarta.validation.constraints.Size
-import org.jetbrains.annotations.NotNull
 import org.springframework.format.annotation.DateTimeFormat
 import java.time.LocalDate
 

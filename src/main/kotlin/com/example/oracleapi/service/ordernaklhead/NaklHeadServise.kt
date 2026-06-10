@@ -1,6 +1,7 @@
 package com.example.oracleapi.service.ordernaklhead
 
 import com.example.oracleapi.dto.ResponseRN
+import com.example.oracleapi.dto.orderNakl.OrderNaklHeadDelRequest
 import com.example.oracleapi.dto.orderNakl.OrderNaklHeadRequest
 import com.example.oracleapi.dto.orderNakl.OrderNaklSpecRequest
 import com.example.oracleapi.dto.orderNakl.OrderNaklSpecResponse
@@ -10,13 +11,13 @@ import com.example.oracleapi.service.country.CountryService
 import com.example.oracleapi.service.nomnlist.NomnlistService
 import com.example.oracleapi.service.orderhead.OrderHeadService
 import com.example.oracleapi.service.typedoc.TypedocService
-import lombok.experimental.PackagePrivate
 import org.springframework.stereotype.Service
 
 @Service
 class NaklHeadServise(
     private val naklHeadIns: NaklHeadIns,
     private val naklSpecIns: NaklSpecIns,
+    private val naklHeadDel: NaklHeadDel,
     private val typedocService: TypedocService,
     private val agnListService: AgnListService,
     private val countryService: CountryService,
@@ -58,6 +59,11 @@ class NaklHeadServise(
         }
 
         return naklSpecIns.take(request)
+    }
+
+    /** Удаление заголовка */
+    fun delHead(request: OrderNaklHeadDelRequest): ResponseRN {
+        return naklHeadDel.take(request)
     }
 
 }
