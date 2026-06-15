@@ -7,8 +7,10 @@ import org.hibernate.JDBCException
 import org.slf4j.LoggerFactory
 import java.math.BigDecimal
 import java.sql.CallableStatement
+import java.sql.Date
 import java.sql.SQLException
 import java.sql.Types
+import java.time.LocalDate
 import javax.sql.DataSource
 
 abstract class BasePackage(
@@ -16,6 +18,7 @@ abstract class BasePackage(
 ) {
 
     companion object {
+        const val AGNLIST = "PKG_AGNLIST"
         const val MARK_BINDING = "PKG_MARK_BINDING"
         const val MARK = "PKG_MARK"
         const val ORDERHEAD = "PKG_ORDERHEAD"
@@ -110,6 +113,14 @@ abstract class BasePackage(
 
     fun setBigDecimalOrNull(stmt: CallableStatement, idx: Int, value: BigDecimal?) {
         if (value != null) stmt.setBigDecimal(idx, value) else stmt.setNull(idx, Types.DECIMAL)
+    }
+
+    fun setStringOrNull(stmt: CallableStatement, idx: Int, value: String?) {
+        if (value != null) stmt.setString(idx, value) else stmt.setNull(idx, Types.VARCHAR)
+    }
+
+    fun setDateOrNull(stmt: CallableStatement, idx: Int, value: LocalDate?) {
+        if (value != null) stmt.setDate(idx, Date.valueOf(value)) else stmt.setNull(idx, Types.DATE)
     }
 
 }

@@ -18,9 +18,5 @@ data class AgnListResponse(
                 inn = agnList.agnidnumb
             )
         }
-
-        fun fromEntityList(agnLists: List<AgnList>): List<AgnListResponse> {
-            return agnLists.map { fromEntity(it) }
-        }
     }
 }
