@@ -5,6 +5,7 @@ import kotlin.random.Random
 class Helper {
     companion object {
         const val SCHEME = "Qreal"
+        const val DD = "DD"
 
         const val IDSTATUS = "ID_STATUS"
 
