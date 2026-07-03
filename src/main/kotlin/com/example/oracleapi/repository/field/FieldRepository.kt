@@ -17,7 +17,7 @@ interface FieldRepository: JpaRepository<Field, Long> {
     @Query("SELECT f FROM Field f WHERE UPPER(f.fieldName) = UPPER(:fieldName) AND f.fieldValue = :fieldValue")
     fun findByFieldNameAndFieldValueIgnoreCase(
         @Param("fieldName") fieldName: String,
-        @Param("fieldValue") fieldValue: Long
+        @Param("fieldValue") fieldValue: Long?
     ): Field?
 
     fun findByFieldNameIgnoreCaseOrderByFieldComment(fieldName: String): MutableList<Field>

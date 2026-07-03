@@ -15,7 +15,7 @@ data class MarkBindingRequest(
         required = true
     )
     @field:Positive(message = "должен быть больше 0")
-    val docRn: Long,            // строка документа
+    val specRn: Long,            // строка документа
 
     @field:Schema(
         required = true

@@ -21,7 +21,7 @@ class MarkBindingIns(
             with(it) {
                 registerOutParameter(1,Types.NUMERIC)
                 setString(2,request.km)
-                setLong(3,request.docRn)
+                setLong(3,request.specRn)
                 setString(4,request.docTableName)
                 setInt(5,request.status)
                 setString(6,request.note)
@@ -33,7 +33,7 @@ class MarkBindingIns(
             MarkBindingResponse(
                 rn,
                 request.km,
-                request.docRn,
+                request.specRn,
                 request.docTableName,
                 LocalDateTime.now(),
 

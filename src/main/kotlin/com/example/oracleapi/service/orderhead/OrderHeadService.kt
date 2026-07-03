@@ -67,7 +67,7 @@ class OrderHeadService(
     @Transactional
     fun updateStatus(request: OrderHeadStatusUpdateRequest): OrderHeadStatusUpdateResponse {
         require(request.rn > 0) { "RN обязательна" }
-        require(request.status >= 0) { "Статус не может быть отрицательным" }
+        request.status?.let { require(it >= 0) { "Статус не может быть отрицательным" } }
         fieldService.validateFieldValue(Field.ORDER_STATUS, request.status)
 
         return orderHeadStatusUpdate.take(request)

@@ -12,7 +12,7 @@ class FieldService(
 ) {
 
     @Transactional(readOnly = true)
-    fun validateFieldValue(fieldName: String, fieldValue: Long): Field {
+    fun validateFieldValue(fieldName: String, fieldValue: Long?): Field {
         return fieldRepository.findByFieldNameAndFieldValueIgnoreCase(fieldName, fieldValue)
             ?: throw IllegalArgumentException("Значение $fieldValue не найдено в справочнике $fieldName")
     }

@@ -14,7 +14,7 @@ class OrderHeadStatusUpdate(
     private val fieldService: FieldService
 ) : BasePackage(dataSource) {
 
-    override val pkg = "PKG_ORDERHEAD"
+    override val pkg = ORDERHEAD
     override val method = "Status_Update"
     override val count = 2
 
@@ -22,9 +22,9 @@ class OrderHeadStatusUpdate(
 
         return dataSource.executePrc {
             it.setLong(1, request.rn)
-            it.setLong(2, request.status)
+            it.setLong(2, request.status ?: -1)
             it.execute()
-            val field = fieldService.getFieldValue(Field.ORDER_STATUS, request.status)
+            val field = fieldService.getFieldValue(Field.ORDER_STATUS, request.status ?: -1)
             OrderHeadStatusUpdateResponse(
                 request.rn,
                 request.status,

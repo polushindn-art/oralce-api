@@ -23,7 +23,6 @@ class JwtHelper(
             "/login",
             "/swagger-ui/**",      // для всех вложенных путей
             "/v3/api-docs/**",
-            "/favicon.ico",
             "/swagger-ui.html",
             "/index.html",
             "/",
