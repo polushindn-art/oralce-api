@@ -18,6 +18,7 @@ abstract class BasePackage(
 ) {
 
     companion object {
+        val EMPTY = null
         const val AGNLIST = "PKG_AGNLIST"
         const val MARK_BINDING = "PKG_MARK_BINDING"
         const val MARK = "PKG_MARK"
