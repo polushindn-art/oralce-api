@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/v1/acatalog")
-@Tag(name = "Каталоги иерархии разделов системы")
+@Tag(name = "Каталоги разделов системы")
 class AcatralogController(
     private val aCatalogService: AcatalogService
 ) : BaseController() {
