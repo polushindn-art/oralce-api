@@ -13,8 +13,35 @@ data class IdspecTsdResponse(
     val summ: BigDecimal?,
     val inprice: BigDecimal?,
     val storein: Long?,
-    val storeout: Long?
-)
+    val storeout: Long?,
+    val km: List<String>? = emptyList()
+) {
+    // Конструктор для JPQL
+    constructor(
+        rn: Long,
+        nomenId: Long,
+        nomenCode: String?,
+        article: String?,
+        nomenName: String?,
+        quant: BigDecimal?,
+        summ: BigDecimal?,
+        inprice: BigDecimal?,
+        storein: Long?,
+        storeout: Long?
+    ) : this(
+        rn = rn,
+        nomenId = nomenId,
+        nomenCode = nomenCode,
+        article = article,
+        nomenName = nomenName,
+        quant = quant,
+        summ = summ,
+        inprice = inprice,
+        storein = storein,
+        storeout = storeout,
+        km = emptyList()
+    )
+}
 
 fun Idspec.toTsdResponse(): IdspecTsdResponse = IdspecTsdResponse(
     rn = this.rn!!,

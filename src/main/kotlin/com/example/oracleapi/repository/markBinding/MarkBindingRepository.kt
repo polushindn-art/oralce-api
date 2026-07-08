@@ -5,4 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface MarkBindingRepository : JpaRepository<MarkBinding, Long> {
 
+    fun findAllBySpecRN(specRN: Long): MutableList<MarkBinding>
+
 }

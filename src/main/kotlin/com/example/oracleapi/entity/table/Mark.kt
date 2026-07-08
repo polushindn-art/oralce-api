@@ -1,5 +1,6 @@
 package com.example.oracleapi.entity.table
 
+import com.example.oracleapi.Helper
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
@@ -11,11 +12,11 @@ import org.hibernate.annotations.ColumnDefault
 import java.time.LocalDate
 
 @Entity
-@Table(name = "MARK", schema = "QREAL")
+@Table(name = "MARK", schema = Helper.SCHEME)
 open class Mark {
     @Id
     @Column(name = "RN", nullable = false)
-    open var id: Long? = null
+    open var rn: Long? = null
 
     @NotNull
     @Column(name = "DATE_ADD", nullable = false)

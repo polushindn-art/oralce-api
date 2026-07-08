@@ -1,15 +1,30 @@
 package com.example.oracleapi.repository.mark
 
 import com.example.oracleapi.dto.mark.MarkFindResponse
+import com.example.oracleapi.entity.table.Mark
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
 import org.springframework.stereotype.Repository
 import java.sql.Clob
 import org.springframework.cache.annotation.Cacheable
+import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
 
 @Repository
-class MarkRepository {
+interface MarkRepository : JpaRepository<Mark, Long> {
+    @Query("""
+        select m.km 
+        from Idspec ids 
+        LEFT JOIN MarkBinding mb on mb.specRN = ids.rn 
+        LEFT JOIN Mark m on m.rn = mb.prn 
+        where ids.rn = :spec""")
+    fun getKmBySpecRn(@Param("spec") specRN: Long): List<String>
+}
+
+@Repository
+class CustomMarkRepository {
 
     @PersistenceContext
     private lateinit var entityManager: EntityManager

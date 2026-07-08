@@ -7,17 +7,17 @@ import com.example.oracleapi.dto.idhead.prihod.PrihodRequest
 import com.example.oracleapi.dto.idhead.status.StatusUpdateRequest
 import com.example.oracleapi.dto.idhead.toResponse
 import com.example.oracleapi.dto.idspec.IdheadWithSpecTsdResponse
-import com.example.oracleapi.dto.idspec.toTsdResponse
+import com.example.oracleapi.dto.idspec.toIdspecTsdResponse
+import com.example.oracleapi.entity.Idhead
 import com.example.oracleapi.repository.idhead.IdheadRepository
 import com.example.oracleapi.repository.idspec.IdspecRepository
-import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
-import org.springframework.data.domain.Pageable
-import com.example.oracleapi.entity.Idhead
 import com.example.oracleapi.service.field.FieldService
 import jakarta.persistence.criteria.Predicate
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -55,8 +55,10 @@ class IdHeadService(
         val head = idheadRepository.findById(rn)
             .orElseThrow { IllegalArgumentException("Документ с RN=$rn не найден") }
 
-        val specs = idspecRepository.findByPrnRnWithNomen(rn)
-            .map { it.toTsdResponse() }
+        //val specs = idspecRepository.findByPrnRnWithNomen(rn).map { it.toTsdResponse() }
+        //val specs = idspecRepository.findByPrnRnWithNomen2(rn)
+        val specRows = idspecRepository.findByPrnRnWithNomen2(rn)
+        val specs = specRows.map { it.toIdspecTsdResponse() }
 
         val statusCode = fieldService.getFieldValue(Helper.IDSTATUS, head.idStatus ?: 0).fieldComment
 

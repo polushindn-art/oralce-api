@@ -20,17 +20,20 @@ import java.time.LocalDate
 open class MarkBinding {
     @Id
     @Column(name = "RN", nullable = false)
-    open var id: Long? = null
+    open var rn: Long? = null
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "PRN", nullable = false)
-    open var prn: Mark? = null
+    open var prnEntity: Mark? = null
+
+    @Column(name = "PRN", nullable = false, updatable = false, insertable = false)
+    var prn: Long? = null
 
     @NotNull
-    @Column(name = "DOC_RN", nullable = false)
-    open var docRn: Long? = null
+    @Column(name = "SPEC_RN", nullable = false)
+    open var specRN: Long? = null
 
     @Size(max = 64)
     @NotNull

@@ -4,13 +4,16 @@ import com.example.oracleapi.dto.mark.MarkUpdRequest
 import com.example.oracleapi.dto.mark.MarkUpdResponse
 import com.example.oracleapi.dto.mark.ParseMarkResponse
 import com.example.oracleapi.dto.vMark.MarkSearchResponse
+import com.example.oracleapi.entity.table.Mark
+import com.example.oracleapi.repository.mark.MarkRepository
 import org.springframework.stereotype.Service
 
 @Service
 class MarkService(
     private val parseMark: ParseMark,
     private val markUPD: MarkUPD,
-    private val markSearch: MarkSearch
+    private val markSearch: MarkSearch,
+    private val markRepository: MarkRepository
 ) {
     fun parseMarkCode(km: String): ParseMarkResponse {
         return parseMark.take(km)
@@ -22,6 +25,10 @@ class MarkService(
 
     fun searchMark(km: String): MarkSearchResponse {
         return markSearch.findMark(km)
+    }
+
+    fun getKmBySpec(spec:Long):List<String> {
+        return markRepository.getKmBySpecRn(spec)
     }
 
 }
