@@ -18,6 +18,7 @@ class JwtHelper(
         const val COOCKIENAME = "accessToken"
         val skipPaths = arrayOf(
             "/v1/wakeup/**",
+            "/v*/tsdlist/snByDeviceId/**",
             "/pictures/**",
             "/v*/api/health",
             "/login",

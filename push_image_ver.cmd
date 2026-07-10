@@ -116,7 +116,7 @@ echo.
 echo 2. Запустить DEV (тестовая):
 echo    docker run -d --name oracle-dev --restart=always -p 8099:8080 -e SPRING_PROFILES_ACTIVE=dev %REGISTRY%/%IMAGE_NAME%:%FULL_VERSION%
 echo.
-echo 3. Запустить PROD BLUE (текущая рабочая):
+echo 3. Запустить PROD BLUE если не запущена (текущая рабочая):
 echo    docker run -d --name oracle-prod-blue --restart=always -p 8090:8080 -e SPRING_PROFILES_ACTIVE=prod %REGISTRY%/%IMAGE_NAME%:%FULL_VERSION%
 echo.
 echo    Перед запуском проверить свободные порты и запустить на нем. Например: 8092

@@ -30,7 +30,7 @@ interface IdspecRepository: JpaRepository<Idspec, Long> {
                 i.inprice,
                 i.storein,
                 i.storeout,
-                LISTAGG(m.km, ',') WITHIN GROUP (ORDER BY m.km) as kms
+                LISTAGG(m.km, ' ') WITHIN GROUP (ORDER BY m.km) as kms
             FROM qreal.idspec i
             LEFT JOIN qreal.nomnlist n ON n.rn = i.nomen
             LEFT JOIN qreal.mark_binding mb ON mb.spec_rn = i.rn

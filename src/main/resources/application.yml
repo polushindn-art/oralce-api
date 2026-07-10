@@ -25,10 +25,6 @@ springdoc:
         - /v1/pictures/**
         - /v1/public/**
         - /v1/email/**
-    - group: 1c-packages
-      display-name: API 1C
-      paths-to-match:
-        - /v1/api/1c/**
     - group: mark
       display-name: Маркировка
       paths-to-match:

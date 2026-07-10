@@ -6,7 +6,7 @@ import java.math.BigDecimal
 fun Tuple.toIdspecTsdResponse(): IdspecTsdResponse {
     val kmsString = this.get("kms", String::class.java)
     val kmList = if (!kmsString.isNullOrBlank()) {
-        kmsString.split(",").filter { it.isNotBlank() }
+        kmsString.split(" ").filter { it.isNotBlank() }
     } else {
         emptyList()
     }

@@ -312,6 +312,13 @@ class TsdListService(
             }
         }
     }
+
+    fun getSnByDeviceId(deviceId: String): TsdIdResponse {
+        return TsdIdResponse(
+            tsdlistRepository.findByDeviceid(deviceId)?.sn ?: "014.XXXX"
+        )
+    }
+
 }
 
 data class UserInfo(

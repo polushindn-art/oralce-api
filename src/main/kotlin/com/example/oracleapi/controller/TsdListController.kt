@@ -2,6 +2,7 @@ package com.example.oracleapi.controller
 
 import com.example.oracleapi.dto.common.MyApiResponse
 import com.example.oracleapi.dto.tsdlist.Registeredjson
+import com.example.oracleapi.dto.tsdlist.TsdIdResponse
 import com.example.oracleapi.dto.tsdlist.TsdUpsertRequest
 import com.example.oracleapi.dto.tsdlist.TsdUpsertResponse
 import com.example.oracleapi.dto.tsdlist.UsedJson
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("v1/tsdlist")
-@Tag(name = "tsdlist", description = "Процедуры пакета PKG TSDLIST")
+@Tag(name = "ТСД", description = "Терминал Сбора Данных")
 class TsdListController(
     private val tsdListService: TsdListService,
 ) : BaseController() {
@@ -64,6 +65,13 @@ class TsdListController(
     ): MyApiResponse<TsdUpsertResponse> {
         val result = tsdListService.upsertTerminal(request)
         return success(result, result.getSuccessMessage())
+    }
+
+    @GetMapping("/snByDeviceId/{deviceId}")
+    fun getSnByDeviceId(
+        @Valid @PathVariable deviceId: String
+    ): MyApiResponse<TsdIdResponse> {
+        return success(tsdListService.getSnByDeviceId(deviceId))
     }
 
 }
