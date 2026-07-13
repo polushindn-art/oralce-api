@@ -1,7 +1,7 @@
 package com.example.oracleapi.repository.idspec
 
 import com.example.oracleapi.dto.idspec.IdspecTsdResponse
-import com.example.oracleapi.entity.Idspec
+import com.example.oracleapi.entity.table.Idspec
 import jakarta.persistence.Tuple
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable

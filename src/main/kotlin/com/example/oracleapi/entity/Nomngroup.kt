@@ -23,12 +23,6 @@ open class Nomngroup {
     @Column(name = "RN", nullable = false)
     open var rn: Long? = null
 
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.RESTRICT)
-    @JoinColumn(name = "CRN", nullable = false)
-    open var crn: com.example.oracleapi.entity.table.Acatalog? = null
-
     @Size(max = 20)
     @NotNull
     @Column(name = "GROUPCODE", nullable = false, length = 20)

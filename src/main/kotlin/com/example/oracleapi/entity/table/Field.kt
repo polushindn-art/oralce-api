@@ -1,4 +1,4 @@
-package com.example.oracleapi.entity
+package com.example.oracleapi.entity.table
 
 import com.example.oracleapi.Helper
 import jakarta.persistence.Column
@@ -9,7 +9,7 @@ import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 
 @Entity
-@Table(name = "FIELD", schema = Helper.SCHEME)
+@Table(name = "FIELD", schema = Helper.Companion.SCHEME)
 open class Field {
     @Id
     @Column(name = "RN", nullable = false)

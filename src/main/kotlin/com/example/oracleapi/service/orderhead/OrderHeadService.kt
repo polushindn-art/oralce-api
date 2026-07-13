@@ -14,7 +14,7 @@ import com.example.oracleapi.dto.orderhead.storein.OrderHeadUpdateStoreInRequest
 import com.example.oracleapi.dto.orderhead.storein.OrderHeadUpdateStoreInResponse
 import com.example.oracleapi.dto.orderhead.ul.OrderHeadUlUpdateRequest
 import com.example.oracleapi.dto.orderhead.ul.OrderHeadUlUpdateResponse
-import com.example.oracleapi.entity.Field
+import com.example.oracleapi.entity.table.Field
 import com.example.oracleapi.repository.orderhead.OrderheadRepository
 import com.example.oracleapi.service.field.FieldService
 import com.example.oracleapi.service.typedoc.TypedocService

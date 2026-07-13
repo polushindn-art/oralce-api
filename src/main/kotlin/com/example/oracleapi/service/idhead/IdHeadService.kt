@@ -8,7 +8,7 @@ import com.example.oracleapi.dto.idhead.status.StatusUpdateRequest
 import com.example.oracleapi.dto.idhead.toResponse
 import com.example.oracleapi.dto.idspec.IdheadWithSpecTsdResponse
 import com.example.oracleapi.dto.idspec.toIdspecTsdResponse
-import com.example.oracleapi.entity.Idhead
+import com.example.oracleapi.entity.table.Idhead
 import com.example.oracleapi.repository.idhead.IdheadRepository
 import com.example.oracleapi.repository.idspec.IdspecRepository
 import com.example.oracleapi.service.field.FieldService

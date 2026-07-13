@@ -3,7 +3,7 @@ package com.example.oracleapi.service.prcDoc
 import com.example.oracleapi.common.BasePackage
 import com.example.oracleapi.dto.prcDoc.head.PrcDocStatusRequest
 import com.example.oracleapi.dto.prcDoc.head.PrcDocStatusResponse
-import com.example.oracleapi.entity.Field
+import com.example.oracleapi.entity.table.Field
 import com.example.oracleapi.service.field.FieldService
 import org.springframework.stereotype.Component
 import java.sql.ResultSet

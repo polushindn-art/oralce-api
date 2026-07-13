@@ -1,6 +1,6 @@
 package com.example.oracleapi.repository.idhead
 
-import com.example.oracleapi.entity.Idhead
+import com.example.oracleapi.entity.table.Idhead
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository

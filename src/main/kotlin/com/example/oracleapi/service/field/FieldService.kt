@@ -1,7 +1,7 @@
 package com.example.oracleapi.service.field
 
 import com.example.oracleapi.dto.field.FieldResponse
-import com.example.oracleapi.entity.Field
+import com.example.oracleapi.entity.table.Field
 import com.example.oracleapi.repository.field.FieldRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

@@ -1,7 +1,8 @@
 package com.example.oracleapi.controller
 
 import com.example.oracleapi.dto.RequestRN
-import com.example.oracleapi.dto.contract.ContractResponse
+import com.example.oracleapi.dto.common.MyApiResponse
+import com.example.oracleapi.dto.contract.ContractDto
 import com.example.oracleapi.service.contract.ContractService
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController
 @Tag(name = "Договор")
 class ContractController(private val contractService: ContractService) : BaseController() {
     @PostMapping("get_contract")
-    fun getContract(@Valid @RequestBody request: RequestRN): List<ContractResponse> {
-        return contractService.getContract(request)
+    fun getContract(@Valid @RequestBody request: RequestRN): MyApiResponse<List<ContractDto>> {
+        return success(contractService.getContract(request))
     }
 }

@@ -3,7 +3,7 @@ package com.example.oracleapi.service.orderhead
 import com.example.oracleapi.common.BasePackage
 import com.example.oracleapi.dto.orderhead.status.OrderHeadStatusUpdateRequest
 import com.example.oracleapi.dto.orderhead.status.OrderHeadStatusUpdateResponse
-import com.example.oracleapi.entity.Field
+import com.example.oracleapi.entity.table.Field
 import com.example.oracleapi.service.field.FieldService
 import org.springframework.stereotype.Component
 import javax.sql.DataSource

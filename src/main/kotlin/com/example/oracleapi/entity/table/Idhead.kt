@@ -1,7 +1,16 @@
-package com.example.oracleapi.entity
+package com.example.oracleapi.entity.table
 
 import com.example.oracleapi.Helper
-import jakarta.persistence.*
+import com.example.oracleapi.entity.Store
+import com.example.oracleapi.entity.Typedoc
+import com.example.oracleapi.entity.Userlist
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.FetchType
+import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
+import jakarta.persistence.Table
 import org.hibernate.annotations.JoinColumnOrFormula
 import org.hibernate.annotations.JoinFormula
 import java.math.BigDecimal
@@ -54,7 +63,13 @@ open class Idhead {
     open var idStatus: Long? = null
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumnOrFormula(column = JoinColumn(name = "ID_STATUS", referencedColumnName = "FIELD_VALUE", insertable = false, updatable = false))
+    @JoinColumnOrFormula(column = JoinColumn(
+        name = "ID_STATUS",
+        referencedColumnName = "FIELD_VALUE",
+        insertable = false,
+        updatable = false
+    )
+    )
     @JoinColumnOrFormula(formula = JoinFormula(value = "'ID_STATUS'", referencedColumnName = "FIELD_NAME"))
     var statusEntity: Field? = null
 

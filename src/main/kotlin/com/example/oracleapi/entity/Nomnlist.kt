@@ -1,6 +1,9 @@
 package com.example.oracleapi.entity
 
 import com.example.oracleapi.Helper
+import com.example.oracleapi.entity.table.Assortspec
+import com.example.oracleapi.entity.table.Automarginoc
+import com.example.oracleapi.entity.table.MarkIntegration
 import com.example.oracleapi.entity.table.Typeprice
 import jakarta.persistence.Column
 import jakarta.persistence.Entity

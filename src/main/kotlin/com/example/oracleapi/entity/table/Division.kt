@@ -1,4 +1,4 @@
-package com.example.oracleapi.entity
+package com.example.oracleapi.entity.table
 
 import com.example.oracleapi.Helper
 import jakarta.persistence.Column
@@ -19,7 +19,7 @@ import org.hibernate.annotations.OnDeleteAction
 open class Division {
     @Id
     @Column(name = "RN", nullable = false)
-    open var id: Long? = null
+    open var rn: Long? = null
 
     @Size(max = 20)
     @NotNull
@@ -39,7 +39,7 @@ open class Division {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "CRN", nullable = false)
-    open var crn: com.example.oracleapi.entity.table.Acatalog? = null
+    open var crn: Acatalog? = null
 
     @NotNull
     @ColumnDefault("0")

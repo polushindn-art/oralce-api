@@ -2,7 +2,6 @@ package com.example.oracleapi.entity.table
 
 import com.example.oracleapi.Helper
 import com.example.oracleapi.dto.prefix.PrefixResponse
-import com.example.oracleapi.entity.Division
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType

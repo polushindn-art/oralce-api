@@ -1,7 +1,8 @@
-package com.example.oracleapi.entity
+package com.example.oracleapi.entity.table
 
 import com.example.oracleapi.Helper
-import com.example.oracleapi.entity.Idhead
+import com.example.oracleapi.entity.Measunit
+import com.example.oracleapi.entity.Nomnlist
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
@@ -61,7 +62,7 @@ open class Idspec {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "COUNTRY", nullable = false)
-    open var country: com.example.oracleapi.entity.table.Country? = null
+    open var country: Country? = null
 
     @Size(max = 40)
     @Column(name = "GTD", length = 40)

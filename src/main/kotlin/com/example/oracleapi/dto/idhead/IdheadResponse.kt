@@ -1,6 +1,6 @@
 package com.example.oracleapi.dto.idhead
 
-import com.example.oracleapi.entity.Idhead
+import com.example.oracleapi.entity.table.Idhead
 import com.fasterxml.jackson.annotation.JsonPropertyOrder
 import java.math.BigDecimal
 import java.time.LocalDateTime

@@ -70,7 +70,7 @@ open class Orderhead {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "PROVIDER", nullable = false, updatable = false, insertable = false)
-    open var providerEntity: com.example.oracleapi.entity.table.AgnList? = null
+    open var providerEntity: AgnList? = null
 
     @NotNull
     @Column(name = "PROVIDER")

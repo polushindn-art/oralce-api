@@ -1,6 +1,6 @@
 package com.example.oracleapi.dto.field
 
-import com.example.oracleapi.entity.Field
+import com.example.oracleapi.entity.table.Field
 
 class FieldResponse(
     val rn: Long,

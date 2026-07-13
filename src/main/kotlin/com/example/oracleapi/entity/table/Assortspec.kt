@@ -1,5 +1,7 @@
-package com.example.oracleapi.entity
+package com.example.oracleapi.entity.table
 
+import com.example.oracleapi.Helper
+import com.example.oracleapi.entity.Nomnlist
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
@@ -14,7 +16,7 @@ import org.hibernate.annotations.OnDeleteAction
 import java.math.BigDecimal
 
 @Entity
-@Table(name = "ASSORTSPEC", schema = "QREAL")
+@Table(name = "ASSORTSPEC", schema = Helper.Companion.SCHEME)
 open class Assortspec {
     @Id
     @Column(name = "RN", nullable = false)
