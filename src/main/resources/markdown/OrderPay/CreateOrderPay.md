@@ -190,6 +190,8 @@
 ```GET /v1/orderpay/getHead/207364225750```
 
 **Пример ответа:**
+<div style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd; border-radius: 10px; padding: 0 4px 4px 4px; background: #fafafa; margin: 12px 0;">
+
 ```json
 {
    "success": true,
@@ -275,6 +277,7 @@
    ]
 }
 ```
+</div>>
 
 ### 4. Получение договора для поставщика
 
@@ -297,6 +300,9 @@
 ```
 
 **Пример ответа**
+
+<div style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd; border-radius: 10px; padding: 0 4px 4px 4px; background: #fafafa; margin: 12px 0;">
+
 ```json
 {
   "success": true,
@@ -341,6 +347,7 @@
   ]
 }
 ```
+</div> 
 
 ## Реализация в 1С
 
