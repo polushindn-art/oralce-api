@@ -99,7 +99,7 @@ class IdHeadService(
         pageable: Pageable
     ): Page<IdheadResponse> {
         val spec = buildSpecification(status, doctype,docnumb, storein, storeout, dateFrom, dateTo)
-        return idheadRepository.findAll(spec, pageable).map { it.toResponse() }
+        return idheadRepository.findAll(spec, pageable) .map { it.toResponse() }
     }
 
     private fun buildSpecification(

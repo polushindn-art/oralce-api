@@ -23,12 +23,12 @@ class PrcDocSpecIns(dataSource: DataSource) : BasePackage(dataSource) {
             stmt.setLong(idx++, request.nomen)
 
             // 3..8 (nomncat)
-            setLongOrNull(stmt, idx++, request.nomncat1)
-            setLongOrNull(stmt, idx++, request.nomncat2)
-            setLongOrNull(stmt, idx++, request.nomncat3)
-            setLongOrNull(stmt, idx++, request.nomncat4)
-            setLongOrNull(stmt, idx++, request.nomncat5)
-            setLongOrNull(stmt, idx++, request.nomncatCS)
+            stmt.setLongOrNull(idx++, request.nomncat1)
+            stmt.setLongOrNull( idx++, request.nomncat2)
+            stmt.setLongOrNull( idx++, request.nomncat3)
+            stmt.setLongOrNull( idx++, request.nomncat4)
+            stmt.setLongOrNull( idx++, request.nomncat5)
+            stmt.setLongOrNull( idx++, request.nomncatCS)
 
             // 9..14 (price)
             stmt.setBigDecimal(idx++, request.pricecs)
@@ -46,15 +46,15 @@ class PrcDocSpecIns(dataSource: DataSource) : BasePackage(dataSource) {
             stmt.setString(idx++, request.checkRoznPrice)
 
             // 20
-            setBigDecimalOrNull(stmt, idx++, request.overhaulpricepr)
+            stmt.setBigDecimalOrNull( idx++, request.overhaulpricepr)
 
             // 21..26 (typepriceaction)
-            setLongOrNull(stmt, idx++, request.typepriceactioncs)
-            setLongOrNull(stmt, idx++, request.typepriceaction1)
-            setLongOrNull(stmt, idx++, request.typepriceaction2)
-            setLongOrNull(stmt, idx++, request.typepriceaction3)
-            setLongOrNull(stmt, idx++, request.typepriceaction4)
-            setLongOrNull(stmt, idx++, request.typepriceaction5)
+            stmt.setLongOrNull( idx++, request.typepriceactioncs)
+            stmt.setLongOrNull( idx++, request.typepriceaction1)
+            stmt.setLongOrNull( idx++, request.typepriceaction2)
+            stmt.setLongOrNull( idx++, request.typepriceaction3)
+            stmt.setLongOrNull( idx++, request.typepriceaction4)
+            stmt.setLongOrNull( idx++, request.typepriceaction5)
 
             // 27. rn_ (IN OUT)
             val rnPos = idx

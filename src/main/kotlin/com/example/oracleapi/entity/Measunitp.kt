@@ -1,6 +1,7 @@
 package com.example.oracleapi.entity
 
 import com.example.oracleapi.Helper
+import com.example.oracleapi.entity.table.Measunit
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType

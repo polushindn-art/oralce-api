@@ -1,6 +1,8 @@
-package com.example.oracleapi.entity
+package com.example.oracleapi.entity.table
 
 import com.example.oracleapi.Helper
+import com.example.oracleapi.entity.Measure
+import com.example.oracleapi.entity.Nomnlist
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
@@ -16,7 +18,7 @@ import org.hibernate.annotations.OnDeleteAction
 import java.math.BigDecimal
 
 @Entity
-@Table(name = "MEASUNIT", schema = Helper.SCHEME)
+@Table(name = "MEASUNIT", schema = Helper.Companion.SCHEME)
 open class Measunit {
     @Id
     @Column(name = "RN", nullable = false)

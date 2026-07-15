@@ -26,12 +26,6 @@ open class Contractval {
     @Column(name = "prn", insertable = false, updatable = false)
     open var prn: Long? = null
 
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.RESTRICT)
-    @JoinColumn(name = "PRN", nullable = false)
-    open var prnEntity: Contract? = null
-
     @Column(name = "DELIVERY_DAYS", precision = 17, scale = 2)
     open var deliveryDays: BigDecimal? = null
 

@@ -28,6 +28,8 @@ abstract class BasePackage(
         const val PRCDOCSPEC = "PKG_PRCDOCSPEC"
         const val ORDERNAKLHEAD = "PKG_ORDERNAKLHEAD"
         const val ORDERNAKLSPEC = "PKG_ORDERNAKLSPEC"
+        const val ORDERPAYHEAD = "PKG_ORDERPAYHEAD"
+        const val ORDERPAYSPEC = "PKG_ORDERPAYSPEC"
     }
 
     private val logger = LoggerFactory.getLogger(BasePackage::class.java)
@@ -108,20 +110,20 @@ abstract class BasePackage(
         return result
     }
 
-    fun setLongOrNull(stmt: CallableStatement, idx: Int, value: Long?) {
-        if (value != null) stmt.setLong(idx, value) else stmt.setNull(idx, Types.NUMERIC)
+    fun CallableStatement.setLongOrNull(idx: Int, value: Long?) {
+        if (value != null) this.setLong(idx, value) else this.setNull(idx, Types.NUMERIC)
     }
 
-    fun setBigDecimalOrNull(stmt: CallableStatement, idx: Int, value: BigDecimal?) {
-        if (value != null) stmt.setBigDecimal(idx, value) else stmt.setNull(idx, Types.DECIMAL)
+    fun CallableStatement.setBigDecimalOrNull(idx: Int, value: BigDecimal?) {
+        if (value != null) this.setBigDecimal(idx, value) else this.setNull(idx, Types.DECIMAL)
     }
 
-    fun setStringOrNull(stmt: CallableStatement, idx: Int, value: String?) {
-        if (value != null) stmt.setString(idx, value) else stmt.setNull(idx, Types.VARCHAR)
+    fun CallableStatement.setStringOrNull(idx: Int, value: String?) {
+        if (value != null) this.setString(idx, value) else this.setNull(idx, Types.VARCHAR)
     }
 
-    fun setDateOrNull(stmt: CallableStatement, idx: Int, value: LocalDate?) {
-        if (value != null) stmt.setDate(idx, Date.valueOf(value)) else stmt.setNull(idx, Types.DATE)
+    fun CallableStatement.setDateOrNull(idx: Int, value: LocalDate?) {
+        if (value != null) this.setDate(idx, Date.valueOf(value)) else this.setNull(idx, Types.DATE)
     }
 
 }

@@ -2,7 +2,9 @@ package com.example.oracleapi.dto.contract
 
 import com.example.oracleapi.annotation.BindingDateFormat
 import com.example.oracleapi.dto.agn.AgnListSimpleDto
+import com.example.oracleapi.dto.orderpay.OrderpayspecDto
 import com.example.oracleapi.entity.table.Contract
+import com.example.oracleapi.entity.table.Orderpayspec
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 import java.io.Serializable
@@ -29,7 +31,8 @@ data class ContractDto(
     val status: BigDecimal? = null,
     @field:Size(max = 320) val objectadress: String? = null,
     @field:Size(max = 160) val note: String? = null,
-    @field:Size(max = 160) val typesavecontr: String? = null
+    @field:Size(max = 160) val typesavecontr: String? = null,
+    val specEntity: List<ContractvalDto>? = null,
 ) : Serializable {
     companion object {
         fun fromEntity(contract: Contract): ContractDto {
@@ -38,7 +41,7 @@ data class ContractDto(
                 agnlist = contract.agnlist,
                 agnListEntity = contract.agnlistEntity?.let { AgnListSimpleDto.fromEntity(it) },
                 ul = contract.ul,
-                ulEntity = contract.agnlistEntity?.let { AgnListSimpleDto.fromEntity(it) },
+                ulEntity = contract.ulEntity?.let { AgnListSimpleDto.fromEntity(it) },
                 numCantract = contract.numCantract,
                 begindate = contract.begindate,
                 enddate = contract.enddate,
@@ -47,6 +50,7 @@ data class ContractDto(
                 objectadress = contract.objectadress,
                 note = contract.note,
                 typesavecontr = contract.typesavecontr,
+                specEntity = contract.specEntity.map { ContractvalDto.fromEntity(it) }
             )
         }
     }

@@ -1,7 +1,7 @@
 package com.example.oracleapi.entity.table
 
 import com.example.oracleapi.Helper
-import com.example.oracleapi.entity.Measunit
+import com.example.oracleapi.entity.table.Measunit
 import com.example.oracleapi.entity.Nomnlist
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
