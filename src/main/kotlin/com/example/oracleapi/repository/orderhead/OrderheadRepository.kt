@@ -66,6 +66,15 @@ interface OrderheadRepository : JpaRepository<Orderhead, Long> {
         @Param("storein") storein: Long?,
     ): Int
 
+    /*Обновить склад получения и наше ЮЛ*/
+    @Modifying
+    @Query("UPDATE Orderhead  o set o.storein = :storein, o.ul = :ul WHERE o.rn = :rn")
+    fun updateStoreinAndUl(
+        @Param("rn") rn: Long?,
+        @Param("storein") storein: Long?,
+        @Param("ul") ul: Long?
+    ): Int
+
     /*Обновить дату прихода*/
     @Modifying
     @Query("update Orderhead o set o.arrivaldate = :arrivaldate WHERE o.rn = :rn")

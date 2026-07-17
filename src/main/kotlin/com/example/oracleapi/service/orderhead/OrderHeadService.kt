@@ -34,6 +34,7 @@ class OrderHeadService(
     private val orderHeadUlUpdate: OrderHeadUlUpdate,
     private val orderHeadUpdateStoreIn: OrderHeadUpdateStoreIn,
     private val orderHeadUpdateArrivalDate: OrderHeadUpdateArrivalDate,
+    private val orderHeadUpdateStoreInAndUl: OrderHeadUpdateStoreInAndUl,
     private val orderHeadUpdateNote: OrderHeadUpdateNote,
     private val fieldService: FieldService,
     private val typeDocService: TypedocService,
@@ -120,6 +121,14 @@ class OrderHeadService(
         request.orderhead?.let { require(it > 0) { "RN заказа обязательна" } }
         request.note?.let { require(it.isNotBlank()) { "Отсутствует текст примечания" } }
         return orderHeadUpdateNote.update(request)
+    }
+
+    @Transactional
+    fun updateStoreInAndUl(request: OrderHeadUpdStoreInAndUlRequest): OrderHeadUpdStoreInAndUlResponse {
+        request.orderhead?.let { require(it > 0) { "RN заказа обязательна" } }
+        request.storeIn?.let { require(it > 0) { "Склад обязателен" } }
+        request.ul?.let { require(it > 0) { "Наше ЮЛ обязательно" } }
+        return orderHeadUpdateStoreInAndUl.update(request)
     }
 
     fun existByRn(rn: Long): Boolean {

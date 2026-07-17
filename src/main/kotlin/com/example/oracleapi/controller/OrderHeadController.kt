@@ -2,6 +2,8 @@ package com.example.oracleapi.controller
 
 import com.example.oracleapi.dto.ResponseRN
 import com.example.oracleapi.dto.common.MyApiResponse
+import com.example.oracleapi.dto.orderhead.OrderHeadUpdStoreInAndUlRequest
+import com.example.oracleapi.dto.orderhead.OrderHeadUpdStoreInAndUlResponse
 import com.example.oracleapi.dto.orderhead.arrivalDate.OrderHeadUpdateArDateRequest
 import com.example.oracleapi.dto.orderhead.arrivalDate.OrderHeadUpdateArDateResponse
 import com.example.oracleapi.dto.orderhead.basisDoc.OrderHeadBasisDocUpdateRequest
@@ -144,6 +146,14 @@ class OrderHeadController(
         @Valid @RequestBody request: OrderSpecDelRequest
     ): MyApiResponse<ResponseRN> {
         return success(orderSpecService.del(request))
+    }
+
+    @PutMapping("update_storein_ul")
+    @Operation(summary = "Обновить склад получатель и наше ЮЛ")
+    fun updateStoreInAndUl(
+        @Valid @RequestBody request: OrderHeadUpdStoreInAndUlRequest
+    ): MyApiResponse<OrderHeadUpdStoreInAndUlResponse> {
+        return success(orderHeadService.updateStoreInAndUl(request))
     }
 
 }
