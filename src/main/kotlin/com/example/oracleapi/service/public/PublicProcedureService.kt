@@ -13,6 +13,6 @@ class PublicProcedureService(
     fun getNomenByBarcode(request: GetNomenByBarcodeRequest): GetNomenByBarcodeResponse =
         getNomenByBarcodeProcedure.getNomenByBarcodeProcedure(request.barcode)
 
-    fun getIdRn(): GenIdResponse = genIdRnProcedur.generateRn()
+    fun getIdRn(): GenIdResponse = genIdRnProcedur.take()
 
 }

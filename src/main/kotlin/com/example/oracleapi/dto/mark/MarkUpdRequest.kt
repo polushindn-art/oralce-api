@@ -9,7 +9,6 @@ import jakarta.validation.constraints.NotNull
 data class MarkUpdRequest(
     @field:NotBlank(message = "KM обязателен")
     val km: String,
-
     val json: List<Map<String, Any>>? = null,
     val table: String? = null,
     val tablern: Long? = null,

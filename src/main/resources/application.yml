@@ -29,3 +29,10 @@ springdoc:
       display-name: Маркировка
       paths-to-match:
         - /v1/mark/**
+    - group: document
+      display-name: Документы
+      paths-to-match:
+        - /v*/orderhead/**
+        - /v*/idhead/**
+        - /v*/orderpay/**
+        - /v*/naklhead/**

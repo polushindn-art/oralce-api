@@ -30,6 +30,8 @@ abstract class BasePackage(
         const val ORDERNAKLSPEC = "PKG_ORDERNAKLSPEC"
         const val ORDERPAYHEAD = "PKG_ORDERPAYHEAD"
         const val ORDERPAYSPEC = "PKG_ORDERPAYSPEC"
+        const val PUBLIC = "PKG_PUBLIC"
+        const val PROTOCOLMARK = "PKG_PROTOCOLMARK"
     }
 
     private val logger = LoggerFactory.getLogger(BasePackage::class.java)

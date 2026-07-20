@@ -13,8 +13,7 @@ data class GenIdResponse(
 ) {
     companion object {
         fun single(
-            rn: Long,
-            executionTimeMs: Long
+            rn: Long
         ): GenIdResponse {
             return GenIdResponse(
                 rn = rn,
@@ -23,8 +22,7 @@ data class GenIdResponse(
         }
 
         fun multiple(
-            ids: List<Long>,
-            executionTimeMs: Long
+            ids: List<Long>
         ): GenIdResponse {
             return GenIdResponse(
                 rns = ids,

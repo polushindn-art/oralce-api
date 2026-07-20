@@ -20,9 +20,9 @@ class OrderHeadUpdateProvider(
         /*Получаем поставщика который сейчас*/
         val providerOld = agnListService.getByRn(orderheadCurrent.provider ?: 0)
 
-        if (providerOld.rn == request.provider) {
+        /*if (providerOld.rn == request.provider) {
             throw IllegalArgumentException("Поставщика с RN: ${request.provider} уже назначен на заказ")
-        }
+        }*/
 
         if (!agnListService.existsById(request.provider)) {
             throw IllegalArgumentException("Поставщика с RN: ${request.provider} не существует")

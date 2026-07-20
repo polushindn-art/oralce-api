@@ -112,7 +112,7 @@ class OrderHeadService(
     fun updateArDate(request: OrderHeadUpdateArDateRequest): OrderHeadUpdateArDateResponse {
         request.orderhead?.let { require(it > 0) { "RN заказа обязательна" } }
         require(request.arrivaldate != null) { "Дата обязательна" }
-        require(request.arrivaldate.isAfter(LocalDate.now())) { "Дата прибытия должна быть в будущем" }
+        //require(request.arrivaldate.isAfter(LocalDate.now())) { "Дата прибытия должна быть в будущем" }
         return orderHeadUpdateArrivalDate.update(request)
     }
 

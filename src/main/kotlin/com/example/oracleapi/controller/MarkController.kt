@@ -1,5 +1,6 @@
 package com.example.oracleapi.controller
 
+import com.example.oracleapi.annotation.AuditTrigger
 import com.example.oracleapi.dto.BarcodeGenerateRequest
 import com.example.oracleapi.dto.common.MyApiResponse
 import com.example.oracleapi.dto.mark.*
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/v1/mark")
+@AuditTrigger
 @Tag(name = "Маркировка")
 class MarkController(
     private val barcodeService: GS1DataMatrixService,
