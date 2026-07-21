@@ -1,6 +1,7 @@
 package com.example.oracleapi.controller
 
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -13,7 +14,7 @@ class MarkdownController {
         val type: String
     )
 
-    @GetMapping("/files-tree")
+    @GetMapping("/files-tree", produces = [MediaType.APPLICATION_JSON_UTF8_VALUE])
     fun getFilesTree(): Map<String, List<FileNode>> {
         val resolver = PathMatchingResourcePatternResolver()
         val resources = resolver.getResources("classpath:/markdown/**/*.md")
@@ -21,28 +22,28 @@ class MarkdownController {
         val result = mutableMapOf<String, MutableList<FileNode>>()
 
         resources.forEach { resource ->
+            // Получаем имя файла с правильной кодировкой
+            val filename = resource.filename ?: return@forEach
             val fullPath = resource.url.toString().substringAfter("/markdown/")
             val parts = fullPath.split("/")
 
             when (parts.size) {
                 1 -> {
-                    // Файл в корне
+                    val name = filename.replace(".md", "")
                     result.getOrPut("root") { mutableListOf() }.add(
-                        FileNode(parts[0].replace(".md", ""), parts[0], "file")
+                        FileNode(name, filename, "file")
                     )
                 }
                 else -> {
-                    // Файл в папке
                     val folder = parts[0]
-                    val filename = parts.last().replace(".md", "")
+                    val name = filename.replace(".md", "")
                     result.getOrPut(folder) { mutableListOf() }.add(
-                        FileNode(filename, fullPath, "file")
+                        FileNode(name, fullPath, "file")
                     )
                 }
             }
         }
 
-        // Сортируем папки и файлы
         return result.toSortedMap().mapValues { (_, files) ->
             files.sortedBy { it.name }
         }

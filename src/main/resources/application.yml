@@ -4,6 +4,12 @@ knife4j:
     language: en
     enable-group: true
     enable-swagger-models: false
+server:
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
 springdoc:
   api-docs:
     enabled: true

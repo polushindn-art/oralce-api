@@ -36,7 +36,11 @@ function switchEnvironment(host, port) {
 // Загрузка списка файлов
 async function loadFileList() {
     try {
-        const response = await fetch('/api/markdown/files-tree');
+        const response = await fetch('/api/markdown/files-tree', {
+            headers: {
+                'Accept': 'application/json; charset=utf-8'
+            }
+        });
         const tree = await response.json();
 
         let html = '';
@@ -139,7 +143,11 @@ function loadFile(filename) {
     currentFile = filename;
     document.getElementById('md-content').innerHTML = '<div class="loading">Загрузка...</div>';
 
-    fetch(`/markdown/${filename}`)
+    fetch(`/markdown/${filename}`, {
+        headers: {
+            'Accept': 'text/markdown; charset=utf-8'
+        }
+    })
         .then(response => {
             if (!response.ok) {
                 throw new Error(`Файл ${filename} не найден`);
