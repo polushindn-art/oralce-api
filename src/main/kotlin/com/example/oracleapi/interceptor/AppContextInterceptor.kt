@@ -51,12 +51,24 @@ class AppContextInterceptor(
         try {
             val auth = SecurityContextHolder.getContext().authentication
             val userName = auth?.name ?: "system"
-            val userIp = request.remoteAddr ?: "0.0.0.0"
+
+            // ✅ Реальный IP пользователя
+            val userIp = request.getHeader("X-Forwarded-For")
+                ?: request.getHeader("X-Real-IP")
+                ?: request.remoteAddr
+                ?: "0.0.0.0"
+
+            // ✅ Если IP из X-Forwarded-For (может быть список через запятую)
+            val realIp = if (userIp.contains(",")) {
+                userIp.split(",").first().trim()
+            } else {
+                userIp
+            }
 
             jdbcTemplate.update(
                 "BEGIN QREAL.PKG_APP_CONTEXT.SET_USER(?, ?); END;",
                 userName,
-                userIp
+                realIp
             )
         } catch (e: Exception) {
             // Логируем ошибку, но не прерываем запрос
