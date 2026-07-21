@@ -3,6 +3,8 @@ package com.example.oracleapi.controller
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
+import java.net.URLDecoder
+import java.nio.charset.StandardCharsets
 
 @RestController
 @RequestMapping("/api/markdown")
@@ -22,23 +24,23 @@ class MarkdownController {
         val result = mutableMapOf<String, MutableList<FileNode>>()
 
         resources.forEach { resource ->
-            // Получаем имя файла с правильной кодировкой
-            val filename = resource.filename ?: return@forEach
             val fullPath = resource.url.toString().substringAfter("/markdown/")
-            val parts = fullPath.split("/")
+            val decodedPath = URLDecoder.decode(fullPath, StandardCharsets.UTF_8.toString())
+            val parts = decodedPath.split("/")
+
+            val filename = resource.filename ?: return@forEach
+            val name = filename.replace(".md", "")
 
             when (parts.size) {
                 1 -> {
-                    val name = filename.replace(".md", "")
                     result.getOrPut("root") { mutableListOf() }.add(
                         FileNode(name, filename, "file")
                     )
                 }
                 else -> {
                     val folder = parts[0]
-                    val name = filename.replace(".md", "")
                     result.getOrPut(folder) { mutableListOf() }.add(
-                        FileNode(name, fullPath, "file")
+                        FileNode(name, decodedPath, "file")
                     )
                 }
             }
