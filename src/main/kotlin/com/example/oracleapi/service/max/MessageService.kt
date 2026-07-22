@@ -1,6 +1,5 @@
 package com.example.oracleapi.service.max
 
-
 import com.example.oracleapi.dto.max.MessageResponse
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -12,6 +11,9 @@ class MessageService(
 
     private val log = LoggerFactory.getLogger(this::class.java)
 
+    /**
+     * Отправка сообщения по chat_id (для групповых чатов)
+     */
     fun sendMessage(chatId: String, text: String, format: String = "markdown"): MessageResponse {
         return try {
             val response = botClient.sendMessage(chatId, text, format)
@@ -36,6 +38,32 @@ class MessageService(
     }
 
     /**
+     * Отправка сообщения по user_id (для личных диалогов)
+     */
+    fun sendMessageByUserId(userId: String, text: String, format: String = "markdown"): MessageResponse {
+        return try {
+            val response = botClient.sendMessageByUserId(userId, text, format)
+            val messageId = response["message_id"]?.toString()
+                ?: response["id"]?.toString()
+                ?: "unknown"
+
+            log.info("✅ Сообщение отправлено пользователю userId: $userId")
+            MessageResponse(
+                success = true,
+                messageId = messageId,
+                error = null
+            )
+        } catch (e: Exception) {
+            log.error("❌ Ошибка отправки сообщения пользователю userId: $userId", e)
+            MessageResponse(
+                success = false,
+                messageId = null,
+                error = "Ошибка отправки: ${e.message}"
+            )
+        }
+    }
+
+    /**
      * Получение информации о боте
      */
     fun getBotInfo(): Map<String, Any> {
@@ -48,5 +76,4 @@ class MessageService(
             throw e
         }
     }
-
 }

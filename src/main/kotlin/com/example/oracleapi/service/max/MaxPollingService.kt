@@ -14,14 +14,13 @@ import org.springframework.web.util.UriComponentsBuilder
 class MaxPollingService(
     private val restTemplate: RestTemplate,
     private val properties: MaxApiProperties,
-    private val botClient: MaxBotClient
+    private val botClient: MaxBotClient,
+    private val maxUserService: MaxUserService
 ) {
 
     private val log = LoggerFactory.getLogger(this::class.java)
     private var marker: Long? = null
-
     private val registrationState = mutableMapOf<String, Boolean>()
-    private val userNumberMap = mutableMapOf<String, String>()
 
     @Scheduled(fixedDelay = 2000)
     fun pollUpdates() {
@@ -79,6 +78,7 @@ class MaxPollingService(
             }
 
         } catch (_: ResourceAccessException) {
+            // таймаут — нормально
         } catch (e: Exception) {
             log.error("❌ Ошибка в Long Polling", e)
         }
@@ -91,22 +91,56 @@ class MaxPollingService(
         if (registrationState[userId] == true) {
             val number = trimmedText
             if (number.matches(Regex("^\\d+$"))) {
-                userNumberMap[userId] = number
-                registrationState[userId] = false
-                log.info("✅ Пользователь $userId зарегистрирован с номером $number")
+                // Проверяем, есть ли уже такой внутренний номер в БД
+                val existingUser = maxUserService.findByInternalNumber(number)
+                if (existingUser != null) {
+                    botClient.sendMessage(
+                        chatId,
+                        """
+                        ❌ Номер *$number* уже зарегистрирован!
 
-                botClient.sendMessage(
-                    chatId,
-                    """
-                    ✅ Номер *$number* сохранен!
+                        Если это ваш номер, обратитесь к администратору.
+                        """.trimIndent(),
+                        "markdown"
+                    )
+                    registrationState[userId] = false
+                    return
+                }
 
-                    📋 Ваш user_id: `$userId`
-                    📋 Ваш chat_id: `$chatId`
+                // Сохраняем в БД
+                try {
+                    val savedUser = maxUserService.saveUser(number, userId, chatId)
+                    registrationState[userId] = false
 
-                    Теперь вы будете получать уведомления о звонках.
-                """.trimIndent(),
-                    "markdown"
-                )
+                    // Получаем имя из сохранённого пользователя
+                    val userName = savedUser.userName ?: "Сотрудник"
+
+                    log.info("✅ Пользователь $userName ($userId) зарегистрирован с номером $number")
+
+                    botClient.sendMessage(
+                        chatId,
+                        """
+                        👋 *Привет, $userName!*
+
+                        ✅ Регистрация успешна!
+
+                        📋 Ваш внутренний номер: *$number*
+                        📋 Ваш user_id: `$userId`
+                        📋 chat_id: `$chatId`
+
+                        Теперь вы будете получать уведомления о входящих звонках.
+                        """.trimIndent(),
+                        "markdown"
+                    )
+                } catch (e: Exception) {
+                    log.error("❌ Ошибка сохранения пользователя $userId", e)
+                    botClient.sendMessage(
+                        chatId,
+                        "❌ Ошибка сохранения. Попробуйте позже или обратитесь к администратору.",
+                        "markdown"
+                    )
+                    registrationState[userId] = false
+                }
             } else {
                 botClient.sendMessage(
                     chatId,
@@ -119,24 +153,74 @@ class MaxPollingService(
 
         when (trimmedText.lowercase()) {
             "/start", "/register" -> {
+                // Проверяем, не зарегистрирован ли уже пользователь
+                val existingUser = maxUserService.findByUserId(userId)
+                if (existingUser != null) {
+                    val userName = existingUser.userName ?: "Сотрудник"
+                    botClient.sendMessage(
+                        chatId,
+                        """
+                        👋 *Привет, $userName!*
+
+                        ✅ Вы уже зарегистрированы!
+
+                        📋 Ваш внутренний номер: *${existingUser.internalNumber}*
+                        📋 Ваш user_id: `$userId`
+
+                        Чтобы изменить номер, напишите /register и введите новый.
+                        """.trimIndent(),
+                        "markdown"
+                    )
+                    return
+                }
+
                 registrationState[userId] = true
                 botClient.sendMessage(
                     chatId,
-                    "📝 Введите ваш внутренний номер телефона (только цифры):",
+                    """
+                    📝 Введите ваш внутренний номер телефона (только цифры).
+
+                    Например: `101` или `1001`
+                    """.trimIndent(),
                     "markdown"
                 )
             }
             "/id" -> {
-                botClient.sendMessage(
-                    chatId,
-                    "📋 Ваш user_id: `$userId`\n📋 chat_id: `$chatId`",
-                    "markdown"
-                )
+                val user = maxUserService.findByUserId(userId)
+                if (user != null) {
+                    val userName = user.userName ?: "Сотрудник"
+                    botClient.sendMessage(
+                        chatId,
+                        """
+                        👤 *$userName*
+
+                        📋 Ваш user_id: `$userId`
+                        📋 chat_id: `$chatId`
+                        📋 Внутренний номер: *${user.internalNumber}*
+                        """.trimIndent(),
+                        "markdown"
+                    )
+                } else {
+                    botClient.sendMessage(
+                        chatId,
+                        """
+                        📋 Ваш user_id: `$userId`
+                        📋 chat_id: `$chatId`
+
+                        Вы ещё не зарегистрированы. Напишите /register
+                        """.trimIndent(),
+                        "markdown"
+                    )
+                }
             }
             else -> {
                 botClient.sendMessage(
                     chatId,
-                    "Напишите /register чтобы зарегистрировать номер"
+                    """
+                    Доступные команды:
+                    /register — зарегистрировать внутренний номер
+                    /id — показать ваши ID
+                    """.trimIndent()
                 )
             }
         }

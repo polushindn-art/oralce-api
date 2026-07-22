@@ -30,7 +30,6 @@ class MaxVerificationService(
             apiClient.verifyAge(sessionId, withDetails = true)
         } catch (e: Exception) {
             log.error("Ошибка вызова MAX API", e)
-            // Проверяем, не является ли исключение ошибкой MAX с понятным кодом
             val maxError = extractMaxError(e)
             return if (maxError != null) {
                 handleErrorResponse(maxError)
@@ -54,13 +53,10 @@ class MaxVerificationService(
     }
 
     private fun extractMaxError(e: Exception): MaxError? {
-        // Пытаемся извлечь код ошибки из сообщения исключения
         val message = e.message ?: return null
         val codePattern = "\"code\":\"([A-Z_]+)\"".toRegex()
         val matchResult = codePattern.find(message)
-        val code = matchResult?.groupValues?.get(1)
-
-        if (code == null) return null
+        val code = matchResult?.groupValues?.get(1) ?: return null
 
         val messagePattern = "\"message\":\"([^\"]+)\"".toRegex()
         val messageMatch = messagePattern.find(message)
@@ -85,10 +81,6 @@ class MaxVerificationService(
             )
 
         val details = data.verificationDetails
-            ?: return AgeVerificationResponse(
-                isAdult = false,
-                error = "Ошибка получения данных. Попробуйте еще раз"
-            )
 
         val isAdult = details.adult.status
         log.info("✅ Возраст подтвержден: $isAdult")
@@ -137,7 +129,6 @@ class MaxVerificationService(
 
         log.warn("MAX API error: code={}, message={}, details={}", error.code, error.message, error.details)
 
-        // Понятные пользователю сообщения
         val userMessage = when (error.code) {
             "SESSION_NOT_FOUND" -> "QR-код недействителен. Попросите покупателя обновить QR-код в приложении MAX"
             "SESSION_EXPIRED" -> "QR-код устарел. Попросите покупателя обновить QR-код (обновляется каждые 30 секунд)"

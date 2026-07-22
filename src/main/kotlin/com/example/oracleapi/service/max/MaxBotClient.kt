@@ -15,6 +15,9 @@ class MaxBotClient(
     private val properties: MaxApiProperties
 ) {
 
+    /**
+     * Отправка сообщения по chat_id (для групповых чатов)
+     */
     fun sendMessage(chatId: String, text: String, format: String = "markdown"): Map<String, Any> {
         val uri = UriComponentsBuilder.fromHttpUrl("${properties.botApiUrl}/messages")
             .queryParam("chat_id", chatId)
@@ -40,14 +43,44 @@ class MaxBotClient(
 
         val rawResponse = response.body ?: throw RestClientException("Empty response from MAX API")
 
-        // Приводим к нужному типу
+        @Suppress("UNCHECKED_CAST")
+        return rawResponse as Map<String, Any>
+    }
+
+    /**
+     * Отправка сообщения по user_id (для личных диалогов)
+     */
+    fun sendMessageByUserId(userId: String, text: String, format: String = "markdown"): Map<String, Any> {
+        val uri = UriComponentsBuilder.fromHttpUrl("${properties.botApiUrl}/messages")
+            .queryParam("user_id", userId)  // ← для личных диалогов!
+            .build()
+            .toUri()
+
+        val headers = HttpHeaders().apply {
+            set("Authorization", properties.botToken)
+            set("Content-Type", "application/json")
+        }
+
+        val body = mapOf(
+            "text" to text,
+            "format" to format
+        )
+
+        val response = restTemplate.exchange(
+            uri,
+            HttpMethod.POST,
+            HttpEntity(body, headers),
+            Map::class.java
+        )
+
+        val rawResponse = response.body ?: throw RestClientException("Empty response from MAX API")
+
         @Suppress("UNCHECKED_CAST")
         return rawResponse as Map<String, Any>
     }
 
     /**
      * Получение информации о боте
-     * @return Map с данными бота (user_id, first_name, username, is_bot и т.д.)
      */
     fun getBotInfo(): Map<String, Any> {
         val url = "${properties.botApiUrl}/me"
@@ -69,5 +102,4 @@ class MaxBotClient(
         @Suppress("UNCHECKED_CAST")
         return rawResponse as Map<String, Any>
     }
-
 }

@@ -17,6 +17,7 @@ class JwtHelper(
     companion object {
         const val COOCKIENAME = "accessToken"
         val skipPaths = arrayOf(
+            "/v1/ats/**",
             "/v1/max/**",
             "/v1/wakeup/**",
             "/v*/tsdlist/snByDeviceId/**",
