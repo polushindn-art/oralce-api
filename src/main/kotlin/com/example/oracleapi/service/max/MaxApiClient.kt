@@ -2,7 +2,6 @@ package com.example.oracleapi.service.max
 
 import com.example.oracleapi.config.MaxApiProperties
 import com.example.oracleapi.dto.max.common.MaxApiResponse
-import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
@@ -16,8 +15,7 @@ import org.springframework.web.util.UriComponentsBuilder
 @Service
 class MaxApiClient(
     private val restTemplate: RestTemplate,
-    private val properties: MaxApiProperties,
-    private val objectMapper: ObjectMapper
+    private val properties: MaxApiProperties
 ) {
 
     private val log = LoggerFactory.getLogger(this::class.java)

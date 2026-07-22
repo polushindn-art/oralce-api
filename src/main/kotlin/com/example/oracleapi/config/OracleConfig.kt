@@ -111,8 +111,7 @@ class OracleConfig(private val env: Environment) {
     }
 
     private fun showFatalError(title: String, message: String, suggestion: String) {
-        val fullMessage = """
-            
+        val fullMessage = """            
             ╔═══════════════════════════════════════════════════════════╗
             ║  ⛓️ $title
             ╠═══════════════════════════════════════════════════════════╣
