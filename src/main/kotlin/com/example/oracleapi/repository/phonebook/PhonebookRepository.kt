@@ -6,6 +6,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface PhonebookRepository : JpaRepository<Phonebook, Long> {
-
     fun findByPhoneInt(phoneInt: String): Phonebook?
 }

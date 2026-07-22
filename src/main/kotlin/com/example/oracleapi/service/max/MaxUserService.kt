@@ -59,8 +59,7 @@ class MaxUserService(
         if (phonebook == null) return "Сотрудник"
         return listOfNotNull(
             phonebook.nname,
-            phonebook.fname,
-            phonebook.lname
+            phonebook.fname
         ).joinToString(" ")
     }
 
