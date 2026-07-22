@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/v1/max")
-@Tag(name = "MAX Цифровой ID", description = "Интеграция с Цифровым ID MAX")
+@Tag(name = "MAX", description = "Интеграция с Цифровым ID MAX")
 class MaxController(
     private val verificationService: MaxVerificationService,
     private val messageService: MessageService
