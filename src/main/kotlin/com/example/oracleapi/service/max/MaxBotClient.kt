@@ -52,7 +52,7 @@ class MaxBotClient(
      */
     fun sendMessageByUserId(userId: String, text: String, format: String = "markdown"): Map<String, Any> {
         val uri = UriComponentsBuilder.fromHttpUrl("${properties.botApiUrl}/messages")
-            .queryParam("user_id", userId)  // ← для личных диалогов!
+            .queryParam("user_id", userId)
             .build()
             .toUri()
 
@@ -64,6 +64,51 @@ class MaxBotClient(
         val body = mapOf(
             "text" to text,
             "format" to format
+        )
+
+        val response = restTemplate.exchange(
+            uri,
+            HttpMethod.POST,
+            HttpEntity(body, headers),
+            Map::class.java
+        )
+
+        val rawResponse = response.body ?: throw RestClientException("Empty response from MAX API")
+
+        @Suppress("UNCHECKED_CAST")
+        return rawResponse as Map<String, Any>
+    }
+
+    /**
+     * Отправка сообщения с инлайн-клавиатурой по user_id (для личных диалогов)
+     */
+    fun sendMessageWithKeyboard(
+        userId: String,
+        text: String,
+        buttons: List<List<Map<String, Any>>>,
+        format: String = "markdown"
+    ): Map<String, Any> {
+        val uri = UriComponentsBuilder.fromHttpUrl("${properties.botApiUrl}/messages")
+            .queryParam("user_id", userId)
+            .build()
+            .toUri()
+
+        val headers = HttpHeaders().apply {
+            set("Authorization", properties.botToken)
+            set("Content-Type", "application/json")
+        }
+
+        val body = mapOf(
+            "text" to text,
+            "format" to format,
+            "attachments" to listOf(
+                mapOf(
+                    "type" to "inline_keyboard",
+                    "payload" to mapOf(
+                        "buttons" to buttons
+                    )
+                )
+            )
         )
 
         val response = restTemplate.exchange(

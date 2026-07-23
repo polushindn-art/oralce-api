@@ -19,19 +19,27 @@ class MarkUPD(
     override val count = 6
 
     fun take(request: MarkUpdRequest): MarkUpdResponse {
-        val jsonString = objectMapper.writeValueAsString(request.json)
+        val jsonString = if (request.json == null) {
+            null
+        } else {
+            objectMapper.writeValueAsString(request.json)
+        }
         return dataSource.executeFun {
-            it.registerOutParameter(1,Types.DOUBLE)
-            it.setString(2,request.km)
-            it.setString(3,jsonString)
-            it.setString(4,request.table)
-            if (request.tablern != null) {
-                it.setLong(5,request.tablern)
+            it.registerOutParameter(1, Types.DOUBLE)
+            it.setString(2, request.km)
+            if (jsonString == null) {
+                it.setNull(3, Types.CLOB)
             } else {
-                it.setNull(5,Types.NULL)
+                it.setString(3, jsonString)
             }
-            it.setInt(6,request.status)
-            it.setString(7,request.note)
+            it.setString(4, request.table)
+            if (request.tablern != null) {
+                it.setLong(5, request.tablern)
+            } else {
+                it.setNull(5, Types.NULL)
+            }
+            it.setInt(6, request.status)
+            it.setString(7, request.note)
             it.execute()
             MarkUpdResponse(
                 it.getLong(1),

@@ -157,7 +157,24 @@ class MaxPollingService(
                 val existingUser = maxUserService.findByUserId(userId)
                 if (existingUser != null) {
                     val userName = existingUser.userName ?: "Сотрудник"
-                    botClient.sendMessage(
+                    val buttons = listOf(
+                        listOf(
+                            mapOf(
+                                "type" to "callback",
+                                "text" to "📋 Мой ID",
+                                "payload" to "my_id"
+                            )
+                        ),
+                        listOf(
+                            mapOf(
+                                "type" to "callback",
+                                "text" to "📝 Изменить номер",
+                                "payload" to "change_number"
+                            )
+                        )
+                    )
+
+                    botClient.sendMessageWithKeyboard(
                         chatId,
                         """
                         👋 *Привет, $userName!*
@@ -166,22 +183,40 @@ class MaxPollingService(
 
                         📋 Ваш внутренний номер: *${existingUser.internalNumber}*
                         📋 Ваш user_id: `$userId`
-
-                        Чтобы изменить номер, напишите /register и введите новый.
                         """.trimIndent(),
+                        buttons,
                         "markdown"
                     )
                     return
                 }
 
-                registrationState[userId] = true
-                botClient.sendMessage(
+                val buttons = listOf(
+                    listOf(
+                        mapOf(
+                            "type" to "callback",
+                            "text" to "📝 Регистрация",
+                            "payload" to "register"
+                        )
+                    ),
+                    listOf(
+                        mapOf(
+                            "type" to "callback",
+                            "text" to "ℹ️ Помощь",
+                            "payload" to "help"
+                        )
+                    )
+                )
+
+                botClient.sendMessageWithKeyboard(
                     chatId,
                     """
-                    📝 Введите ваш внутренний номер телефона (только цифры).
+                    👋 *Добро пожаловать!*
 
-                    Например: `101` или `1001`
+                    Я бот для уведомлений о входящих звонках.
+
+                    Нажмите кнопку *Регистрация*, чтобы привязать ваш внутренний номер телефона.
                     """.trimIndent(),
+                    buttons,
                     "markdown"
                 )
             }
@@ -207,7 +242,7 @@ class MaxPollingService(
                         📋 Ваш user_id: `$userId`
                         📋 chat_id: `$chatId`
 
-                        Вы ещё не зарегистрированы. Напишите /register
+                        Вы ещё не зарегистрированы. Напишите /start
                         """.trimIndent(),
                         "markdown"
                     )
@@ -218,7 +253,7 @@ class MaxPollingService(
                     chatId,
                     """
                     Доступные команды:
-                    /register — зарегистрировать внутренний номер
+                    /start — главное меню
                     /id — показать ваши ID
                     """.trimIndent()
                 )
