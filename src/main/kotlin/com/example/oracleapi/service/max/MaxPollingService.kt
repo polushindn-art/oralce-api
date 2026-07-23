@@ -311,7 +311,7 @@ class MaxPollingService(
                 )
 
                 botClient.sendMessageWithKeyboard(
-                    chatId,
+                    userId,
                     """
                     👋 *Добро пожаловать!*
 
