@@ -59,21 +59,38 @@ class MaxPollingService(
                 val update = updateRaw as? Map<*, *> ?: return@forEach
                 val updateType = update["update_type"] as? String
 
-                if (updateType != "message_created") return@forEach
+                when (updateType) {
+                    "message_created" -> {
+                        val message = update["message"] as? Map<*, *> ?: return@forEach
+                        val sender = message["sender"] as? Map<*, *>
+                        val recipient = message["recipient"] as? Map<*, *>
+                        val bodyMap = message["body"] as? Map<*, *>
 
-                val message = update["message"] as? Map<*, *> ?: return@forEach
-                val sender = message["sender"] as? Map<*, *>
-                val recipient = message["recipient"] as? Map<*, *>
-                val bodyMap = message["body"] as? Map<*, *>
+                        val userId = (sender?.get("user_id") as? Number)?.toString() ?: return@forEach
+                        val chatId = (recipient?.get("chat_id") as? Number)?.toString() ?: return@forEach
+                        val text = bodyMap?.get("text") as? String
 
-                val userId = (sender?.get("user_id") as? Number)?.toString() ?: return@forEach
-                val chatId = (recipient?.get("chat_id") as? Number)?.toString() ?: return@forEach
-                val text = bodyMap?.get("text") as? String
+                        log.info("📩 Получено сообщение от user_id=$userId: $text")
 
-                log.info("📩 Получено сообщение от user_id=$userId: $text")
+                        if (text != null) {
+                            handleMessage(userId, chatId, text)
+                        }
+                    }
 
-                if (text != null) {
-                    handleMessage(userId, chatId, text)
+                    "message_callback" -> {
+                        val callbackData = update["callback_data"] as? Map<*, *> ?: return@forEach
+                        val userId = (callbackData["user_id"] as? Number)?.toString() ?: return@forEach
+                        val chatId = (callbackData["chat_id"] as? Number)?.toString() ?: return@forEach
+                        val payload = callbackData["payload"] as? String ?: return@forEach
+
+                        log.info("🔘 Получен callback от user_id=$userId: payload=$payload")
+
+                        handleCallback(userId, chatId, payload)
+                    }
+
+                    else -> {
+                        log.debug("⚠️ Неизвестный тип события: $updateType")
+                    }
                 }
             }
 
@@ -84,6 +101,85 @@ class MaxPollingService(
         }
     }
 
+    private fun handleCallback(userId: String, chatId: String, payload: String) {
+        when (payload) {
+            "register" -> {
+                registrationState[userId] = true
+                botClient.sendMessage(
+                    chatId,
+                    """
+                    📝 Введите ваш внутренний номер телефона (только цифры).
+
+                    Например: `101` или `1001`
+                    """.trimIndent(),
+                    "markdown"
+                )
+            }
+
+            "my_id" -> {
+                val user = maxUserService.findByUserId(userId)
+                if (user != null) {
+                    val userName = user.userName ?: "Сотрудник"
+                    botClient.sendMessage(
+                        chatId,
+                        """
+                        👤 *$userName*
+
+                        📋 Ваш user_id: `$userId`
+                        📋 chat_id: `$chatId`
+                        📋 Внутренний номер: *${user.internalNumber}*
+                        """.trimIndent(),
+                        "markdown"
+                    )
+                } else {
+                    botClient.sendMessage(
+                        chatId,
+                        """
+                        📋 Ваш user_id: `$userId`
+                        📋 chat_id: `$chatId`
+
+                        Вы ещё не зарегистрированы. Напишите /start
+                        """.trimIndent(),
+                        "markdown"
+                    )
+                }
+            }
+
+            "change_number" -> {
+                registrationState[userId] = true
+                botClient.sendMessage(
+                    chatId,
+                    """
+                    📝 Введите новый внутренний номер телефона (только цифры).
+
+                    Например: `101` или `1001`
+                    """.trimIndent(),
+                    "markdown"
+                )
+            }
+
+            "help" -> {
+                botClient.sendMessage(
+                    chatId,
+                    """
+                    📖 *Помощь*
+
+                    /start — главное меню
+                    /id — показать ваши ID
+                    /register — зарегистрировать номер
+
+                    Также вы можете использовать кнопки в меню.
+                    """.trimIndent(),
+                    "markdown"
+                )
+            }
+
+            else -> {
+                log.warn("⚠️ Неизвестный payload: $payload")
+            }
+        }
+    }
+
     private fun handleMessage(userId: String, chatId: String, text: String) {
         val trimmedText = text.trim()
 
@@ -91,33 +187,42 @@ class MaxPollingService(
         if (registrationState[userId] == true) {
             val number = trimmedText
             if (number.matches(Regex("^\\d+$"))) {
-                // Проверяем, есть ли уже такой внутренний номер в БД
                 val existingUser = maxUserService.findByInternalNumber(number)
                 if (existingUser != null) {
                     botClient.sendMessage(
                         chatId,
-                        """
-                        ❌ Номер *$number* уже зарегистрирован!
-
-                        Если это ваш номер, обратитесь к администратору.
-                        """.trimIndent(),
+                        "❌ Номер *$number* уже зарегистрирован!",
                         "markdown"
                     )
                     registrationState[userId] = false
                     return
                 }
 
-                // Сохраняем в БД
                 try {
                     val savedUser = maxUserService.saveUser(number, userId, chatId)
                     registrationState[userId] = false
 
-                    // Получаем имя из сохранённого пользователя
                     val userName = savedUser.userName ?: "Сотрудник"
-
                     log.info("✅ Пользователь $userName ($userId) зарегистрирован с номером $number")
 
-                    botClient.sendMessage(
+                    val buttons = listOf(
+                        listOf(
+                            mapOf(
+                                "type" to "callback",
+                                "text" to "📋 Мой ID",
+                                "payload" to "my_id"
+                            )
+                        ),
+                        listOf(
+                            mapOf(
+                                "type" to "callback",
+                                "text" to "📝 Изменить номер",
+                                "payload" to "change_number"
+                            )
+                        )
+                    )
+
+                    botClient.sendMessageWithKeyboard(
                         chatId,
                         """
                         👋 *Привет, $userName!*
@@ -127,16 +232,15 @@ class MaxPollingService(
                         📋 Ваш внутренний номер: *$number*
                         📋 Ваш user_id: `$userId`
                         📋 chat_id: `$chatId`
-
-                        Теперь вы будете получать уведомления о входящих звонках.
                         """.trimIndent(),
+                        buttons,
                         "markdown"
                     )
                 } catch (e: Exception) {
                     log.error("❌ Ошибка сохранения пользователя $userId", e)
                     botClient.sendMessage(
                         chatId,
-                        "❌ Ошибка сохранения. Попробуйте позже или обратитесь к администратору.",
+                        "❌ Ошибка сохранения. Попробуйте позже.",
                         "markdown"
                     )
                     registrationState[userId] = false
@@ -152,8 +256,7 @@ class MaxPollingService(
         }
 
         when (trimmedText.lowercase()) {
-            "/start", "/register" -> {
-                // Проверяем, не зарегистрирован ли уже пользователь
+            "/start" -> {
                 val existingUser = maxUserService.findByUserId(userId)
                 if (existingUser != null) {
                     val userName = existingUser.userName ?: "Сотрудник"
@@ -214,12 +317,26 @@ class MaxPollingService(
 
                     Я бот для уведомлений о входящих звонках.
 
-                    Нажмите кнопку *Регистрация*, чтобы привязать ваш внутренний номер телефона.
+                    Нажмите кнопку *Регистрация*, чтобы привязать ваш внутренний номер.
                     """.trimIndent(),
                     buttons,
                     "markdown"
                 )
             }
+
+            "/register" -> {
+                registrationState[userId] = true
+                botClient.sendMessage(
+                    chatId,
+                    """
+                    📝 Введите ваш внутренний номер телефона (только цифры).
+
+                    Например: `101` или `1001`
+                    """.trimIndent(),
+                    "markdown"
+                )
+            }
+
             "/id" -> {
                 val user = maxUserService.findByUserId(userId)
                 if (user != null) {
@@ -248,12 +365,14 @@ class MaxPollingService(
                     )
                 }
             }
+
             else -> {
                 botClient.sendMessage(
                     chatId,
                     """
                     Доступные команды:
                     /start — главное меню
+                    /register — зарегистрировать номер
                     /id — показать ваши ID
                     """.trimIndent()
                 )
