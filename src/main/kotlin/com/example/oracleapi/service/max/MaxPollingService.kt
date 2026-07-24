@@ -1,10 +1,7 @@
 package com.example.oracleapi.service.max
 
 import com.example.oracleapi.config.MaxApiProperties
-import com.example.oracleapi.entity.table.Phonebook
-import com.example.oracleapi.repository.phonebook.PhonebookRepository
 import com.example.oracleapi.service.ats.AsteriskService
-import com.example.oracleapi.service.ats.CallInfo
 import com.example.oracleapi.service.ats.CallNotificationService
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
@@ -198,6 +195,7 @@ class MaxPollingService(
                 val employeeInfo = callNotificationService.findCallerInfo(internalNumber)
                 val employeePhoneSot = employeeInfo?.phoneSot?.takeIf { it.isNotBlank() }
 
+
                 if (employeePhoneSot == null) {
                     botClient.sendMessage(
                         chatId,
@@ -208,9 +206,9 @@ class MaxPollingService(
                 }
 
                 // 🔍 Ищем имя сотрудника (для CallerID)
-                val employeeName = employeeInfo?.let {
+                val employeeName = employeeInfo.let {
                     listOfNotNull(it.fname, it.nname).joinToString(" ")
-                } ?: "Сотрудник"
+                }
 
                 // ✅ Определяем, на какой номер звонить (звонящему)
                 val dialNumber = when {
@@ -226,18 +224,16 @@ class MaxPollingService(
                     """
                     📱 *Идёт перезвон на сотовый!*
                     
-                    ⏳ Сейчас мы дозвонимся до $employeeName и позвоним на ваш сотовый $employeePhoneSot.
+                    ⏳ Сейчас мы дозвонимся до $callerName и позвоним на ваш сотовый $employeePhoneSot.
                     """.trimIndent(),
                     "markdown"
                 )
 
-                // ✅ Звоним на номер звонящего (dialNumber)
-                // Когда он поднимет трубку — соединяем с сотовым сотрудника (employeePhoneSot)
-                // CallerID = имя сотрудника (employeeName)
+                // ✅ Звоним на номер звонящего
                 asteriskService.originateCall(
-                    dialNumber,                     // кому звоним (звонящий)
-                    "800$employeePhoneSot",               // куда соединять (сотовый сотрудника) — БЕЗ 800!
-                    employeeName                    // CallerID (имя сотрудника)
+                    dialNumber,
+                    "800$employeePhoneSot",
+                    employeeName
                 )
             }
 
@@ -297,13 +293,12 @@ class MaxPollingService(
 
         // Проверяем, находится ли пользователь в процессе регистрации
         if (registrationState[userId] == true) {
-            val number = trimmedText
-            if (number.matches(Regex("^\\d+$"))) {
-                val existingUser = maxUserService.findByInternalNumber(number)
+            if (trimmedText.matches(Regex("^\\d+$"))) {
+                val existingUser = maxUserService.findByInternalNumber(trimmedText)
                 if (existingUser != null) {
                     botClient.sendMessage(
                         chatId,
-                        "❌ Номер *$number* уже зарегистрирован!",
+                        "❌ Номер *$trimmedText* уже зарегистрирован!",
                         "markdown"
                     )
                     registrationState[userId] = false
@@ -311,11 +306,11 @@ class MaxPollingService(
                 }
 
                 try {
-                    val savedUser = maxUserService.saveUser(number, userId, chatId)
+                    val savedUser = maxUserService.saveUser(trimmedText, userId, chatId)
                     registrationState[userId] = false
 
                     val userName = savedUser.userName ?: "Сотрудник"
-                    log.info("✅ Пользователь $userName ($userId) зарегистрирован с номером $number")
+                    log.info("✅ Пользователь $userName ($userId) зарегистрирован с номером $trimmedText")
 
                     val buttons = listOf(
                         listOf(
@@ -334,7 +329,7 @@ class MaxPollingService(
 
                         ✅ Регистрация успешна!
 
-                        📋 Ваш внутренний номер: *$number*
+                        📋 Ваш внутренний номер: *$trimmedText*
                         📋 Ваш user_id: `$userId`
                         📋 chat_id: `$chatId`
                         """.trimIndent(),

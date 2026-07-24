@@ -128,7 +128,7 @@ class IdHeadController(
 
     @GetMapping("/{rn}/tsd")
     @Operation(
-        summary = "Получить документ со спецификациями для ТСД",
+        summary = "Получить документ со спецификацией",
         description = "Возвращает заголовок документа и все строки спецификации с данными номенклатуры"
     )
     fun getDocumentWithSpecs(
