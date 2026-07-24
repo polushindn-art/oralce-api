@@ -226,7 +226,7 @@ class MaxPollingService(
                     """
                     📱 *Идёт перезвон на сотовый!*
                     
-                    ⏳ Сейчас вам перезвонит оператор на ваш сотовый номер $employeePhoneSot.
+                    ⏳ Сейчас мы дозвонимся до $employeeName и позвоним на ваш сотовый $employeePhoneSot.
                     """.trimIndent(),
                     "markdown"
                 )
