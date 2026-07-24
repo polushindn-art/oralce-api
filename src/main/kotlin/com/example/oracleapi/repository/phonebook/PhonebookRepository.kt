@@ -6,5 +6,7 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface PhonebookRepository : JpaRepository<Phonebook, Long> {
-    fun findByPhoneInt(phoneInt: String): Phonebook?
+    fun findByPhoneInt(phoneInt: String): List<Phonebook>
+    fun findByPhoneSot(phoneSot: String): List<Phonebook>
+    fun findByPbe(pbe: String): List<Phonebook>
 }

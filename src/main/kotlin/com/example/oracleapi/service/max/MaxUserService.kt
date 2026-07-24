@@ -30,7 +30,9 @@ class MaxUserService(
 
         log.info("📝 Сгенерирован RN=$rn для пользователя $userId")
 
-        val phonebook = phonebookRepository.findByPhoneInt(internalNumber)
+        // Ищем сотрудника в PHONEBOOK по внутреннему номеру (берём первый результат)
+        val phonebookList = phonebookRepository.findByPhoneInt(internalNumber)
+        val phonebook = if (phonebookList.isNotEmpty()) phonebookList.first() else null
         val userName = buildFullName(phonebook)
 
         log.info("📝 Найден сотрудник: $userName ($internalNumber)")
@@ -58,8 +60,8 @@ class MaxUserService(
     private fun buildFullName(phonebook: Phonebook?): String {
         if (phonebook == null) return "Сотрудник"
         return listOfNotNull(
-            phonebook.nname,
-            phonebook.fname
+            phonebook.fname,
+            phonebook.nname
         ).joinToString(" ")
     }
 

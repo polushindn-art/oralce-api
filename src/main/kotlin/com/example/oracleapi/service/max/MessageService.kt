@@ -64,6 +64,37 @@ class MessageService(
     }
 
     /**
+     * Отправка сообщения с инлайн-клавиатурой по user_id (для личных диалогов)
+     */
+    fun sendMessageWithKeyboard(
+        userId: String,
+        text: String,
+        buttons: List<List<Map<String, Any>>>,
+        format: String = "markdown"
+    ): MessageResponse {
+        return try {
+            val response = botClient.sendMessageWithKeyboard(userId, text, buttons, format)
+            val messageId = response["message_id"]?.toString()
+                ?: response["id"]?.toString()
+                ?: "unknown"
+
+            log.info("✅ Сообщение с кнопками отправлено пользователю userId: $userId")
+            MessageResponse(
+                success = true,
+                messageId = messageId,
+                error = null
+            )
+        } catch (e: Exception) {
+            log.error("❌ Ошибка отправки сообщения с кнопками пользователю userId: $userId", e)
+            MessageResponse(
+                success = false,
+                messageId = null,
+                error = "Ошибка отправки: ${e.message}"
+            )
+        }
+    }
+
+    /**
      * Получение информации о боте
      */
     fun getBotInfo(): Map<String, Any> {

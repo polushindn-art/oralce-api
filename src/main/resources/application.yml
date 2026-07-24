@@ -10,6 +10,16 @@ server:
       charset: UTF-8
       enabled: true
       force: true
+max:
+  api:
+    age-verification-url: https://ext-api2.max.ru/v2/business/pos/age-verification
+    bot-api-url: https://platform-api2.max.ru
+    connect-timeout: 5000
+    read-timeout: 60000
+asterisk:
+  ami:
+    host: asterisk.ars
+    port: 5038
 springdoc:
   api-docs:
     enabled: true
