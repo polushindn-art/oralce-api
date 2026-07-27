@@ -5,7 +5,7 @@ RUN apk add --no-cache tzdata musl-locales musl-locales-lang && \
 
 ENV LANG=ru_RU.UTF-8
 ENV LC_ALL=ru_RU.UTF-8
-ENV TZ=Europe/Moscow
+ENV TZ=Asia/Barnaul
 
 COPY target/*.jar app.jar
 EXPOSE 8080

@@ -71,14 +71,13 @@ class BirthdayNotificationService(
     }
 
     private fun buildBirthdayMessage(name: String, age: Int?, employee: Phonebook): String {
-        val ageText = age?.let { " с $it-летием!" } ?: "!"
 
         val fullName = listOfNotNull(employee.fname, employee.nname).joinToString(" ")
 
         return """
             🎉 *Сегодня день рождения!* 🎉
 
-            🥳 Поздравляем *$fullName*$ageText
+            🥳 Поздравляем $fullName
 
             📋 Должность: ${employee.dolgnost ?: "—"}
             🏢 Отдел: ${employee.otdel ?: "—"}
