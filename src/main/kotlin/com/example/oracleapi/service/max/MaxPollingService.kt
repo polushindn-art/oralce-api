@@ -26,6 +26,7 @@ class MaxPollingService(
     private val log = LoggerFactory.getLogger(this::class.java)
     private var marker: Long? = null
     private val registrationState = mutableMapOf<String, Boolean>()
+    private val searchState = mutableMapOf<String, Boolean>()
 
     @Scheduled(fixedDelay = 2000)
     fun pollUpdates() {
@@ -169,11 +170,11 @@ class MaxPollingService(
             ✅ Вы уже зарегистрированы!
             📋 Ваш внутренний номер: *${existingUser.internalNumber}*
             
-            📞 Для звонка на внутренний номер наберите 36-11-36 + номер.
-            🔍 Для поиска сотрудников используйте /search фамилия
+            📞 *Как позвонить сотруднику:*
+                Наберите *36-11-36* → дождитесь приветствия → введите внутренний номер.
             """.trimIndent()
-                } else {
-                    """
+        } else {
+            """
             👋 *Добро пожаловать!*
             
             Я бот для уведомлений о входящих звонках.
@@ -196,24 +197,19 @@ class MaxPollingService(
         when {
             payload.startsWith("call_mobile_") -> {
                 val parts = payload.removePrefix("call_mobile_").split("_")
-                val internalNumber = parts.getOrNull(0) ?: ""      // внутренний номер сотрудника (кому звонят)
-                val callerNumber = parts.getOrNull(1) ?: ""        // номер звонящего (кто звонит)
+                val internalNumber = parts.getOrNull(0) ?: ""
+                val callerNumber = parts.getOrNull(1) ?: ""
 
                 log.info("📱 Обработка перезвона: сотрудник=$internalNumber, звонящий=$callerNumber")
 
-                // 🔍 Ищем информацию о звонящем
                 val callerInfo = callNotificationService.findCallerInfo(callerNumber)
                 val callerName = callerInfo?.let {
                     listOfNotNull(it.fname, it.nname).joinToString(" ")
                 } ?: callerNumber
-
-                // 🔍 Ищем внутренний номер звонящего (если есть)
                 val callerInternalNumber = callerInfo?.phoneInt?.takeIf { it.isNotBlank() }
 
-                // 🔍 Ищем сотовый номер сотрудника (того, кому перезванивают)
                 val employeeInfo = callNotificationService.findCallerInfo(internalNumber)
                 val employeePhoneSot = employeeInfo?.phoneSot?.takeIf { it.isNotBlank() }
-
 
                 if (employeePhoneSot == null) {
                     botClient.sendMessage(
@@ -224,12 +220,10 @@ class MaxPollingService(
                     return
                 }
 
-                // 🔍 Ищем имя сотрудника (для CallerID)
-                val employeeName = employeeInfo.let {
+                val employeeName = employeeInfo?.let {
                     listOfNotNull(it.fname, it.nname).joinToString(" ")
-                }
+                } ?: "Сотрудник"
 
-                // ✅ Определяем, на какой номер звонить (звонящему)
                 val dialNumber = when {
                     callerNumber.matches(Regex("^\\d{3,4}$")) -> callerNumber
                     callerInternalNumber != null -> callerInternalNumber
@@ -248,10 +242,9 @@ class MaxPollingService(
                     "markdown"
                 )
 
-                // ✅ Звоним на номер звонящего
                 asteriskService.originateCall(
                     dialNumber,
-                    "800$employeePhoneSot",
+                    employeePhoneSot,
                     employeeName
                 )
             }
@@ -272,11 +265,11 @@ class MaxPollingService(
                     botClient.sendMessage(
                         chatId,
                         """
-                    👤 *$userName*
-                    📋 Ваш user_id: `$userId`
-                    📋 chat_id: `$chatId`
-                    📋 Внутренний номер: *${user.internalNumber}*
-                    """.trimIndent(),
+                        👤 *$userName*
+                        📋 Ваш user_id: `$userId`
+                        📋 chat_id: `$chatId`
+                        📋 Внутренний номер: *${user.internalNumber}*
+                        """.trimIndent(),
                         "markdown"
                     )
                 } else {
@@ -292,28 +285,24 @@ class MaxPollingService(
                 botClient.sendMessage(
                     chatId,
                     """
-                📖 *Помощь*
-                /start — главное меню
-                /id — показать ваши ID
-                /register — зарегистрировать номер
-                """.trimIndent(),
+                    📖 *Помощь*
+                    /start — главное меню
+                    /id — показать ваши ID
+                    /register — зарегистрировать номер
+                    """.trimIndent(),
                     "markdown"
                 )
             }
 
             payload == "search" -> {
+                searchState[userId] = true
                 botClient.sendMessage(
                     chatId,
                     """
-                        🔍 *Поиск сотрудников*
-                
-                        Введите фамилию, имя, должность или отдел.
-                
-                        Например:
-                        `/search Иванов`
-                        `/search Программист`
-                        `/search ИТ`
-                        """.trimIndent(),
+                    🔍 *Поиск сотрудников*
+
+                    Введите фамилию, имя, должность или отдел.
+                    """.trimIndent(),
                     "markdown"
                 )
             }
@@ -326,6 +315,21 @@ class MaxPollingService(
 
     private fun handleMessage(userId: String, chatId: String, text: String) {
         val trimmedText = text.trim()
+
+        // ✅ Если пользователь в состоянии поиска
+        if (searchState[userId] == true) {
+            searchState[userId] = false
+            if (trimmedText.isNotEmpty()) {
+                searchEmployees(chatId, trimmedText)
+            } else {
+                botClient.sendMessage(
+                    chatId,
+                    "❌ Поисковый запрос не может быть пустым.",
+                    "markdown"
+                )
+            }
+            return
+        }
 
         // Проверяем, находится ли пользователь в процессе регистрации
         if (registrationState[userId] == true) {
@@ -436,39 +440,8 @@ class MaxPollingService(
                 }
             }
 
-            "/search" -> {
-                botClient.sendMessage(
-                    chatId,
-                    """
-            🔍 *Поиск сотрудников*
-
-            Введите фамилию, имя, должность или отдел.
-
-            Например:
-            `/search Иванов`
-            `/search Программист`
-            `/search ИТ`
-            """.trimIndent(),
-                    "markdown"
-                )
-            }
-
             else -> {
-                // ✅ Если сообщение начинается с "/search "
-                if (trimmedText.startsWith("/search ", ignoreCase = true)) {
-                    val query = trimmedText.substringAfter("/search ").trim()
-                    if (query.isNotEmpty()) {
-                        searchEmployees(chatId, query)
-                    } else {
-                        botClient.sendMessage(
-                            chatId,
-                            "❌ Введите поисковый запрос. Например: `/search Иванов`",
-                            "markdown"
-                        )
-                    }
-                } else {
-                    sendMainMenu(userId, chatId)
-                }
+                sendMainMenu(userId, chatId)
             }
         }
     }
@@ -476,7 +449,6 @@ class MaxPollingService(
     private fun searchEmployees(chatId: String, query: String) {
         val searchLower = query.lowercase()
 
-        // Ищем в Phonebook
         val allEmployees = phonebookRepository.findAll()
         val results = allEmployees.filter { employee ->
             val fullName = listOfNotNull(employee.fname, employee.nname).joinToString(" ")
@@ -486,7 +458,7 @@ class MaxPollingService(
                     employee.otdel?.lowercase()?.contains(searchLower) == true ||
                     employee.fname?.lowercase()?.contains(searchLower) == true ||
                     employee.nname?.lowercase()?.contains(searchLower) == true
-        }.take(10) // ограничиваем 10 результатами
+        }.take(10)
 
         if (results.isEmpty()) {
             botClient.sendMessage(
@@ -497,7 +469,6 @@ class MaxPollingService(
             return
         }
 
-        // Формируем сообщение
         val message = buildSearchResult(results, query)
         botClient.sendMessage(chatId, message, "markdown")
     }

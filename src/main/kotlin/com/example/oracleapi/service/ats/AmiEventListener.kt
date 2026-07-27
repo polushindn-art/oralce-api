@@ -1,8 +1,6 @@
-package com.example.oracleapi.service.asterisk
+package com.example.oracleapi.service.ats
 
 import com.example.oracleapi.repository.phonebook.PhonebookRepository
-import com.example.oracleapi.service.ats.AmiClient
-import com.example.oracleapi.service.ats.CallNotificationService
 import jakarta.annotation.PostConstruct
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -35,7 +33,12 @@ class AmiEventListener(
     }
 
     private fun listenToAmi() {
-        val connection = amiClient.connect() ?: return
+        val connection = amiClient.connect() ?: run {
+            log.warn("⏳ Не удалось подключиться к AMI, ждём 5 секунд...")
+            Thread.sleep(5000)
+            return
+        }
+
         val (socket, reader) = connection
 
         try {
@@ -51,9 +54,14 @@ class AmiEventListener(
             }
 
         } catch (e: Exception) {
-            log.error("❌ Ошибка в AMI слушателе", e)
+            log.error("❌ Ошибка в AMI слушателе, переподключение через 10 секунд...", e)
+            Thread.sleep(10000)
         } finally {
-            socket.close()
+            try {
+                socket.close()
+            } catch (e: Exception) {
+                // ignore
+            }
         }
     }
 
