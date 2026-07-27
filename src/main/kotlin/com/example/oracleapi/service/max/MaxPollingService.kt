@@ -1,6 +1,8 @@
 package com.example.oracleapi.service.max
 
 import com.example.oracleapi.config.MaxApiProperties
+import com.example.oracleapi.entity.table.Phonebook
+import com.example.oracleapi.repository.phonebook.PhonebookRepository
 import com.example.oracleapi.service.ats.AsteriskService
 import com.example.oracleapi.service.ats.CallNotificationService
 import org.slf4j.LoggerFactory
@@ -17,7 +19,8 @@ class MaxPollingService(
     private val botClient: MaxBotClient,
     private val maxUserService: MaxUserService,
     private val asteriskService: AsteriskService,
-    private val callNotificationService: CallNotificationService
+    private val callNotificationService: CallNotificationService,
+    private val phonebookRepository: PhonebookRepository
 ) {
 
     private val log = LoggerFactory.getLogger(this::class.java)
@@ -116,13 +119,19 @@ class MaxPollingService(
         val existingUser = maxUserService.findByUserId(userId)
 
         val buttons = if (existingUser != null) {
-            val userName = existingUser.userName ?: "Сотрудник"
             listOf(
                 listOf(
                     mapOf(
                         "type" to "callback",
                         "text" to "📋 Мой ID",
                         "payload" to "my_id"
+                    )
+                ),
+                listOf(
+                    mapOf(
+                        "type" to "callback",
+                        "text" to "🔍 Поиск сотрудников",
+                        "payload" to "search"
                     )
                 )
             )
@@ -133,6 +142,13 @@ class MaxPollingService(
                         "type" to "callback",
                         "text" to "📝 Регистрация",
                         "payload" to "register"
+                    )
+                ),
+                listOf(
+                    mapOf(
+                        "type" to "callback",
+                        "text" to "🔍 Поиск сотрудников",
+                        "payload" to "search"
                     )
                 ),
                 listOf(
@@ -152,9 +168,12 @@ class MaxPollingService(
             
             ✅ Вы уже зарегистрированы!
             📋 Ваш внутренний номер: *${existingUser.internalNumber}*
+            
+            📞 Для звонка на внутренний номер наберите 36-11-36 + номер.
+            🔍 Для поиска сотрудников используйте /search фамилия
             """.trimIndent()
-        } else {
-            """
+                } else {
+                    """
             👋 *Добро пожаловать!*
             
             Я бот для уведомлений о входящих звонках.
@@ -282,6 +301,23 @@ class MaxPollingService(
                 )
             }
 
+            payload == "search" -> {
+                botClient.sendMessage(
+                    chatId,
+                    """
+                        🔍 *Поиск сотрудников*
+                
+                        Введите фамилию, имя, должность или отдел.
+                
+                        Например:
+                        `/search Иванов`
+                        `/search Программист`
+                        `/search ИТ`
+                        """.trimIndent(),
+                    "markdown"
+                )
+            }
+
             else -> {
                 log.warn("⚠️ Неизвестный payload: $payload")
             }
@@ -366,8 +402,6 @@ class MaxPollingService(
                     chatId,
                     """
                     📝 Введите ваш внутренний номер телефона (только цифры).
-
-                    Например: `101` или `1001`
                     """.trimIndent(),
                     "markdown"
                 )
@@ -402,10 +436,92 @@ class MaxPollingService(
                 }
             }
 
+            "/search" -> {
+                botClient.sendMessage(
+                    chatId,
+                    """
+            🔍 *Поиск сотрудников*
+
+            Введите фамилию, имя, должность или отдел.
+
+            Например:
+            `/search Иванов`
+            `/search Программист`
+            `/search ИТ`
+            """.trimIndent(),
+                    "markdown"
+                )
+            }
+
             else -> {
-                sendMainMenu(userId, chatId)
+                // ✅ Если сообщение начинается с "/search "
+                if (trimmedText.startsWith("/search ", ignoreCase = true)) {
+                    val query = trimmedText.substringAfter("/search ").trim()
+                    if (query.isNotEmpty()) {
+                        searchEmployees(chatId, query)
+                    } else {
+                        botClient.sendMessage(
+                            chatId,
+                            "❌ Введите поисковый запрос. Например: `/search Иванов`",
+                            "markdown"
+                        )
+                    }
+                } else {
+                    sendMainMenu(userId, chatId)
+                }
             }
         }
     }
 
+    private fun searchEmployees(chatId: String, query: String) {
+        val searchLower = query.lowercase()
+
+        // Ищем в Phonebook
+        val allEmployees = phonebookRepository.findAll()
+        val results = allEmployees.filter { employee ->
+            val fullName = listOfNotNull(employee.fname, employee.nname).joinToString(" ")
+
+            fullName.lowercase().contains(searchLower) ||
+                    employee.dolgnost?.lowercase()?.contains(searchLower) == true ||
+                    employee.otdel?.lowercase()?.contains(searchLower) == true ||
+                    employee.fname?.lowercase()?.contains(searchLower) == true ||
+                    employee.nname?.lowercase()?.contains(searchLower) == true
+        }.take(10) // ограничиваем 10 результатами
+
+        if (results.isEmpty()) {
+            botClient.sendMessage(
+                chatId,
+                "🔍 По запросу `$query` ничего не найдено.",
+                "markdown"
+            )
+            return
+        }
+
+        // Формируем сообщение
+        val message = buildSearchResult(results, query)
+        botClient.sendMessage(chatId, message, "markdown")
+    }
+
+    private fun buildSearchResult(results: List<Phonebook>, query: String): String {
+        val lines = mutableListOf<String>()
+        lines.add("🔍 *Результаты поиска*")
+        lines.add("Запрос: `$query`")
+        lines.add("Найдено: ${results.size}")
+        lines.add("")
+
+        results.forEachIndexed { index, employee ->
+            val fullName = listOfNotNull(employee.fname, employee.nname).joinToString(" ")
+            lines.add("${index + 1}. *$fullName*")
+            employee.dolgnost?.let { lines.add("   📋 $it") }
+            employee.otdel?.let { lines.add("   🏢 $it") }
+            employee.phoneInt?.let { lines.add("   📞 $it") }
+            employee.phoneSot?.let {
+                lines.add("   📱 ${callNotificationService.formatPhoneNumber(it)}")
+            }
+            employee.email?.let { lines.add("   📧 $it") }
+            lines.add("")
+        }
+
+        return lines.joinToString("\n")
+    }
 }

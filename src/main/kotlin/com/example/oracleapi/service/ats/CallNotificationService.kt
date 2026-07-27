@@ -145,7 +145,7 @@ class CallNotificationService(
         return lines.joinToString("\n")
     }
 
-    private fun formatPhoneNumber(phone: String): String {
+    fun formatPhoneNumber(phone: String): String {
         if (phone.isEmpty()) return phone
         return when {
             phone.startsWith("8") && phone.length == 11 -> "+7${phone.substring(1)}"
