@@ -22,9 +22,9 @@ class OrderHeadStatusUpdate(
 
         return dataSource.executePrc {
             it.setLong(1, request.rn)
-            it.setLong(2, request.status ?: -1)
+            it.setLong(2, request.status)
             it.execute()
-            val field = fieldService.getFieldValue(Field.ORDER_STATUS, request.status ?: -1)
+            val field = fieldService.getFieldValue(Field.ORDER_STATUS, request.status)
             OrderHeadStatusUpdateResponse(
                 request.rn,
                 request.status,

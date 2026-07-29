@@ -80,4 +80,40 @@ class AmiClient(
             false
         }
     }
+
+    /**
+     * Отправляет команду в AMI без ожидания ответа (создаёт новое соединение)
+     */
+    fun sendCommandWithoutResponse(vararg commands: String): Boolean {
+        return try {
+            val socket = Socket(properties.host, properties.port)
+            val writer = BufferedWriter(OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8))
+
+            // Логин
+            writer.write("Action: Login\r\n")
+            writer.write("Username: ${properties.username}\r\n")
+            writer.write("Secret: ${properties.secret}\r\n")
+            writer.write("\r\n")
+            writer.flush()
+
+            // Небольшая пауза для авторизации
+            Thread.sleep(200)
+
+            // Отправляем команды
+            commands.forEach { command ->
+                writer.write(command)
+                writer.write("\r\n")
+            }
+            writer.write("\r\n")
+            writer.flush()
+
+            Thread.sleep(200)
+            socket.close()
+            true
+        } catch (e: Exception) {
+            log.error("❌ Ошибка отправки команды AMI без ответа", e)
+            false
+        }
+    }
+
 }
