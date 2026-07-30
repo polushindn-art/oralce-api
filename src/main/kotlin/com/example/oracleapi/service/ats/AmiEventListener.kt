@@ -125,15 +125,15 @@ class AmiEventListener(
         }
 
         // ===== ПРОВЕРКА 2: Это звонок с нашего городского номера? =====
-        val isOurCityNumber = channel?.contains("DIANET_388585") == true
+        //val isOurCityNumber = channel?.contains("DIANET_388585") == true
 
-        if (!isOurCityNumber) {
+        /*if (!isOurCityNumber) {
             log.debug(
                 "🚫 Пропускаем чужой звонок: channel={}, caller={}, dest={}",
                 channel, caller, destination
             )
             return
-        }
+        }*/
 
         // ===== ОБРАБОТКА ТОЛЬКО НАШИХ ЗВОНКОВ =====
         if (caller != null && destination != null && uniqueId != null) {
