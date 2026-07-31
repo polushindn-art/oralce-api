@@ -49,7 +49,6 @@ import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import javax.sql.DataSource
-
 @Configuration
 @EnableSchedulerLock(defaultLockAtMostFor = "PT30S")
 class ShedLockConfig(

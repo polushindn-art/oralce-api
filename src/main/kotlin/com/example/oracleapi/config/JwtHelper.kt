@@ -17,14 +17,16 @@ class JwtHelper(
     companion object {
         const val COOCKIENAME = "accessToken"
         val skipPaths = arrayOf(
-            "/v1/ats/**",
-            "/v1/max/**",
-            "/v1/wakeup/**",
+            "/glossary.html",
+            "/v*/glossary/**",
+            "/v*/asterisk/**",
+            "/v*/max/**",
+            "/v*/wakeup/**",
             "/v*/tsdlist/snByDeviceId/**",
             "/pictures/**",
             "/v*/api/health",
             "/login",
-            "/swagger-ui/**",      // для всех вложенных путей
+            "/swagger-ui/**",
             "/v3/api-docs/**",
             "/swagger-ui.html",
             "/index.html",
@@ -38,7 +40,7 @@ class JwtHelper(
             "/webjars/**",
             "/v*/error",
             "/v*/not-found",
-            "/v*/auth/**",             // если нужно открыть все под auth
+            "/v*/auth/**",
             "/knife4j/**",
             "/markdown/**",
             "/api/markdown/**"

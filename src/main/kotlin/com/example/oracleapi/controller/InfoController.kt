@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import javax.sql.DataSource
 
-// DTO для ответа
 data class DbInfoResponse(
     val url: String,
     val host: String,

@@ -2,12 +2,6 @@ package com.example.oracleapi.service.ats
 
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.net.Socket
-import java.io.BufferedReader
-import java.io.InputStreamReader
-import java.io.OutputStreamWriter
-import java.io.BufferedWriter
-import java.nio.charset.StandardCharsets
 
 @Service
 class AsteriskService(
@@ -18,7 +12,7 @@ class AsteriskService(
 
     fun originateCall(internalNumber: String, externalNumber: String, callerName: String? = null, actionId: String? = null): Boolean {
         val connection = amiClient.connect() ?: return false
-        val (socket, reader) = connection
+        val (socket, _) = connection
 
         return try {
             val callerId = if (!callerName.isNullOrBlank()) {
@@ -41,7 +35,6 @@ class AsteriskService(
                 commands.add("Variable: AUTH_ACTION_ID=$actionId")
             }
 
-            // ✅ Правильно: передаем socket и список команд
             amiClient.sendCommand(socket, *commands.toTypedArray())
 
             log.info("✅ Команда Originate отправлена: $internalNumber → $externalNumber")

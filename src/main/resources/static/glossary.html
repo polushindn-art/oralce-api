@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Словарь терминов</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        mark {
+            background: #90EE90;
+            padding: 1px 4px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 20px 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab {
+            padding: 10px 24px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            color: #666;
+            transition: all 0.2s;
+        }
+
+        .tab:hover {
+            color: #333;
+            background: #f5f5f5;
+        }
+
+        .tab.active {
+            color: #2196F3;
+            border-bottom-color: #2196F3;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-primary { background: #2196F3; color: white; }
+        .btn-primary:hover { background: #1976D2; }
+
+        .btn-success { background: #4CAF50; color: white; }
+        .btn-success:hover { background: #388E3C; }
+
+        .btn-danger { background: #f44336; color: white; }
+        .btn-danger:hover { background: #D32F2F; }
+
+        .btn-warning { background: #FF9800; color: white; }
+        .btn-warning:hover { background: #F57C00; }
+
+        .btn-outline { background: transparent; border: 1px solid #ddd; color: #333; }
+        .btn-outline:hover { background: #f0f0f0; }
+
+        .search-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-bar input, .search-bar select {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .term-list {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .term-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            gap: 15px;
+        }
+
+        .term-item:last-child {
+            border-bottom: none;
+        }
+
+        .term-item:hover {
+            background: #f8f9fa;
+        }
+
+        .term-item.deleted {
+            background: #fff3e0;
+        }
+
+        .term-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .term-term {
+            font-weight: bold;
+            font-size: 18px;
+            color: #333;
+            cursor: pointer;
+        }
+
+        .term-term:hover {
+            color: #2196F3;
+        }
+
+        .term-definition {
+            color: #666;
+            margin-top: 5px;
+            line-height: 1.5;
+        }
+
+        .term-category {
+            display: inline-block;
+            background: #e8f5e9;
+            color: #388E3C;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .term-actions {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active { display: flex; }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 700px;
+            width: 95%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 { margin: 0; }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .modal-close:hover { color: #333; }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #333;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 2000;
+            display: none;
+            max-width: 400px;
+        }
+
+        .toast.success { background: #4CAF50; }
+        .toast.error { background: #f44336; }
+        .toast.show { display: block; }
+
+        @media (max-width: 600px) {
+            .header { flex-direction: column; align-items: stretch; }
+            .term-item { flex-direction: column; }
+            .term-actions { align-self: flex-start; width: 100%; }
+            .term-actions .btn { flex: 1; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>📚 Словарь терминов</h1>
+        <div class="header-actions">
+            <button class="btn btn-outline" onclick="exportMarkdown()">⬇️ Экспорт MD</button>
+            <button class="btn btn-primary" onclick="openModal()">➕ Добавить термин</button>
+        </div>
+    </div>
+
+    <div class="tabs">
+        <button class="tab active" data-tab="active" onclick="switchTab('active')">✅ Активные</button>
+        <button class="tab" data-tab="deleted" onclick="switchTab('deleted')">🗑️ Удалённые</button>
+    </div>
+
+    <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="🔍 Поиск по терминам и определениям..." oninput="loadTerms()">
+        <select id="categoryFilter" onchange="loadTerms()">
+            <option value="">Все категории</option>
+        </select>
+        <button class="btn btn-outline" onclick="resetFilters()">Сбросить</button>
+    </div>
+
+    <div class="term-list" id="termList">
+        <div class="empty-state">Загрузка...</div>
+    </div>
+</div>
+
+<!-- Модальное окно -->
+<div class="modal" id="editModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalTitle">Добавление термина</h2>
+            <button class="modal-close" onclick="closeModal()">×</button>
+        </div>
+        <form id="termForm" onsubmit="saveTerm(event)">
+            <input type="hidden" id="editId">
+            <div class="form-group">
+                <label for="editTerm">Термин *</label>
+                <input type="text" id="editTerm" required placeholder="Например: Адресное хранение">
+            </div>
+            <div class="form-group">
+                <label for="editDefinition">Определение *</label>
+                <textarea id="editDefinition" required placeholder="Подробное определение термина..."></textarea>
+            </div>
+            <div class="form-group">
+                <label for="editCategory">Категория</label>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <input type="text" id="editCategory" placeholder="Введите новую или выберите из списка" style="flex: 1;">
+                    <select id="editCategorySelect" style="flex: 0 0 auto; max-width: 200px;">
+                        <option value="">Выбрать...</option>
+                    </select>
+                </div>
+                <div style="font-size: 12px; color: #999; margin-top: 4px;">
+                    💡 Введите новую категорию или выберите существующую из списка
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-outline" onclick="closeModal()">Отмена</button>
+                <button type="submit" class="btn btn-success">💾 Сохранить</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+    const API_BASE = '/v1/glossary';
+    let currentTab = 'active';
+
+    // ============================================================
+    // ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК
+    // ============================================================
+    function switchTab(tab) {
+        currentTab = tab;
+        document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+        document.querySelector(`.tab[data-tab="${tab}"]`).classList.add('active');
+        loadTerms();
+    }
+
+    // ============================================================
+    // ЗАГРУЗКА ТЕРМИНОВ
+    // ============================================================
+    function loadTerms() {
+        const search = document.getElementById('searchInput').value;
+        const category = document.getElementById('categoryFilter').value;
+
+        let url;
+        if (currentTab === 'deleted') {
+            url = API_BASE + '/terms/deleted';
+        } else {
+            url = API_BASE + '/terms';
+            const params = new URLSearchParams();
+            if (search) params.append('search', search);
+            if (category) params.append('category', category);
+            if (params.toString()) url += '?' + params.toString();
+        }
+
+        fetch(url)
+            .then(res => res.json())
+            .then(response => {
+                if (response.success) {
+                    renderTerms(response.data);
+                } else {
+                    document.getElementById('termList').innerHTML = `<div class="empty-state">❌ ${response.message}</div>`;
+                }
+            })
+            .catch(err => {
+                document.getElementById('termList').innerHTML = `<div class="empty-state">❌ Ошибка: ${err.message}</div>`;
+            });
+    }
+
+    // ============================================================
+    // ФУНКЦИЯ ПОДСВЕТКИ ТЕКСТА
+    // ============================================================
+    function highlightText(text, query) {
+        if (!query || !text) return escapeHtml(text);
+
+        const escapedText = escapeHtml(text);
+        const escapedQuery = escapeHtml(query);
+
+        // Ищем совпадения (регистронезависимо)
+        const regex = new RegExp('(' + escapedQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+        return escapedText.replace(regex, '<mark>$1</mark>');
+    }
+
+    // ============================================================
+    // ОТОБРАЖЕНИЕ ТЕРМИНОВ
+    // ============================================================
+    function renderTerms(terms) {
+        const container = document.getElementById('termList');
+        const searchQuery = document.getElementById('searchInput').value.trim();
+
+        if (!terms || terms.length === 0) {
+            container.innerHTML = `<div class="empty-state">📭 Термины не найдены</div>`;
+            return;
+        }
+
+        container.innerHTML = terms.map(term => {
+            // Подсвечиваем текст, если есть поисковый запрос
+            const displayTerm = searchQuery ? highlightText(term.term, searchQuery) : escapeHtml(term.term);
+            const displayDefinition = searchQuery ? highlightText(term.definition, searchQuery) : escapeHtml(term.definition);
+
+            return `
+            <div class="term-item">
+                <div class="term-content">
+                    <div class="term-term">${displayTerm}</div>
+                    <div class="term-definition">${displayDefinition}</div>
+                    ${term.category ? `<span class="term-category">${escapeHtml(term.category)}</span>` : ''}
+                    <span style="font-size:11px;color:#999;display:block;margin-top:4px;">RN: ${term.rn}</span>
+                </div>
+                <div class="term-actions">
+                    <button class="btn btn-warning" onclick="editTerm(${term.rn})">✏️</button>
+                    <button class="btn btn-danger" onclick="deleteTerm(${term.rn}, '${escapeHtml(term.term)}')">🗑️</button>
+                    <button class="btn btn-outline" onclick="viewHistory(${term.rn})">📜</button>
+                </div>
+            </div>
+        `;
+        }).join('');
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // ============================================================
+    // КАТЕГОРИИ ДЛЯ ФИЛЬТРА
+    // ============================================================
+    function loadCategories() {
+        fetch(API_BASE + '/categories')
+            .then(res => res.json())
+            .then(response => {
+                if (response.success) {
+                    const select = document.getElementById('categoryFilter');
+                    const currentValue = select.value;
+                    select.innerHTML = '<option value="">Все категории</option>';
+                    response.data.forEach(cat => {
+                        const option = document.createElement('option');
+                        option.value = cat;
+                        option.textContent = cat;
+                        select.appendChild(option);
+                    });
+                    select.value = currentValue;
+                }
+            })
+            .catch(console.warn);
+    }
+
+    // ============================================================
+    // КАТЕГОРИИ ДЛЯ ВЫПАДАЮЩЕГО СПИСКА В МОДАЛКЕ
+    // ============================================================
+    function loadCategorySelect() {
+        const select = document.getElementById('editCategorySelect');
+        if (select.options.length > 1) return;
+
+        fetch(API_BASE + '/categories')
+            .then(res => res.json())
+            .then(response => {
+                if (response.success && response.data) {
+                    select.innerHTML = '<option value="">Выбрать...</option>';
+                    response.data.forEach(cat => {
+                        const option = document.createElement('option');
+                        option.value = cat;
+                        option.textContent = cat;
+                        select.appendChild(option);
+                    });
+                }
+            })
+            .catch(err => console.warn('Ошибка загрузки категорий:', err));
+    }
+
+    // ============================================================
+    // МОДАЛЬНОЕ ОКНО
+    // ============================================================
+    function openModal() {
+        document.getElementById('modalTitle').textContent = '➕ Добавление термина';
+        document.getElementById('editId').value = '';
+        document.getElementById('editTerm').value = '';
+        document.getElementById('editDefinition').value = '';
+        document.getElementById('editCategory').value = '';
+        document.getElementById('editCategorySelect').value = '';
+        document.getElementById('editModal').classList.add('active');
+        loadCategorySelect();
+    }
+
+    function closeModal() {
+        document.getElementById('editModal').classList.remove('active');
+    }
+
+    function editTerm(rn) {
+        fetch(API_BASE + '/term/' + rn)
+            .then(res => res.json())
+            .then(response => {
+                if (response.success) {
+                    const term = response.data;
+                    document.getElementById('modalTitle').textContent = '✏️ Редактирование: ' + term.term;
+                    document.getElementById('editId').value = term.rn;
+                    document.getElementById('editTerm').value = term.term;
+                    document.getElementById('editDefinition').value = term.definition;
+                    document.getElementById('editCategory').value = term.category || '';
+                    document.getElementById('editCategorySelect').value = term.category || '';
+                    document.getElementById('editModal').classList.add('active');
+                    loadCategorySelect();
+                } else {
+                    showToast('error', response.message || 'Ошибка загрузки');
+                }
+            })
+            .catch(err => showToast('error', 'Ошибка: ' + err.message));
+    }
+
+    // ============================================================
+    // СОХРАНЕНИЕ
+    // ============================================================
+    function saveTerm(event) {
+        event.preventDefault();
+
+        const rn = document.getElementById('editId').value;
+        const term = document.getElementById('editTerm').value.trim();
+        const definition = document.getElementById('editDefinition').value.trim();
+        const category = document.getElementById('editCategory').value.trim() || null;
+
+        const data = { term, definition, category };
+        const url = rn ? API_BASE + '/term/' + rn : API_BASE + '/term';
+        const method = rn ? 'PUT' : 'POST';
+
+        fetch(url, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+            .then(res => res.json())
+            .then(response => {
+                if (response.success) {
+                    closeModal();
+                    loadTerms();
+                    loadCategories();
+                    showToast('success', response.message || 'Сохранено');
+                } else {
+                    showToast('error', response.message || 'Ошибка сохранения');
+                }
+            })
+            .catch(err => showToast('error', 'Ошибка: ' + err.message));
+    }
+
+    // ============================================================
+    // УДАЛЕНИЕ (мягкое)
+    // ============================================================
+    function deleteTerm(rn, term) {
+        if (!confirm(`Удалить термин "${term}"?`)) return;
+
+        fetch(API_BASE + '/term/' + rn, { method: 'DELETE' })
+            .then(res => res.json())
+            .then(response => {
+                if (response.success) {
+                    loadTerms();
+                    loadCategories();
+                    showToast('success', 'Термин удалён');
+                } else {
+                    showToast('error', response.message || 'Ошибка удаления');
+                }
+            })
+            .catch(err => showToast('error', 'Ошибка: ' + err.message));
+    }
+
+    // ============================================================
+    // ВОССТАНОВЛЕНИЕ
+    // ============================================================
+    function restoreTerm(rn, term) {
+        if (!confirm(`Восстановить термин "${term}"?`)) return;
+
+        fetch(API_BASE + '/term/' + rn + '/restore', { method: 'PUT' })
+            .then(res => res.json())
+            .then(response => {
+                if (response.success) {
+                    loadTerms();
+                    showToast('success', 'Термин восстановлен');
+                } else {
+                    showToast('error', response.message || 'Ошибка восстановления');
+                }
+            })
+            .catch(err => showToast('error', 'Ошибка: ' + err.message));
+    }
+
+    // ============================================================
+    // ПОЛНОЕ УДАЛЕНИЕ (hard delete)
+    // ============================================================
+    function hardDeleteTerm(rn, term) {
+        if (!confirm(`Удалить термин "${term}" НАВСЕГДА без возможности восстановления?`)) return;
+
+        fetch(API_BASE + '/term/' + rn + '/hard', { method: 'DELETE' })
+            .then(res => res.json())
+            .then(response => {
+                if (response.success) {
+                    loadTerms();
+                    showToast('success', 'Термин полностью удалён');
+                } else {
+                    showToast('error', response.message || 'Ошибка удаления');
+                }
+            })
+            .catch(err => showToast('error', 'Ошибка: ' + err.message));
+    }
+
+    // ============================================================
+    // ИСТОРИЯ
+    // ============================================================
+    function viewHistory(rn) {
+        fetch(API_BASE + '/history/' + rn)
+            .then(res => res.json())
+            .then(response => {
+                if (!response.success || !response.data || response.data.length === 0) {
+                    showToast('info', 'История изменений пуста');
+                    return;
+                }
+                let msg = '📜 История изменений:\n\n';
+                response.data.forEach(h => {
+                    const date = h.changedAt ? new Date(h.changedAt).toLocaleString('ru-RU') : '—';
+                    msg += `Версия ${h.version}: ${date}\n`;
+                    msg += `  Термин: ${h.term}\n`;
+                    msg += `  Определение: ${h.definition.substring(0, 100)}${h.definition.length > 100 ? '...' : ''}\n\n`;
+                });
+                alert(msg);
+            })
+            .catch(err => showToast('error', 'Ошибка: ' + err.message));
+    }
+
+    // ============================================================
+    // ЭКСПОРТ
+    // ============================================================
+    function exportMarkdown() {
+        fetch(API_BASE + '/export/markdown')
+            .then(res => res.json())
+            .then(response => {
+                if (response.success) {
+                    const data = response.data;
+                    const blob = new Blob([data.content], { type: 'text/markdown;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = data.fileName || 'словарь_терминов.md';
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    showToast('success', 'Экспорт выполнен, ' + data.totalTerms + ' терминов');
+                } else {
+                    showToast('error', response.message || 'Ошибка экспорта');
+                }
+            })
+            .catch(err => showToast('error', 'Ошибка: ' + err.message));
+    }
+
+    // ============================================================
+    // ФИЛЬТРЫ
+    // ============================================================
+    function resetFilters() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('categoryFilter').value = '';
+        loadTerms();
+    }
+
+    // ============================================================
+    // TOAST
+    // ============================================================
+    function showToast(type, message) {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.className = 'toast ' + type + ' show';
+        clearTimeout(toast._timeout);
+        toast._timeout = setTimeout(() => {
+            toast.className = 'toast';
+        }, 3000);
+    }
+
+    // ============================================================
+    // ИНИЦИАЛИЗАЦИЯ
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', () => {
+        loadTerms();
+        loadCategories();
+        loadCategorySelect();
+
+        document.getElementById('editModal').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeModal();
+        });
+
+        document.getElementById('editDefinition').addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+                document.getElementById('termForm').dispatchEvent(new Event('submit'));
+            }
+        });
+
+        document.getElementById('editCategorySelect').addEventListener('change', function() {
+            document.getElementById('editCategory').value = this.value;
+        });
+
+        document.getElementById('editCategory').addEventListener('input', function() {
+            const select = document.getElementById('editCategorySelect');
+            for (let opt of select.options) {
+                if (opt.value === this.value) {
+                    select.value = this.value;
+                    return;
+                }
+            }
+            select.value = '';
+        });
+    });
+</script>
+</body>
+</html>

@@ -156,15 +156,6 @@ class AuthSessionStorage {
         session.dialedNumber?.let { dialedNumberIndex[it] = session.actionId }
     }
 
-    fun removeSession(actionId: String) {
-        val session = sessions.remove(actionId)
-        if (session != null) {
-            phoneIndex.remove(session.phoneNumber)
-            session.dialedNumber?.let { dialedNumberIndex.remove(it) }
-            log.debug("🗑️ Удалена сессия: {}", actionId)
-        }
-    }
-
     /**
      * Очистка просроченных сессий
      */
@@ -184,17 +175,6 @@ class AuthSessionStorage {
             }
             log.info("🧹 Очищено {} просроченных сессий", expiredSessions.size)
         }
-    }
-
-    fun getActiveSessions(): List<AuthSession> {
-        return sessions.values.filter { it.status in listOf("INITIATED", "RINGING", "PROGRESS") }
-    }
-
-    fun clearAll() {
-        sessions.clear()
-        phoneIndex.clear()
-        dialedNumberIndex.clear()
-        log.warn("🧹 Все сессии очищены")
     }
 
     /**
@@ -238,20 +218,4 @@ data class AuthSession(
     var destChannel: String? = null,
     var uniqueId: String? = null,
     var authCode: String? = null
-) {
-    fun isWaiting(): Boolean {
-        return status in listOf("INITIATED", "RINGING", "PROGRESS")
-    }
-
-    fun isAnswered(): Boolean {
-        return status == "ANSWER"
-    }
-
-    fun isCompleted(): Boolean {
-        return status in listOf("NOANSWER", "BUSY", "CONGESTION", "CANCELED", "FAILED")
-    }
-
-    fun isExpired(): Boolean {
-        return expiresAt?.isBefore(LocalDateTime.now()) ?: false
-    }
-}
+)
