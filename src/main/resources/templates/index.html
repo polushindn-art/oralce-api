@@ -39,6 +39,35 @@
             📚 ORACLE REST API
         </div>
 
+        <!-- ============================================================
+        АВТОРИЗАЦИЯ (ВХОД/ВЫХОД) — ПЕРВАЯ В ПАНЕЛИ
+        ============================================================ -->
+        <div id="auth-section" style="margin-bottom: 15px;">
+            <!-- Показываем, когда пользователь НЕ авторизован -->
+            <div id="auth-login" style="display: none; padding: 0 10px;">
+                <a href="/login.html" class="link-card" style="display: block; padding: 10px 15px; background: #e3f2fd; border-radius: 8px; text-decoration: none; color: #0d47a1; margin-top: 5px; transition: background 0.2s;"
+                   onmouseover="this.style.background='#bbdefb'"
+                   onmouseout="this.style.background='#e3f2fd'">
+                    <h3 style="margin: 0; font-size: 16px;">🔑 Войти</h3>
+                    <p style="margin: 5px 0 0 0; font-size: 13px; color: #555;">Авторизация для доступа к документам</p>
+                </a>
+            </div>
+
+            <!-- Показываем, когда пользователь авторизован -->
+            <div id="auth-logout" style="display: none; padding: 0 10px;">
+                <div style="display: flex; align-items: center; gap: 10px; padding: 10px 15px; background: #e8f5e9; border-radius: 8px; margin-top: 5px;">
+                    <span style="font-size: 20px;">👤</span>
+                    <div style="flex: 1;">
+                        <div style="font-weight: bold; font-size: 14px;" id="authUsername">Пользователь</div>
+                        <div style="font-size: 12px; color: #666;">Токен активен</div>
+                    </div>
+                    <button onclick="logout()" style="background: #f44336; color: white; border: none; border-radius: 6px; padding: 6px 14px; cursor: pointer; font-size: 13px;">
+                        Выйти
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- Простые кнопки-ссылки -->
         <div class="env-switch">
             <button class="env-link prod" data-host="oracle-rest-api.ars" data-port="80">
@@ -59,6 +88,13 @@
             <div>💾 SID: <strong id="sidValue">-</strong></div>
         </div>
 
+        <!-- ============================================================
+        ГРУППА: API ДОКУМЕНТАЦИЯ (Swagger/Knife4j)
+        ============================================================ -->
+        <div class="group-title" style="font-size: 12px; text-transform: uppercase; color: #999; font-weight: 600; margin: 15px 0 8px 15px; letter-spacing: 0.5px;">
+            📘 API ДОКУМЕНТАЦИЯ
+        </div>
+
         <div class="links">
             <a href="/doc.html" class="link-card">
                 <h3>📖 Knife4j <span class="badge">Рекомендуется</span></h3>
@@ -76,13 +112,19 @@
 
         <hr>
 
-        <div class="sidebar-title">📁 Документы</div>
-        <div id="file-list" class="file-list">Загрузка...</div>
+        <!-- ============================================================
+        ГРУППА: ДОКУМЕНТЫ
+        ============================================================ -->
+        <div class="group-title" style="font-size: 12px; text-transform: uppercase; color: #999; font-weight: 600; margin: 0 0 8px 15px; letter-spacing: 0.5px;">
+            📄 РАБОЧИЕ ДОКУМЕНТЫ
+        </div>
 
-        <hr style="margin: 15px 0; border-color: #eee;">
+        <div class="sidebar-title" style="font-size: 13px; padding-left: 15px;">📁 Документы</div>
+        <div id="file-list" class="file-list" style="padding: 0 10px;">Загрузка...</div>
 
-        <div class="sidebar-title">📚 Словарь терминов</div>
-        <div style="padding: 5px 15px;">
+        <hr style="margin: 12px 0; border-color: #eee;">
+
+        <div style="padding: 0 10px;">
             <a href="/glossary.html" class="link-card" style="display: block; padding: 10px 15px; background: #f8f9fa; border-radius: 8px; text-decoration: none; color: #333; margin-top: 5px; transition: background 0.2s;"
                onmouseover="this.style.background='#e8f5e9'"
                onmouseout="this.style.background='#f8f9fa'">
@@ -90,6 +132,16 @@
                 <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Просмотр и редактирование</p>
             </a>
         </div>
+
+        <div style="padding: 0 10px;">
+            <a href="/idhead.html" class="link-card" style="display: block; padding: 10px 15px; background: #f8f9fa; border-radius: 8px; text-decoration: none; color: #333; margin-top: 5px; transition: background 0.2s;"
+               onmouseover="this.style.background='#bbdefb'"
+               onmouseout="this.style.background='#f8f9fa'">
+                <h3 style="margin: 0; font-size: 16px;">📋 Складские документы</h3>
+                <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Просмотр документов</p>
+            </a>
+        </div>
+
     </div>
 
     <!-- Правая область контента -->
@@ -111,16 +163,50 @@
 </div>
 
 <script>
-    // Инициализация после загрузки страницы
+    // ============================================================
+    // АВТОРИЗАЦИЯ (ВХОД/ВЫХОД)
+    // ============================================================
+    function checkAuth() {
+        const token = localStorage.getItem('accessToken');
+        const username = localStorage.getItem('username') || 'Пользователь';
+
+        const loginBlock = document.getElementById('auth-login');
+        const logoutBlock = document.getElementById('auth-logout');
+        const usernameEl = document.getElementById('authUsername');
+
+        if (token) {
+            loginBlock.style.display = 'none';
+            logoutBlock.style.display = 'block';
+            if (usernameEl) {
+                usernameEl.textContent = username;
+            }
+        } else {
+            loginBlock.style.display = 'block';
+            logoutBlock.style.display = 'none';
+        }
+    }
+
+    function logout() {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('username');
+        checkAuth();
+        window.location.reload();
+    }
+
+    // ============================================================
+    // ИНИЦИАЛИЗАЦИЯ
+    // ============================================================
     document.addEventListener('DOMContentLoaded', () => {
-        // Передаем данные с сервера
         if (window.currentHost) {
             window.currentHostValue = window.currentHost;
         }
         if (typeof init === 'function') {
             init();
         }
+
+        checkAuth();
     });
 </script>
+
 </body>
 </html>

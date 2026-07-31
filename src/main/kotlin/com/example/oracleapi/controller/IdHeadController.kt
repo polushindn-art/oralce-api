@@ -135,7 +135,6 @@ class IdHeadController(
         @PathVariable rn: Long
     ): MyApiResponse<com.example.oracleapi.dto.idspec.IdheadWithSpecTsdResponse> {
         return success(idHeadService.getDocumentWithSpecs(rn))
-        //return success(idHeadService.getSpecsWithKms(rn))
     }
 
     @GetMapping("/all")

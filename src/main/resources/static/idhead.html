@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>Складские документы</title>
+    <style>
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html { -webkit-text-size-adjust: 100%; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 20px 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .header h1 .doc-count {
+            font-size: 14px;
+            color: #999;
+            font-weight: 400;
+        }
+
+        .filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .filters input, .filters select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-primary { background: #2196F3; color: white; }
+        .btn-primary:hover { background: #1976D2; }
+
+        .btn-outline { background: transparent; border: 1px solid #ddd; color: #333; }
+        .btn-outline:hover { background: #f0f0f0; }
+
+        .btn-sm {
+            padding: 4px 10px;
+            font-size: 12px;
+        }
+
+        .doc-list {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .doc-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .doc-item:hover {
+            background: #f0f7ff;
+        }
+
+        .doc-item:active {
+            background: #e3f2fd;
+        }
+
+        .doc-item:last-child { border-bottom: none; }
+
+        .doc-info {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            flex: 1;
+        }
+
+        .doc-info .field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .doc-info .label {
+            font-size: 11px;
+            color: #999;
+            text-transform: uppercase;
+        }
+
+        .doc-info .value {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .doc-status {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .status-completed { background: #e8f5e9; color: #2e7d32; }
+        .status-pending { background: #fff3e0; color: #e65100; }
+        .status-cancelled { background: #ffebee; color: #c62828; }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            padding: 20px;
+            background: white;
+            border-radius: 0 0 12px 12px;
+            flex-wrap: wrap;
+        }
+
+        .pagination button {
+            padding: 6px 14px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 40px;
+            min-height: 36px;
+        }
+
+        .pagination button:hover { background: #f0f0f0; }
+        .pagination button.active { background: #2196F3; color: white; border-color: #2196F3; }
+        .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .loading { text-align: center; padding: 40px; color: #999; }
+        .empty { text-align: center; padding: 40px; color: #999; }
+
+        /* Модальное окно документа */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active { display: flex; }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 1000px;
+            width: 95%;
+            max-height: 90vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
+            position: sticky;
+            top: 0;
+            background: white;
+        }
+
+        .modal-header h2 { margin: 0; }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #999;
+            padding: 4px 10px;
+            line-height: 1;
+        }
+        .modal-close:hover { color: #333; }
+
+        .doc-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .doc-details .field .label { font-size: 11px; color: #999; }
+        .doc-details .field .value { font-size: 14px; font-weight: 500; }
+
+        .spec-table-wrap {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: 0 -30px;
+            padding: 0 30px;
+        }
+
+        .spec-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            min-width: 640px;
+        }
+
+        .spec-table th {
+            background: #f8f9fa;
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 2px solid #ddd;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .spec-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .spec-table tr:hover { background: #f8f9fa; }
+
+        .km-button {
+            background: #e3f2fd;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            color: #1565C0;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+
+        .km-button:hover {
+            background: #bbdefb;
+        }
+
+        .km-button .badge {
+            background: #1565C0;
+            color: white;
+            border-radius: 50%;
+            padding: 0 6px;
+            font-size: 10px;
+            margin-left: 4px;
+        }
+
+        /* Модальное окно для КМ */
+        .km-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1100;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .km-modal.active { display: flex; }
+
+        .km-modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            max-width: 600px;
+            width: 95%;
+            max-height: 80vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .km-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .km-modal-header h3 { margin: 0; }
+        .km-modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+            padding: 4px 10px;
+            line-height: 1;
+        }
+        .km-modal-close:hover { color: #333; }
+
+        .km-list-full {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .km-list-full li {
+            padding: 8px 12px;
+            border-bottom: 1px solid #f0f0f0;
+            font-family: monospace;
+            font-size: 13px;
+            word-break: break-all;
+        }
+
+        .km-list-full li:hover {
+            background: #f8f9fa;
+        }
+
+        .km-count {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 700px) {
+            body { padding: 10px; }
+            .header { padding: 14px 16px; border-radius: 10px; }
+            .header h1 { font-size: 19px; }
+            .header .btn { padding: 8px 12px; font-size: 13px; }
+            .filters { padding: 12px; border-radius: 10px; flex-direction: column; align-items: stretch; }
+            .filters input, .filters select, .filters button { width: 100%; min-height: 40px; }
+            .doc-list { border-radius: 10px; }
+            .doc-item { flex-direction: column; align-items: stretch; padding: 14px 16px; gap: 10px; }
+            .doc-item > span { display: none; }
+            .doc-info { gap: 10px 20px; }
+            .doc-info .field { min-width: 42%; }
+            .modal-content { padding: 16px; width: 100%; height: 100%; max-height: 100%; max-width: 100%; border-radius: 0; }
+            .modal-header { padding-bottom: 12px; margin-bottom: 14px; }
+            .modal-header h2 { font-size: 18px; }
+            .doc-details { grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 12px; }
+            .spec-table-wrap { margin: 0 -16px; padding: 0 16px; }
+            .spec-table { font-size: 12px; min-width: 560px; }
+            .spec-table th, .spec-table td { padding: 6px 8px; }
+            .km-modal-content { width: 100%; height: 100%; max-height: 100%; border-radius: 0; padding: 16px; }
+            .pagination { padding: 14px; gap: 6px; }
+            .pagination button { padding: 6px 10px; }
+        }
+
+        @media (max-width: 400px) {
+            .doc-info .field { min-width: 100%; }
+            .doc-details { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>📄 Складские документы <span class="doc-count" id="docCount"></span></h1>
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <span id="userInfo" style="font-size: 14px; color: #666;"></span>
+            <button class="btn btn-outline" onclick="logout()">🚪 Выйти</button>
+            <button class="btn btn-outline" onclick="loadDocs()">🔄</button>
+        </div>
+    </div>
+
+    <div class="filters">
+        <input type="text" id="filterDocnumb" placeholder="№ документа" style="width:150px;">
+        <select id="filterTypedoc" style="width:200px;">
+            <option value="">Все типы документов</option>
+        </select>
+        <select id="filterStatus" style="width:150px;">
+            <option value="">Все статусы</option>
+        </select>
+        <input type="date" id="filterDateFrom">
+        <input type="date" id="filterDateTo">
+        <button class="btn btn-primary" onclick="loadDocs(0)">🔍 Поиск</button>
+        <button class="btn btn-outline" onclick="resetFilters()">Сбросить</button>
+    </div>
+
+    <div class="doc-list" id="docList">
+        <div class="loading">Загрузка...</div>
+    </div>
+</div>
+
+<!-- Модальное окно документа -->
+<div class="modal" id="docModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="docModalTitle">Документ</h2>
+            <button class="modal-close" onclick="closeDocModal()">×</button>
+        </div>
+        <div id="docModalBody">
+            <div class="loading">Загрузка...</div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для КМ -->
+<div class="km-modal" id="kmModal">
+    <div class="km-modal-content">
+        <div class="km-modal-header">
+            <h3 id="kmModalTitle">📋 Коды маркировки</h3>
+            <button class="km-modal-close" onclick="closeKmModal()">×</button>
+        </div>
+        <div id="kmModalBody">
+            <div class="loading">Загрузка...</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ============================================================
+    // АВТОРИЗАЦИЯ
+    // ============================================================
+    const API_BASE = '/v1/idhead';
+    let accessToken = localStorage.getItem('accessToken');
+    let currentPage = 0;
+    let totalPages = 1;
+
+    // ✅ СОХРАНЯЕМ ТЕКУЩУЮ СТРАНИЦУ ДЛЯ РЕДИРЕКТА ПОСЛЕ ЛОГИНА
+    localStorage.setItem('redirectAfterLogin', window.location.pathname);
+
+    if (!accessToken) {
+        window.location.href = '/login.html';
+    }
+
+    const username = localStorage.getItem('username') || 'Пользователь';
+    const userInfoEl = document.getElementById('userInfo');
+    if (userInfoEl) {
+        userInfoEl.textContent = '👤 ' + username;
+    }
+
+    function logout() {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('username');
+        window.location.href = '/login.html';
+    }
+
+    // ============================================================
+    // FETCH С ТОКЕНОМ
+    // ============================================================
+    function fetchWithAuth(url, options = {}) {
+        const headers = {
+            'Content-Type': 'application/json',
+            ...options.headers
+        };
+
+        if (accessToken) {
+            headers['Authorization'] = 'Bearer ' + accessToken;
+        }
+
+        return fetch(url, {
+            ...options,
+            headers: headers
+        })
+            .then(response => {
+                if (response.status === 401) {
+                    localStorage.removeItem('accessToken');
+                    localStorage.removeItem('username');
+                    window.location.href = '/login.html';
+                    return Promise.reject(new Error('Сессия истекла'));
+                }
+                return response;
+            });
+    }
+
+    // ============================================================
+    // ЗАГРУЗКА ДОКУМЕНТОВ
+    // ============================================================
+    function loadDocs(page) {
+        if (page !== undefined) currentPage = page;
+
+        const params = new URLSearchParams();
+        const docnumb = document.getElementById('filterDocnumb').value.trim();
+        const typedoc = document.getElementById('filterTypedoc').value;
+        const status = document.getElementById('filterStatus').value;
+        const dateFrom = document.getElementById('filterDateFrom').value;
+        const dateTo = document.getElementById('filterDateTo').value;
+
+        if (docnumb) params.append('docnumb', docnumb);
+        if (typedoc) params.append('doctype', typedoc);
+        if (status) params.append('ID_STATUS', status);
+        if (dateFrom) params.append('dateFrom', dateFrom);
+        if (dateTo) params.append('dateTo', dateTo);
+        params.append('page', currentPage);
+        params.append('size', 20);
+
+        document.getElementById('docList').innerHTML = '<div class="loading">Загрузка...</div>';
+
+        fetchWithAuth(API_BASE + '/filter/page?' + params.toString())
+            .then(res => res.json())
+            .then(response => {
+                if (response.success) {
+                    renderDocs(response.data, response.meta);
+                } else {
+                    document.getElementById('docList').innerHTML = `<div class="empty">❌ ${response.message}</div>`;
+                    document.getElementById('docCount').textContent = '';
+                }
+            })
+            .catch(err => {
+                if (err.message === 'Сессия истекла') return;
+                document.getElementById('docList').innerHTML = `<div class="empty">❌ Ошибка: ${err.message}</div>`;
+                document.getElementById('docCount').textContent = '';
+            });
+    }
+
+    // ============================================================
+    // ОТОБРАЖЕНИЕ ДОКУМЕНТОВ
+    // ============================================================
+    function renderDocs(docs, meta) {
+        const container = document.getElementById('docList');
+
+        if (!docs || docs.length === 0) {
+            container.innerHTML = '<div class="empty">📭 Документы не найдены</div>';
+            document.getElementById('docCount').textContent = '(0)';
+            return;
+        }
+
+        if (meta) {
+            totalPages = meta.totalPages || 1;
+            const total = meta.totalElements ?? meta.total ?? docs.length;
+            document.getElementById('docCount').textContent = `(${total})`;
+        } else {
+            document.getElementById('docCount').textContent = `(${docs.length})`;
+        }
+
+        let html = '';
+        docs.forEach(doc => {
+            const statusClass = getStatusClass(doc.statusCode);
+            html += `
+                <div class="doc-item" onclick="openDoc(${doc.rn})">
+                    <div class="doc-info">
+                        <div class="field">
+                            <span class="label">№ документа</span>
+                            <span class="value">${doc.docpref || ''} ${doc.docnumb || ''}</span>
+                        </div>
+                        <div class="field">
+                            <span class="label">Тип</span>
+                            <span class="value">${doc.doctypeCode || '-'}</span>
+                        </div>
+                        <div class="field">
+                            <span class="label">Дата</span>
+                            <span class="value">${formatDate(doc.docdate)}</span>
+                        </div>
+                        <div class="field">
+                            <span class="label">Склад (откуда)</span>
+                            <span class="value">${doc.storeoutCode || '-'}</span>
+                        </div>
+                        <div class="field">
+                            <span class="label">Склад (куда)</span>
+                            <span class="value">${doc.storeinCode || '-'}</span>
+                        </div>
+                        <div class="field">
+                            <span class="label">Сумма</span>
+                            <span class="value">${formatSum(doc.sumprice)}</span>
+                        </div>
+                        <div class="field">
+                            <span class="label">Статус</span>
+                            <span class="doc-status ${statusClass}">${doc.statusCode || '—'}</span>
+                        </div>
+                    </div>
+                    <span style="color:#999;font-size:13px;">▶</span>
+                </div>
+            `;
+        });
+
+        html += renderPagination();
+        container.innerHTML = html;
+    }
+
+    function getStatusClass(status) {
+        if (!status) return '';
+        const s = status.toLowerCase();
+        if (s.includes('выполнен') || s.includes('закрыт') || s.includes('заверш')) return 'status-completed';
+        if (s.includes('отмен') || s.includes('удал')) return 'status-cancelled';
+        return 'status-pending';
+    }
+
+    function formatDate(dateStr) {
+        if (!dateStr) return '—';
+        const d = new Date(dateStr);
+        return d.toLocaleDateString('ru-RU') + ' ' + d.toLocaleTimeString('ru-RU', {hour:'2-digit', minute:'2-digit'});
+    }
+
+    function formatSum(sum) {
+        if (!sum) return '0.00';
+        return Number(sum).toFixed(2);
+    }
+
+    // ============================================================
+    // ПАГИНАЦИЯ
+    // ============================================================
+    function renderPagination() {
+        const isMobile = window.innerWidth <= 700;
+        const range = isMobile ? 1 : 2;
+
+        let html = '<div class="pagination">';
+        html += `<button onclick="loadDocs(0)" ${currentPage === 0 ? 'disabled' : ''}>«</button>`;
+        html += `<button onclick="loadDocs(${currentPage - 1})" ${currentPage === 0 ? 'disabled' : ''}>‹</button>`;
+
+        const start = Math.max(0, currentPage - range);
+        const end = Math.min(totalPages - 1, currentPage + range);
+        for (let i = start; i <= end; i++) {
+            html += `<button onclick="loadDocs(${i})" class="${i === currentPage ? 'active' : ''}">${i + 1}</button>`;
+        }
+
+        html += `<button onclick="loadDocs(${currentPage + 1})" ${currentPage >= totalPages - 1 ? 'disabled' : ''}>›</button>`;
+        html += `<button onclick="loadDocs(${totalPages - 1})" ${currentPage >= totalPages - 1 ? 'disabled' : ''}>»</button>`;
+        html += `</div>`;
+        return html;
+    }
+
+    // ============================================================
+    // ОТКРЫТИЕ ДОКУМЕНТА
+    // ============================================================
+    function openDoc(rn) {
+        document.getElementById('docModal').classList.add('active');
+        document.getElementById('docModalBody').innerHTML = '<div class="loading">Загрузка документа...</div>';
+        document.getElementById('docModalTitle').textContent = 'Документ RN: ' + rn;
+        document.body.style.overflow = 'hidden';
+
+        fetchWithAuth(API_BASE + '/' + rn + '/tsd')
+            .then(res => res.json())
+            .then(response => {
+                if (response.success) {
+                    renderDocDetail(response.data);
+                } else {
+                    document.getElementById('docModalBody').innerHTML = `<div class="empty">❌ ${response.message}</div>`;
+                }
+            })
+            .catch(err => {
+                if (err.message === 'Сессия истекла') return;
+                document.getElementById('docModalBody').innerHTML = `<div class="empty">❌ Ошибка: ${err.message}</div>`;
+            });
+    }
+
+    function closeDocModal() {
+        document.getElementById('docModal').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    // ============================================================
+    // МОДАЛКА КМ (ИСПРАВЛЕННАЯ)
+    // ============================================================
+    function openKmModal(btn) {
+        // Останавливаем всплытие (чтобы не открывался документ)
+        if (window.event) {
+            window.event.stopPropagation();
+        }
+
+        const kmData = btn.getAttribute('data-km');
+        const name = btn.getAttribute('data-name');
+
+        const decodedName = decodeURIComponent(name || 'Коды');
+
+        let codes = [];
+        try {
+            const decodedData = decodeURIComponent(kmData);
+            codes = JSON.parse(decodedData);
+        } catch (e) {
+            console.error('Ошибка парсинга КМ:', e);
+            codes = [];
+        }
+
+        document.getElementById('kmModalTitle').textContent = '📋 Коды маркировки - ' + decodedName;
+        document.getElementById('kmModal').classList.add('active');
+
+        const body = document.getElementById('kmModalBody');
+
+        if (!codes || codes.length === 0) {
+            body.innerHTML = '<div class="empty">Нет кодов маркировки</div>';
+            return;
+        }
+
+        let html = `<div class="km-count">Всего кодов: ${codes.length}</div>`;
+        html += `<ul class="km-list-full">`;
+        codes.forEach((code, index) => {
+            html += `<li>${index + 1}. ${escapeHtml(code)}</li>`;
+        });
+        html += `</ul>`;
+        body.innerHTML = html;
+    }
+
+    function closeKmModal() {
+        document.getElementById('kmModal').classList.remove('active');
+    }
+
+    // ============================================================
+    // ЗАГРУЗКА СТАТУСОВ
+    // ============================================================
+    function loadStatuses() {
+        fetchWithAuth('/v1/fields/ID_STATUS')
+            .then(res => res.json())
+            .then(response => {
+                if (response.success && response.data) {
+                    renderStatusOptions(response.data);
+                }
+            })
+            .catch(err => console.error('Ошибка загрузки статусов:', err));
+    }
+
+    function renderStatusOptions(statuses) {
+        const select = document.getElementById('filterStatus');
+
+        const sorted = [...statuses].sort((a, b) => a.fieldValue - b.fieldValue);
+
+        let html = '<option value="">Все статусы</option>';
+        sorted.forEach(status => {
+            html += `<option value="${status.fieldValue}">${escapeHtml(status.fieldComment)}</option>`;
+        });
+
+        select.innerHTML = html;
+    }
+
+    // ============================================================
+    // ЗАГРУЗКА ТИПОВ ДОКУМЕНТОВ
+    // ============================================================
+    function loadTypedoc() {
+        fetchWithAuth('/v1/typedoc')
+            .then(res => res.json())
+            .then(response => {
+                if (response.success && response.data) {
+                    renderTypedocOptions(response.data);
+                }
+            })
+            .catch(err => console.error('Ошибка загрузки типов документов:', err));
+    }
+
+    function renderTypedocOptions(types) {
+        const select = document.getElementById('filterTypedoc');
+
+        const filtered = types.filter(t => t.divisionCode === 'IDHEAD');
+
+        const sorted = [...filtered].sort((a, b) => a.docname.localeCompare(b.docname, 'ru'));
+
+        let html = '<option value="">Все типы документов</option>';
+        sorted.forEach(t => {
+            // Показываем docname + doccode в скобках
+            const displayName = t.doccode ? `${t.docname} (${t.doccode})` : t.docname;
+            html += `<option value="${t.rn}">${escapeHtml(displayName)}</option>`;
+        });
+
+        select.innerHTML = html;
+    }
+
+    // ============================================================
+    // ОТОБРАЖЕНИЕ ДОКУМЕНТА СО СПЕЦИФИКАЦИЕЙ
+    // ============================================================
+    function renderDocDetail(doc) {
+        if (!doc) {
+            document.getElementById('docModalBody').innerHTML = '<div class="empty">Документ не найден</div>';
+            return;
+        }
+
+        let html = `
+            <div class="doc-details">
+                <div class="field">
+                    <span class="label">№ документа</span>
+                    <span class="value">${doc.docpref || ''} ${doc.docnumb || ''}</span>
+                </div>
+                <div class="field">
+                    <span class="label">Дата</span>
+                    <span class="value">${formatDate(doc.docdate)}</span>
+                </div>
+                <div class="field">
+                    <span class="label">Статус</span>
+                    <span class="value">${doc.idStatusCode || '—'}</span>
+                </div>
+                <div class="field">
+                    <span class="label">Склад (откуда)</span>
+                    <span class="value">${doc.storeoutCode || '-'}</span>
+                </div>
+                <div class="field">
+                    <span class="label">Склад (куда)</span>
+                    <span class="value">${doc.storeinCode || '-'}</span>
+                </div>
+                <div class="field">
+                    <span class="label">Сумма</span>
+                    <span class="value">${formatSum(doc.sumprice)}</span>
+                </div>
+                ${doc.note ? `<div class="field" style="grid-column: span 2;"><span class="label">Примечание</span><span class="value">${escapeHtml(doc.note)}</span></div>` : ''}
+            </div>
+        `;
+
+        if (doc.specs && doc.specs.length > 0) {
+            html += `<h3 style="margin: 20px 0 10px;">📦 Спецификация (${doc.specs.length} позиций)</h3>`;
+            html += `<div class="spec-table-wrap"><table class="spec-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Код</th>
+                        <th>Артикул</th>
+                        <th>Наименование</th>
+                        <th>Кол-во</th>
+                        <th>Цена</th>
+                        <th>Сумма</th>
+                        <th>КМ</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
+
+            doc.specs.forEach((spec, index) => {
+                const hasKm = spec.km && spec.km.length > 0;
+                const kmCount = hasKm ? spec.km.length : 0;
+
+                let kmButton = '—';
+                if (hasKm) {
+                    const kmJson = JSON.stringify(spec.km);
+                    const name = escapeHtml(spec.nomenName || 'Товар');
+                    // Используем data-атрибуты
+                    kmButton = `<button class="km-button" data-km="${encodeURIComponent(kmJson)}" data-name="${encodeURIComponent(name)}" onclick="openKmModal(this)">
+                        📋 КМ <span class="badge">${kmCount}</span>
+                    </button>`;
+                }
+
+                html += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${escapeHtml(spec.nomenCode || '-')}</td>
+                        <td>${escapeHtml(spec.article || '-')}</td>
+                        <td>${escapeHtml(spec.nomenName || '-')}</td>
+                        <td>${spec.quant}</td>
+                        <td>${formatSum(spec.inprice)}</td>
+                        <td>${formatSum(spec.summ)}</td>
+                        <td>${kmButton}</td>
+                    </tr>
+                `;
+            });
+
+            html += `</tbody></table></div>`;
+        } else {
+            html += `<p style="color:#999;margin-top:20px;">Нет позиций в документе</p>`;
+        }
+
+        document.getElementById('docModalBody').innerHTML = html;
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // ============================================================
+    // ФИЛЬТРЫ
+    // ============================================================
+    function resetFilters() {
+        document.getElementById('filterDocnumb').value = '';
+        document.getElementById('filterTypedoc').value = '';
+        document.getElementById('filterStatus').value = '';
+        document.getElementById('filterDateFrom').value = '';
+        document.getElementById('filterDateTo').value = '';
+        currentPage = 0;
+        loadDocs();
+    }
+
+    // ============================================================
+    // ИНИЦИАЛИЗАЦИЯ
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', () => {
+        if (!localStorage.getItem('accessToken')) {
+            window.location.href = '/login.html';
+            return;
+        }
+
+        loadStatuses();
+        loadTypedoc();
+        loadDocs();
+
+        document.getElementById('docModal').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeDocModal();
+        });
+
+        document.getElementById('kmModal').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeKmModal();
+        });
+
+        document.getElementById('filterDocnumb').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') loadDocs(0);
+        });
+    });
+</script>
+</body>
+</html>

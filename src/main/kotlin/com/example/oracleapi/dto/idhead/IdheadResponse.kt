@@ -9,6 +9,7 @@ import java.time.LocalDateTime
 data class IdheadResponse(
     val rn: Long,
     val crn: Long,
+    val typedoc: Long,
     val doctypeCode: String,
     val docpref: String,
     val docdate: LocalDateTime?,
@@ -28,6 +29,7 @@ data class IdheadResponse(
 fun Idhead.toResponse(): IdheadResponse = IdheadResponse(
     rn = this.rn,
     crn = this.crn,
+    typedoc = this.doctype,
     doctypeCode = this.doctypeEntity!!.doccode,
     docpref = this.docpref!!,
     docdate = this.docdate,

@@ -27,7 +27,7 @@ open class Idhead {
     open var crn: Long = 0
 
     @Column(name = "DOCTYPE")
-    open var doctype: Long? = null
+    open var doctype: Long = 0
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "DOCTYPE", insertable = false, updatable = false)
