@@ -94,7 +94,6 @@ echo %YELLOW%[5/5] Очистка старых локальных образов
 docker image prune -f
 echo %GREEN%[OK] Очистка завершена%RESET%
 echo.
-
 :: ============================================
 :: РЕЗУЛЬТАТ
 :: ============================================
@@ -131,10 +130,11 @@ echo    Остановить blue: docker stop oracle-prod-blue
 echo    Удалить blue: docker rm oracle-prod-blue или через Web http://oracle-rest-api.ars:9000
 echo    Переименовать: docker rename oracle-prod-green oracle-prod-blue
 echo.
-echo
 echo    Если удалить старые image в Docker REGISTRY Web http://oracle-rest-api.ars:7000
-echo    Место очистится по задаче в cron или вручную запустить сборщик мусора
-echo    cd /docker/registry
-echo    docker compose exec registry registry garbage-collect --delete-untagged /etc/docker/registry/config.yml
+echo    Нужно запускать сборщик мусора
+echo    docker exec -it registry-registry-1 \
+echo      bin/registry garbage-collect \
+echo      --delete-untagged \
+echo      /etc/docker/registry/config.yml
 echo.
 pause

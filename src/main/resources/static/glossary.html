@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Словарь терминов</title>
+    <!-- Библиотеки -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <style>
         * { box-sizing: border-box; }
         body {
@@ -163,9 +166,119 @@
         }
 
         .term-definition {
-            color: #666;
+            color: #333;
             margin-top: 5px;
-            line-height: 1.5;
+            line-height: 1.6;
+        }
+
+        /* Стили для Markdown в терминах */
+        .term-definition h1,
+        .term-definition h2,
+        .term-definition h3 {
+            margin-top: 12px;
+            margin-bottom: 6px;
+        }
+
+        .term-definition h1 { font-size: 22px; }
+        .term-definition h2 { font-size: 18px; }
+        .term-definition h3 { font-size: 16px; }
+
+        .term-definition ul,
+        .term-definition ol {
+            padding-left: 20px;
+            margin: 6px 0;
+        }
+
+        .term-definition blockquote {
+            border-left: 3px solid #ddd;
+            padding-left: 12px;
+            margin: 6px 0;
+            color: #555;
+        }
+
+        .term-definition code {
+            background: #f4f4f4;
+            padding: 1px 4px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        .term-definition pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 6px 0;
+        }
+
+        .term-definition pre code {
+            background: none;
+            padding: 0;
+        }
+
+        .term-definition a {
+            color: #2196F3;
+            text-decoration: underline;
+        }
+
+        .term-definition a:hover {
+            color: #1976D2;
+        }
+
+        .term-definition p {
+            margin: 8px 0;
+        }
+
+        .term-definition img {
+            max-width: 100%;
+            border-radius: 6px;
+        }
+
+        /* Стили для таблиц */
+        .term-definition table,
+        #previewContainer table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+
+        .term-definition table th,
+        #previewContainer table th {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        .term-definition table td,
+        #previewContainer table td {
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+        }
+
+        .term-definition table tr:nth-child(even),
+        #previewContainer table tr:nth-child(even) {
+            background: #fafafa;
+        }
+
+        .term-definition table tr:hover,
+        #previewContainer table tr:hover {
+            background: #f0f7ff;
+        }
+
+        /* Стили для Mermaid диаграмм */
+        .term-definition .mermaid,
+        #previewContainer .mermaid {
+            background: white;
+            padding: 20px;
+            margin: 10px 0;
+            text-align: center;
+            overflow-x: auto;
+            border: 1px solid #eee;
+            border-radius: 8px;
         }
 
         .term-category {
@@ -209,7 +322,7 @@
             background: white;
             border-radius: 12px;
             padding: 30px;
-            max-width: 700px;
+            max-width: 950px;
             width: 95%;
             max-height: 90vh;
             overflow-y: auto;
@@ -262,6 +375,128 @@
             resize: vertical;
         }
 
+        .editor-container {
+            display: flex;
+            gap: 10px;
+            min-height: 300px;
+        }
+
+        .editor-container .editor-pane {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .editor-container .editor-pane textarea {
+            flex: 1;
+            min-height: 250px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            resize: vertical;
+        }
+
+        .editor-container .preview-pane {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #previewContainer {
+            flex: 1;
+            min-height: 250px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 12px;
+            background: #fafafa;
+            overflow-y: auto;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        #previewContainer h1,
+        #previewContainer h2,
+        #previewContainer h3 {
+            margin-top: 16px;
+            margin-bottom: 8px;
+        }
+
+        #previewContainer h1 { font-size: 24px; }
+        #previewContainer h2 { font-size: 20px; }
+        #previewContainer h3 { font-size: 18px; }
+
+        #previewContainer ul,
+        #previewContainer ol {
+            padding-left: 24px;
+            margin: 8px 0;
+        }
+
+        #previewContainer li {
+            margin: 4px 0;
+        }
+
+        #previewContainer blockquote {
+            border-left: 4px solid #ddd;
+            padding-left: 16px;
+            margin: 8px 0;
+            color: #666;
+        }
+
+        #previewContainer code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        #previewContainer pre {
+            background: #f4f4f4;
+            padding: 12px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 8px 0;
+        }
+
+        #previewContainer pre code {
+            background: none;
+            padding: 0;
+        }
+
+        #previewContainer a {
+            color: #2196F3;
+            text-decoration: underline;
+        }
+
+        #previewContainer a:hover {
+            color: #1976D2;
+        }
+
+        #previewContainer p {
+            margin: 8px 0;
+        }
+
+        #previewContainer img {
+            max-width: 100%;
+            border-radius: 6px;
+        }
+
+        .preview-mode-controls {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .preview-mode-controls .btn {
+            padding: 4px 12px;
+            font-size: 12px;
+        }
+
+        .preview-mode-controls .btn.active {
+            background: #2196F3;
+            color: white;
+            border-color: #2196F3;
+        }
+
         .form-actions {
             display: flex;
             gap: 10px;
@@ -285,9 +520,23 @@
 
         .toast.success { background: #4CAF50; }
         .toast.error { background: #f44336; }
+        .toast.info { background: #2196F3; }
         .toast.show { display: block; }
 
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
+            .editor-container {
+                flex-direction: column;
+                min-height: auto;
+            }
+
+            .editor-container .editor-pane textarea {
+                min-height: 200px;
+            }
+
+            #previewContainer {
+                min-height: 200px;
+            }
+
             .header { flex-direction: column; align-items: stretch; }
             .term-item { flex-direction: column; }
             .term-actions { align-self: flex-start; width: 100%; }
@@ -338,8 +587,30 @@
                 <input type="text" id="editTerm" required placeholder="Например: Адресное хранение">
             </div>
             <div class="form-group">
-                <label for="editDefinition">Определение *</label>
-                <textarea id="editDefinition" required placeholder="Подробное определение термина..."></textarea>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <label for="editDefinition" style="margin: 0;">Определение *</label>
+                    <div class="preview-mode-controls">
+                        <button type="button" class="btn btn-outline active" data-mode="split" onclick="setPreviewMode('split')">📐 Разделить</button>
+                        <button type="button" class="btn btn-outline" data-mode="edit" onclick="setPreviewMode('edit')">✏️ Редактор</button>
+                        <button type="button" class="btn btn-outline" data-mode="preview" onclick="setPreviewMode('preview')">👁️ Предпросмотр</button>
+                    </div>
+                </div>
+                <div class="editor-container" id="editorContainer">
+                    <div class="editor-pane" id="editorPane">
+                        <textarea id="editDefinition" required
+                                  placeholder="Поддерживается Markdown:&#10;**жирный**&#10;*курсив*&#10;`код`&#10;[ссылки](url)&#10;- списки&#10;# заголовки&#10;&#10;Таблицы:&#10;| Столбец 1 | Столбец 2 |&#10;|----------|----------|&#10;| Значение 1 | Значение 2 |&#10;&#10;Диаграммы Mermaid:&#10;&#10;&#96;&#96;&#96;mermaid&#10;graph LR&#10;    A[Начало] --> B[Процесс]&#10;    B --> C[Конец]&#10;&#96;&#96;&#96;"
+                                  oninput="updatePreview()"></textarea>
+                        <div style="font-size: 12px; color: #999; margin-top: 4px;">
+                            💡 Markdown: **жирный**, *курсив*, `код`, [ссылки](url), - списки, # заголовки, таблицы, диаграммы Mermaid
+                        </div>
+                    </div>
+                    <div class="preview-pane" id="previewPane">
+                        <div style="font-weight: bold; font-size: 13px; color: #666; margin-bottom: 4px;">👁️ Предпросмотр:</div>
+                        <div id="previewContainer">
+                            <div style="color: #999; font-style: italic;">Введите текст для предпросмотра...</div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="form-group">
                 <label for="editCategory">Категория</label>
@@ -367,6 +638,158 @@
 <script>
     const API_BASE = '/v1/glossary';
     let currentTab = 'active';
+    let previewMode = 'split';
+
+    // Инициализация Mermaid
+    mermaid.initialize({
+        startOnLoad: false,
+        theme: 'default',
+        securityLevel: 'loose'
+    });
+
+    // ============================================================
+    // НАСТРОЙКИ MARKDOWN
+    // ============================================================
+    function getMarkdownOptions() {
+        const renderer = new marked.Renderer();
+        renderer.link = function(href, title, text) {
+            return `<a href="${href}" target="_blank" rel="noopener noreferrer">${text}</a>`;
+        };
+        return {
+            breaks: true,
+            gfm: true,
+            sanitize: false,
+            renderer: renderer
+        };
+    }
+
+    // ============================================================
+    // ФУНКЦИЯ РЕНДЕРИНГА MARKDOWN С ПОДДЕРЖКОЙ MERMAID
+    // ============================================================
+    function renderMarkdown(text, query) {
+        if (!text) return '';
+
+        const options = getMarkdownOptions();
+        let html = marked.parse(text, options);
+
+        // Обработка Mermaid блоков
+        html = html.replace(/<pre><code class="language-mermaid">([\s\S]*?)<\/code><\/pre>/g, function(match, code) {
+            return `<div class="mermaid">${code.trim()}</div>`;
+        });
+
+        // Если есть поисковый запрос, подсвечиваем совпадения
+        if (query && query.trim()) {
+            const escapedQuery = escapeHtml(query.trim());
+            if (escapedQuery) {
+                const regex = new RegExp(escapedQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+
+                const temp = document.createElement('div');
+                temp.innerHTML = html;
+
+                function highlightTextNodes(node) {
+                    if (node.nodeType === Node.TEXT_NODE) {
+                        const text = node.textContent;
+                        if (regex.test(text)) {
+                            const fragment = document.createDocumentFragment();
+                            let lastIndex = 0;
+                            let match;
+                            regex.lastIndex = 0;
+
+                            while ((match = regex.exec(text)) !== null) {
+                                if (match.index > lastIndex) {
+                                    fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+                                }
+                                const mark = document.createElement('mark');
+                                mark.textContent = match[0];
+                                fragment.appendChild(mark);
+                                lastIndex = regex.lastIndex;
+                            }
+                            if (lastIndex < text.length) {
+                                fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+                            }
+                            node.parentNode.replaceChild(fragment, node);
+                        }
+                    } else if (node.nodeType === Node.ELEMENT_NODE && node.tagName !== 'MARK' && node.tagName !== 'A' && !node.classList.contains('mermaid')) {
+                        Array.from(node.childNodes).forEach(highlightTextNodes);
+                    }
+                }
+
+                highlightTextNodes(temp);
+                html = temp.innerHTML;
+            }
+        }
+
+        return html;
+    }
+
+    // ============================================================
+    // ОБНОВЛЕНИЕ ПРЕДПРОСМОТРА С MERMAID
+    // ============================================================
+    function updatePreview() {
+        const text = document.getElementById('editDefinition').value;
+        const previewContainer = document.getElementById('previewContainer');
+
+        if (!text || text.trim() === '') {
+            previewContainer.innerHTML = `<div style="color: #999; font-style: italic;">Введите текст для предпросмотра...</div>`;
+            return;
+        }
+
+        try {
+            const options = getMarkdownOptions();
+            let html = marked.parse(text, options);
+
+            // Обработка Mermaid блоков
+            html = html.replace(/<pre><code class="language-mermaid">([\s\S]*?)<\/code><\/pre>/g, function(match, code) {
+                return `<div class="mermaid">${code.trim()}</div>`;
+            });
+
+            previewContainer.innerHTML = html;
+
+            // Запуск Mermaid для новых диаграмм
+            const mermaidElements = previewContainer.querySelectorAll('.mermaid');
+            if (mermaidElements.length > 0) {
+                mermaid.run({ nodes: mermaidElements }).catch(err => console.warn('Mermaid error:', err));
+            }
+        } catch (error) {
+            previewContainer.innerHTML = `<div style="color: #f44336;">❌ Ошибка рендеринга: ${error.message}</div>`;
+        }
+    }
+
+    // ============================================================
+    // РЕЖИМЫ ПРЕДПРОСМОТРА
+    // ============================================================
+    function setPreviewMode(mode) {
+        previewMode = mode;
+
+        document.querySelectorAll('.preview-mode-controls .btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.dataset.mode === mode) {
+                btn.classList.add('active');
+            }
+        });
+
+        const editorPane = document.getElementById('editorPane');
+        const previewPane = document.getElementById('previewPane');
+        const container = document.getElementById('editorContainer');
+
+        if (mode === 'split') {
+            editorPane.style.display = 'flex';
+            previewPane.style.display = 'flex';
+            editorPane.style.flex = '1';
+            previewPane.style.flex = '1';
+            container.style.flexDirection = 'row';
+        } else if (mode === 'edit') {
+            editorPane.style.display = 'flex';
+            previewPane.style.display = 'none';
+            editorPane.style.flex = '1';
+            container.style.flexDirection = 'row';
+        } else if (mode === 'preview') {
+            editorPane.style.display = 'none';
+            previewPane.style.display = 'flex';
+            previewPane.style.flex = '1';
+            container.style.flexDirection = 'row';
+        }
+    }
 
     // ============================================================
     // ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК
@@ -413,15 +836,10 @@
     // ============================================================
     // ФУНКЦИЯ ПОДСВЕТКИ ТЕКСТА
     // ============================================================
-    function highlightText(text, query) {
-        if (!query || !text) return escapeHtml(text);
-
-        const escapedText = escapeHtml(text);
-        const escapedQuery = escapeHtml(query);
-
-        // Ищем совпадения (регистронезависимо)
-        const regex = new RegExp('(' + escapedQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
-        return escapedText.replace(regex, '<mark>$1</mark>');
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
     }
 
     // ============================================================
@@ -437,9 +855,8 @@
         }
 
         container.innerHTML = terms.map(term => {
-            // Подсвечиваем текст, если есть поисковый запрос
-            const displayTerm = searchQuery ? highlightText(term.term, searchQuery) : escapeHtml(term.term);
-            const displayDefinition = searchQuery ? highlightText(term.definition, searchQuery) : escapeHtml(term.definition);
+            const displayTerm = renderMarkdown(term.term, searchQuery);
+            const displayDefinition = renderMarkdown(term.definition, searchQuery);
 
             return `
             <div class="term-item">
@@ -451,18 +868,24 @@
                 </div>
                 <div class="term-actions">
                     <button class="btn btn-warning" onclick="editTerm(${term.rn})">✏️</button>
-                    <button class="btn btn-danger" onclick="deleteTerm(${term.rn}, '${escapeHtml(term.term)}')">🗑️</button>
+                    ${currentTab === 'deleted' ?
+                `<button class="btn btn-success" onclick="restoreTerm(${term.rn}, '${escapeHtml(term.term)}')">↩️ Восстановить</button>
+                         <button class="btn btn-danger" onclick="hardDeleteTerm(${term.rn}, '${escapeHtml(term.term)}')">🗑️ Удалить навсегда</button>` :
+                `<button class="btn btn-danger" onclick="deleteTerm(${term.rn}, '${escapeHtml(term.term)}')">🗑️</button>`
+            }
                     <button class="btn btn-outline" onclick="viewHistory(${term.rn})">📜</button>
                 </div>
             </div>
         `;
         }).join('');
-    }
 
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
+        // Запуск Mermaid для отображенных диаграмм
+        setTimeout(() => {
+            const mermaidElements = container.querySelectorAll('.mermaid');
+            if (mermaidElements.length > 0) {
+                mermaid.run({ nodes: mermaidElements }).catch(err => console.warn('Mermaid error:', err));
+            }
+        }, 100);
     }
 
     // ============================================================
@@ -523,6 +946,8 @@
         document.getElementById('editCategorySelect').value = '';
         document.getElementById('editModal').classList.add('active');
         loadCategorySelect();
+        setPreviewMode('split');
+        updatePreview();
     }
 
     function closeModal() {
@@ -543,6 +968,8 @@
                     document.getElementById('editCategorySelect').value = term.category || '';
                     document.getElementById('editModal').classList.add('active');
                     loadCategorySelect();
+                    setPreviewMode('split');
+                    updatePreview();
                 } else {
                     showToast('error', response.message || 'Ошибка загрузки');
                 }
@@ -658,7 +1085,8 @@
                     const date = h.changedAt ? new Date(h.changedAt).toLocaleString('ru-RU') : '—';
                     msg += `Версия ${h.version}: ${date}\n`;
                     msg += `  Термин: ${h.term}\n`;
-                    msg += `  Определение: ${h.definition.substring(0, 100)}${h.definition.length > 100 ? '...' : ''}\n\n`;
+                    const def = h.definition ? h.definition.replace(/\n/g, ' ') : '';
+                    msg += `  Определение: ${def.substring(0, 100)}${def.length > 100 ? '...' : ''}\n\n`;
                 });
                 alert(msg);
             })
@@ -743,6 +1171,8 @@
             }
             select.value = '';
         });
+
+        setPreviewMode('split');
     });
 </script>
 </body>
