@@ -3,7 +3,7 @@ package com.example.oracleapi.service.notification
 import com.example.oracleapi.entity.table.Phonebook
 import com.example.oracleapi.repository.max.MaxUserRepository
 import com.example.oracleapi.repository.phonebook.PhonebookRepository
-import com.example.oracleapi.service.max.MessageService
+import com.example.oracleapi.service.max.call.MessageService
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service

@@ -10,9 +10,14 @@ class MaxApiProperties {
     var verificationToken: String = ""
     var ageVerificationUrl: String = "https://ext-api2.max.ru/v2/business/pos/age-verification"
 
-    // Токен для бота (отправка сообщений)
-    var botToken: String = ""
+    // Общий URL
     var botApiUrl: String = "https://platform-api2.max.ru"
+
+    // Токен для бота (отправка сообщений)
+    var botCallToken: String = ""
+
+    // Токен для отправки уведомлений контрагентам
+    var botAuthToken: String = ""
 
     // Общие настройки
     var connectTimeout: Int = 5000

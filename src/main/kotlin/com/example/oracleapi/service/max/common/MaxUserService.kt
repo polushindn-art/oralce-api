@@ -1,4 +1,4 @@
-package com.example.oracleapi.service.max
+package com.example.oracleapi.service.max.common
 
 import com.example.oracleapi.entity.table.MaxUser
 import com.example.oracleapi.entity.table.Phonebook

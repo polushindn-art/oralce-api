@@ -5,8 +5,8 @@ import com.example.oracleapi.dto.max.AgeVerificationRequest
 import com.example.oracleapi.dto.max.AgeVerificationResponse
 import com.example.oracleapi.dto.max.MessageRequest
 import com.example.oracleapi.dto.max.MessageResponse
-import com.example.oracleapi.service.max.MaxVerificationService
-import com.example.oracleapi.service.max.MessageService
+import com.example.oracleapi.service.max.verification.MaxVerificationService
+import com.example.oracleapi.service.max.call.MessageService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid

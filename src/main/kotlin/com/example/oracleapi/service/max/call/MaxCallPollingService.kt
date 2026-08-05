@@ -1,22 +1,27 @@
-package com.example.oracleapi.service.max
+package com.example.oracleapi.service.max.call
 
 import com.example.oracleapi.config.MaxApiProperties
 import com.example.oracleapi.entity.table.Phonebook
 import com.example.oracleapi.repository.phonebook.PhonebookRepository
 import com.example.oracleapi.service.ats.AsteriskService
 import com.example.oracleapi.service.ats.CallNotificationService
+import com.example.oracleapi.service.max.common.MaxUserService
 import org.slf4j.LoggerFactory
+import org.springframework.http.HttpEntity
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.web.client.ResourceAccessException
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
+import kotlin.collections.get
 
 @Service
-class MaxPollingService(
+class MaxCallPollingService(
     private val restTemplate: RestTemplate,
     private val properties: MaxApiProperties,
-    private val botClient: MaxBotClient,
+    private val botClient: MaxBotCallClient,
     private val maxUserService: MaxUserService,
     private val asteriskService: AsteriskService,
     private val callNotificationService: CallNotificationService,
@@ -41,14 +46,14 @@ class MaxPollingService(
 
             val url = uriBuilder.build().toUri()
 
-            val headers = org.springframework.http.HttpHeaders().apply {
-                set("Authorization", properties.botToken)
+            val headers = HttpHeaders().apply {
+                set("Authorization", properties.botCallToken)
             }
 
             val response = restTemplate.exchange(
                 url,
-                org.springframework.http.HttpMethod.GET,
-                org.springframework.http.HttpEntity<Nothing>(headers),
+                HttpMethod.GET,
+                HttpEntity<Nothing>(headers),
                 Map::class.java
             )
 
@@ -63,6 +68,7 @@ class MaxPollingService(
 
             updates.forEach { updateRaw ->
                 val update = updateRaw as? Map<*, *> ?: return@forEach
+                log.info("🔴 [Call] Получен update: $updateRaw")
                 log.info("📦 Получен update: $updateRaw")
                 // 🔍 Логируем ВСЕ поля для анализа
                 log.info("📦 Полный update: $update")

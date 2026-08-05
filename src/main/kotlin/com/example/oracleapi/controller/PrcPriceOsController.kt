@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/v1/prcprice")
-@Tag(name = "Цены Отдела Отповых Продаж")
+@Tag(name = "Цены Отдела Продаж")
 class PrcPriceOsController(
     private val prcPriceOsService: PrcPriceOsService
 ) : BaseController() {

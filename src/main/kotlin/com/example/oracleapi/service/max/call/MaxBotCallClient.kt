@@ -1,4 +1,4 @@
-package com.example.oracleapi.service.max
+package com.example.oracleapi.service.max.call
 
 import com.example.oracleapi.config.MaxApiProperties
 import org.slf4j.LoggerFactory
@@ -11,7 +11,7 @@ import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
 
 @Service
-class MaxBotClient(
+class MaxBotCallClient(
     private val restTemplate: RestTemplate,
     private val properties: MaxApiProperties
 ) {
@@ -28,7 +28,7 @@ class MaxBotClient(
             .toUri()
 
         val headers = HttpHeaders().apply {
-            set("Authorization", properties.botToken)
+            set("Authorization", properties.botCallToken)
             set("Content-Type", "application/json")
         }
 
@@ -60,7 +60,7 @@ class MaxBotClient(
             .toUri()
 
         val headers = HttpHeaders().apply {
-            set("Authorization", properties.botToken)
+            set("Authorization", properties.botCallToken)
             set("Content-Type", "application/json")
         }
 
@@ -97,7 +97,7 @@ class MaxBotClient(
             .toUri()
 
         val headers = HttpHeaders().apply {
-            set("Authorization", properties.botToken)
+            set("Authorization", properties.botCallToken)
             set("Content-Type", "application/json")
         }
 
@@ -134,7 +134,7 @@ class MaxBotClient(
         val url = "${properties.botApiUrl}/me"
 
         val headers = HttpHeaders().apply {
-            set("Authorization", properties.botToken)
+            set("Authorization", properties.botCallToken)
             set("Content-Type", "application/json")
         }
 

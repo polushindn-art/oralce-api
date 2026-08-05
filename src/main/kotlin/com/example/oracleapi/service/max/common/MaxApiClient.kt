@@ -1,4 +1,4 @@
-package com.example.oracleapi.service.max
+package com.example.oracleapi.service.max.common
 
 import com.example.oracleapi.config.MaxApiProperties
 import com.example.oracleapi.dto.max.common.MaxApiResponse

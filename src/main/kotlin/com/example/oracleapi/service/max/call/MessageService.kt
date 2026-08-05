@@ -1,13 +1,13 @@
-package com.example.oracleapi.service.max
+package com.example.oracleapi.service.max.call
 
 import com.example.oracleapi.dto.max.MessageResponse
-import com.example.oracleapi.dto.max.MessageStatusResponse
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import kotlin.collections.get
 
 @Service
 class MessageService(
-    private val botClient: MaxBotClient
+    private val botClient: MaxBotCallClient
 ) {
 
     private val log = LoggerFactory.getLogger(this::class.java)

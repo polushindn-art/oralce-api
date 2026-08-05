@@ -1,4 +1,4 @@
-package com.example.oracleapi.service.max
+package com.example.oracleapi.service.max.verification
 
 import com.example.oracleapi.dto.max.AgeVerificationResponse
 import com.example.oracleapi.dto.max.DisabledPersonStatus
@@ -6,6 +6,7 @@ import com.example.oracleapi.dto.max.LargeFamilyStatus
 import com.example.oracleapi.dto.max.StudentStatus
 import com.example.oracleapi.dto.max.common.MaxApiResponse
 import com.example.oracleapi.dto.max.common.MaxError
+import com.example.oracleapi.service.max.common.MaxApiClient
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
