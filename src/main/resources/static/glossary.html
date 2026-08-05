@@ -4,9 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Словарь терминов</title>
+
     <!-- Библиотеки -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/emoji-toolkit@6.6.0/lib/js/joypixels.min.js"></script>
+
     <style>
         * { box-sizing: border-box; }
         body {
@@ -598,7 +601,7 @@
                 <div class="editor-container" id="editorContainer">
                     <div class="editor-pane" id="editorPane">
                         <textarea id="editDefinition" required
-                                  placeholder="Поддерживается Markdown:&#10;**жирный**&#10;*курсив*&#10;`код`&#10;[ссылки](url)&#10;- списки&#10;# заголовки&#10;&#10;Таблицы:&#10;| Столбец 1 | Столбец 2 |&#10;|----------|----------|&#10;| Значение 1 | Значение 2 |&#10;&#10;Диаграммы Mermaid:&#10;&#10;&#96;&#96;&#96;mermaid&#10;graph LR&#10;    A[Начало] --> B[Процесс]&#10;    B --> C[Конец]&#10;&#96;&#96;&#96;"
+                                  placeholder="Поддерживается Markdown:&#10;**жирный** :smile: :rocket:&#10;*курсив* :heart:&#10;`код`&#10;[ссылки](url)&#10;- списки&#10;# заголовки&#10;&#10;Таблицы:&#10;| Столбец 1 | Столбец 2 |&#10;|----------|----------|&#10;| Значение 1 | Значение 2 |&#10;&#10;Диаграммы Mermaid:&#10;&#10;&#96;&#96;&#96;mermaid&#10;graph LR&#10;    A[Начало] --> B[Процесс]&#10;    B --> C[Конец]&#10;&#96;&#96;&#96;"
                                   oninput="updatePreview()"></textarea>
                         <div style="font-size: 12px; color: #999; margin-top: 4px;">
                             💡 Markdown: **жирный**, *курсив*, `код`, [ссылки](url), - списки, # заголовки, таблицы, диаграммы Mermaid
@@ -647,6 +650,27 @@
         securityLevel: 'loose'
     });
 
+    // Проверка загрузки joypixels
+    console.log('Joypixels loaded:', typeof joypixels !== 'undefined');
+
+    // ============================================================
+    // ФУНКЦИЯ ДЛЯ КОНВЕРТАЦИИ ЭМОДЗИ
+    // ============================================================
+    function convertEmojis(text) {
+        if (!text) return text;
+
+        if (typeof joypixels !== 'undefined') {
+            try {
+                // Конвертируем :emoji: в эмодзи
+                return joypixels.shortnameToUnicode(text);
+            } catch(e) {
+                console.warn('Joypixels error:', e);
+                return text;
+            }
+        }
+        return text;
+    }
+
     // ============================================================
     // НАСТРОЙКИ MARKDOWN
     // ============================================================
@@ -664,13 +688,16 @@
     }
 
     // ============================================================
-    // ФУНКЦИЯ РЕНДЕРИНГА MARKDOWN С ПОДДЕРЖКОЙ MERMAID
+    // ФУНКЦИЯ РЕНДЕРИНГА MARKDOWN
     // ============================================================
     function renderMarkdown(text, query) {
         if (!text) return '';
 
+        // Конвертируем эмодзи
+        let processedText = convertEmojis(text);
+
         const options = getMarkdownOptions();
-        let html = marked.parse(text, options);
+        let html = marked.parse(processedText, options);
 
         // Обработка Mermaid блоков
         html = html.replace(/<pre><code class="language-mermaid">([\s\S]*?)<\/code><\/pre>/g, function(match, code) {
@@ -709,7 +736,10 @@
                             }
                             node.parentNode.replaceChild(fragment, node);
                         }
-                    } else if (node.nodeType === Node.ELEMENT_NODE && node.tagName !== 'MARK' && node.tagName !== 'A' && !node.classList.contains('mermaid')) {
+                    } else if (node.nodeType === Node.ELEMENT_NODE &&
+                        node.tagName !== 'MARK' &&
+                        node.tagName !== 'A' &&
+                        !node.classList.contains('mermaid')) {
                         Array.from(node.childNodes).forEach(highlightTextNodes);
                     }
                 }
@@ -723,7 +753,7 @@
     }
 
     // ============================================================
-    // ОБНОВЛЕНИЕ ПРЕДПРОСМОТРА С MERMAID
+    // ОБНОВЛЕНИЕ ПРЕДПРОСМОТРА
     // ============================================================
     function updatePreview() {
         const text = document.getElementById('editDefinition').value;
@@ -735,17 +765,17 @@
         }
 
         try {
-            const options = getMarkdownOptions();
-            let html = marked.parse(text, options);
+            let processedText = convertEmojis(text);
 
-            // Обработка Mermaid блоков
+            const options = getMarkdownOptions();
+            let html = marked.parse(processedText, options);
+
             html = html.replace(/<pre><code class="language-mermaid">([\s\S]*?)<\/code><\/pre>/g, function(match, code) {
                 return `<div class="mermaid">${code.trim()}</div>`;
             });
 
             previewContainer.innerHTML = html;
 
-            // Запуск Mermaid для новых диаграмм
             const mermaidElements = previewContainer.querySelectorAll('.mermaid');
             if (mermaidElements.length > 0) {
                 mermaid.run({ nodes: mermaidElements }).catch(err => console.warn('Mermaid error:', err));
@@ -879,7 +909,6 @@
         `;
         }).join('');
 
-        // Запуск Mermaid для отображенных диаграмм
         setTimeout(() => {
             const mermaidElements = container.querySelectorAll('.mermaid');
             if (mermaidElements.length > 0) {
@@ -889,7 +918,7 @@
     }
 
     // ============================================================
-    // КАТЕГОРИИ ДЛЯ ФИЛЬТРА
+    // КАТЕГОРИИ
     // ============================================================
     function loadCategories() {
         fetch(API_BASE + '/categories')
@@ -911,9 +940,6 @@
             .catch(console.warn);
     }
 
-    // ============================================================
-    // КАТЕГОРИИ ДЛЯ ВЫПАДАЮЩЕГО СПИСКА В МОДАЛКЕ
-    // ============================================================
     function loadCategorySelect() {
         const select = document.getElementById('editCategorySelect');
         if (select.options.length > 1) return;
@@ -1012,7 +1038,7 @@
     }
 
     // ============================================================
-    // УДАЛЕНИЕ (мягкое)
+    // УДАЛЕНИЕ
     // ============================================================
     function deleteTerm(rn, term) {
         if (!confirm(`Удалить термин "${term}"?`)) return;
@@ -1031,9 +1057,6 @@
             .catch(err => showToast('error', 'Ошибка: ' + err.message));
     }
 
-    // ============================================================
-    // ВОССТАНОВЛЕНИЕ
-    // ============================================================
     function restoreTerm(rn, term) {
         if (!confirm(`Восстановить термин "${term}"?`)) return;
 
@@ -1050,9 +1073,6 @@
             .catch(err => showToast('error', 'Ошибка: ' + err.message));
     }
 
-    // ============================================================
-    // ПОЛНОЕ УДАЛЕНИЕ (hard delete)
-    // ============================================================
     function hardDeleteTerm(rn, term) {
         if (!confirm(`Удалить термин "${term}" НАВСЕГДА без возможности восстановления?`)) return;
 

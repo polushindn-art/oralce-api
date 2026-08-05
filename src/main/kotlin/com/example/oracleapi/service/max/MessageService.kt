@@ -1,6 +1,7 @@
 package com.example.oracleapi.service.max
 
 import com.example.oracleapi.dto.max.MessageResponse
+import com.example.oracleapi.dto.max.MessageStatusResponse
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
@@ -17,11 +18,10 @@ class MessageService(
     fun sendMessage(chatId: String, text: String, format: String = "markdown"): MessageResponse {
         return try {
             val response = botClient.sendMessage(chatId, text, format)
-            val messageId = response["message_id"]?.toString()
-                ?: response["id"]?.toString()
-                ?: "unknown"
+            val messageId = extractMessageId(response)
 
             log.info("✅ Сообщение отправлено в chatId: $chatId")
+
             MessageResponse(
                 success = true,
                 messageId = messageId,
@@ -36,6 +36,7 @@ class MessageService(
             )
         }
     }
+
 
     /**
      * Отправка сообщения по user_id (для личных диалогов)
@@ -107,4 +108,13 @@ class MessageService(
             throw e
         }
     }
+
+    private fun extractMessageId(response: Map<String, Any>): String {
+        (response["message"] as? Map<*, *>)?.let { message ->
+            (message["body"] as? Map<*, *>)?.get("mid")?.toString()?.let { return it }
+            (message["body"] as? Map<*, *>)?.get("id")?.toString()?.let { return it }
+        }
+        return "unknown"
+    }
+
 }

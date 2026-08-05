@@ -90,7 +90,6 @@ class GlobalExceptionHandler {
         logger.debug(msg)
 
         val errorDetail = when {
-            // НОВОЕ: отсутствует обязательное non-nullable поле в JSON
             msg.contains("missing (therefore NULL) value for creator parameter") -> {
                 val missingField = extractMissingFieldName(msg)
                 if (missingField != null) {

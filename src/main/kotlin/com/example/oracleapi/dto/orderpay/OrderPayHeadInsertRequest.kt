@@ -1,6 +1,5 @@
 package com.example.oracleapi.dto.orderpay
 import com.example.oracleapi.annotation.BindingDateFormat
-import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.NotNull

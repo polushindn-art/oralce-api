@@ -52,3 +52,5 @@ springdoc:
         - /v*/idhead/**
         - /v*/orderpay/**
         - /v*/naklhead/**
+        - /v*/prcdoc/**
+        - /v*/prcprice/**

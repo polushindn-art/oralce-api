@@ -64,6 +64,9 @@ class MaxPollingService(
             updates.forEach { updateRaw ->
                 val update = updateRaw as? Map<*, *> ?: return@forEach
                 log.info("📦 Получен update: $updateRaw")
+                // 🔍 Логируем ВСЕ поля для анализа
+                log.info("📦 Полный update: $update")
+                log.info("📦 Ключи update: ${update.keys}")
                 when (val updateType = update["update_type"] as? String) {
                     "bot_started" -> {
                         val userId = (update["user_id"] as? Number)?.toString() ?: return@forEach
@@ -81,6 +84,18 @@ class MaxPollingService(
                         val userId = (sender?.get("user_id") as? Number)?.toString() ?: return@forEach
                         val chatId = (recipient?.get("chat_id") as? Number)?.toString() ?: return@forEach
                         val text = bodyMap?.get("text") as? String
+
+                        // Проверяем наличие вложений (contact)
+                        val attachments = bodyMap?.get("attachments") as? List<*>
+                        attachments?.forEach { attachment ->
+                            val attachmentMap = attachment as? Map<*, *>
+                            if (attachmentMap?.get("type") == "contact") {
+                                val payload = attachmentMap["payload"] as? Map<*, *>
+                                val vcfInfo = payload?.get("vcf_info") as? String
+                                log.info("📱 Получен контакт: $vcfInfo")
+                                // Здесь можно сохранить номер в БД
+                            }
+                        }
 
                         log.info("📩 Получено сообщение от user_id=$userId: $text")
 
@@ -157,6 +172,12 @@ class MaxPollingService(
                         "type" to "callback",
                         "text" to "ℹ️ Помощь",
                         "payload" to "help"
+                    )
+                ),
+                listOf(
+                    mapOf(
+                        "type" to "request_contact",
+                        "text" to "📱 Поделиться номером"
                     )
                 )
             )

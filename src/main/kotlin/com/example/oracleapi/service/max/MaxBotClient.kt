@@ -1,6 +1,7 @@
 package com.example.oracleapi.service.max
 
 import com.example.oracleapi.config.MaxApiProperties
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -14,6 +15,8 @@ class MaxBotClient(
     private val restTemplate: RestTemplate,
     private val properties: MaxApiProperties
 ) {
+
+    private val log = LoggerFactory.getLogger(this::class.java)
 
     /**
      * Отправка сообщения по chat_id (для групповых чатов)
