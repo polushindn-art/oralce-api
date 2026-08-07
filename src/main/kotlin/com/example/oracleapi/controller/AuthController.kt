@@ -17,8 +17,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
-private val log = LoggerFactory.getLogger(AuthController::class.java)
-
 @RestController
 @RequestMapping("/v1/auth")
 @Tag(name = "Авторизация", description = "Контроллер авторизации")
@@ -28,6 +26,8 @@ class AuthController(
     private val tsdListService: TsdListService,
     private val oracleAuthService: OracleAuthService
 ) : BaseController() {
+
+    private val log = LoggerFactory.getLogger(AuthController::class.java)
 
     @PostMapping("/token")
     @Operation(summary = "Получить токен", description = "Получение токена авторизации")

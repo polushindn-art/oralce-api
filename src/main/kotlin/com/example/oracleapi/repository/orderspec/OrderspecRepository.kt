@@ -1,6 +1,6 @@
 package com.example.oracleapi.repository.orderspec
 
-import com.example.oracleapi.entity.Orderspec
+import com.example.oracleapi.entity.table.Orderspec
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query

@@ -1,4 +1,4 @@
-package com.example.oracleapi.entity
+package com.example.oracleapi.entity.table
 
 import com.example.oracleapi.Helper
 import jakarta.persistence.Column
@@ -10,7 +10,7 @@ import jakarta.validation.constraints.Size
 import org.hibernate.annotations.ColumnDefault
 
 @Entity
-@Table(name = "MEASURE", schema = Helper.SCHEME)
+@Table(name = "MEASURE", schema = Helper.Companion.SCHEME)
 open class Measure {
     @Id
     @Column(name = "RN", nullable = false)

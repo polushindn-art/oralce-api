@@ -1,4 +1,4 @@
-package com.example.oracleapi.entity
+package com.example.oracleapi.entity.table
 
 import com.example.oracleapi.Helper
 import jakarta.persistence.Column
@@ -15,7 +15,7 @@ import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
 
 @Entity
-@Table(name = "NOMNLISTP", schema = Helper.SCHEME)
+@Table(name = "NOMNLISTP", schema = Helper.Companion.SCHEME)
 open class Nomnlistp {
     @Id
     @Column(name = "RN", nullable = false)
@@ -41,7 +41,7 @@ open class Nomnlistp {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "PROVIDER", nullable = false)
-    open var provider: com.example.oracleapi.entity.table.AgnList? = null
+    open var provider: AgnList? = null
 
     @Size(max = 80)
     @Column(name = "NOTE", length = 80)

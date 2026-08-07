@@ -1,6 +1,6 @@
 package com.example.oracleapi.dto.orderpay
 
-import com.example.oracleapi.entity.Nomngroup
+import com.example.oracleapi.entity.table.Nomngroup
 import com.example.oracleapi.entity.table.Orderpayspec
 import jakarta.validation.constraints.NotNull
 import java.io.Serializable

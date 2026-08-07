@@ -26,7 +26,9 @@ data class AgnphonenumberlistDto(
     val note: String? = null,
 
     @field:Size(max = 20)
-    val phoneTail: String? = null
+    val phoneTail: String? = null,
+
+    val phoneMasterRN: Long? = null,
 
 ) : Serializable {
     companion object {
@@ -39,7 +41,8 @@ data class AgnphonenumberlistDto(
                 email = entity.prnagnEntity?.mail,
                 phonenumber = entity.phonenumber,
                 note = entity.note,
-                phoneTail = entity.phoneTail
+                phoneTail = entity.phoneTail,
+                phoneMasterRN = entity.prnagnEntity?.phonenumberrn
             )
         }
     }

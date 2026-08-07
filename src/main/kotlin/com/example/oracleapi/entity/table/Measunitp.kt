@@ -1,7 +1,7 @@
-package com.example.oracleapi.entity
+package com.example.oracleapi.entity.table
 
 import com.example.oracleapi.Helper
-import com.example.oracleapi.entity.table.Measunit
+import com.example.oracleapi.entity.table.Nomnlistp
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
@@ -16,7 +16,7 @@ import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
 
 @Entity
-@Table(name = "MEASUNITP", schema = Helper.SCHEME)
+@Table(name = "MEASUNITP", schema = Helper.Companion.SCHEME)
 open class Measunitp {
     @Id
     @Column(name = "RN")

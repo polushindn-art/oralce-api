@@ -1,7 +1,7 @@
 package com.example.oracleapi.entity.table
 
 import com.example.oracleapi.Helper
-import com.example.oracleapi.entity.Nomngroup
+import com.example.oracleapi.entity.table.Nomngroup
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType

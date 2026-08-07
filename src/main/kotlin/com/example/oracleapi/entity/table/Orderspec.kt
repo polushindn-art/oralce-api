@@ -1,6 +1,7 @@
-package com.example.oracleapi.entity
+package com.example.oracleapi.entity.table
 
 import com.example.oracleapi.Helper
+import com.example.oracleapi.entity.Store
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
@@ -17,7 +18,7 @@ import java.math.BigDecimal
 import java.time.LocalDate
 
 @Entity
-@Table(name = "ORDERSPEC", schema = Helper.SCHEME)
+@Table(name = "ORDERSPEC", schema = Helper.Companion.SCHEME)
 open class Orderspec {
     @Id
     @Column(name = "RN", nullable = false)
@@ -71,7 +72,7 @@ open class Orderspec {
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "COUNTRY", updatable = false, insertable = false)
-    open var countryEntity: com.example.oracleapi.entity.table.Country? = null
+    open var countryEntity: Country? = null
 
     @NotNull
     @Column(columnDefinition = "COUNTRY", nullable = false)

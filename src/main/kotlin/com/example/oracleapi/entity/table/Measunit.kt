@@ -1,8 +1,8 @@
 package com.example.oracleapi.entity.table
 
 import com.example.oracleapi.Helper
-import com.example.oracleapi.entity.Measure
-import com.example.oracleapi.entity.Nomnlist
+import com.example.oracleapi.entity.table.Measure
+import com.example.oracleapi.entity.table.Nomnlist
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType

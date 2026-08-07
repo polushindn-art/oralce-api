@@ -6,6 +6,7 @@ import com.example.oracleapi.repository.phonebook.PhonebookRepository
 import com.example.oracleapi.service.ats.AsteriskService
 import com.example.oracleapi.service.ats.CallNotificationService
 import com.example.oracleapi.service.max.common.MaxUserService
+import com.example.oracleapi.util.PhoneUtils
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
@@ -238,6 +239,8 @@ class MaxCallPollingService(
                 val employeeInfo = callNotificationService.findCallerInfo(internalNumber)
                 val employeePhoneSot = employeeInfo?.phoneSot?.takeIf { it.isNotBlank() }
 
+                val phoneSot = PhoneUtils().phone8(employeePhoneSot)
+
                 if (employeePhoneSot == null) {
                     botClient.sendMessage(
                         chatId,
@@ -247,9 +250,9 @@ class MaxCallPollingService(
                     return
                 }
 
-                val employeeName = employeeInfo?.let {
+                val employeeName = employeeInfo.let {
                     listOfNotNull(it.fname, it.nname).joinToString(" ")
-                } ?: "Сотрудник"
+                }
 
                 val dialNumber = when {
                     callerNumber.matches(Regex("^\\d{3,4}$")) -> callerNumber
@@ -257,21 +260,21 @@ class MaxCallPollingService(
                     else -> callerNumber
                 }
 
-                log.info("📱 Перезвон: звоним на $dialNumber, соединяем с сотовым $employeePhoneSot, CallerID=$employeeName")
+                log.info("📱 Перезвон: звоним на $dialNumber, соединяем с сотовым $phoneSot, CallerID=$employeeName")
 
                 botClient.sendMessage(
                     chatId,
                     """
                     📱 *Идёт перезвон на сотовый!*
                     
-                    ⏳ Сейчас мы дозвонимся до $callerName и позвоним на ваш сотовый $employeePhoneSot.
+                    ⏳ Сейчас мы дозвонимся до $callerName и позвоним на ваш сотовый $phoneSot.
                     """.trimIndent(),
                     "markdown"
                 )
 
                 asteriskService.originateCall(
                     dialNumber,
-                    "800$employeePhoneSot",
+                    "800$phoneSot",
                     employeeName
                 )
             }

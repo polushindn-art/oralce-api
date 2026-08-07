@@ -42,6 +42,22 @@ class Helper {
             return "RFID$randomHex"
         }
 
+        fun insertSpaceToArticle(article: String): String {
+            // 1. Проверка на пустоту
+            if (article.isEmpty()) return ""
+
+            // 2. Если короче 13 символов — возвращаем как есть (или пустую строку?)
+            if (article.length <= 13) return article
+
+            // 3. Вставляем пробелы
+            val sb = StringBuilder(article)
+            sb.insert(3, " ")
+            sb.insert(10, " ")
+
+            // 4. Берём первые 13 символов (с пробелами)
+            return sb.toString().take(13).trim()
+        }
+
     }
 
 }

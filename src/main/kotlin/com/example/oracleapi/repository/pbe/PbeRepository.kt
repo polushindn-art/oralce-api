@@ -1,6 +1,6 @@
 package com.example.oracleapi.repository.pbe
 
-import com.example.oracleapi.entity.Pbe
+import com.example.oracleapi.entity.table.Pbe
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 

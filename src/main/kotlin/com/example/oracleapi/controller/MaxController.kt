@@ -5,11 +5,18 @@ import com.example.oracleapi.dto.max.AgeVerificationRequest
 import com.example.oracleapi.dto.max.AgeVerificationResponse
 import com.example.oracleapi.dto.max.MessageRequest
 import com.example.oracleapi.dto.max.MessageResponse
+import com.example.oracleapi.dto.max.auth.AuthCodeResponse
+import com.example.oracleapi.dto.max.auth.AuthRequestDto
+import com.example.oracleapi.service.agnphonenumber.AgnPhoneService
+import com.example.oracleapi.service.max.RegistrationCodeService
+import com.example.oracleapi.service.max.mainBoth.MainBotMessageService
 import com.example.oracleapi.service.max.verification.MaxVerificationService
 import com.example.oracleapi.service.max.call.MessageService
+import com.example.oracleapi.service.maxUserAgn.MaxUserAgnService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
+import org.slf4j.LoggerFactory
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -17,8 +24,14 @@ import org.springframework.web.bind.annotation.*
 @Tag(name = "MAX", description = "Интеграция с Цифровым ID MAX")
 class MaxController(
     private val verificationService: MaxVerificationService,
-    private val messageService: MessageService
+    private val messageService: MessageService,
+    private  val authMessageService: MainBotMessageService,
+    private val agnPhoneService: AgnPhoneService,
+    private val maxUserAgnService: MaxUserAgnService,
+    private val registrationCodeService: RegistrationCodeService
 ) : BaseController() {
+
+    private val log = LoggerFactory.getLogger(AuthController::class.java)
 
     @PostMapping("/age")
     @Operation(summary = "Проверить возраст через Цифровой ID")
@@ -64,6 +77,80 @@ class MaxController(
     fun getBotInfo(): MyApiResponse<Map<String, Any>> {
         val info = messageService.getBotInfo()
         return success(info, "Информация о боте получена")
+    }
+
+    @PostMapping("/auth/code/request")
+    fun requestCodeForCashier(
+        @RequestBody request: AuthRequestDto
+    ): MyApiResponse<AuthCodeResponse> {
+        val phone = request.phone.replace(Regex("[^\\d+]"), "")
+
+        // 1. Проверяем номер в базе
+        val searchResults = agnPhoneService.searchByPhone(phone)
+        if (searchResults.isEmpty()) {
+            return error(
+                "Номер $phone не найден в системе",
+                AuthCodeResponse(success = false, message = "Номер не найден")
+            )
+        }
+
+        // 2. Проверяем, есть ли chat_id
+        val chatId = maxUserAgnService.findChatIdByPhoneAndBotType(phone, "MAIN") ?: return error(
+            "Покупатель с номером $phone не найден в боте",
+            AuthCodeResponse(success = false, message = "Покупатель не авторизован")
+        )
+
+        // 3. Генерируем код
+        val code = (1000..9999).random().toString()
+
+        // 4. ✅ ПЫТАЕМСЯ ОТПРАВИТЬ и ПРОВЕРЯЕМ РЕЗУЛЬТАТ
+        val sendResult = sendCodeToBot(chatId, code)
+        if (!sendResult) {
+            return error(
+                "Не удалось отправить код покупателю",
+                AuthCodeResponse(success = false, message = "Ошибка отправки")
+            )
+        }
+
+        // 5. Сохраняем код (ТОЛЬКО ПОСЛЕ УСПЕШНОЙ ОТПРАВКИ!)
+        registrationCodeService.saveCode(code, phone, "MAIN")
+
+        return success(
+            AuthCodeResponse(
+                success = true,
+                code = code,
+                phone = phone,
+                message = "Код отправлен покупателю"
+            ),
+            "Код сгенерирован"
+        )
+    }
+
+    /**
+     * Отправить код в бот
+     * @return true - успешно, false - ошибка
+     */
+    private fun sendCodeToBot(chatId: String, code: String): Boolean {
+        val response = authMessageService.sendMessage(
+            chatId = chatId,
+            text = """
+        🔐 *Ваш код подтверждения:*
+        
+        `$code`
+        
+        Назовите этот код кассиру.
+        """.trimIndent(),
+            format = "markdown"
+        )
+
+        // ✅ Проверяем success!
+        if (response.success) {
+            log.info("✅ [Auth] Код отправлен в чат $chatId")
+            return true
+        } else {
+            log.error("❌ [Auth] Ошибка отправки кода: ${response.error}")
+            return false
+        }
     }
 
 }

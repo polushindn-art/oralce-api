@@ -1,4 +1,4 @@
-package com.example.oracleapi.service.max.authAgn
+package com.example.oracleapi.service.max.mainBoth
 
 import com.example.oracleapi.config.MaxApiProperties
 import org.slf4j.LoggerFactory
@@ -11,7 +11,7 @@ import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
 
 @Service
-class MaxBotAuthClient(
+class MaxBotMainClient(
     private val restTemplate: RestTemplate,
     private val properties: MaxApiProperties
 ) {

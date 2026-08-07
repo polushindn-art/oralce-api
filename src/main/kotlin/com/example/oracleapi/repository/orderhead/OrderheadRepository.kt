@@ -1,6 +1,6 @@
 package com.example.oracleapi.repository.orderhead
 
-import com.example.oracleapi.entity.Orderhead
+import com.example.oracleapi.entity.table.Orderhead
 import com.example.oracleapi.entity.table.Ordernaklhead
 import org.intellij.lang.annotations.Language
 import org.springframework.data.jpa.repository.JpaRepository

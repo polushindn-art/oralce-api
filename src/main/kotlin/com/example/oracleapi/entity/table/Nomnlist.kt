@@ -1,10 +1,9 @@
-package com.example.oracleapi.entity
+package com.example.oracleapi.entity.table
 
 import com.example.oracleapi.Helper
-import com.example.oracleapi.entity.table.Assortspec
-import com.example.oracleapi.entity.table.Automarginoc
-import com.example.oracleapi.entity.table.MarkIntegration
-import com.example.oracleapi.entity.table.Typeprice
+import com.example.oracleapi.entity.Packaging
+import com.example.oracleapi.entity.Sku
+import com.example.oracleapi.entity.Typebar
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
@@ -32,7 +31,7 @@ open class Nomnlist {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "CRN", nullable = false)
-    open var crn: com.example.oracleapi.entity.table.Acatalog? = null
+    open var crn: Acatalog? = null
 
     @Size(max = 20)
     @NotNull
@@ -60,7 +59,7 @@ open class Nomnlist {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "COUNTRY", nullable = false)
-    open var country: com.example.oracleapi.entity.table.Country? = null
+    open var country: Country? = null
 
     @Size(max = 40)
     @Column(name = "GTD", length = 40)

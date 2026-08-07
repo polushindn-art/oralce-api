@@ -1,7 +1,7 @@
 package com.example.oracleapi.entity.table
 
 import com.example.oracleapi.Helper
-import com.example.oracleapi.entity.Orderhead
+import com.example.oracleapi.entity.table.Orderhead
 import jakarta.persistence.*
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size

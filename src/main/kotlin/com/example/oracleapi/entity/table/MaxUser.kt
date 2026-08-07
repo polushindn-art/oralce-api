@@ -1,11 +1,14 @@
 package com.example.oracleapi.entity.table
 
 import com.example.oracleapi.Helper
-import jakarta.persistence.*
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.Id
+import jakarta.persistence.Table
 
 @Entity
 @Table(name = "MAX_USERS", schema = Helper.SCHEME)
-data class MaxUser(
+class MaxUser(
     @Id
     @Column(name = "RN")
     val rn: Long,

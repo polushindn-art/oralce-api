@@ -1,8 +1,9 @@
-package com.example.oracleapi.entity
+package com.example.oracleapi.entity.table
 
 import com.example.oracleapi.Helper
-import com.example.oracleapi.entity.table.Acatalog
-import com.example.oracleapi.entity.table.AgnList
+import com.example.oracleapi.entity.Store
+import com.example.oracleapi.entity.Typedoc
+import com.example.oracleapi.entity.Userlist
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
@@ -20,7 +21,7 @@ import java.math.BigDecimal
 import java.time.LocalDate
 
 @Entity
-@Table(name = "ORDERHEAD", schema = Helper.SCHEME)
+@Table(name = "ORDERHEAD", schema = Helper.Companion.SCHEME)
 open class Orderhead {
     @Id
     @Column(name = "RN", nullable = false)
@@ -148,7 +149,7 @@ open class Orderhead {
     @OneToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "PRCDOCHEAD")
-    open var prcdochead: com.example.oracleapi.entity.table.Prcdochead? = null
+    open var prcdochead: Prcdochead? = null
 
     @ColumnDefault("0")
     @Column(name = "STATUS_FLAG")

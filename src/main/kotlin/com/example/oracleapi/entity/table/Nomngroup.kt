@@ -1,6 +1,7 @@
-package com.example.oracleapi.entity
+package com.example.oracleapi.entity.table
 
 import com.example.oracleapi.Helper
+import com.example.oracleapi.entity.Tmcgroup
 import com.example.oracleapi.entity.Userlist
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -17,7 +18,7 @@ import org.hibernate.annotations.OnDeleteAction
 import java.math.BigDecimal
 
 @Entity
-@Table(name = "NOMNGROUP", schema = Helper.SCHEME)
+@Table(name = "NOMNGROUP", schema = Helper.Companion.SCHEME)
 open class Nomngroup {
     @Id
     @Column(name = "RN", nullable = false)

@@ -1,6 +1,6 @@
 package com.example.oracleapi.dto.orderspec
 
-import com.example.oracleapi.entity.Orderspec
+import com.example.oracleapi.entity.table.Orderspec
 import com.fasterxml.jackson.annotation.JsonFormat
 import java.math.BigDecimal
 import java.time.LocalDate
