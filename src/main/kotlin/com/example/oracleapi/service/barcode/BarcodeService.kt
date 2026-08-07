@@ -9,7 +9,6 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
-import org.springframework.web.client.exchange
 import java.awt.RenderingHints
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
@@ -21,6 +20,16 @@ class BarcodeService(
 ) {
 
     private val log = LoggerFactory.getLogger(this::class.java)
+
+    init {
+        // ✅ Принудительно регистрируем плагины TwelveMonkeys
+        try {
+            ImageIO.scanForPlugins()
+            log.info("✅ ImageIO плагины зарегистрированы")
+        } catch (e: Exception) {
+            log.warn("⚠️ Не удалось зарегистрировать плагины: ${e.message}")
+        }
+    }
 
     fun decodeBarcodeFromUrlWithAuth(imageUrl: String, token: String): String? {
         return try {
@@ -61,7 +70,6 @@ class BarcodeService(
             val bitmap = BinaryBitmap(HybridBinarizer(source))
             val reader = MultiFormatReader()
 
-            // ✅ Явно указываем форматы и включаем TRY_HARDER
             val hints = mapOf(
                 DecodeHintType.POSSIBLE_FORMATS to listOf(
                     BarcodeFormat.EAN_13,
@@ -77,6 +85,8 @@ class BarcodeService(
                     BarcodeFormat.RSS_EXPANDED,
                     BarcodeFormat.QR_CODE,
                     BarcodeFormat.DATA_MATRIX,
+                    BarcodeFormat.PDF_417,
+                    BarcodeFormat.AZTEC
                 ),
                 DecodeHintType.TRY_HARDER to true
             )
@@ -113,29 +123,54 @@ class BarcodeService(
 
     fun downloadImageWithAuth(url: String, token: String): BufferedImage? {
         return try {
+            log.info("📥 [Barcode] Скачиваем изображение: $url")
+
             val headers = HttpHeaders().apply {
                 set("Authorization", token)
                 set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+                set("Accept", "image/*")  // ✅ Просим изображение
             }
 
-            val response = restTemplate.exchange<ByteArray>(
+            val response = restTemplate.exchange(
                 url,
                 HttpMethod.GET,
-                HttpEntity<Nothing>(headers)
+                HttpEntity<Nothing>(headers),
+                ByteArray::class.java
             )
 
-            val imageBytes = response.body ?: return null
-            log.info("📥 [Barcode] Загружено ${imageBytes.size} байт")
-            log.info("📥 [Barcode] Content-Type: ${response.headers.contentType}")
-
-            val image = ImageIO.read(ByteArrayInputStream(imageBytes))
-            if (image == null) {
-                log.warn("⚠️ Не удалось декодировать изображение")
+            val imageBytes = response.body
+            if (imageBytes == null || imageBytes.isEmpty()) {
+                log.warn("⚠️ Пустой ответ от сервера")
                 return null
             }
 
-            log.info("📥 [Barcode] Изображение: ${image.width}x${image.height}")
-            image
+            log.info("📥 [Barcode] Загружено ${imageBytes.size} байт")
+            log.info("📥 [Barcode] Content-Type: ${response.headers.contentType}")
+
+            // ✅ Пробуем прочитать через ImageIO
+            var image = ImageIO.read(ByteArrayInputStream(imageBytes))
+            if (image != null) {
+                log.info("📥 [Barcode] Изображение прочитано через ImageIO")
+                return image
+            }
+
+            // ✅ Если не получилось — пробуем через TwelveMonkeys
+            log.info("📥 [Barcode] Пробуем через TwelveMonkeys...")
+
+            val inputStream = ByteArrayInputStream(imageBytes)
+            val imageInputStream = ImageIO.createImageInputStream(inputStream)
+            val readers = ImageIO.getImageReaders(imageInputStream)
+
+            if (readers.hasNext()) {
+                val reader = readers.next()
+                reader.setInput(imageInputStream)
+                image = reader.read(0)
+                log.info("📥 [Barcode] Изображение прочитано через reader: ${reader.formatName}")
+                return image
+            }
+
+            log.warn("⚠️ Не удалось декодировать изображение")
+            null
         } catch (e: Exception) {
             log.error("❌ Ошибка загрузки: ${e.message}")
             null
