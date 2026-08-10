@@ -1,7 +1,7 @@
-package com.example.oracleapi.entity
+package com.example.oracleapi.entity.table
 
 import com.example.oracleapi.Helper
-import com.example.oracleapi.entity.table.Pbe
+import com.example.oracleapi.entity.table.Tsdparam
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -20,7 +20,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Entity
-@Table(name = "TSDLIST", schema = Helper.SCHEME)
+@Table(name = "TSDLIST", schema = Helper.Companion.SCHEME)
 open class Tsdlist {
     @Id
     @Column(name = "RN", nullable = false)

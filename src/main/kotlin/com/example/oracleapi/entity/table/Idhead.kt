@@ -1,9 +1,9 @@
 package com.example.oracleapi.entity.table
 
 import com.example.oracleapi.Helper
-import com.example.oracleapi.entity.Store
-import com.example.oracleapi.entity.Typedoc
-import com.example.oracleapi.entity.Userlist
+import com.example.oracleapi.entity.table.Store
+import com.example.oracleapi.entity.table.Typedoc
+import com.example.oracleapi.entity.table.Userlist
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType

@@ -1,8 +1,8 @@
 package com.example.oracleapi.entity.table
 
 import com.example.oracleapi.Helper
-import com.example.oracleapi.entity.Tmcgroup
-import com.example.oracleapi.entity.Userlist
+import com.example.oracleapi.entity.table.Tmcgroup
+import com.example.oracleapi.entity.table.Userlist
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType

@@ -1,6 +1,6 @@
 package com.example.oracleapi.repository.userpart
 
-import com.example.oracleapi.entity.Userpart
+import com.example.oracleapi.entity.table.Userpart
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 

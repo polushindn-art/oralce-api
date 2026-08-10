@@ -1,7 +1,6 @@
-package com.example.oracleapi.entity
+package com.example.oracleapi.entity.table
 
 import com.example.oracleapi.Helper
-import com.example.oracleapi.entity.table.Acatalog
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
@@ -16,7 +15,7 @@ import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
 
 @Entity
-@Table(name = "SKU", schema = Helper.SCHEME)
+@Table(name = "SKU", schema = Helper.Companion.SCHEME)
 open class Sku {
     @Id
     @Column(name = "RN", nullable = false)

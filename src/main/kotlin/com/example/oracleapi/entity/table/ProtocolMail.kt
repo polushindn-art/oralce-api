@@ -1,4 +1,4 @@
-package com.example.oracleapi.entity
+package com.example.oracleapi.entity.table
 
 import com.example.oracleapi.Helper
 import jakarta.persistence.Column
@@ -11,7 +11,7 @@ import org.hibernate.annotations.ColumnDefault
 import java.time.LocalDate
 
 @Entity
-@Table(name = "PROTOCOL_MAIL", schema = Helper.SCHEME)
+@Table(name = "PROTOCOL_MAIL", schema = Helper.Companion.SCHEME)
 open class ProtocolMail {
     @Id
     @NotNull

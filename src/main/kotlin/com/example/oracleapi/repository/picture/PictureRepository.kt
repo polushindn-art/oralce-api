@@ -1,6 +1,6 @@
 package com.example.oracleapi.repository.picture
 
-import com.example.oracleapi.entity.Picture
+import com.example.oracleapi.entity.table.Picture
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 

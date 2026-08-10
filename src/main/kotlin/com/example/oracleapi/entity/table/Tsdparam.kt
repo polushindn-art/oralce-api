@@ -1,5 +1,6 @@
-package com.example.oracleapi.entity
+package com.example.oracleapi.entity.table
 
+import com.example.oracleapi.Helper
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
@@ -9,7 +10,7 @@ import jakarta.validation.constraints.Size
 import org.hibernate.annotations.ColumnDefault
 
 @Entity
-@Table(name = "TSDPARAM", schema = "QREAL")
+@Table(name = "TSDPARAM", schema = Helper.Companion.SCHEME)
 open class Tsdparam {
     @Id
     @NotNull

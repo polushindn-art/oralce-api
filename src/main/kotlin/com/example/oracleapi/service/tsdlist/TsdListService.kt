@@ -5,7 +5,7 @@ import com.example.oracleapi.dto.store.StoreSimpleResponse
 import com.example.oracleapi.dto.tsdlist.*
 import com.example.oracleapi.dto.tsdparam.ParamDto
 import com.example.oracleapi.dto.userpart.PartInfo
-import com.example.oracleapi.entity.Tsdlist
+import com.example.oracleapi.entity.table.Tsdlist
 import com.example.oracleapi.repository.agnlist.AgnListRepository
 import com.example.oracleapi.repository.pbe.PbeRepository
 import com.example.oracleapi.repository.tsd.TsdListHistoryRepository

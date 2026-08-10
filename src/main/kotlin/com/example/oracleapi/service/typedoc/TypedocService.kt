@@ -1,7 +1,7 @@
 package com.example.oracleapi.service.typedoc
 
 import com.example.oracleapi.dto.typedoc.TypedocResponse
-import com.example.oracleapi.entity.Typedoc
+import com.example.oracleapi.entity.table.Typedoc
 import com.example.oracleapi.repository.typedoc.TypedocRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service

@@ -1,9 +1,6 @@
 package com.example.oracleapi.entity.table
 
 import com.example.oracleapi.Helper
-import com.example.oracleapi.entity.Packaging
-import com.example.oracleapi.entity.Sku
-import com.example.oracleapi.entity.Typebar
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
@@ -47,19 +44,19 @@ open class Nomnlist {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "NOMENGROUP", nullable = false)
-    open var nomengroup: Nomngroup? = null
+    open var nomengroupEntity: Nomngroup? = null
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "MEASURE", nullable = false)
-    open var measure: Measure? = null
+    open var measureEntity: Measure? = null
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "COUNTRY", nullable = false)
-    open var country: Country? = null
+    open var countryEntity: Country? = null
 
     @Size(max = 40)
     @Column(name = "GTD", length = 40)
@@ -73,12 +70,12 @@ open class Nomnlist {
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "TYPEPRICE")
-    open var typeprice: Typeprice? = null
+    open var typepriceEntity: Typeprice? = null
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "TYPEBAR")
-    open var typebar: Typebar? = null
+    open var typebarEntity: Typebar? = null
 
     @NotNull
     @ColumnDefault("0")
@@ -184,7 +181,7 @@ open class Nomnlist {
     @OneToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "ASSORTSPEC")
-    open var assortspec: Assortspec? = null
+    open var assortspecEntity: Assortspec? = null
 
     @Size(max = 40)
     @Column(name = "PBARCODE1", length = 40)
@@ -209,7 +206,7 @@ open class Nomnlist {
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "A4TYPEPRICE")
-    open var a4typeprice: Typeprice? = null
+    open var a4typepriceEntity: Typeprice? = null
 
     @NotNull
     @ColumnDefault("0")
@@ -268,7 +265,7 @@ open class Nomnlist {
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "AUTOMARGINOC")
-    open var automarginoc: Automarginoc? = null
+    open var automarginocEntity: Automarginoc? = null
 
     @Size(max = 6)
     @ColumnDefault("null")
@@ -301,7 +298,7 @@ open class Nomnlist {
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "NOTCONDITION")
-    open var notcondition: Nomnlist? = null
+    open var notcondition: Nomnlist? = null //????????????
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.RESTRICT)
@@ -430,6 +427,6 @@ open class Nomnlist {
     @OnDelete(action = OnDeleteAction.SET_NULL)
     @ColumnDefault("null")
     @JoinColumn(name = "MARK_TYPE_GROUP")
-    open var markTypeGroup: MarkIntegration? = null
+    open var markTypeGroupEntity: MarkIntegration? = null
 
 }

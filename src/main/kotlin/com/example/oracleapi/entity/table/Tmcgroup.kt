@@ -1,12 +1,13 @@
-package com.example.oracleapi.entity
+package com.example.oracleapi.entity.table
 
+import com.example.oracleapi.Helper
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 
 @Entity
-@Table(name = "TMCGROUP", schema = "QREAL")
+@Table(name = "TMCGROUP", schema = Helper.Companion.SCHEME)
 open class Tmcgroup {
     @Id
     @Column(name = "RN", columnDefinition = "unknown")

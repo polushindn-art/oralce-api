@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface AgnphonenumberlistRepository : JpaRepository<Agnphonenumberlist, Long> {
     fun findByPhoneTail(phoneTail: String): List<Agnphonenumberlist>
+    fun existsByPhoneTail(phoneTail: String): Boolean
 }

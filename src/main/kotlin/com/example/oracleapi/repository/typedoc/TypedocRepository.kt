@@ -1,6 +1,6 @@
 package com.example.oracleapi.repository.typedoc
 
-import com.example.oracleapi.entity.Typedoc
+import com.example.oracleapi.entity.table.Typedoc
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param

@@ -79,7 +79,11 @@ class MaxController(
         return success(info, "Информация о боте получена")
     }
 
-    @PostMapping("/auth/code/request")
+    @PostMapping("/code_request")
+    @Operation(
+        summary = "Авторизация",
+        description = "Отправить код авторизации в Маск"
+    )
     fun requestCodeForCashier(
         @RequestBody request: AuthRequestDto
     ): MyApiResponse<AuthCodeResponse> {

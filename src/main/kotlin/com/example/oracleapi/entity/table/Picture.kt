@@ -1,5 +1,6 @@
-package com.example.oracleapi.entity
+package com.example.oracleapi.entity.table
 
+import com.example.oracleapi.Helper
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
@@ -8,7 +9,7 @@ import jakarta.persistence.Table
 import java.time.LocalDateTime
 
 @Entity
-@Table(name = "PICTURE")
+@Table(name = "PICTURE", schema = Helper.Companion.SCHEME)
 class Picture(
     @Id
     @Column(name = "RN")

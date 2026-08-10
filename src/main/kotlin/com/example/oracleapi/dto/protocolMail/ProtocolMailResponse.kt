@@ -1,6 +1,6 @@
 package com.example.oracleapi.dto.protocolMail
 
-import com.example.oracleapi.entity.ProtocolMail
+import com.example.oracleapi.entity.table.ProtocolMail
 
 data class ProtocolMailResponse(
     val result: Long? = 0L,

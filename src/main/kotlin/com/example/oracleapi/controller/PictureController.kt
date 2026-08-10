@@ -2,7 +2,7 @@ package com.example.oracleapi.controller
 
 import com.example.oracleapi.dto.common.MyApiResponse
 import com.example.oracleapi.dto.picture.PictureMetadata
-import com.example.oracleapi.entity.Picture
+import com.example.oracleapi.entity.table.Picture
 import com.example.oracleapi.service.picture.PictureService
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.swagger.v3.oas.annotations.Operation

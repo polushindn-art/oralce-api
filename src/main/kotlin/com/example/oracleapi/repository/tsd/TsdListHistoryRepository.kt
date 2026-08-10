@@ -1,7 +1,8 @@
 package com.example.oracleapi.repository.tsd
 import com.example.oracleapi.dto.tsdlist.Registeredjson
 import com.example.oracleapi.dto.tsdlist.UsedJson
-import com.example.oracleapi.entity.TsdListHistory
+import com.example.oracleapi.entity.table.TsdListHistory
+import com.example.oracleapi.entity.table.Tsdlist
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
@@ -113,5 +114,5 @@ interface TsdListHistoryRepository : JpaRepository<TsdListHistory, Long> {
     @Query("SELECT t FROM Tsdlist t " +
             "WHERE t.deviceid = :deviceId " +
             "AND t.deleted IS NULL")
-    fun findTerminalByDeviceId(@Param("deviceId") deviceId: String): com.example.oracleapi.entity.Tsdlist?
+    fun findTerminalByDeviceId(@Param("deviceId") deviceId: String): Tsdlist?
 }

@@ -1,7 +1,7 @@
 package com.example.oracleapi.dto.store
 
 import com.fasterxml.jackson.annotation.JsonInclude
-import com.example.oracleapi.entity.Store
+import com.example.oracleapi.entity.table.Store
 import java.math.BigDecimal
 
 @JsonInclude(JsonInclude.Include.NON_NULL)

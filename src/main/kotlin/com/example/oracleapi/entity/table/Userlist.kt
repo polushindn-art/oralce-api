@@ -1,4 +1,4 @@
-package com.example.oracleapi.entity
+package com.example.oracleapi.entity.table
 
 import com.example.oracleapi.Helper
 import jakarta.persistence.Column
@@ -24,7 +24,7 @@ open class Userlist {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USERAGN", insertable = false, updatable = false)
-    var agnListEntry: com.example.oracleapi.entity.table.AgnList? = null
+    var agnListEntry: AgnList? = null
 
     @Column(name = "PAROLE", columnDefinition = "unknown")
     open var parole: String? = null

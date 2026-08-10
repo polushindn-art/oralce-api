@@ -24,4 +24,13 @@ class AgnPhoneNumber(
     fun findPhone(@Valid phone: String): MyApiResponse<List<AgnphonenumberlistDto>> {
         return successList(agnPhoneService.searchByPhone(phone))
     }
+
+    @GetMapping("/exist")
+    @Operation(
+        description = "Проверить что клиент зарегистрирован в Боте",
+        summary = "Проверить существование"
+    )
+    fun existsByPhone(@Valid phone: String): MyApiResponse<Boolean> {
+        return success(agnPhoneService.existsByPhone(phone))
+    }
 }

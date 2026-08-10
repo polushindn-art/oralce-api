@@ -1,7 +1,6 @@
-package com.example.oracleapi.entity
+package com.example.oracleapi.entity.table
 
 import com.example.oracleapi.Helper
-import com.example.oracleapi.entity.table.Division
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
@@ -13,7 +12,7 @@ import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
 
 @Entity
-@Table(name = "TYPEDOC", schema = Helper.SCHEME)
+@Table(name = "TYPEDOC", schema = Helper.Companion.SCHEME)
 class Typedoc(
     @Id
     @Column(name = "RN", nullable = false)

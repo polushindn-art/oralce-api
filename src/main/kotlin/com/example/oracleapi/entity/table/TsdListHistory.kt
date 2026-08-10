@@ -1,11 +1,18 @@
-package com.example.oracleapi.entity
+package com.example.oracleapi.entity.table
 
 import com.example.oracleapi.Helper
-import jakarta.persistence.*
+import com.example.oracleapi.entity.table.Userlist
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.FetchType
+import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
+import jakarta.persistence.Table
 import java.time.LocalDateTime
 
 @Entity
-@Table(name = "TSDLISTHISTORY", schema = Helper.SCHEME)
+@Table(name = "TSDLISTHISTORY", schema = Helper.Companion.SCHEME)
 open class TsdListHistory {
     @Id
     @Column(name = "RN")

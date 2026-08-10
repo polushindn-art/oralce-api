@@ -33,6 +33,7 @@ abstract class BasePackage(
         const val PUBLIC = "PKG_PUBLIC"
         const val PROTOCOLMARK = "PKG_PROTOCOLMARK"
         const val PRCPRICEOS = "PKG_PRCPRICEOC"
+        const val PRICE = "PKG_PRICE"
     }
 
     private val logger = LoggerFactory.getLogger(BasePackage::class.java)

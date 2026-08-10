@@ -1,6 +1,6 @@
 package com.example.oracleapi.dto.typedoc
 
-import com.example.oracleapi.entity.Typedoc
+import com.example.oracleapi.entity.table.Typedoc
 
 data class TypedocResponse(
     val rn: Long,

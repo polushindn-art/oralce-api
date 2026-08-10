@@ -1,6 +1,6 @@
 package com.example.oracleapi.dto.picture
 
-import com.example.oracleapi.entity.Picture
+import com.example.oracleapi.entity.table.Picture
 import com.fasterxml.jackson.annotation.JsonFormat
 import java.time.LocalDateTime
 

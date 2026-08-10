@@ -1,6 +1,6 @@
 package com.example.oracleapi.service.picture
 
-import com.example.oracleapi.entity.Picture
+import com.example.oracleapi.entity.table.Picture
 import com.example.oracleapi.repository.picture.PictureRepository
 import org.springframework.stereotype.Service
 

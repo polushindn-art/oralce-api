@@ -1,7 +1,7 @@
 package com.example.oracleapi.service
 
 import com.example.oracleapi.dto.protocolMail.ProtocolMailResponse
-import com.example.oracleapi.entity.ProtocolMail
+import com.example.oracleapi.entity.table.ProtocolMail
 import com.example.oracleapi.repository.ProtocolMailRepository
 import org.springframework.stereotype.Service
 

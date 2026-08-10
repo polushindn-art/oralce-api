@@ -1,6 +1,6 @@
 package com.example.oracleapi.service.userlist
 
-import com.example.oracleapi.entity.Userlist
+import com.example.oracleapi.entity.table.Userlist
 import com.example.oracleapi.repository.userlist.UserlistRepository
 import org.springframework.stereotype.Service
 

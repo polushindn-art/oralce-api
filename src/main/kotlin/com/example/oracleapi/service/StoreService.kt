@@ -2,7 +2,7 @@ package com.example.oracleapi.service
 
 import com.example.oracleapi.dto.store.StoreResponse
 import com.example.oracleapi.dto.store.StoreSimpleResponse
-import com.example.oracleapi.entity.Store
+import com.example.oracleapi.entity.table.Store
 import com.example.oracleapi.repository.store.StoreRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
