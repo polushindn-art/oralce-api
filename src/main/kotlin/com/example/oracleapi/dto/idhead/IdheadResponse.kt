@@ -23,7 +23,9 @@ data class IdheadResponse(
     val note: String?,
     val manager: Long?,
     val storeoper: Long?,
-    val usercode: String?
+    val usercode: String?,
+    val sumweight: BigDecimal?,
+    val sumvolume: BigDecimal?
 )
 
 fun Idhead.toResponse(): IdheadResponse = IdheadResponse(
@@ -44,4 +46,6 @@ fun Idhead.toResponse(): IdheadResponse = IdheadResponse(
     manager = this.manager,
     storeoper = this.storeoper,
     usercode = this.userListEntity?.agnListEntry?.agncode,
+    sumweight = this.sumweight,
+    sumvolume = this.sumvolume
 )

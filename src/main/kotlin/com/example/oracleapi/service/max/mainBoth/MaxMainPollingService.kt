@@ -2,10 +2,15 @@ package com.example.oracleapi.service.max.mainBoth
 
 import com.example.oracleapi.Helper
 import com.example.oracleapi.config.MaxApiProperties
+import com.example.oracleapi.entity.table.Phonebook
+import com.example.oracleapi.repository.phonebook.PhonebookRepository
 import com.example.oracleapi.service.agnphonenumber.AgnPhoneService
+import com.example.oracleapi.service.ats.AsteriskService
+import com.example.oracleapi.service.ats.CallNotificationService
 import com.example.oracleapi.service.barcode.BarcodeService
 import com.example.oracleapi.service.maxUserAgn.MaxUserAgnService
 import com.example.oracleapi.service.nomnlist.NomnlistService
+import com.example.oracleapi.util.PhoneUtils
 import ezvcard.Ezvcard
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpEntity
@@ -16,7 +21,6 @@ import org.springframework.stereotype.Service
 import org.springframework.web.client.ResourceAccessException
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
-import kotlin.text.takeLast
 
 @Service
 class MaxMainPollingService(
@@ -26,13 +30,17 @@ class MaxMainPollingService(
     private val agnPhoneService: AgnPhoneService,
     private val maxUserAgnService: MaxUserAgnService,
     private val barcodeService: BarcodeService,
-    private val nomnlistService: NomnlistService
+    private val nomnlistService: NomnlistService,
+    private val phonebookRepository: PhonebookRepository,
+    private val asteriskService: AsteriskService,
+    private val callNotificationService: CallNotificationService
 ) {
 
     private val log = LoggerFactory.getLogger(this::class.java)
     private var marker: Long? = null
+    private val searchState = mutableMapOf<String, Boolean>()
 
-    @Scheduled(fixedDelay = 2000)
+    @Scheduled(fixedDelay = 2000, initialDelay = 5000)
     fun pollUpdates() {
         try {
             val uriBuilder = UriComponentsBuilder.fromHttpUrl("${properties.botApiUrl}/updates")
@@ -46,7 +54,7 @@ class MaxMainPollingService(
             val url = uriBuilder.build().toUri()
 
             val headers = HttpHeaders().apply {
-                set("Authorization", properties.botAuthToken)
+                set("Authorization", properties.botMainToken)
             }
 
             val response = restTemplate.exchange(
@@ -86,13 +94,15 @@ class MaxMainPollingService(
                         val chatId = (recipient?.get("chat_id") as? Number)?.toString() ?: return@forEach
                         val text = bodyMap?.get("text") as? String
 
+                        // ✅ Флаг: было ли обработано вложение
+                        var attachmentProcessed = false
+
                         // Проверяем вложения
                         val attachments = bodyMap?.get("attachments") as? List<*>
                         attachments?.forEach { attachment ->
                             val attachmentMap = attachment as? Map<*, *>
                             when (attachmentMap?.get("type")) {
                                 "contact" -> {
-                                    // ✅ Обработка контакта
                                     val payload = attachmentMap["payload"] as? Map<*, *>
                                     val vcfInfo = payload?.get("vcf_info") as? String
                                     log.info("📱 [Main Bot] Получен контакт: $vcfInfo")
@@ -103,9 +113,12 @@ class MaxMainPollingService(
                                             handlePhoneNumberReceived(userId, chatId, contactInfo)
                                         }
                                     }
+                                    attachmentProcessed = true
                                 }
 
                                 "image" -> {
+                                    log.info("📸 [Main Bot] Обработка изображения...")
+                                    attachmentProcessed = true  // ← Сразу ставим
                                     val payload = attachmentMap["payload"] as? Map<*, *>
                                     val photoUrl = payload?.get("url") as? String
                                     val photoToken = payload?.get("token") as? String
@@ -114,9 +127,8 @@ class MaxMainPollingService(
                                     log.info("📸 [Main Bot] URL: $photoUrl")
                                     log.info("📸 [Main Bot] TOKEN: $photoToken")
 
-                                    // ✅ Используем тот же токен, что и для получения обновлений
                                     if (photoUrl != null) {
-                                        val authToken = "Bearer ${properties.botAuthToken}"
+                                        val authToken = "Bearer ${properties.botMainToken}"
                                         val barcode = barcodeService.decodeBarcodeFromUrlWithAuth(photoUrl, authToken)
                                         if (barcode != null) {
                                             log.info("📱 [Main Bot] Распознан код: $barcode")
@@ -124,32 +136,17 @@ class MaxMainPollingService(
 
                                             val article = Helper.insertSpaceToArticle(nomen?.article ?: "не найден")
 
-
                                             val nomenText = """
                                                 ${nomen?.nomenname ?: "Товар со штрих-кодом $barcode не найден"}
                                                 Артикул: $article
                                             """.trimIndent()
 
-                                            botClient.sendMessage(
-                                                chatId,
-                                                """
-                                                    $nomenText
-                                                    """.trimIndent(),
-                                                "markdown"
-                                            )
+                                            botClient.sendMessage(chatId, nomenText, "markdown")
                                         } else {
-                                            botClient.sendMessage(
-                                                chatId,
-                                                "❌ Не удалось распознать код на фото",
-                                                "markdown"
-                                            )
+                                            botClient.sendMessage(chatId, "❌ Не удалось распознать код на фото", "markdown")
                                         }
                                     } else {
-                                        botClient.sendMessage(
-                                            chatId,
-                                            "📸 *Фото получено*",
-                                            "markdown"
-                                        )
+                                        botClient.sendMessage(chatId, "📸 *Фото получено*", "markdown")
                                     }
                                 }
                             }
@@ -157,8 +154,8 @@ class MaxMainPollingService(
 
                         log.info("📩 [Main Bot] Получено сообщение от user_id=$userId: $text")
 
-                        if (text != null && text.isNotBlank()) {
-                            handleAuthMessage(userId, chatId, text)
+                        if (!attachmentProcessed && !text.isNullOrBlank()) {
+                            handleTextMessage(userId, chatId, text)
                         }
                     }
 
@@ -203,67 +200,55 @@ class MaxMainPollingService(
 
     data class ContactInfo(val phone: String, val name: String)
 
+    /**
+     * Проверяет, является ли пользователь сотрудником
+     */
+    private fun isEmployee(chatId: String): Boolean {
+        val user = maxUserAgnService.findByChatId(chatId) ?: return false
+        val cleanPhone = PhoneUtils.getPhoneTail(user.phone ?: "")
+        return phonebookRepository.findByPhoneTail(cleanPhone).isNotEmpty()
+    }
+
     private fun sendMainMenu(chatId: String) {
         val isRegistered = maxUserAgnService.isChatRegistered(chatId)
+        val employee = isRegistered && isEmployee(chatId)
 
         val buttons = if (isRegistered) {
-            listOf(
-                listOf(
-                    mapOf(
-                        "type" to "callback",
-                        "text" to "📋 Мои данные",
-                        "payload" to "my_data"
-                    )
-                ),
-                listOf(
-                    mapOf(
-                        "type" to "callback",
-                        "text" to "🗑️ Отписаться",
-                        "payload" to "unsubscribe"
-                    )
-                ),
-                listOf(
-                    mapOf(
-                        "type" to "callback",
-                        "text" to "ℹ️ Помощь",
-                        "payload" to "auth_help"
-                    )
-                )
-            )
+            val list = mutableListOf<List<Map<String, Any>>>()
+            list.add(listOf(mapOf("type" to "callback", "text" to "📋 Мои данные", "payload" to "my_data")))
+
+            if (employee) {
+                list.add(listOf(mapOf("type" to "callback", "text" to "🔍 Поиск сотрудников", "payload" to "search")))
+            }
+
+            list.add(listOf(mapOf("type" to "callback", "text" to "🗑️ Отписаться", "payload" to "unsubscribe")))
+            list.add(listOf(mapOf("type" to "callback", "text" to "ℹ️ Помощь", "payload" to "auth_help")))
+            list
         } else {
             listOf(
-                listOf(
-                    mapOf(
-                        "type" to "callback",
-                        "text" to "📝 Регистрация",
-                        "payload" to "register"
-                    )
-                ),
-                listOf(
-                    mapOf(
-                        "type" to "callback",
-                        "text" to "ℹ️ Помощь",
-                        "payload" to "auth_help"
-                    )
-                )
+                listOf(mapOf("type" to "callback", "text" to "📝 Регистрация", "payload" to "register")),
+                listOf(mapOf("type" to "callback", "text" to "ℹ️ Помощь", "payload" to "auth_help"))
             )
         }
 
-        val text = if (isRegistered) {
-            """
-            👋 *Добро пожаловать!*
-            
-            Вы уже зарегистрированы.
-            
-            Выберите действие в меню ниже.
+        val text = when {
+            !isRegistered -> """
+                👋 *Добро пожаловать!*
+                
+                Для начала работы необходимо зарегистрироваться.
+                Нажмите *"Регистрация"* для начала.
             """.trimIndent()
-        } else {
-            """
-            👋 *Добро пожаловать!*
-            
-            Для начала работы необходимо зарегистрироваться.
-            
-            Нажмите *"Регистрация"* для начала.
+            employee -> """
+                👋 *Привет, сотрудник!*
+                
+                Вы уже зарегистрированы.
+                Выберите действие в меню ниже.
+            """.trimIndent()
+            else -> """
+                👋 *Привет!*
+                
+                Вы уже зарегистрированы.
+                Выберите действие в меню ниже.
             """.trimIndent()
         }
 
@@ -294,11 +279,12 @@ class MaxMainPollingService(
             
             👤 *Кто может зарегистрироваться:*
             Клиенты магазина.
+            Сотрудники организации.
             Номер телефона должен совпадать с номером, с которым вы зарегистрированы в MAX.
             
             🛒 *Как стать клиентом:*
             Обратитесь в информационную службу.
-                        
+            
             📌 *Команды:*
             /start — главное меню
             /help — эта справка
@@ -308,8 +294,25 @@ class MaxMainPollingService(
         )
     }
 
-    private fun handleAuthMessage(userId: String, chatId: String, text: String) {
-        when (text.trim().lowercase()) {
+    private fun handleTextMessage(userId: String, chatId: String, text: String) {
+        val trimmedText = text.trim()
+
+        // ✅ Если пользователь в состоянии поиска
+        if (searchState[userId] == true) {
+            searchState[userId] = false
+            if (trimmedText.isNotEmpty()) {
+                searchEmployees(chatId, trimmedText)
+            } else {
+                botClient.sendMessage(
+                    chatId,
+                    "❌ Поисковый запрос не может быть пустым.",
+                    "markdown"
+                )
+            }
+            return
+        }
+
+        when (trimmedText.lowercase()) {
             "/start" -> {
                 log.info("📌 [Main Bot] Пользователь $userId вызвал /start")
                 sendMainMenu(chatId)
@@ -321,14 +324,13 @@ class MaxMainPollingService(
             }
 
             else -> {
-                log.info("📌 [Main Bot] Неизвестная команда от $userId: $text, показываем меню")
+                log.info("📌 [Main Bot] Неизвестная команда от $userId: $trimmedText, показываем меню")
                 sendMainMenu(chatId)
             }
         }
     }
 
     private fun handlePhoneNumberReceived(userId: String, chatId: String, contact: ContactInfo) {
-        // ✅ Проверяем, зарегистрирован ли уже чат
         if (maxUserAgnService.isChatRegistered(chatId)) {
             val buttons = listOf(
                 listOf(
@@ -339,25 +341,26 @@ class MaxMainPollingService(
                     )
                 )
             )
-            botClient.sendMessageWithKeyboard(
-                chatId,
-                "ℹ️ *Вы уже зарегистрированы!*",
-                buttons,
-                "markdown"
-            )
+            botClient.sendMessageWithKeyboard(chatId, "ℹ️ *Вы уже зарегистрированы!*", buttons, "markdown")
             return
         }
 
         val cleanNumber = contact.phone.replace(Regex("[^\\d+]"), "")
         val nameFromMax = contact.name
+        val phoneTail = PhoneUtils.getPhoneTail(cleanNumber)
 
         log.info("📱 [Main Bot] ✅ ПОЛУЧЕН КОНТАКТ: userId=$userId, chatId=$chatId, phone=$cleanNumber, nameFromMax=$nameFromMax")
 
-        // 🔍 Проверяем номер в таблице контрагентов
-        val searchResults = agnPhoneService.searchByPhone(cleanNumber)
+        // ✅ Сначала проверяем в phonebook (сотрудники)
+        val employeeResults = phonebookRepository.findByPhoneTail(phoneTail)
+            .ifEmpty { phonebookRepository.findByPhoneSot(cleanNumber) }
+            .ifEmpty { phonebookRepository.findByPhoneInt(cleanNumber) }
 
-        if (searchResults.isEmpty()) {
-            // ❌ Номер не найден в базе
+        // ✅ Потом проверяем в agnphonenumberlist (клиенты)
+        val clientResults = agnPhoneService.searchByPhone(cleanNumber)
+
+        // ✅ Если не найден нигде — ошибка
+        if (employeeResults.isEmpty() && clientResults.isEmpty()) {
             val buttons = listOf(
                 listOf(
                     mapOf(
@@ -370,17 +373,28 @@ class MaxMainPollingService(
             botClient.sendMessageWithKeyboard(
                 chatId,
                 """
-                ❌ *Клиент с номером `$cleanNumber` не найден!*
-                
-                Пожалуйста, проверьте правильность номера или обратитесь к администратору.
-                """.trimIndent(),
+            ❌ *Номер `$cleanNumber` не найден!*
+            
+            Пожалуйста, проверьте правильность номера или обратитесь к администратору.
+            """.trimIndent(),
                 buttons,
                 "markdown"
             )
             return
         }
 
-        // ✅ Номер найден — регистрируем
+        // ✅ Определяем роль: сотрудник ИЛИ клиент
+        val isEmployee = employeeResults.isNotEmpty()  // Сотрудник?
+        val isClient = clientResults.isNotEmpty()      // Клиент?
+
+        // ✅ Формируем текст роли
+        val roleText = when {
+            isEmployee && isClient -> "сотрудник + клиент"
+            isEmployee -> "сотрудник"
+            isClient -> "клиент"
+            else -> "пользователь"
+        }
+
         try {
             maxUserAgnService.addUserAgn(
                 userId = userId,
@@ -403,14 +417,15 @@ class MaxMainPollingService(
             botClient.sendMessageWithKeyboard(
                 chatId,
                 """
-                👋 *Привет, $nameFromMax!*
-                
-                ✅ Регистрация прошла успешно!
-                
-                📱 Ваш номер: `$cleanNumber`
-                
-                🔐 Добро пожаловать!
-                """.trimIndent(),
+            👋 *Привет, $nameFromMax!*
+            
+            ✅ Регистрация прошла успешно!
+            
+            📱 Ваш номер: `$cleanNumber`
+            👤 Роль: $roleText
+            
+            🔐 Добро пожаловать!
+            """.trimIndent(),
                 buttons,
                 "markdown"
             )
@@ -426,12 +441,7 @@ class MaxMainPollingService(
                     )
                 )
             )
-            botClient.sendMessageWithKeyboard(
-                chatId,
-                "❌ Ошибка регистрации. Попробуйте позже.",
-                buttons,
-                "markdown"
-            )
+            botClient.sendMessageWithKeyboard(chatId, "❌ Ошибка регистрации. Попробуйте позже.", buttons, "markdown")
         }
     }
 
@@ -450,12 +460,7 @@ class MaxMainPollingService(
                             )
                         )
                     )
-                    botClient.sendMessageWithKeyboard(
-                        chatId,
-                        "ℹ️ *Вы уже зарегистрированы!*",
-                        buttons,
-                        "markdown"
-                    )
+                    botClient.sendMessageWithKeyboard(chatId, "ℹ️ *Вы уже зарегистрированы!*", buttons, "markdown")
                     return
                 }
 
@@ -485,7 +490,7 @@ class MaxMainPollingService(
                     Нажмите *"Поделиться номером"* для отправки контакта.
                     
                     ⚠️ *Важно:*
-                    Вы должны быть клиентом магазина.
+                    Вы должны быть клиентом магазина или сотрудником.
                     Номер в боте MAX должен совпадать с номером в системе.
                     Если номер не найден, регистрация будет отклонена.
                     Для получения карты обратитесь в информационную службу.
@@ -495,9 +500,20 @@ class MaxMainPollingService(
                 )
             }
 
+            payload == "search" -> {
+                if (!isEmployee(chatId)) {
+                    botClient.sendMessage(chatId, "❌ Поиск сотрудников доступен только сотрудникам", "markdown")
+                    return
+                }
+                searchState[userId] = true
+                botClient.sendMessage(chatId, "🔍 Введите фамилию, имя или должность:", "markdown")
+            }
+
             payload == "my_data" -> {
                 val userAgn = maxUserAgnService.findByChatId(chatId)
                 if (userAgn != null) {
+                    val employee = isEmployee(chatId)
+                    val roleText = if (employee) "Сотрудник" else "Клиент"
                     val buttons = listOf(
                         listOf(
                             mapOf(
@@ -514,6 +530,7 @@ class MaxMainPollingService(
                         
                         📱 Номер: `${userAgn.phone}`
                         👤 Имя: ${userAgn.userName ?: "не указано"}
+                        🏷️ Роль: $roleText
                         📅 Зарегистрирован: ${userAgn.createdAt}
                         """.trimIndent(),
                         buttons,
@@ -594,13 +611,18 @@ class MaxMainPollingService(
 
                 } catch (e: Exception) {
                     log.error("❌ [Main Bot] Ошибка отписки", e)
-                    botClient.sendMessage(
-                        chatId,
-                        "❌ Ошибка при отписке. Попробуйте позже.",
-                        "markdown"
-                    )
+                    botClient.sendMessage(chatId, "❌ Ошибка при отписке. Попробуйте позже.", "markdown")
                     sendMainMenu(chatId)
                 }
+            }
+
+            payload.startsWith("call_mobile_") -> {
+                val parts = payload.removePrefix("call_mobile_").split("_")
+                val internalNumber = parts.getOrNull(0) ?: ""
+                val callerNumber = parts.getOrNull(1) ?: ""
+
+                log.info("📱 [Main Bot] Обработка перезвона: сотрудник=$internalNumber, звонящий=$callerNumber")
+                handleCallMobile(chatId, internalNumber, callerNumber)
             }
 
             payload == "auth_help" -> {
@@ -617,4 +639,119 @@ class MaxMainPollingService(
             }
         }
     }
+
+    /**
+     * Обработка перезвона на сотовый сотрудника
+     */
+    private fun handleCallMobile(chatId: String, internalNumber: String, callerNumber: String) {
+        try {
+            val callerInfo = callNotificationService.findCallerInfo(callerNumber)
+            val callerName = callerInfo?.let {
+                listOfNotNull(it.fname, it.nname).joinToString(" ")
+            } ?: callerNumber
+
+            val employeeInfo = callNotificationService.findCallerInfo(internalNumber)
+            val employeePhoneSot = employeeInfo?.phoneSot?.takeIf { it.isNotBlank() }
+
+            if (employeePhoneSot == null) {
+                botClient.sendMessage(
+                    chatId,
+                    "❌ У вас не указан сотовый номер в телефонной книге.",
+                    "markdown"
+                )
+                return
+            }
+
+            val phoneSot = PhoneUtils.phone8(employeePhoneSot)
+            val employeeName = listOfNotNull(employeeInfo?.fname, employeeInfo?.nname).joinToString(" ")
+
+            val dialNumber = when {
+                callerNumber.matches(Regex("^\\d{3,4}$")) -> callerNumber
+                else -> callerNumber
+            }
+
+            log.info("📱 Перезвон: звоним на $dialNumber, соединяем с сотовым $phoneSot, CallerID=$employeeName")
+
+            botClient.sendMessage(
+                chatId,
+                """
+                📱 *Идёт перезвон на сотовый!*
+                
+                ⏳ Сейчас мы дозвонимся до $callerName и позвоним на ваш сотовый $phoneSot.
+                """.trimIndent(),
+                "markdown"
+            )
+
+            asteriskService.originateCall(
+                dialNumber,
+                "800$phoneSot",
+                employeeName
+            )
+
+        } catch (e: Exception) {
+            log.error("❌ Ошибка перезвона", e)
+            botClient.sendMessage(
+                chatId,
+                "❌ Ошибка при выполнении перезвона. Попробуйте позже.",
+                "markdown"
+            )
+        }
+    }
+
+    /**
+     * Поиск сотрудников по фамилии, имени, должности или отделу
+     */
+    private fun searchEmployees(chatId: String, query: String) {
+        val searchLower = query.lowercase()
+
+        val allEmployees = phonebookRepository.findAll()
+        val results = allEmployees.filter { employee ->
+            val fullName = listOfNotNull(employee.fname, employee.nname).joinToString(" ")
+
+            fullName.lowercase().contains(searchLower) ||
+                    employee.dolgnost?.lowercase()?.contains(searchLower) == true ||
+                    employee.otdel?.lowercase()?.contains(searchLower) == true ||
+                    employee.fname?.lowercase()?.contains(searchLower) == true ||
+                    employee.nname?.lowercase()?.contains(searchLower) == true
+        }.take(10)
+
+        if (results.isEmpty()) {
+            botClient.sendMessage(
+                chatId,
+                "🔍 По запросу `$query` ничего не найдено.",
+                "markdown"
+            )
+            return
+        }
+
+        val message = buildSearchResult(results, query)
+        botClient.sendMessage(chatId, message, "markdown")
+    }
+
+    /**
+     * Формирование результата поиска
+     */
+    private fun buildSearchResult(results: List<Phonebook>, query: String): String {
+        val lines = mutableListOf<String>()
+        lines.add("🔍 *Результаты поиска*")
+        lines.add("Запрос: `$query`")
+        lines.add("Найдено: ${results.size}")
+        lines.add("")
+
+        results.forEachIndexed { index, employee ->
+            val fullName = listOfNotNull(employee.fname, employee.nname).joinToString(" ")
+            lines.add("${index + 1}. *$fullName*")
+            employee.dolgnost?.let { lines.add("   📋 $it") }
+            employee.otdel?.let { lines.add("   🏢 $it") }
+            employee.phoneInt?.let { lines.add("   📞 $it") }
+            employee.phoneSot?.let {
+                lines.add("   📱 ${callNotificationService.formatPhoneNumber(it)}")
+            }
+            employee.email?.let { lines.add("   📧 $it") }
+            lines.add("")
+        }
+
+        return lines.joinToString("\n")
+    }
+
 }

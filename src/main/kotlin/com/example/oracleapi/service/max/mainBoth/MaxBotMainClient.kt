@@ -28,7 +28,7 @@ class MaxBotMainClient(
             .toUri()
 
         val headers = HttpHeaders().apply {
-            set("Authorization", properties.botAuthToken)
+            set("Authorization", properties.botMainToken)
             set("Content-Type", "application/json")
         }
 
@@ -64,7 +64,7 @@ class MaxBotMainClient(
             .toUri()
 
         val headers = HttpHeaders().apply {
-            set("Authorization", properties.botAuthToken)
+            set("Authorization", properties.botMainToken)
             set("Content-Type", "application/json")
         }
 
@@ -92,4 +92,104 @@ class MaxBotMainClient(
         return response.body as? Map<String, Any>
             ?: throw RestClientException("Empty response from MAX API")
     }
+
+    /**
+     * Отправка сообщения по user_id (для личных диалогов)
+     */
+    fun sendMessageByUserId(userId: String, text: String, format: String = "markdown"): Map<String, Any> {
+        val uri = UriComponentsBuilder.fromHttpUrl("${properties.botApiUrl}/messages")
+            .queryParam("user_id", userId)
+            .build()
+            .toUri()
+
+        val headers = HttpHeaders().apply {
+            set("Authorization", properties.botMainToken)
+            set("Content-Type", "application/json")
+        }
+
+        val body = mapOf(
+            "text" to text,
+            "format" to format
+        )
+
+        val response = restTemplate.exchange(
+            uri,
+            HttpMethod.POST,
+            HttpEntity(body, headers),
+            Map::class.java
+        )
+
+        @Suppress("UNCHECKED_CAST")
+        return response.body as? Map<String, Any>
+            ?: throw RestClientException("Empty response from MAX API")
+    }
+
+    /**
+     * Отправка сообщения с клавиатурой по user_id
+     */
+    fun sendMessageWithKeyboardByUserId(
+        userId: String,
+        text: String,
+        buttons: List<List<Map<String, Any>>>,
+        format: String = "markdown"
+    ): Map<String, Any> {
+        val uri = UriComponentsBuilder.fromHttpUrl("${properties.botApiUrl}/messages")
+            .queryParam("user_id", userId)
+            .build()
+            .toUri()
+
+        val headers = HttpHeaders().apply {
+            set("Authorization", properties.botMainToken)
+            set("Content-Type", "application/json")
+        }
+
+        val body = mapOf(
+            "text" to text,
+            "format" to format,
+            "attachments" to listOf(
+                mapOf(
+                    "type" to "inline_keyboard",
+                    "payload" to mapOf(
+                        "buttons" to buttons
+                    )
+                )
+            )
+        )
+
+        val response = restTemplate.exchange(
+            uri,
+            HttpMethod.POST,
+            HttpEntity(body, headers),
+            Map::class.java
+        )
+
+        @Suppress("UNCHECKED_CAST")
+        return response.body as? Map<String, Any>
+            ?: throw RestClientException("Empty response from MAX API")
+    }
+
+    /**
+     * Получение информации о боте
+     */
+    fun getBotInfo(): Map<String, Any> {
+        val url = "${properties.botApiUrl}/me"
+
+        val headers = HttpHeaders().apply {
+            set("Authorization", properties.botMainToken)
+            set("Content-Type", "application/json")
+        }
+
+        val response = restTemplate.exchange(
+            url,
+            HttpMethod.GET,
+            HttpEntity<Nothing>(headers),
+            Map::class.java
+        )
+
+        val rawResponse = response.body ?: throw RestClientException("Empty response from MAX API")
+
+        @Suppress("UNCHECKED_CAST")
+        return rawResponse as Map<String, Any>
+    }
+
 }

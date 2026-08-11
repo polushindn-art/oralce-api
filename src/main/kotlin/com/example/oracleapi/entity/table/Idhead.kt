@@ -63,12 +63,13 @@ open class Idhead {
     open var idStatus: Long? = null
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumnOrFormula(column = JoinColumn(
-        name = "ID_STATUS",
-        referencedColumnName = "FIELD_VALUE",
-        insertable = false,
-        updatable = false
-    )
+    @JoinColumnOrFormula(
+        column = JoinColumn(
+            name = "ID_STATUS",
+            referencedColumnName = "FIELD_VALUE",
+            insertable = false,
+            updatable = false
+        )
     )
     @JoinColumnOrFormula(formula = JoinFormula(value = "'ID_STATUS'", referencedColumnName = "FIELD_NAME"))
     var statusEntity: Field? = null

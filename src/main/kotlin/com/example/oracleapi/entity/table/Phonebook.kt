@@ -59,4 +59,7 @@ open class Phonebook {
     @Column(name = "KARMA")
     open var karma: Long? = null
 
+    @Column(name = "PHONE_TAIL")
+    var phoneTail: String? = null
+
 }

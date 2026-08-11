@@ -34,7 +34,7 @@ class MaxCallPollingService(
     private val registrationState = mutableMapOf<String, Boolean>()
     private val searchState = mutableMapOf<String, Boolean>()
 
-    @Scheduled(fixedDelay = 2000)
+    //@Scheduled(fixedDelay = 2000)
     fun pollUpdates() {
         try {
             val uriBuilder = UriComponentsBuilder.fromHttpUrl("${properties.botApiUrl}/updates")
@@ -239,7 +239,7 @@ class MaxCallPollingService(
                 val employeeInfo = callNotificationService.findCallerInfo(internalNumber)
                 val employeePhoneSot = employeeInfo?.phoneSot?.takeIf { it.isNotBlank() }
 
-                val phoneSot = PhoneUtils().phone8(employeePhoneSot)
+                val phoneSot = PhoneUtils.phone8(employeePhoneSot)
 
                 if (employeePhoneSot == null) {
                     botClient.sendMessage(

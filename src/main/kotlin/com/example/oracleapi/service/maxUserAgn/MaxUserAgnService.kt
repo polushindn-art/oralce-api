@@ -17,7 +17,6 @@ class MaxUserAgnService(
 ) {
 
     private val log = LoggerFactory.getLogger(this::class.java)
-    private val phoneUtils = PhoneUtils()
 
     /**
      * Проверить, зарегистрирован ли уже этот чат
@@ -44,7 +43,7 @@ class MaxUserAgnService(
         botType: String = "MAIN",
         userName: String? = null
     ): MaxUserAgn {
-        val phoneTail = phoneUtils.getPhoneTail(phone)
+        val phoneTail = PhoneUtils.getPhoneTail(phone)
 
         // Проверяем, существует ли уже привязка
         val existing = maxUserAgnRepository.findByPhoneTailAndBotType(phoneTail, botType)
@@ -78,7 +77,7 @@ class MaxUserAgnService(
      * Найти chat_id по номеру и типу бота
      */
     fun findChatIdByPhoneAndBotType(phone: String, botType: String): String? {
-        val phoneTail = phoneUtils.getPhoneTail(phone)
+        val phoneTail = PhoneUtils.getPhoneTail(phone)
         return maxUserAgnRepository.findChatIdByPhoneAndBotType(phoneTail, botType)
     }
 
@@ -105,7 +104,7 @@ class MaxUserAgnService(
      */
     @Transactional
     fun deleteByPhoneAndBotType(phone: String, botType: String) {
-        val phoneTail = phoneUtils.getPhoneTail(phone)
+        val phoneTail = PhoneUtils.getPhoneTail(phone)
         maxUserAgnRepository.deleteByPhoneAndBotType(phoneTail, botType)
         log.info("🗑️ Удалена привязка: phone=$phone, botType=$botType")
     }
@@ -114,7 +113,7 @@ class MaxUserAgnService(
      * Проверить, существует ли привязка
      */
     fun existsByPhoneAndBotType(phone: String, botType: String): Boolean {
-        val phoneTail = phoneUtils.getPhoneTail(phone)
+        val phoneTail = PhoneUtils.getPhoneTail(phone)
         return maxUserAgnRepository.existsByPhoneAndBotType(phoneTail, botType)
     }
 }

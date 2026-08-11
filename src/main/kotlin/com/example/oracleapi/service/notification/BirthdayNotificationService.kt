@@ -1,36 +1,31 @@
 package com.example.oracleapi.service.notification
 
 import com.example.oracleapi.entity.table.Phonebook
-import com.example.oracleapi.repository.max.MaxUserRepository
+import com.example.oracleapi.repository.maxUserAgn.MaxUserAgnRepository
 import com.example.oracleapi.repository.phonebook.PhonebookRepository
-import com.example.oracleapi.service.max.call.MessageService
+import com.example.oracleapi.service.max.mainBoth.MainBotMessageService
+import com.example.oracleapi.util.PhoneUtils
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 @Service
 class BirthdayNotificationService(
     private val phonebookRepository: PhonebookRepository,
-    private val maxUserRepository: MaxUserRepository,
-    private val messageService: MessageService
+    private val maxUserAgnRepository: MaxUserAgnRepository,
+    private val mainBotMessageService: MainBotMessageService
 ) {
 
     private val log = LoggerFactory.getLogger(this::class.java)
 
-    /**
-     * Каждый день в 9:30 проверяем дни рождения
-     */
     @Scheduled(cron = "0 30 9 * * *")
     //@Scheduled(cron = "0 */1 * * * *")
     fun sendBirthdayNotifications() {
         log.info("🎂 Проверка дней рождения...")
 
+        // ✅ 1. Получаем именинников из phonebook
         val today = LocalDate.now()
-        val formatter = DateTimeFormatter.ofPattern("dd.MM")
-
-        // Ищем всех сотрудников, у кого сегодня день рождения
         val allEmployees = phonebookRepository.findAll()
         val birthdayPeople = allEmployees.filter { employee ->
             employee.rdate?.let { birthDate ->
@@ -45,44 +40,93 @@ class BirthdayNotificationService(
 
         log.info("🎂 Найдено именинников: ${birthdayPeople.size}")
 
-        // Для каждого именинника отправляем поздравление
+        // ✅ 2. Получаем ВСЕХ активных сотрудников в боте (JOIN)
+        val allEmployeeUsers = maxUserAgnRepository.findAllActiveEmployees()
+
+        if (allEmployeeUsers.isEmpty()) {
+            log.info("📢 Нет сотрудников, зарегистрированных в боте")
+            return
+        }
+
+        log.info("👥 Всего сотрудников в боте: ${allEmployeeUsers.size}")
+
+        // ✅ 3. Получаем именинников в боте
+        val birthdayUsers = maxUserAgnRepository.findBirthdayEmployees()
+        log.info("🎂 Именинников в боте: ${birthdayUsers.size}")
+
+        // ✅ 4. Карта именинников: phoneTail → MaxUserAgn
+        val birthdayUserMap = birthdayUsers.associateBy { user ->
+            PhoneUtils.getPhoneTail(user.phone ?: "")
+        }
+
+        // ✅ 5. Личное поздравление именинникам
         birthdayPeople.forEach { employee ->
-            val fullName = listOfNotNull(employee.fname, employee.nname).joinToString(" ")
-            val age = employee.rdate?.let { today.year - it.year }
+            val phoneTail = PhoneUtils.getPhoneTail(employee.phoneSot ?: "")
+            val user = birthdayUserMap[phoneTail]
 
-            // Ищем пользователей, кому отправить поздравление
-            // Отправляем всем зарегистрированным в MAX
-            val allUsers = maxUserRepository.findAll()
-            val message = buildBirthdayMessage(fullName, age, employee)
-
-            allUsers.forEach { user ->
+            user?.let {
                 try {
-                    messageService.sendMessageByUserId(
-                        user.userId,
-                        message,
+                    mainBotMessageService.sendMessage(
+                        it.chatId ?: return@forEach,
+                        buildPersonalBirthdayMessage(employee),
                         "markdown"
                     )
-                    log.info("✅ Поздравление отправлено пользователю ${user.userName}")
+                    log.info("✅ Личное поздравление отправлено имениннику ${it.userName}")
                 } catch (e: Exception) {
-                    log.error("❌ Не удалось отправить поздравление пользователю ${user.userName}", e)
+                    log.error("❌ Не удалось отправить поздравление имениннику ${it.userId}", e)
                 }
+            }
+        }
+
+        // ✅ 6. Общее уведомление для ВСЕХ сотрудников
+        val generalMessage = buildGeneralBirthdayMessage(birthdayPeople)
+
+        allEmployeeUsers.forEach { user ->
+            try {
+                mainBotMessageService.sendMessage(
+                    user.chatId ?: return@forEach,
+                    generalMessage,
+                    "markdown"
+                )
+                log.info("✅ Общее уведомление отправлено пользователю ${user.userName}")
+            } catch (e: Exception) {
+                log.error("❌ Не удалось отправить уведомление пользователю ${user.userId}", e)
             }
         }
     }
 
-    private fun buildBirthdayMessage(name: String, age: Int?, employee: Phonebook): String {
-
+    private fun buildPersonalBirthdayMessage(employee: Phonebook): String {
         val fullName = listOfNotNull(employee.fname, employee.nname).joinToString(" ")
 
         return """
-            🎉 *Сегодня день рождения!* 🎉
+        🎉🎊 *С ДНЁМ РОЖДЕНИЯ!* 🎊🎉
 
-            🥳 Поздравляем $fullName
+        🥳✨ Поздравляем **$fullName**! ✨🥳
 
-            📋 Должность: ${employee.dolgnost ?: "—"}
-            🏢 Отдел: ${employee.otdel ?: "—"}
+        🌟 Желаем:
+        💪 Крепкого здоровья
+        😊 Счастья и улыбок
+        💰 Финансового благополучия
+        🚀 Успехов в работе
+        ❤️ Тепла и заботы близких
 
-            Пожелаем удачи, здоровья и счастья! 🎂🎁
+        🎂 Пусть этот день будет наполнен радостью! 🎁
+        """.trimIndent()
+    }
+
+    private fun buildGeneralBirthdayMessage(birthdayPeople: List<Phonebook>): String {
+        val names = birthdayPeople.joinToString("\n") { employee ->
+            listOfNotNull(employee.fname, employee.nname).joinToString(" ")
+        }
+
+        return """
+🎉 *Сегодня день рождения!* 🎉
+
+🥳 Поздравляем:
+
+$names
+
+🎂 Присоединяйтесь к поздравлениям! 🎁
         """.trimIndent()
     }
 }

@@ -11,7 +11,6 @@ import com.example.oracleapi.service.agnphonenumber.AgnPhoneService
 import com.example.oracleapi.service.max.RegistrationCodeService
 import com.example.oracleapi.service.max.mainBoth.MainBotMessageService
 import com.example.oracleapi.service.max.verification.MaxVerificationService
-import com.example.oracleapi.service.max.call.MessageService
 import com.example.oracleapi.service.maxUserAgn.MaxUserAgnService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -21,10 +20,10 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/v1/max")
-@Tag(name = "MAX", description = "Интеграция с Цифровым ID MAX")
+@Tag(name = "MAX", description = "Боты MAX")
 class MaxController(
     private val verificationService: MaxVerificationService,
-    private val messageService: MessageService,
+    private val messageService: MainBotMessageService,
     private  val authMessageService: MainBotMessageService,
     private val agnPhoneService: AgnPhoneService,
     private val maxUserAgnService: MaxUserAgnService,

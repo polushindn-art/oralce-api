@@ -50,4 +50,46 @@ interface MaxUserAgnRepository : JpaRepository<MaxUserAgn, Long> {
     fun deleteByChatId(chatId: String)
 
     fun findByChatId(chatId: String): List<MaxUserAgn>
+
+    /**
+     * Найти всех активных пользователей по списку phoneTail
+     */
+    @Query("SELECT m FROM MaxUserAgn m WHERE m.phoneTail IN :phoneTails AND m.isActive = :isActive")
+    fun findByPhoneTailInAndIsActive(
+        @Param("phoneTails") phoneTails: List<String>,
+        @Param("isActive") isActive: Boolean
+    ): List<MaxUserAgn>
+
+    // ✅ Все активные сотрудники (JOIN)
+    @Query("""
+        SELECT mua 
+        FROM MaxUserAgn mua 
+        JOIN Phonebook pb ON pb.phoneTail = mua.phoneTail
+        WHERE pb.phoneSot IS NOT NULL 
+          AND mua.isActive = true
+    """)
+    fun findAllActiveEmployees(): List<MaxUserAgn>
+
+    // ✅ Именинники сегодня (JOIN + фильтр по дате)
+    @Query("""
+    SELECT mua 
+    FROM MaxUserAgn mua 
+    JOIN Phonebook pb ON pb.phoneTail = mua.phoneTail
+    WHERE pb.phoneSot IS NOT NULL 
+      AND mua.isActive = true
+      AND EXTRACT(MONTH FROM pb.rdate) = EXTRACT(MONTH FROM CURRENT_DATE)
+      AND EXTRACT(DAY FROM pb.rdate) = EXTRACT(DAY FROM CURRENT_DATE)
+""")
+    fun findBirthdayEmployees(): List<MaxUserAgn>
+
+    @Query("""
+        SELECT mua 
+        FROM MaxUserAgn mua 
+        JOIN Phonebook pb ON pb.phoneTail = mua.phoneTail
+        WHERE pb.phoneSot IS NOT NULL 
+          AND mua.isActive = true
+          AND mua.phoneTail = :phoneTail
+    """)
+    fun findEmployeeByPhoneTail(@Param("phoneTail") phoneTail: String): MaxUserAgn?
+
 }

@@ -12,7 +12,7 @@ class AgnPhoneFind(
 ) {
     @Transactional(readOnly = true)
     fun searchByPhone(rawPhone: String): List<AgnphonenumberlistDto> {
-        val searchTail = PhoneUtils().getPhoneTail(rawPhone)
+        val searchTail = PhoneUtils.getPhoneTail(rawPhone)
         val entities = repository.findByPhoneTail(searchTail)
         return entities.map { AgnphonenumberlistDto.fromEntity(it) }
     }

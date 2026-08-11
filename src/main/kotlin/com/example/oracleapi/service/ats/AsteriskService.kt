@@ -74,7 +74,6 @@ class AsteriskService(
 
             Thread.sleep(500)
 
-            // ✅ Читаем ответ, но НЕ ЛОГИРУЕМ каждую строчку
             var success = false
             while (reader.ready()) {
                 val responseLine = reader.readLine()

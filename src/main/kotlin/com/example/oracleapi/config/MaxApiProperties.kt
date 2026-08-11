@@ -17,7 +17,7 @@ class MaxApiProperties {
     var botCallToken: String = ""
 
     // Токен для отправки уведомлений контрагентам
-    var botAuthToken: String = ""
+    var botMainToken: String = ""
 
     // Общие настройки
     var connectTimeout: Int = 5000
