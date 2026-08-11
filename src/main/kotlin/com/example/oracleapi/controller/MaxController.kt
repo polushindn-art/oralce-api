@@ -156,4 +156,13 @@ class MaxController(
         }
     }
 
+    @GetMapping("/exist")
+    @Operation(
+        description = "Проверить что клиент зарегистрирован в Боте",
+        summary = "Проверить существование"
+    )
+    fun existsByPhone(@Valid phone: String): MyApiResponse<Boolean> {
+        return success(agnPhoneService.existsByPhone(phone))
+    }
+
 }
