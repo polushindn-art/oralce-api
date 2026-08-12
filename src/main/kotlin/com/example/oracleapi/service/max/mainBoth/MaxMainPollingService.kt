@@ -89,20 +89,52 @@ class MaxMainPollingService(
 
                 when (val updateType = update["update_type"] as? String) {
                     "bot_started" -> {
+                        log.info("🚀 [Main Bot] ========== НАЧАЛО bot_started ==========")
+
                         val user = update["user"] as? Map<*, *>
+                        log.info("📋 [Main Bot] user: $user")
+
                         val userId = (user?.get("user_id") as? Number)?.toString()
                             ?: (update["user_id"] as? Number)?.toString()
-                            ?: return@forEach
+                            ?: run {
+                                log.warn("⚠️ [Main Bot] Не найден user_id в update: $update")
+                                return@forEach
+                            }
 
                         val chatId = (update["chat_id"] as? Number)?.toString()
-                            ?: return@forEach
+                            ?: run {
+                                log.warn("⚠️ [Main Bot] Не найден chat_id в update: $update")
+                                return@forEach
+                            }
 
-                        val avatarUrl = user?.get("full_avatar_url") as? String
+                        // ✅ Логируем ВСЕ поля user
+                        log.info("📋 [Main Bot] user_id: $userId")
+                        log.info("📋 [Main Bot] chat_id: $chatId")
+                        log.info("📋 [Main Bot] user.first_name: ${user?.get("first_name")}")
+                        log.info("📋 [Main Bot] user.last_name: ${user?.get("last_name")}")
+                        log.info("📋 [Main Bot] user.name: ${user?.get("name")}")
+                        log.info("📋 [Main Bot] user.is_bot: ${user?.get("is_bot")}")
+                        log.info("📋 [Main Bot] user.last_activity_time: ${user?.get("last_activity_time")}")
+
+                        // ✅ ОСОБО ВНИМАТЕЛЬНО логируем avatar_url и full_avatar_url
+                        val avatarUrl = user?.get("avatar_url") as? String
+                        val fullAvatarUrl = user?.get("full_avatar_url") as? String
+
+                        log.info("📸 [Main Bot] avatar_url: $avatarUrl")
+                        log.info("📸 [Main Bot] full_avatar_url: $fullAvatarUrl")
+
+                        // ✅ Проверяем все ключи в user, чтобы увидеть, что вообще приходит
+                        if (user != null) {
+                            log.info("📋 [Main Bot] Все ключи в user: ${user.keys.joinToString()}")
+                        }
 
                         // ✅ Сохраняем аватар в кэш (если есть)
-                        if (avatarUrl != null) {
-                            avatarCache[chatId] = avatarUrl
-                            log.info("📸 [Main Bot] Сохранён аватар для chatId=$chatId")
+                        val avatarToUse = fullAvatarUrl ?: avatarUrl
+                        if (avatarToUse != null) {
+                            avatarCache[chatId] = avatarToUse
+                            log.info("📸 [Main Bot] ✅ Сохранён аватар для chatId=$chatId: $avatarToUse")
+                        } else {
+                            log.warn("⚠️ [Main Bot] ❌ Аватар НЕ НАЙДЕН в bot_started для chatId=$chatId")
                         }
 
                         log.info("🚀 [Main Bot] Бот запущен: userId=$userId, chatId=$chatId")
@@ -110,16 +142,12 @@ class MaxMainPollingService(
                         try {
                             maxUserAgnService.activateByChatId(chatId)
                             log.info("✅ [Main Bot] Пользователь $chatId активирован")
-
-                            // ✅ Скачиваем аватар фоном
-                            if (avatarUrl != null) {
-                                avatarService.downloadAndSaveAvatar(chatId, avatarUrl)
-                            }
                         } catch (e: Exception) {
                             log.error("❌ [Main Bot] Ошибка активации пользователя $chatId", e)
                         }
 
                         sendMainMenu(chatId)
+                        log.info("🚀 [Main Bot] ========== КОНЕЦ bot_started ==========")
                     }
 
                     "bot_stopped" -> {

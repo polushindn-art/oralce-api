@@ -16,6 +16,14 @@ max:
     bot-api-url: https://platform-api2.max.ru
     connect-timeout: 5000
     read-timeout: 60000
+sms:
+  ru:
+    api-id: ${SMS_RU_API_ID:57BF6FEA-09FE-0B41-DA0E-EB517C544A35}
+    default-from: ${SMS_RU_FROM:StroyFaktor}
+    test-mode: ${SMS_RU_TEST_MODE:false}
+    connect-timeout: 30000
+    read-timeout: 30000
+    max-numbers-per-request: 100
 asterisk:
   ami:
     host: asterisk.ars
