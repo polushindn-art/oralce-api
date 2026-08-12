@@ -1,5 +1,6 @@
 package com.example.oracleapi.service.maxUserAgn
 
+import com.example.oracleapi.dto.maxUsertAgn.MaxUserAgnDto
 import com.example.oracleapi.entity.table.MaxUserAgn
 import com.example.oracleapi.repository.maxUserAgn.MaxUserAgnRepository
 import com.example.oracleapi.service.public.PublicProcedureService
@@ -28,8 +29,10 @@ class MaxUserAgnService(
     /**
      * Найти привязку по chat_id
      */
-    fun findByChatId(chatId: String): MaxUserAgn? {
-        return maxUserAgnRepository.findByChatId(chatId).firstOrNull()
+    fun findByChatId(chatId: String): MaxUserAgnDto? {
+        return MaxUserAgnDto.fromEntity(
+            maxUserAgnRepository.findByChatId(chatId).firstOrNull() ?: return null,
+        )
     }
 
     /**
@@ -116,4 +119,54 @@ class MaxUserAgnService(
         val phoneTail = PhoneUtils.getPhoneTail(phone)
         return maxUserAgnRepository.existsByPhoneAndBotType(phoneTail, botType)
     }
+
+    fun findByPhoneTailAndBotType(phoneTail: String, botType: String): MaxUserAgn? {
+        return maxUserAgnRepository.findByPhoneTailAndBotType(phoneTail, botType).firstOrNull()
+    }
+
+    /**
+     * Найти пользователя в MAIN боте по номеру телефона
+     */
+    fun findMainUserByPhone(phone: String): MaxUserAgnDto? {
+        val cleanPhone = phone.replace(Regex("[^\\d+]"), "")
+        val phoneTail = PhoneUtils.getPhoneTail(cleanPhone)
+
+        val userAgn = maxUserAgnRepository.findByPhoneTailAndBotType(phoneTail, "MAIN")
+            .firstOrNull { true }
+
+        return userAgn?.let { MaxUserAgnDto.fromEntity(it) }
+    }
+
+    /**
+     * Активировать пользователя по chat_id (если запись существует)
+     */
+    @Transactional
+    fun activateByChatId(chatId: String) {
+        val userAgn = maxUserAgnRepository.findByChatId(chatId).firstOrNull()
+        if (userAgn != null) {
+            userAgn.isActive = true
+            userAgn.updatedAt = LocalDateTime.now()
+            maxUserAgnRepository.save(userAgn)
+            log.info("✅ Пользователь $chatId активирован")
+        } else {
+            log.debug("ℹ️ Пользователь $chatId не найден в БД (возможно, первый вход)")
+        }
+    }
+
+    /**
+     * Деактивировать пользователя по chat_id (если запись существует)
+     */
+    @Transactional
+    fun deactivateByChatId(chatId: String) {
+        val userAgn = maxUserAgnRepository.findByChatId(chatId).firstOrNull()
+        if (userAgn != null) {
+            userAgn.isActive = false
+            userAgn.updatedAt = LocalDateTime.now()
+            maxUserAgnRepository.save(userAgn)
+            log.info("🗑️ Пользователь $chatId деактивирован (isActive = false)")
+        } else {
+            log.debug("ℹ️ Пользователь $chatId не найден в БД")
+        }
+    }
+
 }

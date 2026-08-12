@@ -1,9 +1,11 @@
 package com.example.oracleapi.entity.table
 
 import com.example.oracleapi.Helper
+import com.example.oracleapi.annotation.BindingDateTimeFormat
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
+import jakarta.persistence.Lob
 import jakarta.persistence.Table
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
@@ -56,5 +58,9 @@ open class MaxUserAgn {
     @ColumnDefault("1")
     @Column(name = "IS_ACTIVE")
     open var isActive: Boolean? = null
+
+    @Lob
+    @Column(name = "AVATAR")
+    var avatar: ByteArray? = null
 
 }

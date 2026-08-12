@@ -11,5 +11,7 @@ data class MessageResponse(
     val messageId: String? = null,
 
     @field:Schema(description = "Ошибка (если есть)")
-    val error: String? = null
+    val error: String? = null,
+
+    val message: String? = null
 )

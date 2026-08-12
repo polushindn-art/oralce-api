@@ -5,13 +5,16 @@ import com.example.oracleapi.dto.max.AgeVerificationRequest
 import com.example.oracleapi.dto.max.AgeVerificationResponse
 import com.example.oracleapi.dto.max.MessageRequest
 import com.example.oracleapi.dto.max.MessageResponse
+import com.example.oracleapi.dto.max.SendByPhoneRequest
 import com.example.oracleapi.dto.max.auth.AuthCodeResponse
 import com.example.oracleapi.dto.max.auth.AuthRequestDto
+import com.example.oracleapi.dto.maxUsertAgn.MaxUserAgnDto
 import com.example.oracleapi.service.agnphonenumber.AgnPhoneService
 import com.example.oracleapi.service.max.RegistrationCodeService
 import com.example.oracleapi.service.max.mainBoth.MainBotMessageService
 import com.example.oracleapi.service.max.verification.MaxVerificationService
 import com.example.oracleapi.service.maxUserAgn.MaxUserAgnService
+import com.example.oracleapi.util.BotButtons
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
@@ -23,8 +26,7 @@ import org.springframework.web.bind.annotation.*
 @Tag(name = "MAX", description = "Боты MAX")
 class MaxController(
     private val verificationService: MaxVerificationService,
-    private val messageService: MainBotMessageService,
-    private  val authMessageService: MainBotMessageService,
+    private  val mainBotMessageService: MainBotMessageService,
     private val agnPhoneService: AgnPhoneService,
     private val maxUserAgnService: MaxUserAgnService,
     private val registrationCodeService: RegistrationCodeService
@@ -55,9 +57,12 @@ class MaxController(
     fun sendMessage(
         @Valid @RequestBody request: MessageRequest
     ): MyApiResponse<MessageResponse> {
-        val result = messageService.sendMessage(
+
+
+        val result = mainBotMessageService.sendMessageWithInlineKeyboard(
             chatId = request.chatId,
             text = request.text,
+            buttons = BotButtons.menuButton(),
             format = request.format
         )
 
@@ -74,7 +79,7 @@ class MaxController(
         description = "Возвращает данные бота: user_id, first_name, username, is_bot, description и др."
     )
     fun getBotInfo(): MyApiResponse<Map<String, Any>> {
-        val info = messageService.getBotInfo()
+        val info = mainBotMessageService.getBotInfo()
         return success(info, "Информация о боте получена")
     }
 
@@ -98,7 +103,7 @@ class MaxController(
         }
 
         // 2. Проверяем, есть ли chat_id
-        val chatId = maxUserAgnService.findChatIdByPhoneAndBotType(phone, "MAIN") ?: return error(
+        val chatId = maxUserAgnService.findChatIdByPhoneAndBotType(phone, request.botType) ?: return error(
             "Покупатель с номером $phone не найден в боте",
             AuthCodeResponse(success = false, message = "Покупатель не авторизован")
         )
@@ -116,7 +121,7 @@ class MaxController(
         }
 
         // 5. Сохраняем код (ТОЛЬКО ПОСЛЕ УСПЕШНОЙ ОТПРАВКИ!)
-        registrationCodeService.saveCode(code, phone, "MAIN")
+        //registrationCodeService.saveCode(code, phone, "MAIN")
 
         return success(
             AuthCodeResponse(
@@ -134,15 +139,16 @@ class MaxController(
      * @return true - успешно, false - ошибка
      */
     private fun sendCodeToBot(chatId: String, code: String): Boolean {
-        val response = authMessageService.sendMessage(
+        val response = mainBotMessageService.sendMessageWithInlineKeyboard(
             chatId = chatId,
             text = """
         🔐 *Ваш код подтверждения:*
         
-        `$code`
+        # **`$code`** #
         
         Назовите этот код кассиру.
         """.trimIndent(),
+            BotButtons.menuButton(),
             format = "markdown"
         )
 
@@ -163,6 +169,52 @@ class MaxController(
     )
     fun existsByPhone(@Valid phone: String): MyApiResponse<Boolean> {
         return success(agnPhoneService.existsByPhone(phone))
+    }
+
+    @PostMapping("/send-by-phone")
+    @Operation(
+        summary = "Отправить сообщение по номеру телефона",
+        description = "Находит chat_id по номеру телефона и отправляет сообщение с кнопкой 'В меню'"
+    )
+    fun sendMessageByPhone(
+        @Valid @RequestBody request: SendByPhoneRequest
+    ): MyApiResponse<MessageResponse> {
+        log.info("📤 [API] Отправка сообщения по номеру: ${request.phone}")
+
+        // 1. Находим chat_id по номеру телефона
+        val chatId = maxUserAgnService.findChatIdByPhoneAndBotType(request.phone, "MAIN") ?: return error(
+            "Покупатель с номером ${request.phone} не найден",
+            MessageResponse(success = false, message = "Покупатель не найден")
+        )
+
+        // 2. Отправляем сообщение
+        val result = mainBotMessageService.sendMessageWithInlineKeyboard(
+            chatId = chatId,
+            text = request.text,
+            buttons = BotButtons.menuButton(),
+            format = request.format
+        )
+
+        return if (result.success) {
+            success(result, "Сообщение отправлено на номер ${request.phone}")
+        } else {
+            error(result.error ?: "Неизвестная ошибка", result)
+        }
+    }
+
+    @GetMapping("/status-main")
+    @Operation(
+        description = "Проверяет, зарегистрирован ли номер в MAIN боте",
+        summary = "Статус номера в MAIN боте"
+    )
+    fun getPhoneStatusMain(@Valid phone: String): MyApiResponse<MaxUserAgnDto?> {
+        val result = maxUserAgnService.findMainUserByPhone(phone)
+
+        return if (result != null) {
+            success(result, "Номер зарегистрирован в MAIN боте")
+        } else {
+            success(result, "Номер не зарегистрирован в MAIN боте")
+        }
     }
 
 }

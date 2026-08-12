@@ -16,7 +16,7 @@ class MainBotMessageService(
             val response = botClient.sendMessage(chatId, text, format)
             val messageId = extractMessageId(response)
 
-            log.info("✅ [Auth Bot] Сообщение отправлено в chatId: $chatId")
+            log.info("✅ [Main Bot] Сообщение отправлено в chatId: $chatId")
 
             MessageResponse(
                 success = true,
@@ -24,7 +24,7 @@ class MainBotMessageService(
                 error = null
             )
         } catch (e: Exception) {
-            log.error("❌ [Auth Bot] Ошибка отправки", e)
+            log.error("❌ [Main Bot] Ошибка отправки в chatId: $chatId", e)
             MessageResponse(
                 success = false,
                 messageId = null,
@@ -33,18 +33,17 @@ class MainBotMessageService(
         }
     }
 
-    // ✅ Отправка с клавиатурой по user_id
-    fun sendMessageWithKeyboard(
+    fun sendMessageWithInlineKeyboard(
         chatId: String,
         text: String,
         buttons: List<List<Map<String, Any>>>,
         format: String = "markdown"
     ): MessageResponse {
         return try {
-            val response = botClient.sendMessageWithKeyboard(chatId, text, buttons, format)
+            val response = botClient.sendMessageWithInlineKeyboard(chatId, text, buttons, format)
             val messageId = extractMessageId(response)
 
-            log.info("✅ [Main Bot] Сообщение с кнопками отправлено пользователю userId: $chatId")
+            log.info("✅ [Main Bot] Сообщение с inline-кнопками отправлено в chatId: $chatId")
 
             MessageResponse(
                 success = true,
@@ -52,7 +51,7 @@ class MainBotMessageService(
                 error = null
             )
         } catch (e: Exception) {
-            log.error("❌ [Main Bot] Ошибка отправки с кнопками пользователю userId: $chatId", e)
+            log.error("❌ [Main Bot] Ошибка отправки с inline-кнопками в chatId: $chatId", e)
             MessageResponse(
                 success = false,
                 messageId = null,
@@ -61,9 +60,6 @@ class MainBotMessageService(
         }
     }
 
-    /**
-     * Получение информации о боте
-     */
     fun getBotInfo(): Map<String, Any> {
         return try {
             val info = botClient.getBotInfo()

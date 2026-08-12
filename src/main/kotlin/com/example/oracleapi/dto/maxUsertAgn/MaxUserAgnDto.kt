@@ -1,5 +1,6 @@
 package com.example.oracleapi.dto.maxUsertAgn
 
+import com.example.oracleapi.annotation.BindingDateTimeFormat
 import com.example.oracleapi.entity.table.MaxUserAgn
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size

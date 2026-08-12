@@ -110,13 +110,24 @@ class CallNotificationService(
             log.info("ℹ️ [CallNotification] У сотрудника нет сотового, кнопка не добавлена")
         }
 
+        //Добавляем кнопку "В меню" всегда
+                buttons.add(
+                    listOf(
+                        mapOf(
+                            "type" to "callback",
+                            "text" to "◀️ В меню",
+                            "payload" to "back_to_menu"
+                        )
+                    )
+                )
+
         // ✅ 7. Отправляем через нового бота
         log.info("📤 [CallNotification] Шаг 9: Отправка уведомления в chatId=$chatId, кнопок=${buttons.size}")
 
         val response = if (buttons.isEmpty()) {
             mainBotMessageService.sendMessage(chatId, message, "markdown")
         } else {
-            mainBotMessageService.sendMessageWithKeyboard(chatId, message, buttons, "markdown")
+            mainBotMessageService.sendMessageWithInlineKeyboard(chatId, message, buttons, "markdown")
         }
 
         if (response.success) {
