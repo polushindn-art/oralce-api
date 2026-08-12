@@ -45,6 +45,9 @@ class MaxMainPollingService(
     private var marker: Long? = null
     private val searchState = mutableMapOf<String, Boolean>()
 
+    // ✅ Кэш для аватаров (chatId -> avatarUrl)
+    private val avatarCache = mutableMapOf<String, String>()
+
     @Scheduled(fixedDelay = 3000, initialDelay = 5000)
     fun pollUpdates() {
         try {
@@ -95,6 +98,12 @@ class MaxMainPollingService(
                             ?: return@forEach
 
                         val avatarUrl = user?.get("full_avatar_url") as? String
+
+                        // ✅ Сохраняем аватар в кэш (если есть)
+                        if (avatarUrl != null) {
+                            avatarCache[chatId] = avatarUrl
+                            log.info("📸 [Main Bot] Сохранён аватар для chatId=$chatId")
+                        }
 
                         log.info("🚀 [Main Bot] Бот запущен: userId=$userId, chatId=$chatId")
 
@@ -430,6 +439,17 @@ class MaxMainPollingService(
                 botType = "MAIN",
                 userName = nameFromMax
             )
+
+            // ✅ Если есть аватар в кэше — скачиваем
+            val avatarUrl = avatarCache.remove(chatId)
+            if (avatarUrl != null) {
+                try {
+                    avatarService.downloadAndSaveAvatar(chatId, avatarUrl)
+                    log.info("✅ [Main Bot] Аватар скачан для нового пользователя $chatId")
+                } catch (e: Exception) {
+                    log.warn("⚠️ [Main Bot] Не удалось скачать аватар для $chatId", e)
+                }
+            }
 
             botClient.sendMessageWithInlineKeyboard(
                 chatId,
