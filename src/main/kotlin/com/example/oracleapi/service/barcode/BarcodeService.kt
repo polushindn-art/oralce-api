@@ -9,7 +9,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
-import java.awt.RenderingHints
+import java.awt.*
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import javax.imageio.ImageIO
@@ -22,7 +22,6 @@ class BarcodeService(
     private val log = LoggerFactory.getLogger(this::class.java)
 
     init {
-        // ✅ Принудительно регистрируем плагины TwelveMonkeys
         try {
             ImageIO.scanForPlugins()
             log.info("✅ ImageIO плагины зарегистрированы")
@@ -39,20 +38,18 @@ class BarcodeService(
                 return null
             }
 
-            // ✅ Уменьшаем изображение
-            val resizedImage = resizeImage(image, 1000, 1000)
-
-            // ✅ Пробуем распознать на уменьшенном
-            var result = tryDecode(resizedImage)
+            // ✅ Только 2 попытки: оригинал + увеличенный контраст
+            var result = tryDecode(image)
             if (result != null) {
-                log.info("✅ Распознан код: ${result.text}, тип: ${result.barcodeFormat}")
+                log.info("✅ Распознан код: ${result.text}")
                 return result.text
             }
 
-            // ✅ Если не нашли, пробуем с оригиналом
-            result = tryDecode(image)
+            // Если не распозналось — пробуем с увеличенным контрастом
+            val enhanced = enhanceImage(image)
+            result = tryDecode(enhanced)
             if (result != null) {
-                log.info("✅ Распознан код (оригинал): ${result.text}, тип: ${result.barcodeFormat}")
+                log.info("✅ Распознан код (улучшенный): ${result.text}")
                 return result.text
             }
 
@@ -66,7 +63,13 @@ class BarcodeService(
 
     private fun tryDecode(image: BufferedImage): Result? {
         return try {
-            val source = BufferedImageLuminanceSource(image)
+            // Конвертируем в градации серого для лучшего распознавания
+            val grayImage = BufferedImage(image.width, image.height, BufferedImage.TYPE_BYTE_GRAY)
+            val g = grayImage.createGraphics()
+            g.drawImage(image, 0, 0, null)
+            g.dispose()
+
+            val source = BufferedImageLuminanceSource(grayImage)
             val bitmap = BinaryBitmap(HybridBinarizer(source))
             val reader = MultiFormatReader()
 
@@ -88,37 +91,39 @@ class BarcodeService(
                     BarcodeFormat.PDF_417,
                     BarcodeFormat.AZTEC
                 ),
-                DecodeHintType.TRY_HARDER to true
+                DecodeHintType.TRY_HARDER to true,
+                DecodeHintType.PURE_BARCODE to true
             )
 
             reader.decode(bitmap, hints)
         } catch (e: NotFoundException) {
             null
         } catch (e: Exception) {
-            log.error("Ошибка декодирования", e)
             null
         }
     }
 
-    private fun resizeImage(original: BufferedImage, maxWidth: Int, maxHeight: Int): BufferedImage {
-        val width = original.width
-        val height = original.height
-
-        if (width <= maxWidth && height <= maxHeight) {
-            return original
-        }
-
-        val ratio = minOf(maxWidth.toDouble() / width, maxHeight.toDouble() / height)
-        val newWidth = (width * ratio).toInt()
-        val newHeight = (height * ratio).toInt()
-
-        val resized = BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB)
-        val g = resized.createGraphics()
-        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR)
-        g.drawImage(original, 0, 0, newWidth, newHeight, null)
+    /**
+     * Быстрое улучшение изображения (контраст + резкость)
+     */
+    private fun enhanceImage(image: BufferedImage): BufferedImage {
+        val result = BufferedImage(image.width, image.height, image.type)
+        val g = result.createGraphics()
+        g.drawImage(image, 0, 0, null)
         g.dispose()
 
-        return resized
+        // Увеличиваем контраст
+        for (x in 0 until result.width) {
+            for (y in 0 until result.height) {
+                val rgb = result.getRGB(x, y)
+                val r = ((rgb shr 16 and 0xFF) * 1.3).coerceIn(0.0, 255.0).toInt()
+                val g1 = ((rgb shr 8 and 0xFF) * 1.3).coerceIn(0.0, 255.0).toInt()
+                val b = ((rgb and 0xFF) * 1.3).coerceIn(0.0, 255.0).toInt()
+                result.setRGB(x, y, Color(r, g1, b).rgb)
+            }
+        }
+
+        return result
     }
 
     fun downloadImageWithAuth(url: String, token: String): BufferedImage? {
@@ -128,7 +133,7 @@ class BarcodeService(
             val headers = HttpHeaders().apply {
                 set("Authorization", token)
                 set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
-                set("Accept", "image/*")  // ✅ Просим изображение
+                set("Accept", "image/*")
             }
 
             val response = restTemplate.exchange(
@@ -145,18 +150,14 @@ class BarcodeService(
             }
 
             log.info("📥 [Barcode] Загружено ${imageBytes.size} байт")
-            log.info("📥 [Barcode] Content-Type: ${response.headers.contentType}")
 
-            // ✅ Пробуем прочитать через ImageIO
             var image = ImageIO.read(ByteArrayInputStream(imageBytes))
             if (image != null) {
                 log.info("📥 [Barcode] Изображение прочитано через ImageIO")
                 return image
             }
 
-            // ✅ Если не получилось — пробуем через TwelveMonkeys
-            log.info("📥 [Barcode] Пробуем через TwelveMonkeys...")
-
+            // Пробуем через TwelveMonkeys
             val inputStream = ByteArrayInputStream(imageBytes)
             val imageInputStream = ImageIO.createImageInputStream(inputStream)
             val readers = ImageIO.getImageReaders(imageInputStream)

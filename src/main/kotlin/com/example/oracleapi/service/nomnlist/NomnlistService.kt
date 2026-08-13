@@ -19,8 +19,8 @@ class NomnlistService(
         return nomnlistFind.find(rn)
     }
 
-    fun findByBarcode(baroce: String): NomnlistDto? {
-        val nomen = publicGetNomenByBarcodeProcedure.getNomenByBarcodeProcedure(baroce)
+    fun findByBarcode(barcode: String): NomnlistDto? {
+        val nomen = publicGetNomenByBarcodeProcedure.getNomenByBarcodeProcedure(barcode)
         return findByRn(nomen.nomen)
     }
 

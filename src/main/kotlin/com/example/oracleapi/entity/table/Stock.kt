@@ -9,9 +9,29 @@ import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
 import java.math.BigDecimal
 import java.time.LocalDate
+import com.example.oracleapi.dto.stock.StockInfoDto
 
 @Entity
 @Table(name = "STOCK", schema = Helper.SCHEME)
+@SqlResultSetMapping(
+    name = "StockInfoMapping",
+    classes = [
+        ConstructorResult(
+            targetClass = StockInfoDto::class,
+            columns = [
+                ColumnResult(name = "nomenName", type = String::class),
+                ColumnResult(name = "storeCode", type = String::class),
+                ColumnResult(name = "nomenId", type = Long::class),
+                ColumnResult(name = "storeId", type = Long::class),
+                ColumnResult(name = "quantToSale", type = BigDecimal::class),
+                ColumnResult(name = "pbeCode", type = String::class),
+                ColumnResult(name = "storePbe", type = Long::class),
+                ColumnResult(name = "price", type = BigDecimal::class),
+                ColumnResult(name = "priceOut", type = BigDecimal::class)
+            ]
+        )
+    ]
+)
 open class Stock {
     @Id
     @Column(name = "RN", nullable = false)

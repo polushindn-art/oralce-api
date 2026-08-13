@@ -2,6 +2,7 @@ package com.example.oracleapi.controller
 
 import com.example.oracleapi.dto.common.MyApiResponse
 import com.example.oracleapi.dto.stock.StockDto
+import com.example.oracleapi.dto.stock.StockInfoDto
 import com.example.oracleapi.service.stock.StockService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -24,5 +25,23 @@ class StockController(
         return successList(stockService.findStocksByNomen(nomen))
     }
 
+    @GetMapping("/findByNomenNotNull")
+    @Operation(summary = "Получить остаток номенклатуры на складах больше 0")
+    fun getByNomenNotNull(
+        @Valid @RequestParam nomen: BigDecimal
+    ): MyApiResponse<List<StockDto>> {
+        return successList(stockService.findStocksByNomenQuantNotNull(nomen))
+    }
+
+    @GetMapping("/info")
+    @Operation(
+        summary = "Получить информацию о товаре (Native Query)",
+        description = "Возвращает информацию о товаре используя нативный SQL запрос"
+    )
+    fun getStockInfo(
+        @RequestParam nomen: BigDecimal
+    ): MyApiResponse<List<StockInfoDto>> {
+        return successList(stockService.getStockByNomenInfo(nomen))
+    }
 
 }

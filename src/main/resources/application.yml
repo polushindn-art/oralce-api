@@ -62,3 +62,4 @@ springdoc:
         - /v*/naklhead/**
         - /v*/prcdoc/**
         - /v*/prcprice/**
+        - /v*/tohead/**

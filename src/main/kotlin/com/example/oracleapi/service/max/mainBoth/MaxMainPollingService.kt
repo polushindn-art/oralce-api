@@ -2,6 +2,7 @@ package com.example.oracleapi.service.max.mainBoth
 
 import com.example.oracleapi.Helper
 import com.example.oracleapi.config.MaxApiProperties
+import com.example.oracleapi.dto.website.WebSiteRequest
 import com.example.oracleapi.entity.table.Phonebook
 import com.example.oracleapi.repository.phonebook.PhonebookRepository
 import com.example.oracleapi.service.agnphonenumber.AgnPhoneService
@@ -11,6 +12,8 @@ import com.example.oracleapi.service.barcode.BarcodeService
 import com.example.oracleapi.service.max.AvatarService
 import com.example.oracleapi.service.maxUserAgn.MaxUserAgnService
 import com.example.oracleapi.service.nomnlist.NomnlistService
+import com.example.oracleapi.service.stock.StockService
+import com.example.oracleapi.service.website.WebSiteService
 import com.example.oracleapi.util.BotButtons
 import com.example.oracleapi.util.PhoneUtils
 import ezvcard.Ezvcard
@@ -24,6 +27,7 @@ import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.ResourceAccessException
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
+import java.math.BigDecimal
 import java.time.format.DateTimeFormatter
 
 @Service
@@ -39,6 +43,8 @@ class MaxMainPollingService(
     private val asteriskService: AsteriskService,
     private val callNotificationService: CallNotificationService,
     private val avatarService: AvatarService,
+    private val webSiteService: WebSiteService,
+    private val stockService: StockService
 ) {
 
     private val log = LoggerFactory.getLogger(this::class.java)
@@ -162,11 +168,11 @@ class MaxMainPollingService(
                         log.info("🛑 [Main Bot] ПОЛУЧЕН bot_stopped! userId=$userId, chatId=$chatId")
 
                         // ✅ Проверяем, есть ли пользователь в БД
-                        val userAgn  = maxUserAgnService.findByChatId(chatId)
-                        log.info("📋 [Main Bot] Найден пользователь: ${userAgn  != null}")
+                        val userAgn = maxUserAgnService.findByChatId(chatId)
+                        log.info("📋 [Main Bot] Найден пользователь: ${userAgn != null}")
 
-                        if (userAgn  != null) {
-                            log.info("✅ [Main Bot] Пользователь найден: ${userAgn .userName}")
+                        if (userAgn != null) {
+                            log.info("✅ [Main Bot] Пользователь найден: ${userAgn.userName}")
                             maxUserAgnService.deactivateByChatId(chatId)
                             log.info("✅ [Main Bot] Пользователь деактивирован")
                         } else {
@@ -220,15 +226,22 @@ class MaxMainPollingService(
                                         val barcode = barcodeService.decodeBarcodeFromUrlWithAuth(photoUrl, authToken)
                                         if (barcode != null) {
                                             log.info("📱 [Main Bot] Распознан код: $barcode")
-                                            val nomen = nomnlistService.findByBarcode(barcode)
-                                            val article = Helper.insertSpaceToArticle(nomen?.article ?: "не найден")
-                                            val nomenText = """
-                                                ${nomen?.nomenname ?: "Товар со штрих-кодом $barcode не найден"}
-                                                Артикул: $article
-                                            """.trimIndent()
-                                            botClient.sendMessage(chatId, nomenText, "markdown")
+
+                                            val nomenText =  stockService.getFullStockMessageByBarcode(barcode)
+
+                                            botClient.sendMessageWithInlineKeyboard(
+                                                chatId,
+                                                nomenText,
+                                                BotButtons.menuButton(),
+                                                "markdown"
+                                            )
                                         } else {
-                                            botClient.sendMessage(chatId, "❌ Не удалось распознать код на фото", "markdown")
+                                            botClient.sendMessageWithInlineKeyboard(
+                                                chatId,
+                                                "❌ Не удалось распознать код на фото",
+                                                BotButtons.menuButton(),
+                                                "markdown"
+                                            )
                                         }
                                     } else {
                                         botClient.sendMessage(chatId, "📸 *Фото получено*", "markdown")
@@ -332,12 +345,14 @@ class MaxMainPollingService(
                 Для начала работы необходимо зарегистрироваться.
                 Нажмите *"Регистрация"* для начала.
             """.trimIndent()
+
             employee -> """
                 👋 *Привет, сотрудник!*
                 
                 Вы уже зарегистрированы.
                 Выберите действие в меню ниже.
             """.trimIndent()
+
             else -> """
                 👋 *Привет!*
                 
@@ -419,7 +434,12 @@ class MaxMainPollingService(
      */
     private fun handlePhoneNumberReceived(userId: String, chatId: String, contact: ContactInfo) {
         if (maxUserAgnService.isChatRegistered(chatId)) {
-            botClient.sendMessageWithInlineKeyboard(chatId, "ℹ️ *Вы уже зарегистрированы!*", BotButtons.menuButton(), "markdown")
+            botClient.sendMessageWithInlineKeyboard(
+                chatId,
+                "ℹ️ *Вы уже зарегистрированы!*",
+                BotButtons.menuButton(),
+                "markdown"
+            )
             return
         }
 
@@ -497,7 +517,12 @@ class MaxMainPollingService(
 
         } catch (e: Exception) {
             log.error("❌ [Main Bot] Ошибка регистрации", e)
-            botClient.sendMessageWithInlineKeyboard(chatId, "❌ Ошибка регистрации. Попробуйте позже.", BotButtons.menuButton(), "markdown")
+            botClient.sendMessageWithInlineKeyboard(
+                chatId,
+                "❌ Ошибка регистрации. Попробуйте позже.",
+                BotButtons.menuButton(),
+                "markdown"
+            )
         }
     }
 
@@ -507,7 +532,12 @@ class MaxMainPollingService(
         when {
             payload == "register" -> {
                 if (maxUserAgnService.isChatRegistered(chatId)) {
-                    botClient.sendMessageWithInlineKeyboard(chatId, "ℹ️ *Вы уже зарегистрированы!*", BotButtons.menuButton(), "markdown")
+                    botClient.sendMessageWithInlineKeyboard(
+                        chatId,
+                        "ℹ️ *Вы уже зарегистрированы!*",
+                        BotButtons.menuButton(),
+                        "markdown"
+                    )
                     return
                 }
 

@@ -12,7 +12,7 @@ import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
 
 @Entity
-@Table(name = "TYPEDOC", schema = Helper.Companion.SCHEME)
+@Table(name = "TYPEDOC", schema = Helper.SCHEME)
 class Typedoc(
     @Id
     @Column(name = "RN", nullable = false)
