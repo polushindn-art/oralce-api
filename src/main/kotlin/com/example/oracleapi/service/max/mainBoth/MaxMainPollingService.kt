@@ -10,12 +10,12 @@ import com.example.oracleapi.service.barcode.BarcodeService
 import com.example.oracleapi.service.max.AvatarService
 import com.example.oracleapi.service.maxUserAgn.MaxUserAgnService
 import com.example.oracleapi.service.stock.StockService
-import com.example.oracleapi.service.website.WebSiteService
 import com.example.oracleapi.util.BotButtons
 import com.example.oracleapi.util.PhoneUtils
 import ezvcard.Ezvcard
 import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
+import org.springframework.core.io.ByteArrayResource
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -27,6 +27,9 @@ import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.ConcurrentHashMap
+import org.springframework.http.*
+import org.springframework.util.LinkedMultiValueMap
+import org.springframework.web.client.postForEntity
 
 @Service
 class MaxMainPollingService(
@@ -40,12 +43,13 @@ class MaxMainPollingService(
     private val asteriskService: AsteriskService,
     private val callNotificationService: CallNotificationService,
     private val avatarService: AvatarService,
-    private val stockService: StockService
+    private val stockService: StockService,
 ) {
 
     private val log = LoggerFactory.getLogger(this::class.java)
     private var marker: Long? = null
     private val searchState = ConcurrentHashMap<String, Long>()
+    private val barcodeManualState = ConcurrentHashMap<String, Long>() // ✅ Состояние для ручного ввода штрих-кода
 
     data class CacheEntry(val url: String, val timestamp: Long)
 
@@ -214,25 +218,19 @@ class MaxMainPollingService(
                                     attachmentProcessed = true
                                     val payload = attachmentMap["payload"] as? Map<*, *>
                                     val photoUrl = payload?.get("url") as? String
-                                    val photoToken = payload?.get("token") as? String
 
                                     log.info("📸 [Main Bot] Получено ФОТО от user_id=$userId, chatId=$chatId")
-                                    log.info("📸 [Main Bot] URL: $photoUrl")
-                                    log.info("📸 [Main Bot] TOKEN: $photoToken")
 
                                     if (photoUrl != null) {
                                         val authToken = "Bearer ${properties.botMainToken}"
 
-                                        //val barcode = barcodeService.decodeBarcodeFromUrlWithAuth(photoUrl, authToken)
                                         val barcode = runBlocking {
                                             barcodeService.decodeBarcodeFromUrlWithAuth(photoUrl, authToken)
                                         }
 
                                         if (barcode != null) {
                                             log.info("📱 [Main Bot] Распознан код: $barcode")
-
-                                            val nomenText =  stockService.getFullStockMessageByBarcode(barcode)
-
+                                            val nomenText = stockService.getFullStockMessageByBarcode(barcode)
                                             botClient.sendMessageWithInlineKeyboard(
                                                 chatId,
                                                 nomenText,
@@ -240,9 +238,16 @@ class MaxMainPollingService(
                                                 "markdown"
                                             )
                                         } else {
+                                            // ✅ Не распознали — переводим в режим ручного ввода
+                                            barcodeManualState[userId] = System.currentTimeMillis()
+
                                             botClient.sendMessageWithInlineKeyboard(
                                                 chatId,
-                                                "❌ Не удалось распознать код на фото",
+                                                """
+                                                    ❌ *Не удалось распознать код на фото.*
+                                                    
+                                                    Пожалуйста, введите цифры штрих-кода вручную ответным сообщением:
+                                                    """.trimIndent(),
                                                 BotButtons.menuButton(),
                                                 "markdown"
                                             )
@@ -327,7 +332,8 @@ class MaxMainPollingService(
         val buttons = if (isRegistered) {
             val list = mutableListOf<List<Map<String, Any>>>()
             list.add(listOf(mapOf("type" to "callback", "text" to "📋 Мои данные", "payload" to "my_data")))
-
+            list.add(listOf(mapOf("type" to "callback", "text" to "🔍 Поиск товара", "payload" to "product_search")))
+            list.add(listOf(mapOf("type" to "callback", "text" to "🪪 Моя дисконтная карта", "payload" to "my_qr_card")))
             if (employee) {
                 list.add(listOf(mapOf("type" to "callback", "text" to "🔍 Поиск сотрудников", "payload" to "search")))
             }
@@ -370,23 +376,26 @@ class MaxMainPollingService(
     /**
      * ✅ Помощь с кнопкой "В меню"
      */
+    /**
+     * ✅ Помощь с кнопкой "В меню"
+     */
     private fun sendHelp(chatId: String) {
         val text = """
             📖 *Помощь*
             
+            🔍 *Как искать товар:*
+            1. Нажмите кнопку *"🔍 Поиск товара"* в главном меню.
+            2. Отправьте **фотографию** штрих-кода.
+            3. Или введите **цифры штрих-кода вручную** текстом, если фото не получилось.
+            
             🔐 *Как зарегистрироваться:*
-            1. Нажмите *Регистрация* в главном меню
-            2. Нажмите *Поделиться номером*
-            3. Подтвердите отправку номера
-            4. Дождитесь сообщения об успешной регистрации
+            1. Нажмите *Регистрация* в главном меню.
+            2. Нажмите *Поделиться номером*.
+            3. Подтвердите отправку номера.
+            4. Дождитесь сообщения об успешной регистрации.
             
             👤 *Кто может зарегистрироваться:*
-            Клиенты магазина.
-            Сотрудники организации.
-            Номер телефона должен совпадать с номером, с которым вы зарегистрированы в MAX.
-            
-            🛒 *Как стать клиентом:*
-            Обратитесь в информационную службу.
+            Клиенты магазина и сотрудники организации. Номер в боте MAX должен совпадать с номером в системе.
             
             📌 *Команды:*
             /start — главное меню
@@ -399,11 +408,29 @@ class MaxMainPollingService(
     private fun handleTextMessage(userId: String, chatId: String, text: String) {
         val trimmedText = text.trim()
 
+        // 1. Проверка на поиск сотрудников
         if (searchState.remove(userId) != null) {
             if (trimmedText.isNotEmpty()) {
                 searchEmployees(chatId, trimmedText)
             } else {
                 botClient.sendMessage(chatId, "❌ Поисковый запрос не может быть пустым.", "markdown")
+            }
+            return
+        }
+
+        // ✅ 2. Проверка на ручной ввод штрих-кода
+        if (barcodeManualState.remove(userId) != null) {
+            if (trimmedText.isNotEmpty()) {
+                log.info("⌨️ [Main Bot] Ручной ввод штрих-кода от user_id=$userId: $trimmedText")
+                val nomenText = stockService.getFullStockMessageByBarcode(trimmedText)
+                botClient.sendMessageWithInlineKeyboard(
+                    chatId,
+                    nomenText,
+                    BotButtons.menuButton(),
+                    "markdown"
+                )
+            } else {
+                botClient.sendMessage(chatId, "❌ Штрих-код не может быть пустым.", "markdown")
             }
             return
         }
@@ -559,6 +586,20 @@ class MaxMainPollingService(
                 )
             }
 
+            payload == "product_search" -> {
+                barcodeManualState[userId] = System.currentTimeMillis()
+                botClient.sendMessageWithInlineKeyboard(
+                    chatId,
+                    """
+                    🔍 *Поиск товара*
+                    
+                    Отправьте **фотографию** штрих-кода или введите его **цифры вручную** в следующем сообщении:
+                    """.trimIndent(),
+                    BotButtons.menuButton(),
+                    "markdown"
+                )
+            }
+
             payload == "search" -> {
                 if (!isEmployee(chatId)) {
                     botClient.sendMessage(chatId, "❌ Поиск сотрудников доступен только сотрудникам", "markdown")
@@ -659,6 +700,34 @@ class MaxMainPollingService(
 
             payload == "back_to_menu" -> {
                 sendMainMenu(chatId)
+            }
+
+            payload == "my_qr_card" -> {
+                // Берем реальный номер карты пользователя (или фолбек, если номер не привязан)
+                val userAgn = maxUserAgnService.findByChatId(chatId)
+                val cardNumber = userAgn?.phone?.let { "ARSCC_$it" } ?: "ARSCC00026004078"
+
+                try {
+                    // 1. Генерируем QR-код через BarcodeService
+                    val qrBytes = barcodeService.generateQrCodeBytes(cardNumber)
+
+                    // 2. Отправляем картинку через наш бот-клиент
+                    botClient.sendPhoto(
+                        chatId = chatId,
+                        photoBytes = qrBytes,
+                        fileName = "discount_qr.png",
+                        caption = "🪪 Ваша дисконтная карта: $cardNumber"
+                    )
+                    log.info("✅ [Main Bot] QR-код дисконтной карты отправлен для chatId=$chatId")
+                } catch (e: Exception) {
+                    log.error("❌ [Main Bot] Ошибка генерации или отправки QR-кода", e)
+                    botClient.sendMessageWithInlineKeyboard(
+                        chatId,
+                        "❌ Не удалось сгенерировать QR-код. Попробуйте позже.",
+                        BotButtons.menuButton(),
+                        "markdown"
+                    )
+                }
             }
 
             else -> {
@@ -809,6 +878,30 @@ class MaxMainPollingService(
         val oneHourAgo = System.currentTimeMillis() - 3600_000
         searchState.entries.removeIf { it.value < oneHourAgo }
         avatarCache.entries.removeIf { it.value.timestamp < oneHourAgo }
+    }
+
+    fun sendQrCodeToChat(chatId: String, cardText: String, botToken: String, restTemplate: RestTemplate) {
+        val qrBytes = barcodeService.generateQrCodeBytes(cardText)
+
+        // URL зависит от API вашего мессенджера (например, Telegram или MAX бот)
+        val url = "https://api.messenger.ru/bot/messages?chat_id=$chatId"
+
+        val headers = HttpHeaders().apply {
+            contentType = MediaType.MULTIPART_FORM_DATA
+            set("Authorization", "Bearer $botToken")
+        }
+
+        val fileResource = object : ByteArrayResource(qrBytes) {
+            override fun getFilename(): String = "discount_qr.png"
+        }
+
+        val body = LinkedMultiValueMap<String, Any>().apply {
+            add("file", fileResource)
+            add("caption", "Ваш QR-код: $cardText")
+        }
+
+        val requestEntity = HttpEntity(body, headers)
+        restTemplate.postForEntity<String>(url, requestEntity)
     }
 
 }

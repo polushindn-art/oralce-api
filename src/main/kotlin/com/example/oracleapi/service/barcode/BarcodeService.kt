@@ -2,8 +2,10 @@ package com.example.oracleapi.service.barcode
 
 import com.google.zxing.*
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource
+import com.google.zxing.client.j2se.MatrixToImageWriter
 import com.google.zxing.common.GlobalHistogramBinarizer
 import com.google.zxing.common.HybridBinarizer
+import com.google.zxing.qrcode.QRCodeWriter
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import nu.pattern.OpenCV
@@ -19,6 +21,7 @@ import java.awt.RenderingHints
 import java.awt.image.BufferedImage
 import java.awt.image.DataBufferByte
 import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import javax.imageio.ImageIO
 
 data class DecodeDetailResult(
@@ -57,9 +60,10 @@ class BarcodeService(
     private val decodeHints = mapOf(
         // TRY_HARDER убран, так как он сканирует вертикально, а мы и так вращаем изображение вручную.
         // Без него код работает быстрее без потери эффективности.
+        DecodeHintType.TRY_HARDER to true,
         DecodeHintType.CHARACTER_SET to "UTF-8",
         DecodeHintType.POSSIBLE_FORMATS to listOf(
-            BarcodeFormat.EAN_13, BarcodeFormat.EAN_8, BarcodeFormat.UPC_A, BarcodeFormat.UPC_E,
+            BarcodeFormat.EAN_13, BarcodeFormat.EAN_8, BarcodeFormat.UPC_A,
             BarcodeFormat.CODE_128, BarcodeFormat.CODE_39, BarcodeFormat.CODE_93, BarcodeFormat.ITF,
             BarcodeFormat.QR_CODE, BarcodeFormat.DATA_MATRIX, BarcodeFormat.PDF_417
         )
@@ -137,38 +141,42 @@ class BarcodeService(
     }
 
     private fun tryDecodeWithOpenCvAndFilters(image: BufferedImage, angle: Int): DecodeDetailResult? {
-        // Создаем ридер один раз для всех фильтров в рамках одного угла
         val reader = MultiFormatReader().apply { setHints(decodeHints) }
 
-        // 1. Исходник
-        tryDecodeAllMethods(image, "Оригинал", angle, reader)?.let { return it }
+        // 1. Исходник + Нарезка
+        tryDecodeSlices(image, "Оригинал", angle, reader)?.let { return it}
+
+        // 2. Красный канал + Нарезка
+        val redChannelImage = extractRedChannel(image)
+        tryDecodeSlices(redChannelImage, "Красный канал", angle, reader)?.let { return it }
 
         if (isOpenCvLoaded) {
             try {
-                // Использование .use для предотвращения утечек памяти C++
+                // Превращаем картинку в серую матрицу для OpenCV
                 bufferedImageToMat(image).use { mat ->
 
-                    // УРОВЕНЬ 3: OpenCV Поиск области штрих-кода
-                    opencvFindAndCropBarcodeRegion(mat)?.let { croppedRegion ->
-                        tryDecodeAllMethods(croppedRegion, "OpenCV Детекция области (Crop Region)", angle, reader)?.let { return it }
-                    }
+                    // УРОВЕНЬ А: CLAHE (Вытягивает контраст на металле и пластике)
+                    Mat().use { claheMat ->
+                        val clahe = Imgproc.createCLAHE(3.0, Size(8.0, 8.0))
+                        clahe.apply(mat, claheMat)
 
-                    // УРОВЕНЬ 1: OpenCV Адаптивная бинаризация Гаусса
-                    Mat().use { adaptiveMat ->
-                        Imgproc.adaptiveThreshold(mat, adaptiveMat, 255.0, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY, 31, 10.0)
-                        tryDecodeAllMethods(matToBufferedImage(adaptiveMat), "OpenCV Адаптивный Порог (Shadow Fix)", angle, reader)?.let { return it }
-                    }
+                        // Пробуем CLAHE с нарезкой
+                        tryDecodeSlices(matToBufferedImage(claheMat), "OpenCV CLAHE", angle, reader)?.let { return it }
 
-                    // УРОВЕНЬ 2: OpenCV Дилатация
-                    Mat().use { dilatedMat ->
-                        Mat().use { kernel ->
-                            val k = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, Size(3.0, 3.0))
-                            k.copyTo(kernel)
-                            k.release()
-
-                            Imgproc.dilate(mat, dilatedMat, kernel)
-                            tryDecodeAllMethods(matToBufferedImage(dilatedMat), "OpenCV Дилатация (Восстановление штрихов)", angle, reader)?.let { return it }
+                        // УРОВЕНЬ Б: Порог Оцу (Otsu) — идеальное разделение черного и белого
+                        Mat().use { otsuMat ->
+                            Imgproc.threshold(claheMat, otsuMat, 0.0, 255.0, Imgproc.THRESH_BINARY + Imgproc.THRESH_OTSU)
+                            tryDecodeSlices(matToBufferedImage(otsuMat), "OpenCV Otsu Binary", angle, reader)?.let { return it }
                         }
+                    }
+
+                    // УРОВЕНЬ В: Поиск области штрих-кода (Crop)
+                    opencvFindAndCropBarcodeRegion(mat)?.let { croppedRegion ->
+                        tryDecodeSlices(croppedRegion, "OpenCV Crop Region", angle, reader)?.let { return it }
+
+                        // Если кроп нашелся, но мелкий — пробуем его увеличить в 2 раза (Zoom)
+                        val zoomed = scaleUp(croppedRegion, 2.0)
+                        tryDecodeSlices(zoomed, "OpenCV Crop + Zoom 2x", angle, reader)?.let { return it }
                     }
                 }
             } catch (e: Exception) {
@@ -176,9 +184,10 @@ class BarcodeService(
             }
         }
 
-        // Резервный кроп центра (60%)
+        // Резервный кроп центра (60%) + Увеличение
         val centerCropped = cropCenter(image, 0.6)
-        tryDecodeAllMethods(centerCropped, "Обрезка центра (Crop 60%)", angle, reader)?.let { return it }
+        val zoomedCenter = scaleUp(centerCropped, 2.0)
+        tryDecodeSlices(zoomedCenter, "Crop 60% + Zoom", angle, reader)?.let { return it }
 
         return null
     }
@@ -257,19 +266,25 @@ class BarcodeService(
 
         try {
             val res = reader.decodeWithState(BinaryBitmap(HybridBinarizer(source)))
-            return DecodeDetailResult(res.text, res.barcodeFormat, filterName, angle)
+            if (isValidBarcodeResult(res.text, res.barcodeFormat)) {
+                return DecodeDetailResult(res.text, res.barcodeFormat, filterName, angle)
+            }
         } catch (_: NotFoundException) {}
         finally { reader.reset() }
 
         try {
             val res = reader.decodeWithState(BinaryBitmap(GlobalHistogramBinarizer(source)))
-            return DecodeDetailResult(res.text, res.barcodeFormat, filterName, angle)
+            if (isValidBarcodeResult(res.text, res.barcodeFormat)) {
+                return DecodeDetailResult(res.text, res.barcodeFormat, filterName, angle)
+            }
         } catch (_: NotFoundException) {}
         finally { reader.reset() }
 
         try {
             val res = reader.decodeWithState(BinaryBitmap(HybridBinarizer(source.invert())))
-            return DecodeDetailResult(res.text, res.barcodeFormat, filterName, angle)
+            if (isValidBarcodeResult(res.text, res.barcodeFormat)) {
+                return DecodeDetailResult(res.text, res.barcodeFormat, filterName, angle)
+            }
         } catch (_: NotFoundException) {}
         finally { reader.reset() }
 
@@ -368,4 +383,123 @@ class BarcodeService(
             null
         }
     }
+
+    /**
+     * Извлекает только красный канал из изображения.
+     * Идеально подходит для черных штрих-кодов на красном фоне,
+     * так как красный фон становится чисто белым, а черные линии остаются черными.
+     */
+    private fun extractRedChannel(image: BufferedImage): BufferedImage {
+        val width = image.width
+        val height = image.height
+        val redImage = BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY)
+        val redRaster = redImage.raster
+
+        for (y in 0 until height) {
+            for (x in 0 until width) {
+                // Получаем пиксель в формате ARGB
+                val rgb = image.getRGB(x, y)
+                // Сдвигаем биты, чтобы достать только значение красного (0-255)
+                val red = (rgb shr 16) and 0xFF
+
+                // Записываем это значение как яркость серого в новое изображение
+                redRaster.setSample(x, y, 0, red)
+            }
+        }
+        return redImage
+    }
+
+    /**
+     * Метод "Умной нарезки". Разрезает изображение на несколько горизонтальных полос.
+     * Это позволяет обойти горизонтальные блики, царапины и засветы, передавая в сканер
+     * только чистую верхнюю или нижнюю часть штрих-кода.
+     */
+    private fun tryDecodeSlices(
+        image: BufferedImage,
+        filterName: String,
+        angle: Int,
+        reader: MultiFormatReader
+    ): DecodeDetailResult? {
+        // 1. Сначала пробуем картинку целиком
+        tryDecodeAllMethods(image, filterName, angle, reader)?.let { return it }
+
+        // 2. Если не вышло - режем картинку на 3 части по горизонтали (Верх, Центр, Низ)
+        val slices = 3
+        val sliceHeight = image.height / slices
+
+        if (sliceHeight < 10) return null // Защита от слишком мелких картинок
+
+        for (i in 0 until slices) {
+            val y = i * sliceHeight
+            val h = if (i == slices - 1) image.height - y else sliceHeight
+            val croppedSlice = image.getSubimage(0, y, image.width, h)
+
+            tryDecodeAllMethods(
+                croppedSlice,
+                "$filterName (Нарезка ${i + 1}/$slices)",
+                angle,
+                reader
+            )?.let { return it }
+        }
+
+        return null
+    }
+
+    /**
+     * Увеличивает изображение (Zoom) для мелких штрих-кодов.
+     */
+    private fun scaleUp(image: BufferedImage, scale: Double): BufferedImage {
+        val newWidth = (image.width * scale).toInt()
+        val newHeight = (image.height * scale).toInt()
+        val resized = BufferedImage(newWidth, newHeight, image.type)
+        val g2d = resized.createGraphics()
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR)
+        g2d.drawImage(image, 0, 0, newWidth, newHeight, null)
+        g2d.dispose()
+        return resized
+    }
+
+    /**
+     * Строгая проверка валидности штрих-кода.
+     * Отсекает случайный мусор и «галлюцинации» сканера на пустых фото.
+     */
+    /**
+     * Жесткая проверка валидности. Полностью блокирует ложные срабатывания
+     * сканера на текстурах, дереве и шумах.
+     */
+    private fun isValidBarcodeResult(text: String, format: BarcodeFormat): Boolean {
+        if (text.isBlank()) return false
+
+        return when (format) {
+            BarcodeFormat.EAN_13 -> text.length == 13 && text.all { it.isDigit() }
+            BarcodeFormat.UPC_A  -> text.length == 12 && text.all { it.isDigit() }
+            BarcodeFormat.EAN_8,
+            BarcodeFormat.UPC_E  -> text.length == 8 && text.all { it.isDigit() }
+
+            // CODE_128, CODE_39, CODE_93: требуем длину от 6 символов и безопасные символы
+            BarcodeFormat.CODE_128,
+            BarcodeFormat.CODE_39,
+            BarcodeFormat.CODE_93 -> text.length >= 6 && text.all { it.isLetterOrDigit() || it == '-' || it == '_' }
+
+            // ITF часто галлюцинирует на текстурах. Требуем, чтобы это были только цифры длиной от 6 символов
+            BarcodeFormat.ITF -> text.length >= 6 && text.all { it.isDigit() }
+
+            // QR и DataMatrix должны содержать осмысленный текст хотя бы от 3 символов
+            BarcodeFormat.QR_CODE,
+            BarcodeFormat.DATA_MATRIX -> text.length >= 3
+
+            // Всё остальное, что не вошло в список, отбрасываем сразу
+            else -> false
+        }
+    }
+
+    fun generateQrCodeBytes(text: String, width: Int = 400, height: Int = 400): ByteArray {
+        val qrWriter = QRCodeWriter()
+        val bitMatrix = qrWriter.encode(text, BarcodeFormat.QR_CODE, width, height)
+        return ByteArrayOutputStream().use { outputStream ->
+            MatrixToImageWriter.writeToStream(bitMatrix, "PNG", outputStream)
+            outputStream.toByteArray()
+        }
+    }
+
 }
