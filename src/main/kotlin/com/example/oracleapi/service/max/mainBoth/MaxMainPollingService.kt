@@ -40,7 +40,6 @@ class MaxMainPollingService(
     private val asteriskService: AsteriskService,
     private val callNotificationService: CallNotificationService,
     private val avatarService: AvatarService,
-    private val webSiteService: WebSiteService,
     private val stockService: StockService
 ) {
 
@@ -352,16 +351,10 @@ class MaxMainPollingService(
             """.trimIndent()
 
             employee -> """
-                👋 *Привет, сотрудник!*
-                
-                Вы уже зарегистрированы.
                 Выберите действие в меню ниже.
             """.trimIndent()
 
             else -> """
-                👋 *Привет!*
-                
-                Вы уже зарегистрированы.
                 Выберите действие в меню ниже.
             """.trimIndent()
         }
