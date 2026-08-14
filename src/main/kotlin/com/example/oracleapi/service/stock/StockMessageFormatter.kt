@@ -1,14 +1,20 @@
 package com.example.oracleapi.service.stock
 
+import com.example.oracleapi.Helper
 import com.example.oracleapi.config.StoreNameMapper
 import com.example.oracleapi.dto.nomnlist.NomnlistDto
 import com.example.oracleapi.dto.stock.StockInfoDto
+import com.example.oracleapi.dto.website.WebSiteRequest
+import com.example.oracleapi.service.website.WebSiteService
+import com.example.oracleapi.util.Article
+import com.example.oracleapi.util.BarcodeUtils
 import org.springframework.stereotype.Component
 import java.math.BigDecimal
 
 @Component
 class StockMessageFormatter(
-    private val storeNameMapper: StoreNameMapper
+    private val storeNameMapper: StoreNameMapper,
+    private val webSiteService: WebSiteService
 ) {
 
     /**
@@ -45,9 +51,6 @@ class StockMessageFormatter(
                 appendLine()
                 appendLine("📌 *${nomen.nomenname ?: "Без названия"}*")
                 appendLine("🔢 Артикул: ${nomen.article ?: "не указан"}")
-                if (barcode != null) {
-                    appendLine("📋 Штрих-код: `$barcode`")
-                }
                 appendLine()
                 appendLine("Товар временно отсутствует.")
                 appendLine("Обратитесь к менеджеру для уточнения.")
@@ -59,10 +62,8 @@ class StockMessageFormatter(
             appendLine("📦 *Остатки товара*")
             appendLine()
             appendLine("📌 *${nomen.nomenname ?: "Без названия"}*")
-            appendLine("🔢 Артикул: ${nomen.article ?: "не указан"}")
-            if (barcode != null) {
-                appendLine("📋 Штрих-код: `$barcode`")
-            }
+            val article = Article.shortArticle(nomen.article!!)
+            appendLine("🔢 Артикул: `$article`")
             appendLine()
 
             available.forEach { stock ->
@@ -93,6 +94,13 @@ class StockMessageFormatter(
             val total = available.sumOf { it.quantToSale ?: BigDecimal.ZERO }
             appendLine("---")
             appendLine("📊 *Итого: $total шт*")
+
+            if (nomen.article != null) {
+                val link = webSiteService.getLinkWebSite(WebSiteRequest(nomen.article)).link
+                appendLine()
+                appendLine("🌐 [Открыть сайт](https://$link)")
+            }
+
         }
     }
 }

@@ -27,6 +27,7 @@
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
     </properties>
 
+
     <!-- ПРОФИЛИ -->
     <profiles>
         <profile>
@@ -47,6 +48,13 @@
     </profiles>
 
     <dependencies>
+
+
+        <dependency>
+            <groupId>org.jetbrains.kotlinx</groupId>
+            <artifactId>kotlinx-coroutines-core</artifactId>
+        </dependency>
+
         <!-- Google Guava для CacheBuilder -->
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -229,10 +237,17 @@
             <artifactId>imageio-webp</artifactId>
             <version>3.10.1</version>
         </dependency>
+
         <dependency>
             <groupId>com.twelvemonkeys.imageio</groupId>
             <artifactId>imageio-core</artifactId>
             <version>3.10.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openpnp</groupId>
+            <artifactId>opencv</artifactId>
+            <version>4.7.0-0</version>
         </dependency>
 
     </dependencies>

@@ -46,8 +46,6 @@ class MaxBotMainClient(
         return executeGet(uri)
     }
 
-    // ========== PRIVATE METHODS ==========
-
     private fun createHeaders(): HttpHeaders {
         return HttpHeaders().apply {
             set("Authorization", properties.botMainToken)

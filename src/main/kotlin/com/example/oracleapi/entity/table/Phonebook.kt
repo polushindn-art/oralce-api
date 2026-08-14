@@ -1,6 +1,7 @@
 package com.example.oracleapi.entity.table
 
 import com.example.oracleapi.Helper
+import com.example.oracleapi.dto.phonebook.PhonebookDto
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
@@ -62,4 +63,20 @@ open class Phonebook {
     @Column(name = "PHONE_TAIL")
     var phoneTail: String? = null
 
+}
+
+fun Phonebook.toDto(): PhonebookDto {
+    return PhonebookDto(
+        rn = rn,
+        nname = nname,
+        fname = fname,
+        lname = lname,
+        email = email,
+        pbe = pbe,
+        rdate = rdate,
+        phoneInt = phoneInt,
+        phoneSot = phoneSot,
+        phoneTail = phoneTail,
+        otdel = otdel,
+    )
 }

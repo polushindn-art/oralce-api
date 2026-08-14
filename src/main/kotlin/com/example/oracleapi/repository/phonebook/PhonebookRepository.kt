@@ -13,4 +13,5 @@ interface PhonebookRepository : JpaRepository<Phonebook, Long> {
     fun findByPbe(pbe: String): List<Phonebook>
     @Query("SELECT p FROM Phonebook p WHERE p.phoneTail = :phoneTail")
     fun findByPhoneTail(@Param("phoneTail") phoneTail: String): List<Phonebook>
+
 }

@@ -1,8 +1,6 @@
 package com.example.oracleapi.service.max.mainBoth
 
-import com.example.oracleapi.Helper
 import com.example.oracleapi.config.MaxApiProperties
-import com.example.oracleapi.dto.website.WebSiteRequest
 import com.example.oracleapi.entity.table.Phonebook
 import com.example.oracleapi.repository.phonebook.PhonebookRepository
 import com.example.oracleapi.service.agnphonenumber.AgnPhoneService
@@ -11,12 +9,12 @@ import com.example.oracleapi.service.ats.CallNotificationService
 import com.example.oracleapi.service.barcode.BarcodeService
 import com.example.oracleapi.service.max.AvatarService
 import com.example.oracleapi.service.maxUserAgn.MaxUserAgnService
-import com.example.oracleapi.service.nomnlist.NomnlistService
 import com.example.oracleapi.service.stock.StockService
 import com.example.oracleapi.service.website.WebSiteService
 import com.example.oracleapi.util.BotButtons
 import com.example.oracleapi.util.PhoneUtils
 import ezvcard.Ezvcard
+import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
@@ -27,8 +25,8 @@ import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.ResourceAccessException
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
-import java.math.BigDecimal
 import java.time.format.DateTimeFormatter
+import java.util.concurrent.ConcurrentHashMap
 
 @Service
 class MaxMainPollingService(
@@ -38,7 +36,6 @@ class MaxMainPollingService(
     private val agnPhoneService: AgnPhoneService,
     private val maxUserAgnService: MaxUserAgnService,
     private val barcodeService: BarcodeService,
-    private val nomnlistService: NomnlistService,
     private val phonebookRepository: PhonebookRepository,
     private val asteriskService: AsteriskService,
     private val callNotificationService: CallNotificationService,
@@ -49,13 +46,16 @@ class MaxMainPollingService(
 
     private val log = LoggerFactory.getLogger(this::class.java)
     private var marker: Long? = null
-    private val searchState = mutableMapOf<String, Boolean>()
+    private val searchState = ConcurrentHashMap<String, Long>()
+
+    data class CacheEntry(val url: String, val timestamp: Long)
 
     // ✅ Кэш для аватаров (chatId -> avatarUrl)
-    private val avatarCache = mutableMapOf<String, String>()
+    private val avatarCache = ConcurrentHashMap<String, CacheEntry>()
 
     @Scheduled(fixedDelay = 3000, initialDelay = 5000)
     fun pollUpdates() {
+        cleanupCaches()
         try {
             val uriBuilder = UriComponentsBuilder.fromHttpUrl("${properties.botApiUrl}/updates")
                 .queryParam("limit", 5)
@@ -135,9 +135,9 @@ class MaxMainPollingService(
                         }
 
                         // ✅ Сохраняем аватар в кэш (если есть)
-                        val avatarToUse = fullAvatarUrl ?: avatarUrl
+                        val avatarToUse = avatarCache.remove(chatId)
                         if (avatarToUse != null) {
-                            avatarCache[chatId] = avatarToUse
+                            avatarCache[chatId] = avatarToUse // <-- Ошибка здесь
                             log.info("📸 [Main Bot] ✅ Сохранён аватар для chatId=$chatId: $avatarToUse")
                         } else {
                             log.warn("⚠️ [Main Bot] ❌ Аватар НЕ НАЙДЕН в bot_started для chatId=$chatId")
@@ -223,7 +223,12 @@ class MaxMainPollingService(
 
                                     if (photoUrl != null) {
                                         val authToken = "Bearer ${properties.botMainToken}"
-                                        val barcode = barcodeService.decodeBarcodeFromUrlWithAuth(photoUrl, authToken)
+
+                                        //val barcode = barcodeService.decodeBarcodeFromUrlWithAuth(photoUrl, authToken)
+                                        val barcode = runBlocking {
+                                            barcodeService.decodeBarcodeFromUrlWithAuth(photoUrl, authToken)
+                                        }
+
                                         if (barcode != null) {
                                             log.info("📱 [Main Bot] Распознан код: $barcode")
 
@@ -401,8 +406,7 @@ class MaxMainPollingService(
     private fun handleTextMessage(userId: String, chatId: String, text: String) {
         val trimmedText = text.trim()
 
-        if (searchState[userId] == true) {
-            searchState[userId] = false
+        if (searchState.remove(userId) != null) {
             if (trimmedText.isNotEmpty()) {
                 searchEmployees(chatId, trimmedText)
             } else {
@@ -489,10 +493,11 @@ class MaxMainPollingService(
             )
 
             // ✅ Если есть аватар в кэше — скачиваем
-            val avatarUrl = avatarCache.remove(chatId)
-            if (avatarUrl != null) {
+            val avatarEntry = avatarCache.remove(chatId) // Теперь это CacheEntry, а не String
+            if (avatarEntry != null) {
                 try {
-                    avatarService.downloadAndSaveAvatar(chatId, avatarUrl)
+                    // Передаем avatarEntry.url в метод сохранения
+                    avatarService.downloadAndSaveAvatar(chatId, avatarEntry.url)
                     log.info("✅ [Main Bot] Аватар скачан для нового пользователя $chatId")
                 } catch (e: Exception) {
                     log.warn("⚠️ [Main Bot] Не удалось скачать аватар для $chatId", e)
@@ -566,7 +571,7 @@ class MaxMainPollingService(
                     botClient.sendMessage(chatId, "❌ Поиск сотрудников доступен только сотрудникам", "markdown")
                     return
                 }
-                searchState[userId] = true
+                searchState[userId] = System.currentTimeMillis()
                 botClient.sendMessage(chatId, "🔍 Введите фамилию, имя или должность:", "markdown")
             }
 
@@ -806,4 +811,11 @@ class MaxMainPollingService(
 
         return lines.joinToString("\n")
     }
+
+    private fun cleanupCaches() {
+        val oneHourAgo = System.currentTimeMillis() - 3600_000
+        searchState.entries.removeIf { it.value < oneHourAgo }
+        avatarCache.entries.removeIf { it.value.timestamp < oneHourAgo }
+    }
+
 }

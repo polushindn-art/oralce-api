@@ -35,8 +35,8 @@ class StockController(
 
     @GetMapping("/info")
     @Operation(
-        summary = "Получить информацию о товаре (Native Query)",
-        description = "Возвращает информацию о товаре используя нативный SQL запрос"
+        summary = "Получить информацию о товаре",
+        description = "Возвращает информацию о товаре"
     )
     fun getStockInfo(
         @RequestParam nomen: BigDecimal

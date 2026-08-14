@@ -3,6 +3,7 @@ package com.example.oracleapi.service.public
 import com.example.oracleapi.common.BasePackage
 import com.example.oracleapi.common.BasePkg
 import com.example.oracleapi.dto.public.GetNomenByBarcodeResponse
+import com.example.oracleapi.util.BarcodeUtils
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.persistence.EntityManager
 import org.springframework.stereotype.Component
@@ -19,14 +20,14 @@ class PublicGetNomenByBarcodeProcedure(
     override val count = 1
 
     fun getNomenByBarcodeProcedure(barcode: String): GetNomenByBarcodeResponse {
-
+        val cleaned = BarcodeUtils.cleanBarcodeText(barcode)
         return dataSource.executeFun {
             it.registerOutParameter(1, Types.NUMERIC)
-            it.setString(2, barcode)
+            it.setString(2, cleaned)
             it.execute()
             GetNomenByBarcodeResponse(
                 it.getLong(1),
-                barcode
+                 barcode
             )
         }
 
