@@ -15,7 +15,7 @@ class ToHeadController(
 ) : BaseController() {
 
     @GetMapping("/get_by_rn/{rn}")
-    @Operation(summary = "Получить все склады")
+    @Operation(summary = "Получить заголовок по RN")
     fun getByRN(@PathVariable rn: Long): MyApiResponse<ToheadDto> {
         return success(toheadService.toheadFindByRn(rn))
     }

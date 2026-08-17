@@ -1,7 +1,7 @@
 package com.example.oracleapi.service.agnphonenumber
 
 import com.example.oracleapi.dto.agnphonenumberlist.AgnphonenumberlistDto
-import com.example.oracleapi.repository.agnphonenumberlist.AgnphonenumberlistRepository
+import com.example.oracleapi.dto.agnphonenumberlist.PhoneCardDto
 import com.example.oracleapi.util.PhoneUtils
 import org.springframework.stereotype.Service
 
@@ -17,4 +17,9 @@ class AgnPhoneService(
     fun existsByPhone(phone: String): Boolean {
         return agnPhoneExists.existsByPhone(PhoneUtils.getPhoneTail(phone))
     }
+
+    fun searchCardByPhone(phone: String): List<PhoneCardDto> {
+        return agnPhoneFind.searchCardByPhone(phone)
+    }
+
 }

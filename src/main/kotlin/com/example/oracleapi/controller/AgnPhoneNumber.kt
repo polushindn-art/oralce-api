@@ -1,6 +1,7 @@
 package com.example.oracleapi.controller
 
 import com.example.oracleapi.dto.agnphonenumberlist.AgnphonenumberlistDto
+import com.example.oracleapi.dto.agnphonenumberlist.PhoneCardDto
 import com.example.oracleapi.dto.common.MyApiResponse
 import com.example.oracleapi.service.agnphonenumber.AgnPhoneService
 import io.swagger.v3.oas.annotations.Operation
@@ -33,4 +34,19 @@ class AgnPhoneNumber(
     fun existsByPhone(@Valid phone: String): MyApiResponse<Boolean> {
         return success(agnPhoneService.existsByPhone(phone))
     }
+
+    @GetMapping("/cardByPhoneTail")
+    @Operation(
+        description = "Найти дисконтную карту по номеру",
+        summary = "Дисконтная карта"
+    )
+    fun findCardByPhone(@Valid phone: String): MyApiResponse<List<PhoneCardDto>> {
+        val result = agnPhoneService.searchCardByPhone(phone)
+        return if (result.isEmpty()) {
+            error("Карты не найдены для номера: $phone")
+        } else {
+            successList(result, "Найдено ${result.size} карт")
+        }
+    }
+
 }

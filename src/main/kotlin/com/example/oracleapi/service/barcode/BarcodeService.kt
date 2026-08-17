@@ -5,6 +5,8 @@ import com.google.zxing.client.j2se.BufferedImageLuminanceSource
 import com.google.zxing.client.j2se.MatrixToImageWriter
 import com.google.zxing.common.GlobalHistogramBinarizer
 import com.google.zxing.common.HybridBinarizer
+import com.google.zxing.datamatrix.DataMatrixWriter
+import com.google.zxing.datamatrix.encoder.SymbolShapeHint
 import com.google.zxing.qrcode.QRCodeWriter
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
@@ -17,11 +19,15 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
+import java.awt.Color
+import java.awt.Font
+import java.awt.GradientPaint
 import java.awt.RenderingHints
 import java.awt.image.BufferedImage
 import java.awt.image.DataBufferByte
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import java.io.File
 import javax.imageio.ImageIO
 
 data class DecodeDetailResult(
@@ -500,6 +506,200 @@ class BarcodeService(
             MatrixToImageWriter.writeToStream(bitMatrix, "PNG", outputStream)
             outputStream.toByteArray()
         }
+    }
+
+
+    fun generateQrCodeBytesWithText(
+        text: String,
+        cardNumber: String,
+        width: Int = 300,
+        height: Int = 350  // чуть больше для текста
+    ): ByteArray {
+        val qrWriter = QRCodeWriter()
+        val bitMatrix = qrWriter.encode(text, BarcodeFormat.QR_CODE, width, height - 50)
+
+        // 1. Создаём QR-код как BufferedImage
+        val qrImage = MatrixToImageWriter.toBufferedImage(bitMatrix)
+
+        // 2. Создаём новое изображение с местом для текста
+        val combinedImage = BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
+        val graphics = combinedImage.createGraphics()
+
+        // 3. Белый фон
+        graphics.color = Color.WHITE
+        graphics.fillRect(0, 0, width, height)
+
+        // 4. Рисуем QR-код (смещаем вверх)
+        graphics.drawImage(qrImage, 0, 0, null)
+
+        // 5. Рисуем текст под QR-кодом
+        graphics.color = Color.BLACK
+        graphics.font = Font("Arial", Font.BOLD, 16)
+
+        val fm = graphics.fontMetrics
+        val textToDraw = "Карта: $cardNumber"
+        val x = (width - fm.stringWidth(textToDraw)) / 2
+        val y = height - 15  // отступ снизу
+
+        graphics.drawString(textToDraw, x, y)
+        graphics.dispose()
+
+        // 6. Конвертируем в ByteArray
+        val baos = ByteArrayOutputStream()
+        ImageIO.write(combinedImage, "png", baos)
+        return baos.toByteArray()
+    }
+
+    fun generateDataMatrixWithLabel(
+        data: String,
+        label: String = "Дисконтная карта",
+        codeWidth: Int = 250,
+        codeHeight: Int = 250,
+        totalHeight: Int = 340  // код + 50px текст + отступы
+    ): ByteArray {
+        // 1. Генерируем DataMatrix
+        val writer = DataMatrixWriter()
+        val bitMatrix = writer.encode(data, BarcodeFormat.DATA_MATRIX, codeWidth, codeHeight)
+        val codeImage = MatrixToImageWriter.toBufferedImage(bitMatrix)
+
+        // 2. Создаём итоговое изображение с местом для текста
+        val finalImage = BufferedImage(codeWidth, totalHeight, BufferedImage.TYPE_INT_RGB)
+        val g = finalImage.createGraphics()
+
+        // 3. Белый фон
+        g.color = Color.WHITE
+        g.fillRect(0, 0, codeWidth, totalHeight)
+
+        // 4. Рисуем DataMatrix сверху
+        g.drawImage(codeImage, 0, 10, null)
+
+        // 5. Рисуем подпись "Дисконтная карта" (мелко)
+        g.color = Color.DARK_GRAY
+        g.font = Font("Arial", Font.PLAIN, 14)
+        val fm = g.fontMetrics
+        val labelX = (codeWidth - fm.stringWidth(label)) / 2
+        g.drawString(label, labelX, codeHeight + 35)
+
+        // 6. Рисуем номер карты (крупно, жирно)
+        g.color = Color.BLACK
+        g.font = Font("Arial", Font.BOLD, 20)
+        val fm2 = g.fontMetrics
+        val numberX = (codeWidth - fm2.stringWidth(data)) / 2
+        g.drawString(data, numberX, codeHeight + 65)
+
+        g.dispose()
+
+        // 7. Конвертируем в байты
+        val baos = ByteArrayOutputStream()
+        ImageIO.write(finalImage, "png", baos)
+        return baos.toByteArray()
+    }
+
+
+    fun generateArsenalCard(
+        cardNumber: String,
+        cardIndex: Int = 1,
+        cardWidth: Int = 800,
+        cardHeight: Int = 1200
+    ): ByteArray {
+        val image = BufferedImage(cardWidth, cardHeight, BufferedImage.TYPE_INT_ARGB)
+        val g = image.createGraphics()
+
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+        g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON)
+        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY)
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR)
+
+        // Светлый чистый белый фон
+        g.color = Color.WHITE
+        g.fillRoundRect(0, 0, cardWidth, cardHeight, 40, 40)
+
+        // Тонкая аккуратная рамка
+        g.color = Color(210, 220, 235)
+        g.drawRoundRect(0, 0, cardWidth - 1, cardHeight - 1, 40, 40)
+
+        // Фирменные цвета сайта sdl-arsenal.ru
+        val primaryBlue = Color(0, 71, 171)
+        val accentOrange = Color(255, 107, 0)
+        val textDark = Color(15, 23, 42)
+        val textGray = Color(140, 150, 165)
+
+        // Шапка (Логотип) с оранжевым акцентом
+        g.color = accentOrange
+        g.fillRect(60, 60, 6, 50)
+
+        g.color = primaryBlue
+        g.font = Font("SansSerif", Font.BOLD, 44)
+        g.drawString("АРСЕНАЛ", 80, 98)
+
+        g.color = textGray
+        g.font = Font("SansSerif", Font.BOLD, 14)
+        g.drawString("ДИСКОНТНАЯ СИСТЕМА", 80, 128)
+
+        // Рисуем плашку с номером ТОЛЬКО для карт со 2-й и далее. Первая карта без номера.
+        if (cardIndex > 1) {
+            val badgeText = "$cardIndex"
+            g.font = Font("SansSerif", Font.BOLD, 22)
+            val badgeSize = 50
+            val badgeX = cardWidth - badgeSize - 60
+            val badgeY = 60
+
+            g.color = primaryBlue
+            g.fillRoundRect(badgeX, badgeY, badgeSize, badgeSize, 16, 16)
+            g.color = Color.WHITE
+
+            val metrics = g.fontMetrics
+            val textWidth = metrics.stringWidth(badgeText)
+            val textHeight = metrics.ascent
+            g.drawString(
+                badgeText,
+                badgeX + (badgeSize - textWidth) / 2,
+                badgeY + (badgeSize + textHeight) / 2 - 4
+            )
+        }
+
+        // Разделитель
+        g.color = Color(240, 242, 246)
+        g.drawLine(60, 160, cardWidth - 60, 160)
+
+        // DataMatrix (всегда квадратный, по центру)
+        val hints = mapOf(EncodeHintType.DATA_MATRIX_SHAPE to SymbolShapeHint.FORCE_SQUARE)
+        val bitMatrix = DataMatrixWriter().encode(cardNumber, BarcodeFormat.DATA_MATRIX, 0, 0, hints)
+        val codeImage = MatrixToImageWriter.toBufferedImage(bitMatrix)
+
+        val codeSize = 400
+        val codeX = (cardWidth - codeSize) / 2
+        val codeY = 230
+
+        g.color = Color(248, 250, 252)
+        g.fillRoundRect(codeX - 24, codeY - 24, codeSize + 48, codeSize + 48, 24, 24)
+        g.color = Color(230, 235, 245)
+        g.drawRoundRect(codeX - 24, codeY - 24, codeSize + 48, codeSize + 48, 24, 24)
+
+        g.drawImage(codeImage, codeX, codeY, codeSize, codeSize, null)
+
+        // Номер карты (без форматирования)
+        g.color = textGray
+        g.font = Font("SansSerif", Font.BOLD, 14)
+        g.drawString("НОМЕР КАРТЫ", 60, 720)
+
+        g.color = textDark
+        g.font = Font("Monospaced", Font.BOLD, 46)
+        g.drawString(cardNumber, 60, 780)
+
+        // Нижний футер с сайтом
+        g.color = Color(235, 240, 248)
+        g.drawLine(60, cardHeight - 100, cardWidth - 60, cardHeight - 100)
+
+        g.color = primaryBlue
+        g.font = Font("SansSerif", Font.BOLD, 18)
+        g.drawString("www.sdl-arsenal.ru", 60, cardHeight - 50)
+
+        g.dispose()
+
+        val baos = ByteArrayOutputStream()
+        ImageIO.write(image, "png", baos)
+        return baos.toByteArray()
     }
 
 }

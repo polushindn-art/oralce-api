@@ -1,18 +1,26 @@
 package com.example.oracleapi.service.max.mainBoth
 
 import com.example.oracleapi.config.MaxApiProperties
+import okhttp3.OkHttpClient
+import org.json.JSONObject
 import org.slf4j.LoggerFactory
-import org.springframework.core.io.ByteArrayResource
+import org.springframework.core.io.FileSystemResource
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import org.springframework.util.LinkedMultiValueMap
+import org.springframework.web.client.HttpServerErrorException
 import org.springframework.web.client.RestClientException
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
+import java.io.File
 import java.net.URI
+import java.net.URLDecoder
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
 
 @Service
 class MaxBotMainClient(
@@ -21,16 +29,13 @@ class MaxBotMainClient(
 ) {
 
     private val log = LoggerFactory.getLogger(this::class.java)
-    /**
-     * Отправка сообщения (по chat_id) — без кнопок
-     */
+
+    // ==================== ОСНОВНЫЕ МЕТОДЫ ====================
+
     fun sendMessage(chatId: String, text: String, format: String = "markdown"): Map<String, Any> {
         return sendMessageWithInlineKeyboard(chatId, text, emptyList(), format)
     }
 
-    /**
-     * Отправка сообщения с inline-клавиатурой (внутри сообщения, по chat_id)
-     */
     fun sendMessageWithInlineKeyboard(
         chatId: String,
         text: String,
@@ -42,13 +47,62 @@ class MaxBotMainClient(
         return executePost(uri, body)
     }
 
-    /**
-     * Получение информации о боте
-     */
     fun getBotInfo(): Map<String, Any> {
         val uri = buildMeUri()
         return executeGet(uri)
     }
+
+    // ==================== ОТПРАВКА ФОТО ====================
+
+    fun sendPhoto(
+        chatId: String,
+        photoBytes: ByteArray,
+        fileName: String,
+        caption: String,
+        buttons: List<List<Map<String, Any>>> = emptyList() // ← Добавили параметр
+    ): Map<String, Any> {
+        log.info("📸 [MAX API] ========== НАЧАЛО ОТПРАВКИ ФОТО ==========")
+        log.info("📸 [MAX API] chatId: {}", chatId)
+        log.info("📸 [MAX API] fileName: {}", fileName)
+        log.info("📸 [MAX API] Размер фото: {} байт", photoBytes.size)
+
+        val uploadUrl = getUploadUrl()
+        val imageToken = uploadFileToUrl(uploadUrl, photoBytes, fileName)
+
+        val maxAttempts = 5
+        var lastException: Exception? = null
+
+        for (attempt in 1..maxAttempts) {
+            try {
+                val delay = when (attempt) {
+                    1 -> 500L
+                    2 -> 1000L
+                    3 -> 2000L
+                    4 -> 4000L
+                    else -> 5000L
+                }
+
+                Thread.sleep(delay)
+
+                // Передаем кнопки в метод отправки
+                val response = sendMessageWithAttachmentToken(chatId, caption, imageToken, buttons)
+
+                log.info("✅ [MAX API] Фото '{}' успешно отправлено в чат {} (попытка {})", fileName, chatId, attempt)
+                return response
+
+            } catch (e: HttpServerErrorException.InternalServerError) {
+                lastException = e
+                if (attempt == maxAttempts) throw e
+            } catch (e: Exception) {
+                lastException = e
+                throw e
+            }
+        }
+
+        throw lastException ?: RuntimeException("Неизвестная ошибка при отправке фото")
+    }
+
+    // ==================== ПРИВАТНЫЕ МЕТОДЫ ====================
 
     private fun createHeaders(): HttpHeaders {
         return HttpHeaders().apply {
@@ -122,83 +176,151 @@ class MaxBotMainClient(
             ?: throw RestClientException("Empty response from MAX API")
     }
 
-    /**
-     * Отправка изображения (в виде массива байтов) в чат
-     */
-    /**
-     * Отправка изображения (в виде массива байтов) в чат
-     */
-    /**
-     * Отправка изображения по правилам MAX API (через предварительную загрузку в /uploads)
-     */
-    /**
-     * Отправка изображения через предварительную загрузку в /uploads (в виде сырых байтов)
-     */
-    fun sendPhoto(chatId: String, photoBytes: ByteArray, fileName: String, caption: String = ""): Map<String, Any> {
-        // Шаг 1: Получаем URL для загрузки
-        val uploadInitUri = UriComponentsBuilder.fromHttpUrl("${properties.botApiUrl}/uploads")
+    // ==================== ЗАГРУЗКА ФАЙЛОВ ====================
+
+    private fun getUploadUrl(): String {
+        log.info("📤 [MAX API] getUploadUrl()")
+
+        val uri = UriComponentsBuilder.fromHttpUrl("${properties.botApiUrl}/uploads")
             .queryParam("type", "image")
             .build()
             .toUri()
 
-        val headers = createHeaders()
-        val initResponse = restTemplate.exchange(
-            uploadInitUri,
-            HttpMethod.POST,
-            HttpEntity<Nothing>(headers),
-            Map::class.java
-        )
+        log.info("📤 [MAX API] URI: {}", uri)
 
-        val uploadUrl = (initResponse.body?.get("url") as? String)
-            ?: throw RuntimeException("Не удалось получить URL для загрузки от MAX API. Ответ: ${initResponse.body}")
+        val response = executePost(uri, emptyMap())
+        log.info("📦 [MAX API] Ответ от /uploads: {}", response)
 
-        // Шаг 2: Загружаем файл как чистые бинарные данные (Raw Binary) в теле запроса
-        val uploadHeaders = HttpHeaders().apply {
-            contentType = MediaType.IMAGE_PNG
+        val url = response["url"] as? String
+        if (url == null) {
+            log.error("❌ [MAX API] В ответе нет поля 'url'! Полный ответ: {}", response)
+            throw RuntimeException("Сервер MAX не вернул URL для загрузки")
         }
 
-        val uploadRequest = HttpEntity(photoBytes, uploadHeaders)
-        val uploadResponse = restTemplate.exchange(
-            uploadUrl,
-            HttpMethod.POST,
-            uploadRequest,
-            Map::class.java
-        )
+        log.info("✅ [MAX API] URL получен: {}", url)
+        return url
+    }
 
-        log.info("📦 [MAX API] Ответ от сервера загрузки файлов: ${uploadResponse.body}")
 
-        val token = (uploadResponse.body?.get("token") as? String)
-            ?: throw RuntimeException("Не удалось получить токен загруженного файла от MAX API. Ответ: ${uploadResponse.body}")
+    private fun uploadFileToUrl(uploadUrl: String, bytes: ByteArray, fileName: String): String {
+        log.info("📤 [MAX API] Загрузка через OkHttp Multipart + умный парсер photos")
 
-        // Шаг 3: Отправляем сообщение с вложением (attachment) через стандартный JSON API
-        val messageUri = buildMessagesUri(chatId)
-        val messageBody = mutableMapOf<String, Any>(
-            "text" to caption,
-            "format" to "markdown",
-            "attachments" to listOf(
-                mapOf(
-                    "type" to "image",
-                    "payload" to mapOf(
-                        "token" to token
-                    )
-                )
+        // 1. Формируем запрос через OkHttp (который стабильно дает HTTP 200 на oneme.ru)
+        val requestBody = okhttp3.MultipartBody.Builder()
+            .setType(okhttp3.MultipartBody.FORM)
+            .addFormDataPart(
+                "data",
+                fileName,
+                bytes.toRequestBody("image/png".toMediaType())
+            )
+            .build()
+
+        val request = Request.Builder()
+            .url(uploadUrl)
+            .post(requestBody)
+            .build()
+
+        val client = OkHttpClient.Builder()
+            .connectTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+            .writeTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+            .readTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+            .build()
+
+        val response = client.newCall(request).execute()
+        val responseBodyString = response.body?.string()
+        log.info("📦 [MAX API] Код: {}, Тело: {}", response.code, responseBodyString)
+
+        if (!response.isSuccessful || responseBodyString.isNullOrBlank()) {
+            throw RuntimeException("Ошибка загрузки HTTP ${response.code}: $responseBodyString")
+        }
+
+        val json = JSONObject(responseBodyString)
+
+        // 2. Проверяем ошибки верхнего уровня, если они есть
+        if (json.has("error_code")) {
+            val errCode = json.optString("error_code")
+            val errData = json.optString("error_data")
+            if (errCode.isNotEmpty() && errCode != "0" && errCode != "null" && errCode != "4") {
+                throw RuntimeException("Ошибка загрузки: error_code=$errCode, data=$errData")
+            }
+        }
+
+        // 3. УМНЫЙ ПАРСЕР: Достаем токен из вложенной структуры `photos -> <id> -> token`
+        if (json.has("photos")) {
+            val photosObj = json.optJSONObject("photos")
+            if (photosObj != null && photosObj.keys().hasNext()) {
+                val firstKey = photosObj.keys().next()
+                val photoData = photosObj.optJSONObject(firstKey)
+                val token = photoData?.optString("token")
+                if (!token.isNullOrBlank()) {
+                    log.info("✅ [MAX API] Токен успешно извлечен из структуры photos!")
+                    return token
+                }
+            }
+        }
+
+        // 4. Запасной вариант: проверяем прямые поля на случай другого формата ответа
+        val directToken = json.optString("token", null)?.takeIf { it.isNotBlank() && it != "null" }
+            ?: json.optString("file_id", null)?.takeIf { it.isNotBlank() && it != "null" }
+
+        if (directToken != null) {
+            return directToken
+        }
+
+        // 5. Последний фоллбек — достаем из URL
+        val uriComponents = UriComponentsBuilder.fromHttpUrl(uploadUrl).build()
+        val rawToken = uriComponents.queryParams.getFirst("photoIds")
+            ?: uriComponents.queryParams.getFirst("token")
+        if (rawToken != null) {
+            return URLDecoder.decode(rawToken, "UTF-8")
+        }
+
+        throw RuntimeException("Не удалось получить токен из ответа: $responseBodyString")
+    }
+
+    private fun sendMessageWithAttachmentToken(
+        chatId: String,
+        text: String,
+        token: String,
+        buttons: List<List<Map<String, Any>>>
+    ): Map<String, Any> {
+        val uri = buildMessagesUri(chatId)
+
+        // Формируем вложения: картинка + клавиатура (если она есть)
+        val attachments = mutableListOf<Map<String, Any>>(
+            mapOf(
+                "type" to "image",
+                "payload" to mapOf("token" to token)
             )
         )
 
-        val messageHeaders = createHeaders().apply {
-            set("Content-Type", "application/json")
+        if (buttons.isNotEmpty()) {
+            attachments.add(
+                mapOf(
+                    "type" to "inline_keyboard",
+                    "payload" to mapOf("buttons" to buttons)
+                )
+            )
         }
 
-        val response = restTemplate.exchange(
-            messageUri,
-            HttpMethod.POST,
-            HttpEntity(messageBody, messageHeaders),
-            Map::class.java
+        val body = mutableMapOf(
+            "text" to text,
+            "format" to "markdown",
+            "attachments" to attachments
         )
 
-        @Suppress("UNCHECKED_CAST")
-        return response.body as? Map<String, Any>
-            ?: throw RestClientException("Empty response from MAX API")
+        return executePost(uri, body)
     }
 
+    private fun extractErrorId(responseBody: String?): String? {
+        if (responseBody == null) return null
+        return try {
+            val json = JSONObject(responseBody)
+            val message = json.optString("message", "")
+            val match = Regex("Error ID: ([a-f0-9]+)").find(message)
+            match?.groupValues?.get(1)
+        } catch (e: Exception) {
+            null
+        }
+    }
 }

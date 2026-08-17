@@ -13,9 +13,11 @@ import com.example.oracleapi.service.stock.StockService
 import com.example.oracleapi.util.BotButtons
 import com.example.oracleapi.util.PhoneUtils
 import ezvcard.Ezvcard
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
-import org.springframework.core.io.ByteArrayResource
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -27,9 +29,7 @@ import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.ConcurrentHashMap
-import org.springframework.http.*
-import org.springframework.util.LinkedMultiValueMap
-import org.springframework.web.client.postForEntity
+import java.util.concurrent.atomic.AtomicBoolean
 
 @Service
 class MaxMainPollingService(
@@ -48,28 +48,39 @@ class MaxMainPollingService(
 
     private val log = LoggerFactory.getLogger(this::class.java)
     private var marker: Long? = null
+    private val markerLock = Any()
+    private val isInitialized = AtomicBoolean(false)
+
     private val searchState = ConcurrentHashMap<String, Long>()
-    private val barcodeManualState = ConcurrentHashMap<String, Long>() // ✅ Состояние для ручного ввода штрих-кода
+    private val barcodeManualState = ConcurrentHashMap<String, Long>()
 
     data class CacheEntry(val url: String, val timestamp: Long)
-
-    // ✅ Кэш для аватаров (chatId -> avatarUrl)
     private val avatarCache = ConcurrentHashMap<String, CacheEntry>()
+    private val employeeCache = ConcurrentHashMap<String, Boolean>()
 
-    @Scheduled(fixedDelay = 3000, initialDelay = 5000)
+    // ✅ Защита от дублирования callback'ов
+    private val processedCallbacks = ConcurrentHashMap<String, Long>()
+
+    // ✅ Ограниченный пул корутин
+    private val botScope = CoroutineScope(Dispatchers.IO.limitedParallelism(10) + SupervisorJob())
+
+    @Scheduled(fixedDelay = 2000, initialDelay = 1000)
     fun pollUpdates() {
         cleanupCaches()
         try {
-            val uriBuilder = UriComponentsBuilder.fromHttpUrl("${properties.botApiUrl}/updates")
-                .queryParam("limit", 5)
-                .queryParam("timeout", 20)
+            val currentMarker: Long?
+            synchronized(markerLock) {
+                currentMarker = marker
+            }
 
-            if (marker != null) {
-                uriBuilder.queryParam("marker", marker)
+            val uriBuilder = UriComponentsBuilder.fromHttpUrl("${properties.botApiUrl}/updates")
+                .queryParam("limit", 20)
+
+            if (currentMarker != null) {
+                uriBuilder.queryParam("marker", currentMarker)
             }
 
             val url = uriBuilder.build().toUri()
-
             val headers = HttpHeaders().apply {
                 set("Authorization", properties.botMainToken)
             }
@@ -82,380 +93,204 @@ class MaxMainPollingService(
             )
 
             val body = response.body
-            val updates = body?.get("updates") as? List<*> ?: return
-            val newMarker = (body["marker"] as? Number)?.toLong()
+            val updates = body?.get("updates") as? List<*>
+            val newMarker = (body?.get("marker") as? Number)?.toLong()
 
-            if (newMarker != null && newMarker != marker) {
-                marker = newMarker
-                log.info("🤖 [Main Bot] Получены новые обновления. Маркер: $marker")
+            // ✅ Безопасная инициализация
+            if (!isInitialized.get()) {
+                if (newMarker != null) {
+                    synchronized(markerLock) {
+                        marker = newMarker
+                    }
+                }
+                isInitialized.set(true)
+                log.info("✅ [Main Bot] Инициализация завершена, маркер: $marker")
+                return
             }
 
+            if (newMarker != null && newMarker != currentMarker) {
+                synchronized(markerLock) {
+                    marker = newMarker
+                }
+                log.info("🤖 [Main Bot] Обновлён маркер: $newMarker")
+            }
+
+            if (updates.isNullOrEmpty()) return
+
             updates.forEach { updateRaw ->
-                val update = updateRaw as? Map<*, *> ?: return@forEach
-
-                log.info("📦 [Main Bot] ВСЕ update: $update")  // ← Логируем всё!
-                log.info("📦 [Main Bot] update_type: ${update["update_type"]}")
-
-                when (val updateType = update["update_type"] as? String) {
-                    "bot_started" -> {
-                        log.info("🚀 [Main Bot] ========== НАЧАЛО bot_started ==========")
-
-                        val user = update["user"] as? Map<*, *>
-                        log.info("📋 [Main Bot] user: $user")
-
-                        val userId = (user?.get("user_id") as? Number)?.toString()
-                            ?: (update["user_id"] as? Number)?.toString()
-                            ?: run {
-                                log.warn("⚠️ [Main Bot] Не найден user_id в update: $update")
-                                return@forEach
-                            }
-
-                        val chatId = (update["chat_id"] as? Number)?.toString()
-                            ?: run {
-                                log.warn("⚠️ [Main Bot] Не найден chat_id в update: $update")
-                                return@forEach
-                            }
-
-                        // ✅ Логируем ВСЕ поля user
-                        log.info("📋 [Main Bot] user_id: $userId")
-                        log.info("📋 [Main Bot] chat_id: $chatId")
-                        log.info("📋 [Main Bot] user.first_name: ${user?.get("first_name")}")
-                        log.info("📋 [Main Bot] user.last_name: ${user?.get("last_name")}")
-                        log.info("📋 [Main Bot] user.name: ${user?.get("name")}")
-                        log.info("📋 [Main Bot] user.is_bot: ${user?.get("is_bot")}")
-                        log.info("📋 [Main Bot] user.last_activity_time: ${user?.get("last_activity_time")}")
-
-                        // ✅ ОСОБО ВНИМАТЕЛЬНО логируем avatar_url и full_avatar_url
-                        val avatarUrl = user?.get("avatar_url") as? String
-                        val fullAvatarUrl = user?.get("full_avatar_url") as? String
-
-                        log.info("📸 [Main Bot] avatar_url: $avatarUrl")
-                        log.info("📸 [Main Bot] full_avatar_url: $fullAvatarUrl")
-
-                        // ✅ Проверяем все ключи в user, чтобы увидеть, что вообще приходит
-                        if (user != null) {
-                            log.info("📋 [Main Bot] Все ключи в user: ${user.keys.joinToString()}")
-                        }
-
-                        // ✅ Сохраняем аватар в кэш (если есть)
-                        val avatarToUse = avatarCache.remove(chatId)
-                        if (avatarToUse != null) {
-                            avatarCache[chatId] = avatarToUse // <-- Ошибка здесь
-                            log.info("📸 [Main Bot] ✅ Сохранён аватар для chatId=$chatId: $avatarToUse")
-                        } else {
-                            log.warn("⚠️ [Main Bot] ❌ Аватар НЕ НАЙДЕН в bot_started для chatId=$chatId")
-                        }
-
-                        log.info("🚀 [Main Bot] Бот запущен: userId=$userId, chatId=$chatId")
-
-                        try {
-                            maxUserAgnService.activateByChatId(chatId)
-                            log.info("✅ [Main Bot] Пользователь $chatId активирован")
-                        } catch (e: Exception) {
-                            log.error("❌ [Main Bot] Ошибка активации пользователя $chatId", e)
-                        }
-
-                        sendMainMenu(chatId)
-                        log.info("🚀 [Main Bot] ========== КОНЕЦ bot_started ==========")
-                    }
-
-                    "bot_stopped" -> {
-                        val user = update["user"] as? Map<*, *>
-                        val userId = (user?.get("user_id") as? Number)?.toString()
-                            ?: (update["user_id"] as? Number)?.toString()
-                            ?: return@forEach
-
-                        val chatId = (update["chat_id"] as? Number)?.toString()
-                            ?: return@forEach
-
-                        log.info("🛑 [Main Bot] ПОЛУЧЕН bot_stopped! userId=$userId, chatId=$chatId")
-
-                        // ✅ Проверяем, есть ли пользователь в БД
-                        val userAgn = maxUserAgnService.findByChatId(chatId)
-                        log.info("📋 [Main Bot] Найден пользователь: ${userAgn != null}")
-
-                        if (userAgn != null) {
-                            log.info("✅ [Main Bot] Пользователь найден: ${userAgn.userName}")
-                            maxUserAgnService.deactivateByChatId(chatId)
-                            log.info("✅ [Main Bot] Пользователь деактивирован")
-                        } else {
-                            log.warn("⚠️ [Main Bot] Пользователь с chatId=$chatId НЕ НАЙДЕН в БД")
-                        }
-                    }
-
-                    "message_created" -> {
-                        val message = update["message"] as? Map<*, *> ?: return@forEach
-                        val sender = message["sender"] as? Map<*, *>
-                        val recipient = message["recipient"] as? Map<*, *>
-                        val bodyMap = message["body"] as? Map<*, *>
-
-                        val userId = (sender?.get("user_id") as? Number)?.toString() ?: return@forEach
-                        val chatId = (recipient?.get("chat_id") as? Number)?.toString() ?: return@forEach
-                        val text = bodyMap?.get("text") as? String
-
-                        var attachmentProcessed = false
-
-                        val attachments = bodyMap?.get("attachments") as? List<*>
-                        attachments?.forEach { attachment ->
-                            val attachmentMap = attachment as? Map<*, *>
-                            when (attachmentMap?.get("type")) {
-                                "contact" -> {
-                                    val payload = attachmentMap["payload"] as? Map<*, *>
-                                    val vcfInfo = payload?.get("vcf_info") as? String
-                                    log.info("📱 [Main Bot] Получен контакт: $vcfInfo")
-
-                                    if (vcfInfo != null) {
-                                        val contactInfo = parseContactFromVcf(vcfInfo)
-                                        if (contactInfo != null) {
-                                            handlePhoneNumberReceived(userId, chatId, contactInfo)
-                                        }
-                                    }
-                                    attachmentProcessed = true
-                                }
-
-                                "image" -> {
-                                    log.info("📸 [Main Bot] Обработка изображения...")
-                                    attachmentProcessed = true
-                                    val payload = attachmentMap["payload"] as? Map<*, *>
-                                    val photoUrl = payload?.get("url") as? String
-
-                                    log.info("📸 [Main Bot] Получено ФОТО от user_id=$userId, chatId=$chatId")
-
-                                    if (photoUrl != null) {
-                                        val authToken = "Bearer ${properties.botMainToken}"
-
-                                        val barcode = runBlocking {
-                                            barcodeService.decodeBarcodeFromUrlWithAuth(photoUrl, authToken)
-                                        }
-
-                                        if (barcode != null) {
-                                            log.info("📱 [Main Bot] Распознан код: $barcode")
-                                            val nomenText = stockService.getFullStockMessageByBarcode(barcode)
-                                            botClient.sendMessageWithInlineKeyboard(
-                                                chatId,
-                                                nomenText,
-                                                BotButtons.menuButton(),
-                                                "markdown"
-                                            )
-                                        } else {
-                                            // ✅ Не распознали — переводим в режим ручного ввода
-                                            barcodeManualState[userId] = System.currentTimeMillis()
-
-                                            botClient.sendMessageWithInlineKeyboard(
-                                                chatId,
-                                                """
-                                                    ❌ *Не удалось распознать код на фото.*
-                                                    
-                                                    Пожалуйста, введите цифры штрих-кода вручную ответным сообщением:
-                                                    """.trimIndent(),
-                                                BotButtons.menuButton(),
-                                                "markdown"
-                                            )
-                                        }
-                                    } else {
-                                        botClient.sendMessage(chatId, "📸 *Фото получено*", "markdown")
-                                    }
-                                }
-                            }
-                        }
-
-                        log.info("📩 [Main Bot] Получено сообщение от user_id=$userId: $text")
-
-                        if (!attachmentProcessed && !text.isNullOrBlank()) {
-                            handleTextMessage(userId, chatId, text)
-                        }
-                    }
-
-                    "message_callback" -> {
-                        val callbackData = update["callback"] as? Map<*, *> ?: return@forEach
-                        val userData = callbackData["user"] as? Map<*, *> ?: return@forEach
-                        val userId = (userData["user_id"] as? Number)?.toString() ?: return@forEach
-                        val payload = callbackData["payload"] as? String ?: return@forEach
-
-                        val message = update["message"] as? Map<*, *> ?: return@forEach
-                        val recipient = message["recipient"] as? Map<*, *> ?: return@forEach
-                        val chatId = (recipient["chat_id"] as? Number)?.toString() ?: return@forEach
-
-                        log.info("🔘 [Main Bot] Callback от user_id=$userId, payload=$payload")
-                        handleAuthCallback(userId, chatId, payload)
-                    }
-
-                    else -> {
-                        log.debug("⚠️ [Main Bot] Неизвестный тип: $updateType")
+                botScope.launch {
+                    try {
+                        val update = updateRaw as? Map<*, *> ?: return@launch
+                        processUpdate(update)
+                    } catch (e: Exception) {
+                        log.error("❌ Ошибка обработки апдейта", e)
                     }
                 }
             }
-
-        } catch (e: HttpClientErrorException.TooManyRequests) {
-            log.warn("⚠️ 429 Too Many Requests, ждём 5 секунд...")
-            Thread.sleep(5000)
         } catch (e: HttpClientErrorException.Unauthorized) {
-            log.error("❌ 401 Unauthorized! Проверьте токен botMainToken")
-            Thread.sleep(30000)
+            log.error("❌ 401 Unauthorized! Проверьте токен")
         } catch (e: ResourceAccessException) {
-            log.trace("⏳ Long Polling таймаут")
+            // Таймаут — это нормально для Long Polling
         } catch (e: Exception) {
-            log.error("❌ [Main Bot] Ошибка в Long Polling", e)
-            Thread.sleep(2000)
+            log.error("❌ [Main Bot] Ошибка в pollUpdates", e)
         }
     }
 
-    private fun parseContactFromVcf(vcfInfo: String): ContactInfo? {
-        return try {
-            val vcard = Ezvcard.parse(vcfInfo).first()
-            val phone = vcard.telephoneNumbers.firstOrNull()?.text
-            val name = vcard.formattedName?.value ?: "Пользователь"
-            if (phone != null) ContactInfo(phone = phone, name = name) else null
-        } catch (e: Exception) {
-            log.error("❌ [Main Bot] Ошибка парсинга VCF: ${e.message}")
-            null
+    private fun processUpdate(update: Map<*, *>) {
+        when (update["update_type"] as? String) {
+            "bot_started" -> handleBotStarted(update)
+            "bot_stopped" -> handleBotStopped(update)
+            "message_created" -> handleMessageCreated(update)
+            "message_callback" -> handleMessageCallback(update)
         }
     }
 
-    data class ContactInfo(val phone: String, val name: String)
+    // ==================== ОБРАБОТЧИКИ СОБЫТИЙ ====================
 
-    private fun isEmployee(chatId: String): Boolean {
-        val user = maxUserAgnService.findByChatId(chatId) ?: return false
-        val cleanPhone = PhoneUtils.getPhoneTail(user.phone ?: "")
-        return phonebookRepository.findByPhoneTail(cleanPhone).isNotEmpty()
-    }
+    private fun handleBotStarted(update: Map<*, *>) {
+        val user = update["user"] as? Map<*, *>
+        val chatId = (update["chat_id"] as? Number)?.toString()
+            ?: (user?.get("chat_id") as? Number)?.toString()
+            ?: return
 
-    /**
-     * ✅ Главное меню с inline-кнопками
-     */
-    private fun sendMainMenu(chatId: String) {
-        log.info("📋 [Main Bot] Отправка главного меню в chatId=$chatId")
-
-        val isRegistered = maxUserAgnService.isChatRegistered(chatId)
-        val employee = isRegistered && isEmployee(chatId)
-
-        val buttons = if (isRegistered) {
-            val list = mutableListOf<List<Map<String, Any>>>()
-            list.add(listOf(mapOf("type" to "callback", "text" to "📋 Мои данные", "payload" to "my_data")))
-            list.add(listOf(mapOf("type" to "callback", "text" to "🔍 Поиск товара", "payload" to "product_search")))
-            list.add(listOf(mapOf("type" to "callback", "text" to "🪪 Моя дисконтная карта", "payload" to "my_qr_card")))
-            if (employee) {
-                list.add(listOf(mapOf("type" to "callback", "text" to "🔍 Поиск сотрудников", "payload" to "search")))
-            }
-
-            list.add(listOf(mapOf("type" to "callback", "text" to "🗑️ Отписаться", "payload" to "unsubscribe")))
-            list.add(listOf(mapOf("type" to "callback", "text" to "ℹ️ Помощь", "payload" to "auth_help")))
-            list
-        } else {
-            listOf(
-                listOf(mapOf("type" to "callback", "text" to "📝 Регистрация", "payload" to "register")),
-                listOf(mapOf("type" to "callback", "text" to "ℹ️ Помощь", "payload" to "auth_help"))
-            )
-        }
-
-        val text = when {
-            !isRegistered -> """
-                👋 *Добро пожаловать!*
-                
-                Для начала работы необходимо зарегистрироваться.
-                Нажмите *"Регистрация"* для начала.
-            """.trimIndent()
-
-            employee -> """
-                Выберите действие в меню ниже.
-            """.trimIndent()
-
-            else -> """
-                Выберите действие в меню ниже.
-            """.trimIndent()
+        val avatarUrl = user?.get("avatar_url") as? String
+        if (avatarUrl != null) {
+            avatarCache[chatId] = CacheEntry(avatarUrl, System.currentTimeMillis())
         }
 
         try {
-            botClient.sendMessageWithInlineKeyboard(chatId, text, buttons, "markdown")
-            log.info("✅ [Main Bot] Меню отправлено в chatId=$chatId")
+            maxUserAgnService.activateByChatId(chatId)
         } catch (e: Exception) {
-            log.error("❌ [Main Bot] Ошибка отправки меню в chatId=$chatId", e)
+            log.error("❌ Ошибка активации пользователя $chatId", e)
+        }
+        sendMainMenu(chatId)
+    }
+
+    private fun handleBotStopped(update: Map<*, *>) {
+        val chatId = (update["chat_id"] as? Number)?.toString() ?: return
+        try {
+            maxUserAgnService.deactivateByChatId(chatId)
+        } catch (e: Exception) {
+            log.error("❌ Ошибка деактивации пользователя $chatId", e)
         }
     }
 
-    /**
-     * ✅ Помощь с кнопкой "В меню"
-     */
-    /**
-     * ✅ Помощь с кнопкой "В меню"
-     */
-    private fun sendHelp(chatId: String) {
-        val text = """
-            📖 *Помощь*
-            
-            🔍 *Как искать товар:*
-            1. Нажмите кнопку *"🔍 Поиск товара"* в главном меню.
-            2. Отправьте **фотографию** штрих-кода.
-            3. Или введите **цифры штрих-кода вручную** текстом, если фото не получилось.
-            
-            🔐 *Как зарегистрироваться:*
-            1. Нажмите *Регистрация* в главном меню.
-            2. Нажмите *Поделиться номером*.
-            3. Подтвердите отправку номера.
-            4. Дождитесь сообщения об успешной регистрации.
-            
-            👤 *Кто может зарегистрироваться:*
-            Клиенты магазина и сотрудники организации. Номер в боте MAX должен совпадать с номером в системе.
-            
-            📌 *Команды:*
-            /start — главное меню
-            /help — эта справка
-        """.trimIndent()
+    private fun handleMessageCreated(update: Map<*, *>) {
+        val message = update["message"] as? Map<*, *> ?: return
+        val sender = message["sender"] as? Map<*, *>
+        val recipient = message["recipient"] as? Map<*, *>
+        val bodyMap = message["body"] as? Map<*, *>
 
-        botClient.sendMessageWithInlineKeyboard(chatId, text, BotButtons.menuButton(), "markdown")
+        val userId = (sender?.get("user_id") as? Number)?.toString() ?: return
+        val chatId = (recipient?.get("chat_id") as? Number)?.toString() ?: return
+        val text = bodyMap?.get("text") as? String
+
+        val attachments = bodyMap?.get("attachments") as? List<*>
+
+        attachments?.forEach { attachment ->
+            val attachmentMap = attachment as? Map<*, *>
+            when (attachmentMap?.get("type")) {
+                "contact" -> {
+                    val payload = attachmentMap["payload"] as? Map<*, *>
+                    val vcfInfo = payload?.get("vcf_info") as? String
+                    if (vcfInfo != null) {
+                        parseContactFromVcf(vcfInfo)?.let {
+                            handlePhoneNumberReceived(userId, chatId, it)
+                        }
+                    }
+                    return  // Контакт — отдельное действие
+                }
+                "image" -> {
+                    val payload = attachmentMap["payload"] as? Map<*, *>
+                    val photoUrl = payload?.get("url") as? String
+                    if (photoUrl != null) {
+                        botScope.launch {
+                            try {
+                                val authToken = "Bearer ${properties.botMainToken}"
+                                val barcode = barcodeService.decodeBarcodeFromUrlWithAuth(photoUrl, authToken)
+                                if (barcode != null) {
+                                    botClient.sendMessageWithInlineKeyboard(
+                                        chatId,
+                                        stockService.getFullStockMessageByBarcode(barcode),
+                                        BotButtons.menuButton(),
+                                        "markdown"
+                                    )
+                                } else {
+                                    barcodeManualState[userId] = System.currentTimeMillis()
+                                    botClient.sendMessageWithInlineKeyboard(
+                                        chatId,
+                                        "❌ Не распознано. Введите цифры вручную:",
+                                        BotButtons.menuButton(),
+                                        "markdown"
+                                    )
+                                }
+                            } catch (e: Exception) {
+                                log.error("❌ Ошибка обработки фото", e)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // ✅ Текст обрабатывается независимо от фото
+        if (!text.isNullOrBlank()) {
+            handleTextMessage(userId, chatId, text)
+        }
     }
+
+    // ✅ Защита от дублирования callback'ов (10 секунд)
+    private fun handleMessageCallback(update: Map<*, *>) {
+        val callbackData = update["callback"] as? Map<*, *> ?: return
+        val userId = (callbackData["user"] as? Map<*, *>)?.get("user_id")?.toString() ?: return
+        val payload = callbackData["payload"] as? String ?: return
+
+        val message = update["message"] as? Map<*, *>
+        val recipient = message?.get("recipient") as? Map<*, *>
+        val chatId = recipient?.get("chat_id")?.toString() ?: return
+
+        val callbackId = "$userId:$payload"
+        val now = System.currentTimeMillis()
+        val lastProcessed = processedCallbacks[callbackId]
+
+        if (lastProcessed != null && now - lastProcessed < 10000) {
+            log.info("⏭️ [Main Bot] Пропускаем дублирующий callback: $payload от userId=$userId")
+            return
+        }
+        processedCallbacks[callbackId] = now
+
+        handleAuthCallback(userId, chatId, payload)
+    }
+
+    // ==================== ОСТАЛЬНЫЕ МЕТОДЫ ====================
 
     private fun handleTextMessage(userId: String, chatId: String, text: String) {
         val trimmedText = text.trim()
 
-        // 1. Проверка на поиск сотрудников
         if (searchState.remove(userId) != null) {
-            if (trimmedText.isNotEmpty()) {
-                searchEmployees(chatId, trimmedText)
-            } else {
-                botClient.sendMessage(chatId, "❌ Поисковый запрос не может быть пустым.", "markdown")
-            }
+            if (trimmedText.isNotEmpty()) searchEmployees(chatId, trimmedText)
             return
         }
 
-        // ✅ 2. Проверка на ручной ввод штрих-кода
         if (barcodeManualState.remove(userId) != null) {
             if (trimmedText.isNotEmpty()) {
-                log.info("⌨️ [Main Bot] Ручной ввод штрих-кода от user_id=$userId: $trimmedText")
-                val nomenText = stockService.getFullStockMessageByBarcode(trimmedText)
                 botClient.sendMessageWithInlineKeyboard(
                     chatId,
-                    nomenText,
+                    stockService.getFullStockMessageByBarcode(trimmedText),
                     BotButtons.menuButton(),
                     "markdown"
                 )
-            } else {
-                botClient.sendMessage(chatId, "❌ Штрих-код не может быть пустым.", "markdown")
             }
             return
         }
 
         when (trimmedText.lowercase()) {
-            "/start" -> {
-                log.info("📌 [Main Bot] Пользователь $userId вызвал /start")
-                sendMainMenu(chatId)
-            }
-
-            "/help" -> {
-                log.info("📌 [Main Bot] Пользователь $userId вызвал /help")
-                sendHelp(chatId)
-            }
-
-            else -> {
-                log.info("📌 [Main Bot] Неизвестная команда от $userId: $trimmedText, показываем меню")
-                sendMainMenu(chatId)
-            }
+            "/start" -> sendMainMenu(chatId)
+            "/help" -> sendHelp(chatId)
+            else -> sendMainMenu(chatId)
         }
     }
 
-    /**
-     * ✅ Регистрация с кнопкой "В меню"
-     */
     private fun handlePhoneNumberReceived(userId: String, chatId: String, contact: ContactInfo) {
         if (maxUserAgnService.isChatRegistered(chatId)) {
             botClient.sendMessageWithInlineKeyboard(
@@ -468,40 +303,6 @@ class MaxMainPollingService(
         }
 
         val cleanNumber = contact.phone.replace(Regex("[^\\d+]"), "")
-        val nameFromMax = contact.name
-        val phoneTail = PhoneUtils.getPhoneTail(cleanNumber)
-
-        log.info("📱 [Main Bot] ✅ ПОЛУЧЕН КОНТАКТ: userId=$userId, chatId=$chatId, phone=$cleanNumber, nameFromMax=$nameFromMax")
-
-        val employeeResults = phonebookRepository.findByPhoneTail(phoneTail)
-            .ifEmpty { phonebookRepository.findByPhoneSot(cleanNumber) }
-            .ifEmpty { phonebookRepository.findByPhoneInt(cleanNumber) }
-
-        val clientResults = agnPhoneService.searchByPhone(cleanNumber)
-
-        if (employeeResults.isEmpty() && clientResults.isEmpty()) {
-            botClient.sendMessageWithInlineKeyboard(
-                chatId,
-                """
-            ❌ *Номер `$cleanNumber` не найден!*
-            
-            Пожалуйста, проверьте правильность номера или обратитесь к администратору.
-            """.trimIndent(),
-                BotButtons.menuButton(),
-                "markdown"
-            )
-            return
-        }
-
-        val isEmployee = employeeResults.isNotEmpty()
-        val isClient = clientResults.isNotEmpty()
-
-        val roleText = when {
-            isEmployee && isClient -> "сотрудник + клиент"
-            isEmployee -> "сотрудник"
-            isClient -> "клиент"
-            else -> "пользователь"
-        }
 
         try {
             maxUserAgnService.addUserAgn(
@@ -509,123 +310,69 @@ class MaxMainPollingService(
                 chatId = chatId,
                 phone = cleanNumber,
                 botType = "MAIN",
-                userName = nameFromMax
+                userName = contact.name
             )
+            invalidateEmployeeCache(chatId)
 
-            // ✅ Если есть аватар в кэше — скачиваем
-            val avatarEntry = avatarCache.remove(chatId) // Теперь это CacheEntry, а не String
+            val avatarEntry = avatarCache.remove(chatId)
             if (avatarEntry != null) {
                 try {
-                    // Передаем avatarEntry.url в метод сохранения
                     avatarService.downloadAndSaveAvatar(chatId, avatarEntry.url)
-                    log.info("✅ [Main Bot] Аватар скачан для нового пользователя $chatId")
                 } catch (e: Exception) {
-                    log.warn("⚠️ [Main Bot] Не удалось скачать аватар для $chatId", e)
+                    log.warn("⚠️ Не удалось скачать аватар", e)
                 }
             }
 
             botClient.sendMessageWithInlineKeyboard(
                 chatId,
-                """
-            👋 *Привет, $nameFromMax!*
-            
-            ✅ Регистрация прошла успешно!
-            
-            📱 Ваш номер: `$cleanNumber`
-            👤 Роль: $roleText
-            
-            🔐 Добро пожаловать!
-            """.trimIndent(),
+                "✅ *Регистрация прошла успешно!*\n\nДобро пожаловать!",
                 BotButtons.menuButton(),
                 "markdown"
             )
-
         } catch (e: Exception) {
-            log.error("❌ [Main Bot] Ошибка регистрации", e)
-            botClient.sendMessageWithInlineKeyboard(
-                chatId,
-                "❌ Ошибка регистрации. Попробуйте позже.",
-                BotButtons.menuButton(),
-                "markdown"
-            )
+            log.error("❌ Ошибка регистрации", e)
+            botClient.sendMessage(chatId, "❌ Ошибка регистрации", "markdown")
         }
     }
 
     private fun handleAuthCallback(userId: String, chatId: String, payload: String) {
-        log.info("🔘 [Main Bot] Callback: userId=$userId, chatId=$chatId, payload=$payload")
-
         when {
             payload == "register" -> {
-                if (maxUserAgnService.isChatRegistered(chatId)) {
-                    botClient.sendMessageWithInlineKeyboard(
-                        chatId,
-                        "ℹ️ *Вы уже зарегистрированы!*",
-                        BotButtons.menuButton(),
-                        "markdown"
-                    )
-                    return
-                }
-
-                log.info("📝 [Main Bot] Пользователь $userId нажал 'Регистрация'")
-
                 botClient.sendMessageWithInlineKeyboard(
                     chatId,
-                    """
-                    📝 *Регистрация*
-                    
-                    Нажмите *"Поделиться номером"* для отправки контакта.
-                    
-                    ⚠️ *Важно:*
-                    Вы должны быть клиентом магазина или сотрудником.
-                    Номер в боте MAX должен совпадать с номером в системе.
-                    Если номер не найден, регистрация будет отклонена.
-                    Для получения карты обратитесь в информационную службу.
-                    """.trimIndent(),
+                    "📝 Нажмите *«Поделиться номером»* для регистрации.",
                     BotButtons.registerButtons(),
                     "markdown"
                 )
             }
-
             payload == "product_search" -> {
                 barcodeManualState[userId] = System.currentTimeMillis()
                 botClient.sendMessageWithInlineKeyboard(
                     chatId,
-                    """
-                    🔍 *Поиск товара*
-                    
-                    Отправьте **фотографию** штрих-кода или введите его **цифры вручную** в следующем сообщении:
-                    """.trimIndent(),
+                    "🔍 Отправьте **фото** штрих-кода или введите **цифры** вручную:",
                     BotButtons.menuButton(),
                     "markdown"
                 )
             }
-
             payload == "search" -> {
                 if (!isEmployee(chatId)) {
-                    botClient.sendMessage(chatId, "❌ Поиск сотрудников доступен только сотрудникам", "markdown")
+                    botClient.sendMessage(chatId, "❌ Доступно только сотрудникам", "markdown")
                     return
                 }
                 searchState[userId] = System.currentTimeMillis()
-                botClient.sendMessage(chatId, "🔍 Введите фамилию, имя или должность:", "markdown")
+                botClient.sendMessage(chatId, "🔍 Введите запрос для поиска:", "markdown")
             }
-
             payload == "my_data" -> {
-                val userAgn = maxUserAgnService.findByChatId(chatId)
-                if (userAgn != null) {
-                    val employee = isEmployee(chatId)
-                    val roleText = if (employee) "Сотрудник" else "Клиент"
-
+                val user = maxUserAgnService.findByChatId(chatId)
+                if (user != null) {
                     val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")
-                    val formattedDate = userAgn.createdAt?.format(formatter) ?: "не указано"
-
+                    val formattedDate = user.createdAt?.format(formatter) ?: "не указано"
                     botClient.sendMessageWithInlineKeyboard(
                         chatId,
                         """
                         📋 *Ваши данные:*
-                        
-                        📱 Номер: `${userAgn.phone}`
-                        👤 Имя: ${userAgn.userName ?: "не указано"}
-                        🏷️ Роль: $roleText
+                        📱 Телефон: `${user.phone}`
+                        👤 Имя: ${user.userName ?: "не указано"}
                         📅 Зарегистрирован: $formattedDate
                         """.trimIndent(),
                         BotButtons.menuButton(),
@@ -635,103 +382,99 @@ class MaxMainPollingService(
                     sendMainMenu(chatId)
                 }
             }
-
             payload == "unsubscribe" -> {
-
                 botClient.sendMessageWithInlineKeyboard(
                     chatId,
-                    """
-                    🗑️ *Отписка*
-                    
-                    Вы уверены, что хотите отписаться?
-                    
-                    После отписки вы больше не будете получать:
-                    • Коды для подтверждения на кассе
-                    • Уведомления о заказах
-                    • Другие сообщения от бота
-                    
-                    Вы всегда сможете зарегистрироваться снова.
-                    """.trimIndent(),
+                    "🗑️ Вы уверены, что хотите отписаться?",
                     BotButtons.unsubscribeButtons(),
                     "markdown"
                 )
             }
-
             payload == "confirm_unsubscribe" -> {
                 try {
                     maxUserAgnService.deleteByChatId(chatId)
-                    log.info("🗑️ [Main Bot] Пользователь $chatId отписался")
-
-
+                    invalidateEmployeeCache(chatId)
+                    processedCallbacks.entries.removeIf { it.key.startsWith("$userId:") }
                     botClient.sendMessageWithInlineKeyboard(
                         chatId,
-                        """
-                        ✅ *Вы отписались!*
-                        
-                        Вы больше не будете получать уведомления.
-                        
-                        Если захотите вернуться, нажмите *"Зарегистрироваться снова"*.
-                        """.trimIndent(),
+                        "✅ Вы отписались.",
                         BotButtons.registerAgainButton(),
                         "markdown"
                     )
-
-                    sendMainMenu(chatId)
-
                 } catch (e: Exception) {
-                    log.error("❌ [Main Bot] Ошибка отписки", e)
-                    botClient.sendMessage(chatId, "❌ Ошибка при отписке. Попробуйте позже.", "markdown")
-                    sendMainMenu(chatId)
+                    log.error("❌ Ошибка отписки", e)
+                    botClient.sendMessage(chatId, "❌ Ошибка отписки", "markdown")
                 }
             }
-
             payload.startsWith("call_mobile_") -> {
                 val parts = payload.removePrefix("call_mobile_").split("_")
-                val internalNumber = parts.getOrNull(0) ?: ""
-                val callerNumber = parts.getOrNull(1) ?: ""
-
-                log.info("📱 [Main Bot] Обработка перезвона: сотрудник=$internalNumber, звонящий=$callerNumber")
-                handleCallMobile(chatId, internalNumber, callerNumber)
+                handleCallMobile(
+                    chatId,
+                    parts.getOrNull(0) ?: "",
+                    parts.getOrNull(1) ?: ""
+                )
             }
-
-            payload == "auth_help" -> {
-                sendHelp(chatId)
-            }
-
-            payload == "back_to_menu" -> {
-                sendMainMenu(chatId)
-            }
-
             payload == "my_qr_card" -> {
-                // Берем реальный номер карты пользователя (или фолбек, если номер не привязан)
                 val userAgn = maxUserAgnService.findByChatId(chatId)
-                val cardNumber = userAgn?.phone?.let { "ARSCC_$it" } ?: "ARSCC00026004078"
 
-                try {
-                    // 1. Генерируем QR-код через BarcodeService
-                    val qrBytes = barcodeService.generateQrCodeBytes(cardNumber)
-
-                    // 2. Отправляем картинку через наш бот-клиент
-                    botClient.sendPhoto(
-                        chatId = chatId,
-                        photoBytes = qrBytes,
-                        fileName = "discount_qr.png",
-                        caption = "🪪 Ваша дисконтная карта: $cardNumber"
-                    )
-                    log.info("✅ [Main Bot] QR-код дисконтной карты отправлен для chatId=$chatId")
-                } catch (e: Exception) {
-                    log.error("❌ [Main Bot] Ошибка генерации или отправки QR-кода", e)
+                if (userAgn == null) {
                     botClient.sendMessageWithInlineKeyboard(
                         chatId,
-                        "❌ Не удалось сгенерировать QR-код. Попробуйте позже.",
+                        "❌ Вы не зарегистрированы.",
                         BotButtons.menuButton(),
                         "markdown"
                     )
+                    return
+                }
+
+                val cards = agnPhoneService.searchCardByPhone(userAgn.phone ?: "")
+
+                if (cards.isEmpty()) {
+                    botClient.sendMessageWithInlineKeyboard(
+                        chatId,
+                        """
+                                ❌ *Дисконтная карта не найдена*
+                                
+                                Уважаемый покупатель!
+                                
+                                К сожалению, в нашей базе данных не найдена дисконтная карта,
+                                привязанная к вашему номеру телефона: `${userAgn.phone}`
+                                
+                                📌 *Что делать:*
+                                1. Обратитесь в *информационную службу* магазина
+                                2. Предъявите номер телефона, указанный при регистрации
+                                3. Сотрудник свяжет вашу карту с номером телефона
+                                                                
+                                После этого вы сможете пользоваться картой в боте.
+                            """.trimIndent(),
+                        BotButtons.menuButton(),
+                        "markdown"
+                    )
+                    return
+                }
+
+                //Отправляем QR-коды для всех карт
+                cards.forEachIndexed { index, card ->
+                    val cardNumber = card.dscbarnumb!!
+                    val cardIndex = index + 1 // 1, 2, 3, 4, 5...
+
+                    val qrBytes = barcodeService.generateArsenalCard(cardNumber, cardIndex)
+
+                    botClient.sendPhoto(
+                        chatId = chatId,
+                        photoBytes = qrBytes,
+                        fileName = "qr_card_${cardNumber}.png",
+                        caption = """
+                        👤 Владелец: ${card.agnname ?: "не указан"}
+                        """.trimIndent(),
+                        buttons = BotButtons.menuButton()
+                    )
                 }
             }
-
+            payload == "auth_help" -> sendHelp(chatId)
+            payload == "back_to_menu" -> sendMainMenu(chatId)
             else -> {
-                log.warn("⚠️ [Main Bot] Неизвестный payload: $payload")
+                log.warn("⚠️ Неизвестный payload: $payload")
                 sendMainMenu(chatId)
             }
         }
@@ -740,60 +483,39 @@ class MaxMainPollingService(
     private fun handleCallMobile(chatId: String, internalNumber: String, callerNumber: String) {
         try {
             val callerInfo = callNotificationService.findCallerInfo(callerNumber)
-            val callerName = callerInfo?.let {
-                listOfNotNull(it.fname, it.nname).joinToString(" ")
-            } ?: callerNumber
-
             val employeeInfo = callNotificationService.findCallerInfo(internalNumber)
-            val employeePhoneSot = employeeInfo?.phoneSot?.takeIf { it.isNotBlank() }
+            val phoneSot = employeeInfo?.phoneSot?.takeIf { it.isNotBlank() }
 
-            if (employeePhoneSot == null) {
-                botClient.sendMessage(chatId, "❌ У вас не указан сотовый номер в телефонной книге.", "markdown")
+            if (phoneSot == null) {
+                botClient.sendMessage(chatId, "❌ Номер не найден.", "markdown")
                 return
             }
 
-            val phoneSot = PhoneUtils.phone8(employeePhoneSot)
             val employeeName = listOfNotNull(employeeInfo?.fname, employeeInfo?.nname).joinToString(" ")
-
-            val dialNumber = when {
-                callerNumber.matches(Regex("^\\d{3,4}$")) -> callerNumber
-                else -> callerNumber
-            }
-
-            log.info("📱 Перезвон: звоним на $dialNumber, соединяем с сотовым $phoneSot, CallerID=$employeeName")
+            val formattedPhone = PhoneUtils.phone8(phoneSot)
 
             botClient.sendMessage(
                 chatId,
-                """
-                📱 *Идёт перезвон на сотовый!*
-                
-                ⏳ Сейчас мы дозвонимся до $callerName и позвоним на ваш сотовый $phoneSot.
-                """.trimIndent(),
+                "📱 *Идёт перезвон на сотовый!*\n\n⏳ Дозваниваемся до $employeeName...",
                 "markdown"
             )
 
+            // ✅ Исправленный вызов
             asteriskService.originateCall(
-                dialNumber,
-                "800$phoneSot",
-                employeeName
+                internalNumber = callerNumber,  // ← Внутренний номер (кому звоним)
+                externalNumber = "800$formattedPhone"  // ← Внешний номер (отображается)
             )
-
         } catch (e: Exception) {
             log.error("❌ Ошибка перезвона", e)
-            botClient.sendMessage(chatId, "❌ Ошибка при выполнении перезвона. Попробуйте позже.", "markdown")
+            botClient.sendMessage(chatId, "❌ Ошибка при перезвоне", "markdown")
         }
     }
 
-    /**
-     * Поиск сотрудников
-     */
     private fun searchEmployees(chatId: String, query: String) {
         val searchLower = query.lowercase()
-
         val allEmployees = phonebookRepository.findAll()
         val results = allEmployees.filter { employee ->
             val fullName = listOfNotNull(employee.fname, employee.nname).joinToString(" ")
-
             fullName.lowercase().contains(searchLower) ||
                     employee.dolgnost?.lowercase()?.contains(searchLower) == true ||
                     employee.otdel?.lowercase()?.contains(searchLower) == true ||
@@ -801,24 +523,12 @@ class MaxMainPollingService(
                     employee.nname?.lowercase()?.contains(searchLower) == true
         }.take(10)
 
+        val buttons = listOf(
+            listOf(mapOf("type" to "callback", "text" to "🔍 Новый поиск", "payload" to "search")),
+            listOf(mapOf("type" to "callback", "text" to "◀️ В меню", "payload" to "back_to_menu"))
+        )
+
         if (results.isEmpty()) {
-            // ✅ Если ничего не найдено — показываем кнопку "Новый поиск"
-            val buttons = listOf(
-                listOf(
-                    mapOf(
-                        "type" to "callback",
-                        "text" to "🔍 Новый поиск",
-                        "payload" to "search"
-                    )
-                ),
-                listOf(
-                    mapOf(
-                        "type" to "callback",
-                        "text" to "◀️ В меню",
-                        "payload" to "back_to_menu"
-                    )
-                )
-            )
             botClient.sendMessageWithInlineKeyboard(
                 chatId,
                 "🔍 По запросу `$query` ничего не найдено.",
@@ -828,27 +538,12 @@ class MaxMainPollingService(
             return
         }
 
-        val message = buildSearchResult(results, query)
-
-        // ✅ Добавляем кнопки "Новый поиск" и "В меню"
-        val buttons = listOf(
-            listOf(
-                mapOf(
-                    "type" to "callback",
-                    "text" to "🔍 Новый поиск",
-                    "payload" to "search"
-                )
-            ),
-            listOf(
-                mapOf(
-                    "type" to "callback",
-                    "text" to "◀️ В меню",
-                    "payload" to "back_to_menu"
-                )
-            )
+        botClient.sendMessageWithInlineKeyboard(
+            chatId,
+            buildSearchResult(results, query),
+            buttons,
+            "markdown"
         )
-
-        botClient.sendMessageWithInlineKeyboard(chatId, message, buttons, "markdown")
     }
 
     private fun buildSearchResult(results: List<Phonebook>, query: String): String {
@@ -874,34 +569,85 @@ class MaxMainPollingService(
         return lines.joinToString("\n")
     }
 
+    private fun parseContactFromVcf(vcfInfo: String): ContactInfo? {
+        return try {
+            val vcard = Ezvcard.parse(vcfInfo).first()
+            ContactInfo(
+                phone = vcard.telephoneNumbers.firstOrNull()?.text ?: "",
+                name = vcard.formattedName?.value ?: "Пользователь"
+            )
+        } catch (e: Exception) {
+            log.error("❌ Ошибка парсинга VCF", e)
+            null
+        }
+    }
+
+    data class ContactInfo(val phone: String, val name: String)
+
+    private fun isEmployee(chatId: String): Boolean {
+        return employeeCache.computeIfAbsent(chatId) {
+            val user = maxUserAgnService.findByChatId(chatId) ?: return@computeIfAbsent false
+            val cleanPhone = PhoneUtils.getPhoneTail(user.phone ?: "")
+            phonebookRepository.findByPhoneTail(cleanPhone).isNotEmpty()
+        }
+    }
+
+    private fun invalidateEmployeeCache(chatId: String) {
+        employeeCache.remove(chatId)
+    }
+
+    private fun sendMainMenu(chatId: String) {
+        val isRegistered = maxUserAgnService.isChatRegistered(chatId)
+        val employee = isRegistered && isEmployee(chatId)
+
+        val buttons = mutableListOf<List<Map<String, Any>>>().apply {
+            if (isRegistered) {
+                add(listOf(mapOf("type" to "callback", "text" to "📋 Мои данные", "payload" to "my_data")))
+                add(listOf(mapOf("type" to "callback", "text" to "🔍 Поиск товара", "payload" to "product_search")))
+                add(listOf(mapOf("type" to "callback", "text" to "🪪 Моя дисконтная карта", "payload" to "my_qr_card")))
+                if (employee) {
+                    add(listOf(mapOf("type" to "callback", "text" to "🔍 Поиск сотрудников", "payload" to "search")))
+                }
+                add(listOf(mapOf("type" to "callback", "text" to "🗑️ Отписаться", "payload" to "unsubscribe")))
+                add(listOf(mapOf("type" to "callback", "text" to "ℹ️ Помощь", "payload" to "auth_help")))
+            } else {
+                add(listOf(mapOf("type" to "callback", "text" to "📝 Регистрация", "payload" to "register")))
+                add(listOf(mapOf("type" to "callback", "text" to "ℹ️ Помощь", "payload" to "auth_help")))
+            }
+        }
+
+        val text = if (!isRegistered) {
+            "👋 *Добро пожаловать!*\n\nДля начала работы необходимо зарегистрироваться.\nНажмите *«Регистрация»*."
+        } else {
+            "Выберите действие в меню ниже:"
+        }
+
+        botClient.sendMessageWithInlineKeyboard(chatId, text, buttons, "markdown")
+    }
+
+    private fun sendHelp(chatId: String) {
+        val text = """
+            📖 *Помощь*
+            
+            🔍 *Как искать товар:*
+            1. Нажмите *«Поиск товара»*
+            2. Отправьте фото штрих-кода
+            
+            🔐 *Как зарегистрироваться:*
+            1. Нажмите *«Регистрация»*
+            2. Нажмите *«Поделиться номером»*
+            
+            👤 *Кто может зарегистрироваться:*
+            Клиенты и сотрудники магазина.
+        """.trimIndent()
+
+        botClient.sendMessageWithInlineKeyboard(chatId, text, BotButtons.menuButton(), "markdown")
+    }
+
     private fun cleanupCaches() {
-        val oneHourAgo = System.currentTimeMillis() - 3600_000
-        searchState.entries.removeIf { it.value < oneHourAgo }
-        avatarCache.entries.removeIf { it.value.timestamp < oneHourAgo }
+        val now = System.currentTimeMillis()
+        searchState.entries.removeIf { now - it.value > 3600_000 }
+        avatarCache.entries.removeIf { now - it.value.timestamp > 3600_000 }
+        processedCallbacks.entries.removeIf { now - it.value > 30000 }
     }
-
-    fun sendQrCodeToChat(chatId: String, cardText: String, botToken: String, restTemplate: RestTemplate) {
-        val qrBytes = barcodeService.generateQrCodeBytes(cardText)
-
-        // URL зависит от API вашего мессенджера (например, Telegram или MAX бот)
-        val url = "https://api.messenger.ru/bot/messages?chat_id=$chatId"
-
-        val headers = HttpHeaders().apply {
-            contentType = MediaType.MULTIPART_FORM_DATA
-            set("Authorization", "Bearer $botToken")
-        }
-
-        val fileResource = object : ByteArrayResource(qrBytes) {
-            override fun getFilename(): String = "discount_qr.png"
-        }
-
-        val body = LinkedMultiValueMap<String, Any>().apply {
-            add("file", fileResource)
-            add("caption", "Ваш QR-код: $cardText")
-        }
-
-        val requestEntity = HttpEntity(body, headers)
-        restTemplate.postForEntity<String>(url, requestEntity)
-    }
-
 }

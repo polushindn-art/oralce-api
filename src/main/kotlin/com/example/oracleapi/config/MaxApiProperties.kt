@@ -20,6 +20,6 @@ class MaxApiProperties {
     var botMainToken: String = ""
 
     // Общие настройки
-    var connectTimeout: Int = 5000
-    var readTimeout: Int = 60000
+    var connectTimeout: Int = 3000
+    var readTimeout: Int = 10000
 }
