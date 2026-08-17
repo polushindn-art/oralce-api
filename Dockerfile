@@ -1,7 +1,9 @@
 FROM eclipse-temurin:21-jre-alpine
 
-RUN apk add --no-cache tzdata musl-locales musl-locales-lang libstdc++ && \
-    rm -rf /var/cache/apk/*
+RUN apt-get update && apt-get install -y \
+    tzdata \
+    libstdc++6 \
+    && rm -rf /var/lib/apt/lists/*
 
 ENV LANG=ru_RU.UTF-8
 ENV LC_ALL=ru_RU.UTF-8
