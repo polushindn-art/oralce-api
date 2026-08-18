@@ -22,6 +22,8 @@ class JwtHelper(
             "/v*/phonebook/all",
             "/v*/sms/send-bot-link",
             "/login.html",
+            "/idhead.html",
+            "/monitor.html",
             "/glossary.html",
             "/v*/glossary/**",
             "/v*/asterisk/**",

@@ -1,5 +1,18 @@
 # 📊 ORACLE REST API — Дашборд
 
+## 📈 Динамика ресурсов системы (CPU & Memory)
+<div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); margin-bottom: 20px;">
+    <div style="position: relative; height: 220px; width: 100%;">
+        <canvas id="homeSystemChart"></canvas>
+    </div>
+</div>
+
+## ⚠️ Последние сбои в системе
+<div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); margin-bottom: 20px;" id="home-errors-card">
+    <div id="home-errors-body" style="font-size: 13px; color: #64748b;">
+        Загрузка информации о сбоях...
+    </div>
+</div>
 ## 🔔 Последние обновления
 
 <div style="max-height: 450px; overflow-y: auto; border: 3px solid #ddd; border-radius: 10px; padding: 8px 16px;">
@@ -46,36 +59,3 @@
 | 27.03.2026 | 💯 Релиз версии 1.0 💯                                                                                                                                                                                                                                                                                                                       |
 
 </div>
-
----
-
-## 📈 Статус окружений 
-
-| Окружение       | Статус                   |
-|-----------------|--------------------------|
-| 🔵 Рабочая      | ✅ Работает               |
-| 🟠 Тестовая     | ✅ Работает               |
-| ⚠️ Нестабильная | ⚠️ Может быть недоступна |
-
----
-
-## 🎯 Как начать работу
-
-1. **Получить JWT токен** → `POST /v1/auth/token`
-2. **Открыть Knife4j** → [кликните здесь](/doc.html)
-3. **Проверить здоровье сервиса** → `GET /v1/api/health`
-
----
-
-## 🐛 Частые ошибки
-
-| Ошибка           | Решение                    |
-|------------------|----------------------------|
-| 401 Unauthorized | Токен не передан или истёк |
-| 403 Forbidden    | Недостаточно прав          |
-| 404 Not Found    | Неверный эндпоинт          |
-| 409 Conflict     | Документ уже завершён      |
-
----
-
-> 📅 **Версия:** 1.0 | 🕐 **Обновлено:** 17.08.2026

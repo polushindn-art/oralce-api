@@ -784,8 +784,8 @@ class BarcodeService(
         }
 
         // 4. Текст "НОМЕР КАРТЫ" (строго по центру)
-        g.color = textGray
-        g.font = Font("SansSerif", Font.BOLD, 14)
+        g.color = textDark
+        g.font = Font("SansSerif", Font.BOLD, 18)
         val labelMetrics = g.fontMetrics
         val labelWidth = labelMetrics.stringWidth("НОМЕР КАРТЫ")
         val labelY = codeY + codeSize + padding + 60

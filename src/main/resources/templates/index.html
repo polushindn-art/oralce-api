@@ -13,8 +13,29 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 
+    <!-- ГЛОБАЛЬНЫЙ ПЕРЕХВАТЧИК FETCH: автоматически передает JWT-токен для api-docs.js -->
+    <script>
+        const originalFetch = window.fetch;
+        window.fetch = async function(url, options = {}) {
+            options.headers = options.headers || {};
+            const token = localStorage.getItem('accessToken');
+
+            if (token) {
+                if (options.headers instanceof Headers) {
+                    if (!options.headers.has('Authorization')) {
+                        options.headers.append('Authorization', 'Bearer ' + token);
+                    }
+                } else {
+                    if (!options.headers['Authorization'] && !options.headers['authorization']) {
+                        options.headers['Authorization'] = 'Bearer ' + token;
+                    }
+                }
+            }
+            return originalFetch(url, options);
+        };
+    </script>
+
     <style>
-        .hidden { display: none !important; }
         .mobile-toggle {
             display: none;
             position: fixed;
@@ -28,6 +49,38 @@
             font-weight: bold;
             cursor: pointer;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .env-switch {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 0 10px;
+            margin-bottom: 15px;
+        }
+        .env-link {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 13px;
+            border: 1px solid #cbd5e1;
+            background: #f8fafc;
+            color: #1e293b;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .env-link:hover { background: #f1f5f9; }
+
+        .env-status-badge {
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
         }
 
         @media (max-width: 768px) {
@@ -52,6 +105,18 @@
                 width: 100%;
             }
         }
+
+        /* НАСТРОЙКИ ПЕЧАТИ: скрываем лишние элементы интерфейса при печати */
+        @media print {
+            .sidebar, .mobile-toggle, #top-status-bar, div[style*="position: fixed; bottom: 20px;"] {
+                display: none !important;
+            }
+            .content {
+                margin-left: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+            }
+        }
     </style>
 
     <!-- Передача данных с сервера -->
@@ -66,6 +131,7 @@
         /*]]>*/
     </script>
 
+    <!-- Основной скрипт управления документами -->
     <script src="/js/api-docs.js"></script>
 </head>
 <body>
@@ -102,10 +168,20 @@
             </div>
         </div>
 
+        <!-- КНОПКИ ОКРУЖЕНИЙ -->
         <div class="env-switch">
-            <button class="env-link prod" data-host="oracle-rest-api.ars" data-port="80">🔵 Рабочая (порт 80)</button>
-            <button class="env-link dev" data-host="oracle-rest-api.ars" data-port="3000">🟠 Тестовая (порт 3000)</button>
-            <button class="env-link unstable" data-host="oracle-rest-api.ars" data-port="3001">⚠️ Нестабильная (порт 3001)</button>
+            <button class="env-link" data-host="oracle-rest-api.ars" data-port="80">
+                <span>🔵 Рабочая (80)</span>
+                <span id="env-status-80" class="env-status-badge" style="background: #e2e8f0; color: #64748b;">Проверка...</span>
+            </button>
+            <button class="env-link" data-host="oracle-rest-api.ars" data-port="3000">
+                <span>🟠 Тестовая (3000)</span>
+                <span id="env-status-3000" class="env-status-badge" style="background: #e2e8f0; color: #64748b;">Проверка...</span>
+            </button>
+            <button class="env-link" data-host="oracle-rest-api.ars" data-port="3001">
+                <span>⚠️ Нестабил. (3001)</span>
+                <span id="env-status-3001" class="env-status-badge" style="background: #e2e8f0; color: #64748b;">Проверка...</span>
+            </button>
         </div>
 
         <div class="env-info">
@@ -116,7 +192,7 @@
 
         <hr style="margin: 12px 0; border-color: #eee;">
 
-        <!-- 🚀 ГЛАВНЫЕ РАЗДЕЛЫ (ПЕРЕНЕСЕНЫ НАВЕРХ) -->
+        <!-- 🚀 ГЛАВНЫЕ РАЗДЕЛЫ -->
         <div class="group-title" style="font-size: 12px; text-transform: uppercase; color: #2563eb; font-weight: 700; margin: 10px 0 8px 15px; letter-spacing: 0.5px;">
             ⚡ БЫСТРЫЙ ДОСТУП
         </div>
@@ -153,9 +229,7 @@
 
         <hr style="margin: 12px 0; border-color: #eee;">
 
-        <!-- ============================================================
-        ГРУППА: ДОКУМЕНТЫ (Динамический список)
-        ============================================================ -->
+        <!-- РАБОЧИЕ ДОКУМЕНТЫ -->
         <div class="group-title" style="font-size: 12px; text-transform: uppercase; color: #999; font-weight: 600; margin: 0 0 8px 15px; letter-spacing: 0.5px;">
             📄 РАБОЧИЕ ДОКУМЕНТЫ
         </div>
@@ -168,8 +242,8 @@
     <!-- Правая область контента -->
     <div class="content">
 
-        <!-- ВЕРХНИЙ СТАТУС-БАР МОНИТОРИНГ -->
-        <div id="top-status-bar" style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center; justify-content: space-between; background: #1e293b; color: #fff; padding: 12px 20px; border-radius: 10px; margin-bottom: 20px; border-left: 5px solid #22c55e;">
+        <!-- ВЕРХНИЙ СТАТУС-БАР МОНИТОРИНГ (Прилипает к верху при прокрутке) -->
+        <div id="top-status-bar" style="position: sticky; top: 15px; z-index: 100; display: flex; flex-wrap: wrap; gap: 15px; align-items: center; justify-content: space-between; background: #1e293b; color: #fff; padding: 12px 20px; border-radius: 10px; margin-bottom: 20px; border-left: 5px solid #22c55e; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
             <div style="display: flex; align-items: center; gap: 12px;">
                 <a href="/monitor.html" target="_blank" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 8px;">
                     <span style="font-size: 18px;">📊</span>
@@ -194,111 +268,9 @@
             </div>
         </div>
 
-        <!-- 1. ДАШБОРД (Контент из start_page.md + мониторинг) -->
-        <div id="dashboard-area">
-            <div style="max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; font-family: inherit; color: #1e293b;" class="markdown-body">
-
-                <h2>📊 ORACLE REST API — Дашборд</h2>
-
-                <!-- 📈 ГРАФИК РЕСУРСОВ В РЕАЛЬНОМ ВРЕМЕНИ -->
-                <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.05);">
-                    <div style="font-size: 14px; font-weight: bold; color: #1e293b; margin-bottom: 15px;">
-                        📈 Динамика ресурсов системы (CPU & Memory)
-                    </div>
-                    <div style="position: relative; height: 220px; width: 100%;">
-                        <canvas id="homeSystemChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- ⚠️ ЛЕНТА ПОСЛЕДНИХ СБОЕВ -->
-                <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.05);" id="home-errors-card">
-                    <div style="font-size: 14px; font-weight: bold; color: #1e293b; margin-bottom: 12px;">
-                        ⚠️ Последние сбои в системе
-                    </div>
-                    <div id="home-errors-body" style="font-size: 13px; color: #64748b;">
-                        Загрузка информации о сбоях...
-                    </div>
-                </div>
-
-                <h2>🔔 Последние обновления</h2>
-
-                <div style="max-height: 450px; overflow-y: auto; border: 3px solid #ddd; border-radius: 10px; padding: 8px 16px; background: white;">
-                    <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
-                        <thead>
-                        <tr style="border-bottom: 2px solid #ddd; background: #f8fafc;">
-                            <th style="padding: 8px; text-align: left;">📆 Дата</th>
-                            <th style="padding: 8px; text-align: left;">Что изменилось 🛠️</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px; font-weight: bold;">18.08.2026</td><td style="padding: 8px;">Мониторинг системы 📈</td></tr>
-                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px; font-weight: bold;">17.08.2026</td><td style="padding: 8px;">Добавлен метод отправки изображений в сообщении</td></tr>
-                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px; font-weight: bold;">13.08.2026</td><td style="padding: 8px;"><b>GET</b> /v1/phonebook/all<br/><b>GET</b> /v1/stock/info - Возвращает информацию о товаре</td></tr>
-                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px; font-weight: bold;">12.08.2026</td><td style="padding: 8px;"><b>POST</b> /v1/sms/send-bot-link - Отправляет SMS со ссылкой на бота<br/><b>GET</b> /v1/max/status-main - Статус номера в MAIN боте<br/><b>POST</b> /v1/max/send-by-phone - Отправить сообщение по телефону<br/>В методе <code>/v1/idhead/filter/page</code> добавлены параметры <code>Вес</code> и <code>Объем</code></td></tr>
-                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px; font-weight: bold;">11.08.2026</td><td style="padding: 8px;"><b>GET</b> /v1/max/exist - Проверить что номер зарегистрирован в чате</td></tr>
-                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px; font-weight: bold;">10.08.2026</td><td style="padding: 8px;"><b>POST</b> /v1/price/getPriceOut - 💸 Получение цены для номенклатуры<br/><b>GET</b> /v1/stock/findByNomen - Получить остаток номенклатуры на складах<br/><b>POST</b> /v1/max/code_request - Авторизация через Макс<br/><b>GET</b> /v1/agnphone/exist - Проверить клиента в Боте</td></tr>
-                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px; font-weight: bold;">07.08.2026</td><td style="padding: 8px;">Создан Бот в месседжере МАКС для клиентов</td></tr>
-                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px; font-weight: bold;">05.08.2026</td><td style="padding: 8px;"><b>POST</b> /v1/prcprice/ins_api - Создать цену Отдела Продаж<br/><b>GET</b> /v1/agnphone/get - Получить контрагента 👨‍💼 по номеру</td></tr>
-                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px; font-weight: bold;">03.08.2026</td><td style="padding: 8px;">Для Словаря терминов добавил поддержку mermaid 🧜‍♀️</td></tr>
-                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px; font-weight: bold;">31.07.2026</td><td style="padding: 8px;">Новые разделы (Словарь терминов, Складские документы)</td></tr>
-                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px; font-weight: bold;">29.07.2026</td><td style="padding: 8px;"><b>POST</b> /v1/asterisk/auth/voice/initiate - Авторизация звонком</td></tr>
-                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px; font-weight: bold;">27.07.2026</td><td style="padding: 8px;">Добавлен поиск 🧐 через бота в Макс</td></tr>
-                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px; font-weight: bold;">24.07.2026</td><td style="padding: 8px;">Управление Asterisk ☎️ через AMI<br/><b>GET</b> /v1/idhead/filter/page - Фильтрация с пагинацией<br/><b>GET</b> /v1/idhead/{rn}/tsd - Документ со спецификацией</td></tr>
-                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px; font-weight: bold;">22.07.2026</td><td style="padding: 8px;">Эндпоинты для работы с мессенджером Макс 📫</td></tr>
-                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px; font-weight: bold;">21.07.2026</td><td style="padding: 8px;">🔞 Подтверждение возраста через МАКС</td></tr>
-                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px; font-weight: bold;">20.07.2026</td><td style="padding: 8px;">Документы вынесены в Swagger, доработки для буфера обмена</td></tr>
-                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px; font-weight: bold;">17.07.2026</td><td style="padding: 8px;"><b>PUT</b> /v1/orderhead/update_storein_ul - Обновить склад получателя</td></tr>
-                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px; font-weight: bold;">15.07.2026</td><td style="padding: 8px;">Оплата поставщикам (ins_head, ins_spec)</td></tr>
-                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px; font-weight: bold;">13.07.2026</td><td style="padding: 8px;">Контроллер PayDoc, OrderPayDoc, Contract</td></tr>
-                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px; font-weight: bold;">10.07.2026</td><td style="padding: 8px;">Сущности договоров и оплат, <b>GET</b> /v1/website/get_link</td></tr>
-                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px; font-weight: bold;">08.07.2026</td><td style="padding: 8px;">Связка КМ со складскими документами Qreal</td></tr>
-                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px; font-weight: bold;">06.07.2026</td><td style="padding: 8px;">Каталог заказа поставщика по номенклатуре</td></tr>
-                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px; font-weight: bold;">03.07.2026</td><td style="padding: 8px;">Проверка наличия статуса для заказа</td></tr>
-                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px; font-weight: bold;">16.06.2026</td><td style="padding: 8px;"><b>DELETE</b> /v1/prcdoc/del_head</td></tr>
-                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px; font-weight: bold;">15.06.2026</td><td style="padding: 8px;"><b>DELETE</b> /v1/prcdoc/del_spec, контроллер agnlist</td></tr>
-                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px; font-weight: bold;">10.06.2026</td><td style="padding: 8px;"><b>DELETE</b> /v1/naklhead/del_head</td></tr>
-                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px; font-weight: bold;">09.06.2026</td><td style="padding: 8px;">Сущности nomnlist, country, накладные расходы 📑</td></tr>
-                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px; font-weight: bold;">08.06.2026</td><td style="padding: 8px;">Эндпоинты для работы с ТСД</td></tr>
-                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px; font-weight: bold;">03.06.2026</td><td style="padding: 8px;">Создание документа изменения ТМЦ</td></tr>
-                        <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px; font-weight: bold;">01.06.2026</td><td style="padding: 8px;">Заказ Поставщику, партиционирование схемы БД</td></tr>
-                        <tr><td style="padding: 8px; font-weight: bold;">27.03.2026</td><td style="padding: 8px;">💯 Релиз версии 1.0 💯</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <hr style="border: 0; border-top: 1px solid #ddd; margin: 10px 0;">
-
-                <h2>📈 Статус окружений</h2>
-                <table style="width: 100%; border-collapse: collapse; font-size: 13px; background: white; border-radius: 8px; overflow: hidden;">
-                    <tr style="border-bottom: 1px solid #eee;"><td style="padding: 10px;">🔵 Рабочая</td><td style="padding: 10px; font-weight: bold; color: #16a34a;">✅ Работает</td></tr>
-                    <tr style="border-bottom: 1px solid #eee;"><td style="padding: 10px;">🟠 Тестовая</td><td style="padding: 10px; font-weight: bold; color: #16a34a;">✅ Работает</td></tr>
-                    <tr><td style="padding: 10px;">⚠️ Нестабильная</td><td style="padding: 10px; font-weight: bold; color: #ca8a04;">⚠️ Может быть недоступна</td></tr>
-                </table>
-
-                <h2>🎯 Как начать работу</h2>
-                <ol style="font-size: 13px; line-height: 1.6; background: white; padding: 15px 25px; border-radius: 8px;">
-                    <li><b>Получить JWT токен</b> → <code>POST /v1/auth/token</code></li>
-                    <li><b>Открыть Knife4j</b> → <a href="/doc.html" target="_blank">кликните здесь</a></li>
-                    <li><b>Проверить здоровье сервиса</b> → <code>GET /v1/api/health</code></li>
-                </ol>
-
-                <h2>🐛 Частые ошибки</h2>
-                <table style="width: 100%; border-collapse: collapse; font-size: 13px; background: white; border-radius: 8px; overflow: hidden;">
-                    <tr style="background: #f8fafc; border-bottom: 2px solid #ddd;"><th style="padding: 8px; text-align: left;">Ошибка</th><th style="padding: 8px; text-align: left;">Решение</th></tr>
-                    <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px;"><code>401 Unauthorized</code></td><td style="padding: 8px;">Токен не передан или истёк</td></tr>
-                    <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px;"><code>403 Forbidden</code></td><td style="padding: 8px;">Недостаточно прав</td></tr>
-                    <tr style="border-bottom: 1px solid #eee;"><td style="padding: 8px;"><code>404 Not Found</code></td><td style="padding: 8px;">Неверный эндпоинт</td></tr>
-                    <tr><td style="padding: 8px;"><code>409 Conflict</code></td><td style="padding: 8px;">Документ уже завершён</td></tr>
-                </table>
-
-                <p style="font-size: 12px; color: #666; margin-top: 10px;">📅 <b>Версия:</b> 1.0 | 🕐 <b>Обновлено:</b> 18.08.2026</p>
-
-            </div>
-        </div>
-
-        <!-- 2. ОБЛАСТЬ ДОКУМЕНТАЦИИ (Сюда api-docs.js загружает выбранный Markdown-файл) -->
-        <div id="md-content" class="markdown-body hidden">
-            <div class="loading">Выберите документ из списка слева...</div>
+        <!-- ОСНОВНОЙ КОНТЕЙНЕР (api-docs.js сюда загружает start_page.md и любые другие документы) -->
+        <div id="md-content" class="markdown-body" style="max-width: 1100px; margin: 0 auto;">
+            <div class="loading">Загрузка главной страницы...</div>
         </div>
     </div>
 
@@ -319,12 +291,12 @@
         const usernameEl = document.getElementById('authUsername');
 
         if (token) {
-            loginBlock.style.display = 'none';
-            logoutBlock.style.display = 'block';
+            if (loginBlock) loginBlock.style.display = 'none';
+            if (logoutBlock) logoutBlock.style.display = 'block';
             if (usernameEl) usernameEl.textContent = username;
         } else {
-            loginBlock.style.display = 'block';
-            logoutBlock.style.display = 'none';
+            if (loginBlock) loginBlock.style.display = 'block';
+            if (logoutBlock) logoutBlock.style.display = 'none';
         }
     }
 
@@ -335,30 +307,42 @@
         window.location.reload();
     }
 
-    // 📈 Инициализация графика
-    const ctx = document.getElementById('homeSystemChart').getContext('2d');
-    const maxDataPoints = 30;
-    const homeSystemChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: [],
-            datasets: [
-                { label: 'CPU (%)', data: [], borderColor: '#c084fc', backgroundColor: 'rgba(192, 132, 252, 0.1)', borderWidth: 2, tension: 0.3, fill: true },
-                { label: 'Heap (МБ)', data: [], borderColor: '#38bdf8', backgroundColor: 'rgba(56, 189, 248, 0.1)', borderWidth: 2, tension: 0.3, fill: true, yAxisID: 'y1' }
-            ]
-        },
-        options: {
-            responsive: true, maintainAspectRatio: false,
-            scales: {
-                x: { grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } } },
-                y: { type: 'linear', position: 'left', min: 0, max: 100, grid: { color: '#f1f5f9' } },
-                y1: { type: 'linear', position: 'right', grid: { drawOnChartArea: false } }
-            },
-            animation: false
+    let homeSystemChart = null;
+    let maxDataPoints = 30;
+
+    // Инициализация графика, если он появился на странице (когда загружен start_page.md)
+    function initHomeChart() {
+        const canvas = document.getElementById('homeSystemChart');
+        if (!canvas) {
+            homeSystemChart = null;
+            return;
         }
-    });
+        if (homeSystemChart) return; // Уже инициализирован
+
+        const ctx = canvas.getContext('2d');
+        homeSystemChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [
+                    { label: 'CPU (%)', data: [], borderColor: '#c084fc', backgroundColor: 'rgba(192, 132, 252, 0.1)', borderWidth: 2, tension: 0.3, fill: true },
+                    { label: 'Heap (МБ)', data: [], borderColor: '#38bdf8', backgroundColor: 'rgba(56, 189, 248, 0.1)', borderWidth: 2, tension: 0.3, fill: true, yAxisID: 'y1' }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                scales: {
+                    x: { grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } } },
+                    y: { type: 'linear', position: 'left', min: 0, max: 100, grid: { color: '#f1f5f9' } },
+                    y1: { type: 'linear', position: 'right', grid: { drawOnChartArea: false } }
+                },
+                animation: false
+            }
+        });
+    }
 
     function addHomeDataPoint(timeLabel, cpuVal, memVal) {
+        if (!homeSystemChart) return;
         if (homeSystemChart.data.labels.length >= maxDataPoints) {
             homeSystemChart.data.labels.shift();
             homeSystemChart.data.datasets[0].data.shift();
@@ -370,6 +354,35 @@
         homeSystemChart.update();
     }
 
+    // Проверка статуса окружений (портов)
+    async function checkEnvironmentsStatus() {
+        const ports = ['80', '3000', '3001'];
+        for (const port of ports) {
+            const statusEl = document.getElementById(`env-status-${port}`);
+            if (!statusEl) continue;
+
+            const protocol = window.location.protocol;
+            const hostname = window.location.hostname || 'localhost';
+            const targetUrl = `${protocol}//${hostname}${port === '80' ? '' : ':' + port}/actuator/health`;
+
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 2500);
+
+                await fetch(targetUrl, { method: 'GET', mode: 'no-cors', signal: controller.signal });
+                clearTimeout(timeoutId);
+
+                statusEl.textContent = 'Работает';
+                statusEl.style.background = '#dcfce7';
+                statusEl.style.color = '#166534';
+            } catch (e) {
+                statusEl.textContent = 'Недоступна';
+                statusEl.style.background = '#fee2e2';
+                statusEl.style.color = '#991b1b';
+            }
+        }
+    }
+
     async function updateTopStatusBar() {
         try {
             const bar = document.getElementById('top-status-bar');
@@ -378,6 +391,7 @@
             const activeConnEl = document.getElementById('top-active-conn');
             const cpuEl = document.getElementById('top-cpu');
             const memEl = document.getElementById('top-mem');
+            const errorsBody = document.getElementById('home-errors-body');
 
             const timeNow = new Date().toLocaleTimeString();
 
@@ -388,54 +402,67 @@
                 dbIsUp = healthData.components?.db?.status === "UP" || healthData.status === "UP";
             }
 
-            const errRes = await fetch('/v1/monitoring/errors-hour');
-            let errMin = 0, errHour = 0;
-            if (errRes.ok) {
-                const errData = await errRes.json();
-                errMin = errData.lastMinute || 0;
-                errHour = errData.lastHour || 0;
-                errStatsEl.textContent = `${errMin} / ${errHour}`;
+            let errMin = 0;
+            const token = localStorage.getItem('accessToken');
+            const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
 
-                const errorsBody = document.getElementById('home-errors-body');
-                if (errData.recentErrors && errData.recentErrors.length > 0) {
-                    errorsBody.innerHTML = `
-                        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
-                            <thead><tr style="background: #f8fafc; text-align: left;"><th style="padding: 6px;">Время</th><th style="padding: 6px;">Ошибка</th><th style="padding: 6px;">Путь</th></tr></thead>
-                            <tbody>
-                                ${errData.recentErrors.map(e => `<tr><td style="padding: 6px;">${e.timestamp}</td><td style="padding: 6px; color: #dc2626;">${e.type}</td><td style="padding: 6px;"><code>${e.path}</code></td></tr>`).join('')}
-                            </tbody>
-                        </table>`;
-                } else {
-                    errorsBody.innerHTML = '🟢 Сбоев не зафиксировано.';
+            try {
+                const errRes = await fetch('/v1/monitoring/errors-hour', { headers });
+                if (errRes.ok) {
+                    const errData = await errRes.json();
+                    errMin = errData.lastMinute || 0;
+                    const errHour = errData.lastHour || 0;
+                    errStatsEl.textContent = `${errMin} / ${errHour}`;
+
+                    if (errorsBody) {
+                        if (errData.recentErrors && errData.recentErrors.length > 0) {
+                            errorsBody.innerHTML = `
+                                <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                                    <thead><tr style="background: #f8fafc; text-align: left;"><th style="padding: 6px;">Время</th><th style="padding: 6px;">Ошибка</th><th style="padding: 6px;">Путь</th></tr></thead>
+                                    <tbody>
+                                        ${errData.recentErrors.map(e => `<tr><td style="padding: 6px;">${e.timestamp}</td><td style="padding: 6px; color: #dc2626;">${e.type}</td><td style="padding: 6px;"><code>${e.path}</code></td></tr>`).join('')}
+                                    </tbody>
+                                </table>`;
+                        } else {
+                            errorsBody.innerHTML = '🟢 Сбоев не зафиксировано.';
+                        }
+                    }
                 }
-            }
 
-            const connRes = await fetch('/actuator/metrics/hikaricp.connections.active');
-            if (connRes.ok) {
-                const connData = await connRes.json();
-                activeConnEl.textContent = connData.measurements ? connData.measurements[0].value : '-';
-            }
-
-            let cpuPercent = 0;
-            const cpuRes = await fetch('/actuator/metrics/system.cpu.usage');
-            if (cpuRes.ok) {
-                const cpuData = await cpuRes.json();
-                if (cpuData.measurements) {
-                    cpuPercent = Math.round(cpuData.measurements[0].value * 100);
-                    cpuEl.textContent = `${cpuPercent}%`;
+                const connRes = await fetch('/actuator/metrics/hikaricp.connections.active', { headers });
+                if (connRes.ok) {
+                    const connData = await connRes.json();
+                    activeConnEl.textContent = connData.measurements ? connData.measurements[0].value : '-';
                 }
-            }
 
-            let usedMb = 0;
-            const memRes = await fetch('/actuator/metrics/jvm.memory.used');
-            if (memRes.ok) {
-                const memData = await memRes.json();
-                if (memData.measurements) {
-                    usedMb = Math.round(memData.measurements[0].value / (1024 * 1024));
-                    memEl.textContent = `${usedMb} МБ`;
+                const cpuRes = await fetch('/actuator/metrics/system.cpu.usage', { headers });
+                if (cpuRes.ok) {
+                    const cpuData = await cpuRes.json();
+                    if (cpuData.measurements) {
+                        let cpuPercent = Math.round(cpuData.measurements[0].value * 100);
+                        cpuEl.textContent = `${cpuPercent}%`;
+                    }
                 }
+
+                const memRes = await fetch('/actuator/metrics/jvm.memory.used', { headers });
+                if (memRes.ok) {
+                    const memData = await memRes.json();
+                    if (memData.measurements) {
+                        let usedMb = Math.round(memData.measurements[0].value / (1024 * 1024));
+                        memEl.textContent = `${usedMb} МБ`;
+                    }
+                }
+            } catch (metricErr) {
+                console.warn('Метрики частично недоступны:', metricErr);
             }
 
+            let cpuValText = cpuEl.textContent.replace('%', '');
+            let memValText = memEl.textContent.replace(' МБ', '');
+            let cpuPercent = !isNaN(cpuValText) && cpuValText !== '-' ? parseInt(cpuValText) : 0;
+            let usedMb = !isNaN(memValText) && memValText !== '-' ? parseInt(memValText) : 0;
+
+            // Проверяем и инициализируем график, если мы на главной
+            initHomeChart();
             addHomeDataPoint(timeNow, cpuPercent, usedMb);
 
             if (!dbIsUp || errMin > 0) {
@@ -450,28 +477,10 @@
         }
     }
 
-    // Переключение: Дашборд на главной, Документы — при клике в меню
-    function toggleView() {
-        const dashboard = document.getElementById('dashboard-area');
-        const docs = document.getElementById('md-content');
-
-        if (window.location.hash && window.location.hash !== "#") {
-            dashboard.classList.add('hidden');
-            docs.classList.remove('hidden');
-        } else {
-            dashboard.classList.remove('hidden');
-            docs.classList.add('hidden');
-        }
-    }
-
-    window.addEventListener('hashchange', toggleView);
-
     document.addEventListener('DOMContentLoaded', () => {
         if (window.currentHost) {
             window.currentHostValue = window.currentHost;
         }
-
-        toggleView();
 
         if (typeof init === 'function') {
             init();
@@ -479,7 +488,33 @@
 
         checkAuth();
         updateTopStatusBar();
+        checkEnvironmentsStatus();
         setInterval(updateTopStatusBar, 1000);
+        setInterval(checkEnvironmentsStatus, 10000);
+
+        // Наблюдатель следит за #md-content: как только в нем появляется график, инициализируем его
+        const observer = new MutationObserver(() => {
+            initHomeChart();
+        });
+        observer.observe(document.getElementById('md-content'), { childList: true, subtree: true });
+
+        // Мобильное меню (открытие/закрытие по клику)
+        const mobileToggle = document.getElementById('mobileToggle');
+        const sidebar = document.getElementById('sidebar');
+
+        if (mobileToggle && sidebar) {
+            mobileToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('active');
+            });
+
+            sidebar.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('active');
+                    }
+                });
+            });
+        }
     });
 </script>
 
