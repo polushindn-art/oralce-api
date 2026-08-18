@@ -3,16 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>API Документация</title>
+    <title>API Документация & Мониторинг</title>
 
-    <!-- Стили -->
     <link rel="stylesheet" href="/css/api-docs.css">
 
-    <!-- Скрипты -->
+    <style>
+        .mobile-toggle {
+            display: none;
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 1100;
+            background: #0f172a;
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        @media (max-width: 768px) {
+            .mobile-toggle { display: block; }
+            .main-container { flex-direction: column; }
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: -300px;
+                width: 260px;
+                height: 100vh;
+                background: #fff;
+                z-index: 1050;
+                transition: left 0.3s ease-in-out;
+                box-shadow: 5px 0 15px rgba(0,0,0,0.1);
+                overflow-y: auto;
+            }
+            .sidebar.active { left: 0; }
+            .content {
+                margin-left: 0 !important;
+                padding: 60px 15px 15px 15px !important;
+                width: 100%;
+            }
+        }
+    </style>
+
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 
-    <!-- Передача данных с сервера -->
     <script th:inline="javascript">
         /*<![CDATA[*/
         window.currentHost = {
@@ -20,9 +57,6 @@
             port: /*[[${host.second}]]*/ '',
             sid: /*[[${host.third}]]*/ ''
         };
-
-        // Для отладки
-        console.log('Host from server:', window.currentHost);
         /*]]>*/
     </script>
 
@@ -33,27 +67,20 @@
 <div class="mobile-toggle" id="mobileToggle">☰ Меню</div>
 
 <div class="main-container">
-    <!-- Левая боковая панель -->
-    <div class="sidebar" id="sidebar">
-        <div class="sidebar-title">
-            📚 ORACLE REST API
-        </div>
 
-        <!-- ============================================================
-        АВТОРИЗАЦИЯ (ВХОД/ВЫХОД) — ПЕРВАЯ В ПАНЕЛИ
-        ============================================================ -->
+    <!-- САЙДБАР -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-title">📚 ORACLE REST API</div>
+
+        <!-- АВТОРИЗАЦИЯ -->
         <div id="auth-section" style="margin-bottom: 15px;">
-            <!-- Показываем, когда пользователь НЕ авторизован -->
             <div id="auth-login" style="display: none; padding: 0 10px;">
-                <a href="/login.html" class="link-card" style="display: block; padding: 10px 15px; background: #e3f2fd; border-radius: 8px; text-decoration: none; color: #0d47a1; margin-top: 5px; transition: background 0.2s;"
-                   onmouseover="this.style.background='#bbdefb'"
-                   onmouseout="this.style.background='#e3f2fd'">
+                <a href="/login.html" class="link-card" style="display: block; padding: 10px 15px; background: #e3f2fd; border-radius: 8px; text-decoration: none; color: #0d47a1; margin-top: 5px;">
                     <h3 style="margin: 0; font-size: 16px;">🔑 Войти</h3>
-                    <p style="margin: 5px 0 0 0; font-size: 13px; color: #555;">Авторизация для доступа к документам</p>
+                    <p style="margin: 5px 0 0 0; font-size: 13px; color: #555;">Авторизация</p>
                 </a>
             </div>
 
-            <!-- Показываем, когда пользователь авторизован -->
             <div id="auth-logout" style="display: none; padding: 0 10px;">
                 <div style="display: flex; align-items: center; gap: 10px; padding: 10px 15px; background: #e8f5e9; border-radius: 8px; margin-top: 5px;">
                     <span style="font-size: 20px;">👤</span>
@@ -68,104 +95,95 @@
             </div>
         </div>
 
-        <!-- Простые кнопки-ссылки -->
         <div class="env-switch">
-            <button class="env-link prod" data-host="oracle-rest-api.ars" data-port="80">
-                🔵 Рабочая (порт 80)
-            </button>
-            <button class="env-link dev" data-host="oracle-rest-api.ars" data-port="3000">
-                🟠 Тестовая (порт 3000)
-            </button>
-            <button class="env-link unstable" data-host="oracle-rest-api.ars" data-port="3001">
-                ⚠️ Тестовая нестабильная (порт 3001)
-            </button>
+            <button class="env-link prod" data-host="oracle-rest-api.ars" data-port="80">🔵 Рабочая (порт 80)</button>
+            <button class="env-link dev" data-host="oracle-rest-api.ars" data-port="3000">🟠 Тестовая (порт 3000)</button>
+            <button class="env-link unstable" data-host="oracle-rest-api.ars" data-port="3001">⚠️ Нестабильная (порт 3001)</button>
         </div>
 
-        <!-- Информация о текущем сервере -->
         <div class="env-info">
             <div>🌐 Текущий хост: <strong id="hostValue">-</strong></div>
             <div>🔌 Порт: <strong id="portValue">-</strong></div>
             <div>💾 SID: <strong id="sidValue">-</strong></div>
         </div>
 
-        <!-- ============================================================
-        ГРУППА: API ДОКУМЕНТАЦИЯ (Swagger/Knife4j)
-        ============================================================ -->
-        <div class="group-title" style="font-size: 12px; text-transform: uppercase; color: #999; font-weight: 600; margin: 15px 0 8px 15px; letter-spacing: 0.5px;">
-            📘 API ДОКУМЕНТАЦИЯ
-        </div>
-
+        <div class="group-title" style="font-size: 12px; text-transform: uppercase; color: #999; font-weight: 600; margin: 20px 0 8px 15px;">📘 API ДОКУМЕНТАЦИЯ</div>
         <div class="links">
-            <a href="/doc.html" class="link-card">
-                <h3>📖 Knife4j <span class="badge">Рекомендуется</span></h3>
-                <p>Документация API</p>
-            </a>
-            <a href="/swagger-ui/index.html" class="link-card">
-                <h3>🦁 Swagger UI</h3>
-                <p>Классический интерфейс</p>
-            </a>
-            <a href="/doc.html#/main-api/Авторизация/login" class="link-card warning">
-                <h3>🔑 Авторизация</h3>
-                <p>Получение JWT токена</p>
-            </a>
+            <a href="/doc.html" class="link-card"><h3>📖 Knife4j <span class="badge">Рекомендуется</span></h3><p>Документация API</p></a>
+            <a href="/swagger-ui/index.html" class="link-card"><h3>🦁 Swagger UI</h3><p>Классический интерфейс</p></a>
+            <a href="/doc.html#/main-api/Авторизация/login" class="link-card warning"><h3>🔑 Авторизация</h3><p>Получение токена</p></a>
         </div>
 
         <hr>
 
-        <!-- ============================================================
-        ГРУППА: ДОКУМЕНТЫ
-        ============================================================ -->
-        <div class="group-title" style="font-size: 12px; text-transform: uppercase; color: #999; font-weight: 600; margin: 0 0 8px 15px; letter-spacing: 0.5px;">
-            📄 РАБОЧИЕ ДОКУМЕНТЫ
-        </div>
-
+        <div class="group-title" style="font-size: 12px; text-transform: uppercase; color: #999; font-weight: 600; margin: 0 0 8px 15px;">📄 ДОКУМЕНТЫ</div>
         <div class="sidebar-title" style="font-size: 13px; padding-left: 15px;">📁 Документы</div>
         <div id="file-list" class="file-list" style="padding: 0 10px;">Загрузка...</div>
 
         <hr style="margin: 12px 0; border-color: #eee;">
 
         <div style="padding: 0 10px;">
-            <a href="/glossary.html" class="link-card" style="display: block; padding: 10px 15px; background: #f8f9fa; border-radius: 8px; text-decoration: none; color: #333; margin-top: 5px; transition: background 0.2s;"
-               onmouseover="this.style.background='#e8f5e9'"
-               onmouseout="this.style.background='#f8f9fa'">
+            <a href="/glossary.html" class="link-card" style="display: block; padding: 10px 15px; background: #f8f9fa; border-radius: 8px; text-decoration: none; color: #333; margin-top: 5px;">
                 <h3 style="margin: 0; font-size: 16px;">📖 Словарь терминов</h3>
-                <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Просмотр и редактирование</p>
             </a>
         </div>
-
         <div style="padding: 0 10px;">
-            <a href="/idhead.html" class="link-card" style="display: block; padding: 10px 15px; background: #f8f9fa; border-radius: 8px; text-decoration: none; color: #333; margin-top: 5px; transition: background 0.2s;"
-               onmouseover="this.style.background='#bbdefb'"
-               onmouseout="this.style.background='#f8f9fa'">
+            <a href="/idhead.html" class="link-card" style="display: block; padding: 10px 15px; background: #f8f9fa; border-radius: 8px; text-decoration: none; color: #333; margin-top: 5px;">
                 <h3 style="margin: 0; font-size: 16px;">📋 Складские документы</h3>
-                <p style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Просмотр документов</p>
             </a>
         </div>
-
     </div>
 
-    <!-- Правая область контента -->
+    <!-- КОНТЕНТ -->
     <div class="content">
+        <!-- СТАТУС-БАР МОНИТОРИНГА -->
+        <div id="top-status-bar" style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center; justify-content: space-between; background: #1e293b; color: #fff; padding: 12px 20px; border-radius: 10px; margin-bottom: 20px; border-left: 5px solid #22c55e;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <a href="/monitor.html" target="_blank" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 18px;">📊</span>
+                    <div>
+                        <div style="font-size: 11px; color: #94a3b8; text-transform: uppercase;">Система</div>
+                        <div style="font-size: 14px; font-weight: bold;" id="top-db-status">Загрузка...</div>
+                    </div>
+                </a>
+            </div>
+
+            <div style="display: flex; flex-wrap: wrap; gap: 20px; font-size: 13px;">
+                <div><span style="color: #94a3b8; font-size: 11px;">Ошибки (мин/ч):</span> <strong id="top-err-stats" style="color: #f8fafc;">0 / 0</strong></div>
+                <div><span style="color: #94a3b8; font-size: 11px;">Актив. соед:</span> <strong id="top-active-conn" style="color: #f8fafc;">-</strong></div>
+                <div><span style="color: #94a3b8; font-size: 11px;">CPU:</span> <strong id="top-cpu" style="color: #f8fafc;">-</strong></div>
+                <div><span style="color: #94a3b8; font-size: 11px;">Память:</span> <strong id="top-mem" style="color: #f8fafc;">-</strong></div>
+            </div>
+
+            <div>
+                <a href="/monitor.html" target="_blank" style="background: #38bdf8; color: #0f172a; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; text-decoration: none;">
+                    Дашборд ↗
+                </a>
+            </div>
+        </div>
+
         <div id="md-content" class="markdown-body">
             <div class="loading">Выберите документ из списка слева...</div>
         </div>
     </div>
-
-    <div style="position: fixed; bottom: 20px; right: 20px; display: flex; gap: 10px; z-index: 1000;">
-        <button id="printPdfBtn" class="action-btn print-btn">
-            🖨️ PDF / Печать
-        </button>
-        <button id="downloadWordBtn" class="action-btn word-btn" style="display: none;">
-            📄 Скачать в Word
-        </button>
-    </div>
-
 </div>
 
 <script>
-    // ============================================================
-    // АВТОРИЗАЦИЯ (ВХОД/ВЫХОД)
-    // ============================================================
+    // Проверка срока годности JWT токена на клиенте
+    function isTokenValid(token) {
+        if (!token) return false;
+        try {
+            const payloadBase64 = token.split('.')[1];
+            const base64 = payloadBase64.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+            const payload = JSON.parse(jsonPayload);
+            const currentTime = Math.floor(Date.now() / 1000);
+            return !(payload.exp && payload.exp < currentTime);
+        } catch (e) {
+            return false;
+        }
+    }
+
     function checkAuth() {
         const token = localStorage.getItem('accessToken');
         const username = localStorage.getItem('username') || 'Пользователь';
@@ -174,13 +192,14 @@
         const logoutBlock = document.getElementById('auth-logout');
         const usernameEl = document.getElementById('authUsername');
 
-        if (token) {
+        if (token && isTokenValid(token)) {
             loginBlock.style.display = 'none';
             logoutBlock.style.display = 'block';
-            if (usernameEl) {
-                usernameEl.textContent = username;
-            }
+            if (usernameEl) usernameEl.textContent = username;
         } else {
+            // Токен протух или отсутствует — очищаем мусор
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('username');
             loginBlock.style.display = 'block';
             logoutBlock.style.display = 'none';
         }
@@ -189,22 +208,109 @@
     function logout() {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('username');
+        localStorage.removeItem('lastDoc');
+        if (window.location.hash) {
+            history.pushState("", document.title, window.location.pathname);
+        }
         checkAuth();
         window.location.reload();
     }
 
-    // ============================================================
-    // ИНИЦИАЛИЗАЦИЯ
-    // ============================================================
+    async function updateTopStatusBar() {
+        try {
+            const bar = document.getElementById('top-status-bar');
+            const dbStatusEl = document.getElementById('top-db-status');
+            const errStatsEl = document.getElementById('top-err-stats');
+            const activeConnEl = document.getElementById('top-active-conn');
+            const cpuEl = document.getElementById('top-cpu');
+            const memEl = document.getElementById('top-mem');
+
+            const healthRes = await fetch('/actuator/health');
+            let dbIsUp = false;
+            if (healthRes.ok) {
+                const healthData = await healthRes.json();
+                dbIsUp = healthData.components?.db?.status === "UP" || healthData.status === "UP";
+            }
+
+            const errRes = await fetch('/v1/monitoring/errors-hour');
+            let errMin = 0, errHour = 0;
+            if (errRes.ok) {
+                const errData = await errRes.json();
+                errMin = errData.lastMinute || 0;
+                errHour = errData.lastHour || 0;
+                errStatsEl.textContent = `${errMin} / ${errHour}`;
+                errStatsEl.style.color = (errMin > 0 || errHour > 0) ? '#f87171' : '#4ade80';
+            }
+
+            const connRes = await fetch('/actuator/metrics/hikaricp.connections.active');
+            if (connRes.ok) {
+                const connData = await connRes.json();
+                activeConnEl.textContent = connData.measurements ? connData.measurements[0].value : '-';
+            }
+
+            const cpuRes = await fetch('/actuator/metrics/system.cpu.usage');
+            if (cpuRes.ok) {
+                const cpuData = await cpuRes.json();
+                if (cpuData.measurements) cpuEl.textContent = `${Math.round(cpuData.measurements[0].value * 100)}%`;
+            }
+
+            const memRes = await fetch('/actuator/metrics/jvm.memory.used');
+            if (memRes.ok) {
+                const memData = await memRes.json();
+                if (memData.measurements) {
+                    const usedMb = Math.round(memData.measurements[0].value / (1024 * 1024));
+                    memEl.textContent = `${usedMb} МБ`;
+                }
+            }
+
+            if (!dbIsUp || errMin > 0) {
+                bar.style.background = '#7f1d1d';
+                bar.style.borderLeftColor = '#ef4444';
+                dbStatusEl.textContent = '⚠️ БД DOWN / ОШИБКА';
+                dbStatusEl.style.color = '#fca5a5';
+            } else if (errHour > 0) {
+                bar.style.background = '#78350f';
+                bar.style.borderLeftColor = '#f59e0b';
+                dbStatusEl.textContent = '⚡ UP (Ошибки за час)';
+                dbStatusEl.style.color = '#fde68a';
+            } else {
+                bar.style.background = '#1e293b';
+                bar.style.borderLeftColor = '#22c55e';
+                dbStatusEl.textContent = '🟢 База данных в норме';
+                dbStatusEl.style.color = '#4ade80';
+            }
+        } catch (e) {
+            const bar = document.getElementById('top-status-bar');
+            if (bar) {
+                bar.style.background = '#7f1d1d';
+                bar.style.borderLeftColor = '#ef4444';
+                document.getElementById('top-db-status').textContent = '❌ Сервер недоступен';
+            }
+        }
+    }
+
+    function initMobileMenu() {
+        const mobileToggle = document.getElementById('mobileToggle');
+        const sidebar = document.getElementById('sidebar');
+        if (mobileToggle && sidebar) {
+            mobileToggle.addEventListener('click', () => sidebar.classList.toggle('active'));
+            sidebar.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    if (window.innerWidth <= 768) sidebar.classList.remove('active');
+                });
+            });
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
-        if (window.currentHost) {
-            window.currentHostValue = window.currentHost;
-        }
-        if (typeof init === 'function') {
-            init();
-        }
+        if (window.currentHost) window.currentHostValue = window.currentHost;
+        if (typeof init === 'function') init();
 
         checkAuth();
+        initMobileMenu();
+
+        updateTopStatusBar();
+        setInterval(updateTopStatusBar, 3000);
     });
 </script>
 

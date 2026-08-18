@@ -1,5 +1,6 @@
 package com.example.oracleapi.config
 
+import com.example.oracleapi.service.ErrorCounter // Проверьте правильность пакета ErrorCounter
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -21,7 +22,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 class SecurityConfig(
     private val userDetailsService: UserDetailsService,
     private val objectMapper: ObjectMapper,
-    private val jwtHelper: JwtHelper
+    private val jwtHelper: JwtHelper,
+    private val customAuthenticationEntryPoint: CustomAuthenticationEntryPoint // ← 1. Внедрили точку входа
 ) {
 
     @Bean
@@ -41,8 +43,8 @@ class SecurityConfig(
             // Настройка авторизации
             .authorizeHttpRequests { auth ->
                 auth
-                    // Публичные пути
-                    .requestMatchers(*JwtHelper.skipPaths).permitAll()
+                    // Публичные пути + системный путь /error для правильных 404 ошибок
+                    .requestMatchers(*JwtHelper.skipPaths, "/error").permitAll()
 
                     // Административные пути
                     .requestMatchers("/admin/**").hasRole("ADMIN")
@@ -59,7 +61,8 @@ class SecurityConfig(
 
             // Обработка исключений аутентификации
             .exceptionHandling { exceptions ->
-                exceptions.authenticationEntryPoint(CustomAuthenticationEntryPoint())
+                // ← 2. Передаем готовый бин без пустых скобок
+                exceptions.authenticationEntryPoint(customAuthenticationEntryPoint)
             }
 
             // UserDetailsService
@@ -85,7 +88,6 @@ class SecurityConfig(
     fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration = CorsConfiguration()
 
-        // Разрешаем запросы с этих источников
         configuration.allowedOrigins = listOf(
             "http://localhost:8080",
             "http://localhost:3000",
@@ -100,12 +102,10 @@ class SecurityConfig(
             "http://oracle-rest-api.ars:3000"
         )
 
-        // Разрешаем все необходимые методы
         configuration.allowedMethods = listOf(
             "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"
         )
 
-        // Разрешаем заголовки
         configuration.allowedHeaders = listOf(
             "Authorization",
             "Content-Type",
@@ -116,16 +116,13 @@ class SecurityConfig(
             "Access-Control-Request-Headers"
         )
 
-        // Разрешаем отправку cookie
         configuration.allowCredentials = true
 
-        // Заголовки, доступные клиенту
         configuration.exposedHeaders = listOf(
             "Authorization",
             "Set-Cookie"
         )
 
-        // Время жизни preflight запроса (в секундах)
         configuration.maxAge = 3600L
 
         val source = UrlBasedCorsConfigurationSource()

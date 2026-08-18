@@ -159,13 +159,30 @@
 </div>
 
 <script>
-    const API_BASE = '/v1';
+    // Функция проверки актуальности токена на клиенте
+    function isTokenValid(token) {
+        if (!token) return false;
+        try {
+            const payloadBase64 = token.split('.')[1];
+            const base64 = payloadBase64.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+            const payload = JSON.parse(jsonPayload);
+            const currentTime = Math.floor(Date.now() / 1000);
+            return !(payload.exp && payload.exp < currentTime);
+        } catch (e) {
+            return false;
+        }
+    }
 
-    // Если уже есть токен — редирект на главную или на предыдущую страницу
-    if (localStorage.getItem('accessToken')) {
+    // Если токен уже есть и он валиден — сразу редиректим на главную
+    const existingToken = localStorage.getItem('accessToken');
+    if (existingToken && isTokenValid(existingToken)) {
         const redirect = localStorage.getItem('redirectAfterLogin') || '/';
         localStorage.removeItem('redirectAfterLogin');
         window.location.href = redirect;
+    } else {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('username');
     }
 
     function login(event) {
@@ -184,7 +201,9 @@
         btn.innerHTML = '<span class="loading-spinner"></span> Вход...';
         hideError();
 
-        fetch(API_BASE + '/auth/token', {
+        // Укажите точный путь вашего эндпоинта.
+        // Если метод @PostMapping("/token") висит прямо в контроллере, то путь '/token'
+        fetch('/v1/auth/token', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password })
@@ -193,21 +212,23 @@
             .then(data => {
                 console.log('Ответ сервера:', data);
 
-                if (data.success !== true) {
+                // Проверяем флаг успеха (в вашем коде бэкенда это state или success)
+                const isSuccess = data.success === true || data.state === true || (data.data && data.data.state === true);
+
+                if (!isSuccess) {
                     showError(data.message || 'Ошибка авторизации');
                     btn.disabled = false;
                     btn.textContent = 'Войти';
                     return;
                 }
 
+                // Достаем токен из структуры MyApiResponse -> data (ResultAuth)
                 let token = null;
                 let userName = username;
 
-                if (data.data && data.data.token) {
-                    token = data.data.token;
-                    if (data.data.username) {
-                        userName = data.data.username;
-                    }
+                if (data.data) {
+                    if (data.data.token) token = data.data.token;
+                    if (data.data.username) userName = data.data.username;
                 } else if (data.token) {
                     token = data.token;
                 }
@@ -216,12 +237,11 @@
                     localStorage.setItem('accessToken', token);
                     localStorage.setItem('username', userName);
 
-                    // Куда редиректить? Сначала проверяем сохранённую страницу
                     let redirect = localStorage.getItem('redirectAfterLogin') || '/';
                     localStorage.removeItem('redirectAfterLogin');
                     window.location.href = redirect;
                 } else {
-                    showError('Не удалось получить токен');
+                    showError('Не удалось получить токен из ответа сервера');
                     btn.disabled = false;
                     btn.textContent = 'Войти';
                 }
@@ -245,7 +265,10 @@
 
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
-            document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+            const activeEl = document.activeElement;
+            if (activeEl && (activeEl.id === 'username' || activeEl.id === 'password')) {
+                document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+            }
         }
     });
 </script>

@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мониторинг Oracle API</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #0f172a; color: #fff; padding: 20px; margin: 0; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        h1 { text-align: center; color: #38bdf8; font-size: 24px; margin-bottom: 30px; }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
+        .card { background: #1e293b; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); position: relative; overflow: hidden; }
+        .card-full { grid-column: 1 / -1; }
+
+        /* Декоративные полоски */
+        .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: #475569; }
+        .card.up::before { background: #4ade80; }
+        .card.down::before { background: #f87171; }
+        .card.info::before { background: #38bdf8; }
+        .card.purple::before { background: #c084fc; }
+
+        .metric-title { font-size: 13px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+        .metric-value { font-size: 32px; font-weight: bold; color: #f8fafc; }
+        .metric-sub { font-size: 12px; color: #64748b; margin-top: 5px; }
+
+        .status-up { color: #4ade80; }
+        .status-down { color: #f87171; }
+
+        /* Таблица последних ошибок */
+        .error-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+        .error-table th { text-align: left; color: #94a3b8; padding: 6px; border-bottom: 1px solid #334155; }
+        .error-table td { padding: 6px; border-bottom: 1px solid #33415522; color: #cbd5e1; }
+
+        .footer { text-align: center; margin-top: 30px; font-size: 12px; color: #64748b; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🛠️ Мониторинг Oracle API & Системы</h1>
+
+    <div class="grid">
+        <!-- БАЗА ДАННЫХ -->
+        <div class="card" id="card-status">
+            <div class="metric-title">Статус базы данных (Oracle)</div>
+            <div class="metric-value" id="db-status">Загрузка...</div>
+        </div>
+
+        <div class="card info">
+            <div class="metric-title">Активные соединения (Active)</div>
+            <div class="metric-value" id="active-conn">-</div>
+        </div>
+
+        <div class="card up">
+            <div class="metric-title">Свободные соединения (Idle)</div>
+            <div class="metric-value" id="idle-conn">-</div>
+        </div>
+
+        <div class="card" id="card-pending">
+            <div class="metric-title">Очередь ожидания (Pending)</div>
+            <div class="metric-value" id="pending-conn" style="color: #4ade80;">0</div>
+        </div>
+
+        <div class="card">
+            <div class="metric-title">Лимит соединений (Max)</div>
+            <div class="metric-value" id="max-conn" style="color: #94a3b8;">-</div>
+        </div>
+
+        <!-- ДИСК И ПРОЦЕССОР -->
+        <div class="card info" id="card-disk">
+            <div class="metric-title">Свободно на диске</div>
+            <div class="metric-value" id="disk-space">-</div>
+            <div class="metric-sub" id="disk-total">Всего: -</div>
+        </div>
+
+        <div class="card purple">
+            <div class="metric-title">Загрузка CPU</div>
+            <div class="metric-value" id="cpu-usage">-</div>
+        </div>
+
+        <!-- ОШИБКИ (Мин / Час / День) -->
+        <div class="card" id="card-errors">
+            <div class="metric-title">Ошибки (Мин / Час / День)</div>
+            <div style="display: flex; justify-content: space-between; margin-top: 10px;">
+                <div style="text-align: center; flex: 1;">
+                    <div style="font-size: 11px; color: #94a3b8;">1 мин</div>
+                    <div class="metric-value" id="err-min" style="font-size: 24px; color: #4ade80;">0</div>
+                </div>
+                <div style="text-align: center; flex: 1; border-left: 1px solid #334155; border-right: 1px solid #334155;">
+                    <div style="font-size: 11px; color: #94a3b8;">1 час</div>
+                    <div class="metric-value" id="err-hour" style="font-size: 24px; color: #4ade80;">0</div>
+                </div>
+                <div style="text-align: center; flex: 1;">
+                    <div style="font-size: 11px; color: #94a3b8;">24 часа</div>
+                    <div class="metric-value" id="err-day" style="font-size: 24px; color: #4ade80;">0</div>
+                </div>
+            </div>
+            <div id="err-types" style="margin-top: 12px; font-size: 11px; color: #94a3b8; border-top: 1px solid #334155; padding-top: 8px; display: none;">
+                Типы за час: <span id="err-types-list" style="color: #cbd5e1;">-</span>
+            </div>
+        </div>
+
+        <!-- ЛЕНТА ПОСЛЕДНИХ ОШИБОК -->
+        <div class="card card-full" id="recent-errors-card" style="display: none;">
+            <div class="metric-title" style="color: #f87171;">⚠️ Последние сбои в системе</div>
+            <table class="error-table">
+                <thead>
+                <tr>
+                    <th style="width: 80px;">Время</th>
+                    <th style="width: 200px;">Тип ошибки</th>
+                    <th>Путь (URL)</th>
+                </tr>
+                </thead>
+                <tbody id="recent-errors-body">
+                <!-- Заполняется динамически -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- СИСТЕМНЫЕ МЕТРИКИ -->
+        <div class="card purple">
+            <div class="metric-title">Использование памяти (JVM Heap)</div>
+            <div class="metric-value" id="jvm-memory">-</div>
+            <div class="metric-sub" id="jvm-memory-max">Максимум: -</div>
+        </div>
+
+        <div class="card info">
+            <div class="metric-title">Активные HTTP-запросы</div>
+            <div class="metric-value" id="http-active">0</div>
+        </div>
+
+        <div class="card purple">
+            <div class="metric-title">Активные потоки (Threads)</div>
+            <div class="metric-value" id="jvm-threads">-</div>
+        </div>
+
+        <div class="card">
+            <div class="metric-title">Время работы (Uptime)</div>
+            <div class="metric-value" id="app-uptime" style="font-size: 24px;">-</div>
+        </div>
+    </div>
+
+    <div class="footer">
+        Обновление каждые 5 сек • Последний опрос: <span id="last-update">-</span>
+    </div>
+</div>
+
+<script>
+    const API_URL = "/actuator";
+
+    async function updateMetrics() {
+        try {
+            // 1. Health базы и диска
+            const healthRes = await fetch(`${API_URL}/health`);
+            const healthData = await healthRes.json();
+            const dbStatusEl = document.getElementById("db-status");
+            const cardStatus = document.getElementById("card-status");
+            const dbIsUp = healthData.components?.db?.status === "UP" || healthData.status === "UP";
+
+            if (dbIsUp) {
+                dbStatusEl.innerHTML = "UP";
+                dbStatusEl.className = "metric-value status-up";
+                cardStatus.className = "card up";
+            } else {
+                dbStatusEl.innerHTML = "DOWN";
+                dbStatusEl.className = "metric-value status-down";
+                cardStatus.className = "card down";
+            }
+
+            // Диск из Health
+            const disk = healthData.components?.diskSpace?.details;
+            if (disk) {
+                const freeGb = (disk.free / (1024 * 1024 * 1024)).toFixed(1);
+                const totalGb = (disk.total / (1024 * 1024 * 1024)).toFixed(1);
+                document.getElementById("disk-space").innerText = `${freeGb} ГБ`;
+                document.getElementById("disk-total").innerText = `Всего: ${totalGb} ГБ`;
+            }
+
+            // 2. HikariCP
+            fetchMetric("hikaricp.connections.active", "active-conn");
+            fetchMetric("hikaricp.connections.idle", "idle-conn");
+            fetchMetric("hikaricp.connections.max", "max-conn");
+
+            const pendingVal = await fetchMetricValue("hikaricp.connections.pending");
+            const pendingEl = document.getElementById("pending-conn");
+            const cardPending = document.getElementById("card-pending");
+            pendingEl.innerText = pendingVal;
+            if (pendingVal > 0) {
+                pendingEl.style.color = "#f87171";
+                cardPending.className = "card down";
+            } else {
+                pendingEl.style.color = "#4ade80";
+                cardPending.className = "card up";
+            }
+
+            // 3. Статистика ошибок и лента
+            try {
+                const errRes = await fetch('/v1/monitoring/errors-hour');
+                if (errRes.ok) {
+                    const errData = await errRes.json();
+
+                    document.getElementById("err-min").innerText = errData.lastMinute;
+                    document.getElementById("err-hour").innerText = errData.lastHour;
+                    document.getElementById("err-day").innerText = errData.lastDay;
+
+                    // Типы ошибок
+                    const types = errData.byTypeLastHour || {};
+                    const typeEntries = Object.entries(types);
+                    const errTypesContainer = document.getElementById("err-types");
+                    if (typeEntries.length > 0) {
+                        errTypesContainer.style.display = "block";
+                        document.getElementById("err-types-list").innerHTML = typeEntries.map(([t, c]) => `<b style="color:#f87171">${t}</b>: ${c}`).join(' | ');
+                    } else {
+                        errTypesContainer.style.display = "none";
+                    }
+
+                    // Лента последних ошибок
+                    const recentCard = document.getElementById("recent-errors-card");
+                    const recentBody = document.getElementById("recent-errors-body");
+                    if (errData.recentErrors && errData.recentErrors.length > 0) {
+                        recentCard.style.display = "block";
+                        recentBody.innerHTML = errData.recentErrors.map(e => `
+                            <tr>
+                                <td>${e.timestamp}</td>
+                                <td style="color: #f87171; font-weight: 500;">${e.type}</td>
+                                <td>${e.path}</td>
+                            </tr>
+                        `).join('');
+                    } else {
+                        recentCard.style.display = "none";
+                    }
+
+                    const cardErrors = document.getElementById("card-errors");
+                    if (errData.lastHour > 0 || errData.lastMinute > 0) {
+                        cardErrors.className = "card down";
+                    } else {
+                        cardErrors.className = "card up";
+                    }
+                }
+            } catch (e) {
+                console.error("Не удалось получить статистику ошибок", e);
+            }
+
+            // 4. CPU Usage
+            const cpuVal = await fetchMetricValue("system.cpu.usage");
+            if (cpuVal !== "-") {
+                document.getElementById("cpu-usage").innerText = `${Math.round(cpuVal * 100)}%`;
+            }
+
+            // 5. Память JVM
+            const memUsedBytes = await fetchMetricValue("jvm.memory.used");
+            const memMaxBytes = await fetchMetricValue("jvm.memory.max");
+            if (memUsedBytes !== "-" && memMaxBytes !== "-") {
+                const usedMb = Math.round(memUsedBytes / (1024 * 1024));
+                const maxMb = Math.round(memMaxBytes / (1024 * 1024));
+                document.getElementById("jvm-memory").innerText = `${usedMb} МБ`;
+                document.getElementById("jvm-memory-max").innerText = `Из ${maxMb} МБ`;
+            }
+
+            // 6. HTTP запросы и потоки
+            fetchMetric("http.server.requests.active", "http-active");
+            fetchMetric("jvm.threads.live", "jvm-threads");
+
+            // 7. Uptime
+            const uptimeSec = await fetchMetricValue("process.uptime");
+            if (uptimeSec !== "-") {
+                const hours = Math.floor(uptimeSec / 3600);
+                const minutes = Math.floor((uptimeSec % 3600) / 60);
+                const seconds = Math.floor(uptimeSec % 60);
+                document.getElementById("app-uptime").innerText = `${hours}ч ${minutes}м ${seconds}с`;
+            }
+
+            document.getElementById("last-update").innerText = new Date().toLocaleTimeString();
+
+        } catch (e) {
+            console.error("Ошибка соединения с Actuator", e);
+        }
+    }
+
+    async function fetchMetric(metricName, elementId) {
+        const val = await fetchMetricValue(metricName);
+        document.getElementById(elementId).innerText = val;
+    }
+
+    async function fetchMetricValue(metricName) {
+        try {
+            const res = await fetch(`${API_URL}/metrics/${metricName}`);
+            if (!res.ok) return "-";
+            const data = await res.json();
+            return data.measurements ? data.measurements[0].value : "-";
+        } catch {
+            return "-";
+        }
+    }
+
+    updateMetrics();
+    setInterval(updateMetrics, 1000);
+</script>
+
+</body>
+</html>

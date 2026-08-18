@@ -31,7 +31,7 @@ class JwtAuthenticationFilter(
 
         // Пропускаем публичные эндпоинты (не требуют аутентификации)
         if (isPublicPath(path)) {
-            log.debug("Skipping authentication for public path: $path")
+            //log.debug("Skipping authentication for public path: $path")
             filterChain.doFilter(request, response)
             return
         }
@@ -82,7 +82,11 @@ class JwtAuthenticationFilter(
         )
         SecurityContextHolder.getContext().authentication = authentication
 
-        log.info("User '{}' authenticated for path: {}", username, path)
+        // Логируем только обычные запросы пользователей (не actuator)
+        if (!path.startsWith("/actuator")) {
+            log.debug("User '{}' authenticated for path: {}", username, path)
+        }
+
         // Продолжаем цепочку фильтров
         filterChain.doFilter(request, response)
     }

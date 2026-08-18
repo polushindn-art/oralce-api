@@ -28,6 +28,14 @@ asterisk:
   ami:
     host: asterisk.ars
     port: 5038
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,metrics,hikaricp"
+  endpoint:
+    health:
+      show-details: always
 springdoc:
   api-docs:
     enabled: true

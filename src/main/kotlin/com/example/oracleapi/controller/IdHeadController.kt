@@ -14,6 +14,7 @@ import com.example.oracleapi.service.idhead.IdHeadService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
+import org.springdoc.core.annotations.ParameterObject
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.web.PageableDefault
@@ -165,6 +166,7 @@ class IdHeadController(
         @RequestParam(required = false) storeout: Long?,
         @RequestParam(required = false) dateFrom: LocalDate?,
         @RequestParam(required = false) dateTo: LocalDate?,
+        @ParameterObject
         @PageableDefault(size = 20, sort = ["docdate", "rn"], direction = Sort.Direction.DESC) pageable: Pageable
     ): MyApiResponse<List<IdheadResponse>> {
         return success(idHeadService.getByFiltersWithPagination(status, doctype, docnumb, storein, storeout, dateFrom, dateTo, pageable))
