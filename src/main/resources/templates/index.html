@@ -355,27 +355,45 @@
     }
 
     // Проверка статуса окружений (портов)
+    // Честная проверка статуса окружений (портов)
     async function checkEnvironmentsStatus() {
         const ports = ['80', '3000', '3001'];
+
         for (const port of ports) {
             const statusEl = document.getElementById(`env-status-${port}`);
             if (!statusEl) continue;
 
             const protocol = window.location.protocol;
             const hostname = window.location.hostname || 'localhost';
-            const targetUrl = `${protocol}//${hostname}${port === '80' ? '' : ':' + port}/actuator/health`;
+            // Используем стандартный эндпоинт или favicon, чтобы проверить доступность порта
+            const testUrl = `${protocol}//${hostname}${port === '80' ? '' : ':' + port}/favicon.ico?t=` + Date.now();
 
-            try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 2500);
+            const isAlive = await new Promise((resolve) => {
+                const img = new Image();
+                const timer = setTimeout(() => {
+                    img.src = '';
+                    resolve(false); // Таймаут — считаем недоступным
+                }, 2000);
 
-                await fetch(targetUrl, { method: 'GET', mode: 'no-cors', signal: controller.signal });
-                clearTimeout(timeoutId);
+                img.onload = () => {
+                    clearTimeout(timer);
+                    resolve(true); // Успех — сервер ответил
+                };
 
+                img.onerror = () => {
+                    clearTimeout(timer);
+                    // Даже если favicon.ico не найден (ошибка 404), но сервер ответил — порт работает!
+                    resolve(true);
+                };
+
+                img.src = testUrl;
+            });
+
+            if (isAlive) {
                 statusEl.textContent = 'Работает';
                 statusEl.style.background = '#dcfce7';
                 statusEl.style.color = '#166534';
-            } catch (e) {
+            } else {
                 statusEl.textContent = 'Недоступна';
                 statusEl.style.background = '#fee2e2';
                 statusEl.style.color = '#991b1b';
@@ -417,12 +435,26 @@
                     if (errorsBody) {
                         if (errData.recentErrors && errData.recentErrors.length > 0) {
                             errorsBody.innerHTML = `
-                                <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
-                                    <thead><tr style="background: #f8fafc; text-align: left;"><th style="padding: 6px;">Время</th><th style="padding: 6px;">Ошибка</th><th style="padding: 6px;">Путь</th></tr></thead>
-                                    <tbody>
-                                        ${errData.recentErrors.map(e => `<tr><td style="padding: 6px;">${e.timestamp}</td><td style="padding: 6px; color: #dc2626;">${e.type}</td><td style="padding: 6px;"><code>${e.path}</code></td></tr>`).join('')}
-                                    </tbody>
-                                </table>`;
+                                <div style="max-height: 300px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px;">
+                                    <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                                        <thead>
+                                            <tr style="background: #f8fafc; text-align: left; position: sticky; top: 0; border-bottom: 2px solid #e2e8f0;">
+                                                <th style="padding: 8px 10px;">Время</th>
+                                                <th style="padding: 8px 10px;">Ошибка</th>
+                                                <th style="padding: 8px 10px;">Путь</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${errData.recentErrors.map(e => `
+                                                <tr style="border-bottom: 1px solid #f1f5f9;">
+                                                    <td style="padding: 8px 10px; white-space: nowrap;">${e.timestamp}</td>
+                                                    <td style="padding: 8px 10px; color: #dc2626; font-weight: 500;">${e.type}</td>
+                                                    <td style="padding: 8px 10px;"><code>${e.path}</code></td>
+                                                </tr>
+                                            `).join('')}
+                                        </tbody>
+                                    </table>
+                                </div>`;
                         } else {
                             errorsBody.innerHTML = '🟢 Сбоев не зафиксировано.';
                         }
