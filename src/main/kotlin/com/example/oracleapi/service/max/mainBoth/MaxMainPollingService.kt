@@ -458,7 +458,7 @@ class MaxMainPollingService(
                     val cardNumber = card.dscbarnumb!!
                     val cardIndex = index + 1 // 1, 2, 3, 4, 5...
 
-                    val qrBytes = barcodeService.generateArsenalCard(cardNumber, cardIndex)
+                    val qrBytes = barcodeService.generateArsenalCardFromFile(cardNumber, cardIndex)
 
                     botClient.sendPhoto(
                         chatId = chatId,

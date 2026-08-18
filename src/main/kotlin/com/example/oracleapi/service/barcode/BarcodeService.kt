@@ -2,6 +2,7 @@ package com.example.oracleapi.service.barcode
 
 import com.google.zxing.*
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource
+import com.google.zxing.client.j2se.MatrixToImageConfig
 import com.google.zxing.client.j2se.MatrixToImageWriter
 import com.google.zxing.common.GlobalHistogramBinarizer
 import com.google.zxing.common.HybridBinarizer
@@ -699,6 +700,109 @@ class BarcodeService(
 
         val baos = ByteArrayOutputStream()
         ImageIO.write(image, "png", baos)
+        return baos.toByteArray()
+    }
+
+    fun generateArsenalCardFromFile(
+        cardNumber: String,
+        cardIndex: Int = 1
+    ): ByteArray {
+        // 1. Загружаем файл шаблона из ресурсов Spring Boot
+        val resourceStream = object {}::class.java.getResourceAsStream("/card_template.png")
+            ?: throw IllegalStateException("Файл шаблона card_template.png не найден в папке resources!")
+
+        val template = ImageIO.read(resourceStream)
+
+        val cardWidth = template.width
+        val cardHeight = template.height
+
+        val g = template.createGraphics()
+
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+        g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON)
+        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY)
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR)
+
+        val primaryBlue = Color(0, 71, 171)
+        val textDark = Color(15, 23, 42)
+        val textGray = Color(130, 140, 155)
+
+        // 2. Плашка с номером (для карт со 2-й и далее)
+        if (cardIndex > 1) {
+            val badgeText = "$cardIndex"
+            g.font = Font("SansSerif", Font.BOLD, 22)
+            val badgeSize = 50
+            val badgeX = cardWidth - badgeSize - 60
+            val badgeY = 60
+
+            g.color = primaryBlue
+            g.fillRoundRect(badgeX, badgeY, badgeSize, badgeSize, 16, 16)
+            g.color = Color.WHITE
+
+            val metrics = g.fontMetrics
+            val textWidth = metrics.stringWidth(badgeText)
+            val textHeight = metrics.ascent
+            g.drawString(
+                badgeText,
+                badgeX + (badgeSize - textWidth) / 2,
+                badgeY + (badgeSize + textHeight) / 2 - 4
+            )
+        }
+
+        // 3. DataMatrix (по центру, чуть ниже)
+        val hints = mapOf(EncodeHintType.DATA_MATRIX_SHAPE to SymbolShapeHint.FORCE_SQUARE)
+        val bitMatrix = DataMatrixWriter().encode(cardNumber, BarcodeFormat.DATA_MATRIX, 0, 0, hints)
+
+        val codeSize = 400
+        val codeX = (cardWidth - codeSize) / 2
+        val codeY = 130
+
+        // Подложка под штрихкод
+        val padding = 24
+        g.color = Color(248, 250, 252)
+        g.fillRoundRect(codeX - padding, codeY - padding, codeSize + (padding * 2), codeSize + (padding * 2), 24, 24)
+        g.color = Color(230, 235, 245)
+        g.drawRoundRect(codeX - padding, codeY - padding, codeSize + (padding * 2), codeSize + (padding * 2), 24, 24)
+
+        // Рисуем модули DataMatrix
+        val matrixWidth = bitMatrix.width
+        val matrixHeight = bitMatrix.height
+        val moduleWidth = codeSize.toDouble() / matrixWidth
+        val moduleHeight = codeSize.toDouble() / matrixHeight
+
+        g.color = Color.BLACK
+        for (x in 0 until matrixWidth) {
+            for (y in 0 until matrixHeight) {
+                if (bitMatrix[x, y]) {
+                    val rx = codeX + (x * moduleWidth).toInt()
+                    val ry = codeY + (y * moduleHeight).toInt()
+                    val rw = codeX + ((x + 1) * moduleWidth).toInt() - rx
+                    val rh = codeY + ((y + 1) * moduleHeight).toInt() - ry
+                    g.fillRect(rx, ry, rw, rh)
+                }
+            }
+        }
+
+        // 4. Текст "НОМЕР КАРТЫ" (строго по центру)
+        g.color = textGray
+        g.font = Font("SansSerif", Font.BOLD, 14)
+        val labelMetrics = g.fontMetrics
+        val labelWidth = labelMetrics.stringWidth("НОМЕР КАРТЫ")
+        val labelY = codeY + codeSize + padding + 60
+        g.drawString("НОМЕР КАРТЫ", (cardWidth - labelWidth) / 2, labelY)
+
+        // 5. Сам номер карты (Consolas, Bold, 46 — с точкой внутри нуля, строго по центру)
+        g.color = textDark
+        g.font = Font("Consolas", Font.BOLD, 46)
+        val numberMetrics = g.fontMetrics
+        val numberWidth = numberMetrics.stringWidth(cardNumber)
+        val numberY = labelY + 60
+        g.drawString(cardNumber, (cardWidth - numberWidth) / 2, numberY)
+
+        g.dispose()
+
+        val baos = ByteArrayOutputStream()
+        ImageIO.write(template, "png", baos)
         return baos.toByteArray()
     }
 
