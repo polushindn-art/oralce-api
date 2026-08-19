@@ -1,9 +1,9 @@
 package com.example.oracleapi.config
 
-import com.example.oracleapi.service.ErrorCounter // Проверьте правильность пакета ErrorCounter
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -43,6 +43,7 @@ class SecurityConfig(
             // Настройка авторизации
             .authorizeHttpRequests { auth ->
                 auth
+                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                     // Публичные пути + системный путь /error для правильных 404 ошибок
                     .requestMatchers(*JwtHelper.skipPaths, "/error").permitAll()
 
@@ -98,11 +99,12 @@ class SecurityConfig(
             "https://sdl-arsenal.ru",
             "https://ya.ars",
             "https://ya.ars:443",
+            "http://oracle-rest-api.ars",
+            "http://oracle-rest-api.ars:80",
             "http://oracle-rest-api.ars:3001",
             "http://oracle-rest-api.ars:3000",
+            "http://192.168.1.198:80",
         )
-
-        configuration.allowedOriginPatterns = listOf("http://oracle-rest-api.ars:*")
 
         configuration.allowedMethods = listOf(
             "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"

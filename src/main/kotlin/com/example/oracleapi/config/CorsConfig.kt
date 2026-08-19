@@ -10,7 +10,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 class CorsConfig : WebMvcConfigurer {
     override fun addCorsMappings(registry: CorsRegistry) {
         registry.addMapping("/**")
-            .allowedOrigins("http://localhost:5173")
+            .allowedOriginPatterns(
+                "http://localhost:*",
+                "https://localhost:*",
+                "http://oracle-rest-api.ars*",
+                "https://oracle-rest-api.ars*"
+            )
             .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
             .allowedHeaders("*")
             .allowCredentials(true)
