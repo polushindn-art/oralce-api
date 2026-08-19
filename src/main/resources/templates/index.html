@@ -438,15 +438,13 @@
     }
 
     async function checkEnvironmentsStatus() {
-        // 1. Проверяем ПРОД через ваш эндпоинт /v1/api/health
-        await checkCustomApiHealth('/v1/api/health', 'env-status-prod');
+        // 1. Проверяем Рабочую (Прод)
+        await checkCustomApiHealth('http://oracle-rest-api.ars/v1/api/health', 'env-status-prod');
 
-        // 2. Дев (порт 8099)
-        const proto = window.location.protocol;
-        const host = window.location.hostname || 'localhost';
-        await checkCustomApiHealth(`${proto}//${host}:8099/v1/api/health`, 'env-status-dev');
+        // 2. Проверяем Тестовую (Дев) — порт 3000 (или 8099, в зависимости от вашего порта)
+        await checkCustomApiHealth('http://oracle-rest-api.ars:3000/v1/api/health', 'env-status-dev');
 
-        // 3. Нестабильная (порт 3001)
+        // 3. Проверяем Нестабильную (порт 3001)
         await checkCustomApiHealth('http://oracle-rest-api.ars:3001/v1/api/health', 'env-status-unstable');
     }
 
