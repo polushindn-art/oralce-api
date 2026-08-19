@@ -76,6 +76,7 @@ fun Phonebook.toDto(): PhonebookDto {
         rdate = rdate,
         phoneInt = phoneInt,
         phoneSot = phoneSot,
+        dolgnost = dolgnost,
         phoneTail = phoneTail,
         otdel = otdel,
     )

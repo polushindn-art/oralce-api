@@ -98,8 +98,11 @@ class SecurityConfig(
             "https://sdl-arsenal.ru",
             "https://ya.ars",
             "https://ya.ars:443",
-            "http://oracle-rest-api.ars:*"
+            "http://oracle-rest-api.ars:3001",
+            "http://oracle-rest-api.ars:3000",
         )
+
+        configuration.allowedOriginPatterns = listOf("http://oracle-rest-api.ars:*")
 
         configuration.allowedMethods = listOf(
             "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"

@@ -168,27 +168,25 @@
             </div>
         </div>
 
-        <!-- КНОПКИ ОКРУЖЕНИЙ -->
+        <!-- КНОПКИ ОКРУЖЕНИЙ СО СТАТУСАМИ -->
         <div class="env-switch">
-
-            <!-- 🔵 Рабочая (Прод) — ведет на основной продакшн / домен -->
+            <!-- 🔵 Рабочая (Прод) -->
             <button class="env-link" onclick="window.location.href='http://oracle-rest-api.ars/'">
                 <span>🔵 Рабочая (Прод)</span>
-                <span id="env-status-prod" class="env-status-badge" style="background: #e2e8f0; color: #64748b;">Проверка...</span>
+                <span id="env-status-prod" class="env-status-badge" style="background: #e2e8f0; color: #64748b;">...</span>
             </button>
 
-            <!-- 🟠 Тестовая (Дев) — ведет строго на порт 8099 -->
+            <!-- 🟠 Тестовая (Дев 3000) -->
             <button class="env-link" onclick="window.location.href='http://oracle-rest-api.ars:3000/'">
-                <span>🟠 Тестовая (Дев 3000)</span>
-                <span id="env-status-dev" class="env-status-badge" style="background: #e2e8f0; color: #64748b;">Проверка...</span>
+                <span>🟠 Тестовая (3000)</span>
+                <span id="env-status-dev" class="env-status-badge" style="background: #e2e8f0; color: #64748b;">...</span>
             </button>
 
-            <!-- ⚠️ Нестабильная — ведет на внешний компьютер (порт 3001) -->
+            <!-- ⚠️ Нестабильная (3001) -->
             <button class="env-link" onclick="window.location.href='http://oracle-rest-api.ars:3001/'">
                 <span>⚠️ Нестабил. (3001)</span>
-                <span id="env-status-unstable" class="env-status-badge" style="background: #e2e8f0; color: #64748b;">Проверка...</span>
+                <span id="env-status-unstable" class="env-status-badge" style="background: #e2e8f0; color: #64748b;">...</span>
             </button>
-
         </div>
 
         <div class="env-info">
@@ -205,13 +203,10 @@
         </div>
 
         <div class="env-switch">
-            <!-- Portainer -->
             <button class="env-link" onclick="window.open('http://oracle-rest-api.ars:9000', '_blank')" style="background: #eff6ff; border-color: #bfdbfe; color: #1e40af;">
                 <span>📦 Portainer (9000)</span>
                 <span style="font-size: 11px; background: #dbeafe; padding: 2px 6px; border-radius: 4px;">Открыть ↗</span>
             </button>
-
-            <!-- Docker Registry UI -->
             <button class="env-link" onclick="window.open('http://oracle-rest-api.ars:7000', '_blank')" style="background: #f0fdf4; border-color: #bbf7d0; color: #166534;">
                 <span>🐳 Registry UI (7000)</span>
                 <span style="font-size: 11px; background: #dcfce7; padding: 2px 6px; border-radius: 4px;">Открыть ↗</span>
@@ -268,7 +263,7 @@
     <!-- Правая область контента -->
     <div class="content">
 
-        <!-- ВЕРХНИЙ СТАТУС-БАР МОНИТОРИНГ (Прилипает к верху при прокрутке) -->
+        <!-- ВЕРХНИЙ СТАТУС-БАР МОНИТОРИНГ -->
         <div id="top-status-bar" style="position: sticky; top: 15px; z-index: 100; display: flex; flex-wrap: wrap; gap: 15px; align-items: center; justify-content: space-between; background: #1e293b; color: #fff; padding: 12px 20px; border-radius: 10px; margin-bottom: 20px; border-left: 5px solid #22c55e; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
             <div style="display: flex; align-items: center; gap: 12px;">
                 <a href="/monitor.html" target="_blank" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 8px;">
@@ -294,7 +289,7 @@
             </div>
         </div>
 
-        <!-- ОСНОВНОЙ КОНТЕЙНЕР (api-docs.js сюда загружает start_page.md и любые другие документы) -->
+        <!-- ОСНОВНОЙ КОНТЕЙНЕР -->
         <div id="md-content" class="markdown-body" style="max-width: 1100px; margin: 0 auto;">
             <div class="loading">Загрузка главной страницы...</div>
         </div>
@@ -333,10 +328,48 @@
         window.location.reload();
     }
 
+    // Проверка состояния окружений для кнопок в меню
+    async function checkCustomApiHealth(url, badgeId) {
+        const badge = document.getElementById(badgeId);
+        if (!badge) return;
+
+        try {
+            // Используем mode: 'cors' и небольшой таймаут через AbortController
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 4000);
+
+            const response = await fetch(url + '/v1/api/health', {
+                method: 'GET',
+                signal: controller.signal,
+                cache: 'no-cache'
+            });
+            clearTimeout(timeoutId);
+
+            if (response.ok) {
+                badge.textContent = 'OK';
+                badge.style.background = '#dcfce7';
+                badge.style.color = '#166534';
+            } else {
+                badge.textContent = 'ERR';
+                badge.style.background = '#fee2e2';
+                badge.style.color = '#991b1b';
+            }
+        } catch (e) {
+            badge.textContent = 'OFF';
+            badge.style.background = '#f1f5f9';
+            badge.style.color = '#64748b';
+        }
+    }
+
+    async function checkEnvironmentsStatus() {
+        await checkCustomApiHealth('http://oracle-rest-api.ars', 'env-status-prod');
+        await checkCustomApiHealth('http://oracle-rest-api.ars:3000', 'env-status-dev');
+        await checkCustomApiHealth('http://oracle-rest-api.ars:3001', 'env-status-unstable');
+    }
+
     let homeSystemChart = null;
     let maxDataPoints = 30;
 
-    // Инициализация графика, если он появился на странице (когда загружен start_page.md)
     function initHomeChart() {
         if (homeSystemChart) return homeSystemChart;
 
@@ -437,59 +470,7 @@
         chart.update('none');
     }
 
-    async function checkEnvironmentsStatus() {
-        // 1. Проверяем Рабочую (Прод)
-        await checkCustomApiHealth('http://oracle-rest-api.ars/v1/api/health', 'env-status-prod');
-
-        // 2. Проверяем Тестовую (Дев) — порт 3000 (или 8099, в зависимости от вашего порта)
-        await checkCustomApiHealth('http://oracle-rest-api.ars:3000/v1/api/health', 'env-status-dev');
-
-        // 3. Проверяем Нестабильную (порт 3001)
-        await checkCustomApiHealth('http://oracle-rest-api.ars:3001/v1/api/health', 'env-status-unstable');
-    }
-
-    async function checkCustomApiHealth(url, elementId) {
-        const statusEl = document.getElementById(elementId);
-        if (!statusEl) return;
-
-        try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 2500); // Таймаут 2.5 секунды, чтобы не зависать
-
-            const response = await fetch(url, {
-                method: 'GET',
-                signal: controller.signal,
-                cache: 'no-cache'
-            });
-            clearTimeout(timeoutId);
-
-            if (response.ok) {
-                const json = await response.json();
-                const isUp = json.success && json.data && json.data.status === "UP";
-                setEnvStatus(statusEl, isUp);
-            } else {
-                setEnvStatus(statusEl, false);
-            }
-        } catch (e) {
-            // Если сервер недоступен или сработал CORS — кнопка сразу станет красной
-            setEnvStatus(statusEl, false);
-        }
-    }
-
-    function setEnvStatus(el, isUp) {
-        if (isUp) {
-            el.textContent = 'Работает';
-            el.style.background = '#dcfce7';
-            el.style.color = '#166534';
-        } else {
-            el.textContent = 'Недоступна';
-            el.style.background = '#fee2e2';
-            el.style.color = '#991b1b';
-        }
-    }
-
     async function updateTopStatusBar() {
-
         try {
             const bar = document.getElementById('top-status-bar');
             const dbStatusEl = document.getElementById('top-db-status');
@@ -583,7 +564,6 @@
             let cpuPercent = !isNaN(cpuValText) && cpuValText !== '-' ? parseInt(cpuValText) : 0;
             let usedMb = !isNaN(memValText) && memValText !== '-' ? parseInt(memValText) : 0;
 
-            // Проверяем и инициализируем график, если мы на главной
             initHomeChart();
             addHomeDataPoint(timeNow, cpuPercent, usedMb, errorsLastMinute);
 
@@ -611,16 +591,15 @@
         checkAuth();
         updateTopStatusBar();
         checkEnvironmentsStatus();
-        setInterval(updateTopStatusBar, 1000);
-        setInterval(checkEnvironmentsStatus, 10000);
 
-        // Наблюдатель следит за #md-content: как только в нем появляется график, инициализируем его
+        setInterval(updateTopStatusBar, 1000);
+        setInterval(checkEnvironmentsStatus, 10000); // Проверка окружений каждые 10 секунд
+
         const observer = new MutationObserver(() => {
             initHomeChart();
         });
         observer.observe(document.getElementById('md-content'), { childList: true, subtree: true });
 
-        // Мобильное меню (открытие/закрытие по клику)
         const mobileToggle = document.getElementById('mobileToggle');
         const sidebar = document.getElementById('sidebar');
 
