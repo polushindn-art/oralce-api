@@ -1,8 +1,9 @@
 # 📊 ORACLE REST API — Дашборд
 
 ## 📈 Динамика ресурсов системы (CPU & Memory)
-<div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); margin-bottom: 20px;">
-    <div style="position: relative; height: 220px; width: 100%;">
+<div style="background: #1e293b; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); margin-bottom: 20px; border-top: 4px solid #38bdf8;">
+    <div style="font-size: 13px; color: #94a3b8; text-transform: uppercase; margin-bottom: 10px; font-weight: bold;">📈 Динамика ресурсов системы (CPU, Память и Сбои)</div>
+    <div style="position: relative; height: 260px; width: 100%;">
         <canvas id="homeSystemChart"></canvas>
     </div>
 </div>
@@ -13,13 +14,15 @@
         Загрузка информации о сбоях...
     </div>
 </div>
+
 ## 🔔 Последние обновления
 
 <div style="max-height: 450px; overflow-y: auto; border: 3px solid #ddd; border-radius: 10px; padding: 8px 16px;">
 
 | 📆 Дата    | Что изменилось 🛠️                                                                                                                                                                                                                                                                                                                           |
 |------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 18.08.2026 | Мониторинг системы 📈                                                                                                                                                                                                                                                                                                                          |
+| 19.08.2026 | Для отслеживания зависших соединений (утечек) добавил встроенный детектор пула соединений HikariCP                                                                                                                                                                                                                                           |
+| 18.08.2026 | Мониторинг системы 📈                                                                                                                                                                                                                                                                                                                        |
 | 17.08.2026 | Добавлен метод отправки изображений в сообщении                                                                                                                                                                                                                                                                                              |
 | 13.08.2026 | **GET** /v1/phonebook/all<br/>**GET** /v1/stock/info - Возвращает информацию о товаре                                                                                                                                                                                                                                                        |
 | 12.08.2026 | Метод <br/>**POST** /v1/sms/send-bot-link - Отправляет SMS со ссылкой на бота https://max.ru/id2225152479_3_bot<br/>**GET** /v1/max/status-main - Статус номера в MAIN боте<br/>**POST** /v1/max/send-by-phone - Отправить сообщение по номеру телефона<br/>В методе /v1/idhead/filter/page добавил новые параметры в ответе `Вес` и `Объем` |

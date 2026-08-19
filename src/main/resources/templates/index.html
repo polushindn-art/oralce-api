@@ -170,18 +170,25 @@
 
         <!-- КНОПКИ ОКРУЖЕНИЙ -->
         <div class="env-switch">
-            <button class="env-link" data-host="oracle-rest-api.ars" data-port="80">
-                <span>🔵 Рабочая (80)</span>
-                <span id="env-status-80" class="env-status-badge" style="background: #e2e8f0; color: #64748b;">Проверка...</span>
+
+            <!-- 🔵 Рабочая (Прод) — ведет на основной продакшн / домен -->
+            <button class="env-link" onclick="window.location.href='http://oracle-rest-api.ars/'">
+                <span>🔵 Рабочая (Прод)</span>
+                <span id="env-status-prod" class="env-status-badge" style="background: #e2e8f0; color: #64748b;">Проверка...</span>
             </button>
-            <button class="env-link" data-host="oracle-rest-api.ars" data-port="3000">
-                <span>🟠 Тестовая (3000)</span>
-                <span id="env-status-3000" class="env-status-badge" style="background: #e2e8f0; color: #64748b;">Проверка...</span>
+
+            <!-- 🟠 Тестовая (Дев) — ведет строго на порт 8099 -->
+            <button class="env-link" onclick="window.location.href='http://oracle-rest-api.ars:3000/'">
+                <span>🟠 Тестовая (Дев 3000)</span>
+                <span id="env-status-dev" class="env-status-badge" style="background: #e2e8f0; color: #64748b;">Проверка...</span>
             </button>
-            <button class="env-link" data-host="oracle-rest-api.ars" data-port="3001">
+
+            <!-- ⚠️ Нестабильная — ведет на внешний компьютер (порт 3001) -->
+            <button class="env-link" onclick="window.location.href='http://oracle-rest-api.ars:3001/'">
                 <span>⚠️ Нестабил. (3001)</span>
-                <span id="env-status-3001" class="env-status-badge" style="background: #e2e8f0; color: #64748b;">Проверка...</span>
+                <span id="env-status-unstable" class="env-status-badge" style="background: #e2e8f0; color: #64748b;">Проверка...</span>
             </button>
+
         </div>
 
         <div class="env-info">
@@ -312,12 +319,10 @@
 
     // Инициализация графика, если он появился на странице (когда загружен start_page.md)
     function initHomeChart() {
+        if (homeSystemChart) return homeSystemChart;
+
         const canvas = document.getElementById('homeSystemChart');
-        if (!canvas) {
-            homeSystemChart = null;
-            return;
-        }
-        if (homeSystemChart) return; // Уже инициализирован
+        if (!canvas) return null;
 
         const ctx = canvas.getContext('2d');
         homeSystemChart = new Chart(ctx, {
@@ -325,83 +330,149 @@
             data: {
                 labels: [],
                 datasets: [
-                    { label: 'CPU (%)', data: [], borderColor: '#c084fc', backgroundColor: 'rgba(192, 132, 252, 0.1)', borderWidth: 2, tension: 0.3, fill: true },
-                    { label: 'Heap (МБ)', data: [], borderColor: '#38bdf8', backgroundColor: 'rgba(56, 189, 248, 0.1)', borderWidth: 2, tension: 0.3, fill: true, yAxisID: 'y1' }
+                    {
+                        label: 'CPU (%)',
+                        data: [],
+                        borderColor: '#c084fc',
+                        backgroundColor: 'rgba(192, 132, 252, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true
+                    },
+                    {
+                        label: 'Heap Память (МБ)',
+                        data: [],
+                        borderColor: '#38bdf8',
+                        backgroundColor: 'rgba(56, 189, 248, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true,
+                        yAxisID: 'y1'
+                    },
+                    {
+                        label: 'Ошибки (за мин)',
+                        data: [],
+                        borderColor: '#f87171',
+                        backgroundColor: 'rgba(248, 113, 113, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true,
+                        yAxisID: 'y2'
+                    }
                 ]
             },
             options: {
-                responsive: true, maintainAspectRatio: false,
+                responsive: true,
+                maintainAspectRatio: false,
                 scales: {
-                    x: { grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } } },
-                    y: { type: 'linear', position: 'left', min: 0, max: 100, grid: { color: '#f1f5f9' } },
-                    y1: { type: 'linear', position: 'right', grid: { drawOnChartArea: false } }
+                    x: {
+                        grid: { color: '#334155' },
+                        ticks: { color: '#94a3b8', font: { size: 10 } }
+                    },
+                    y: {
+                        type: 'linear',
+                        position: 'left',
+                        min: 0,
+                        max: 100,
+                        grid: { color: '#334155' },
+                        ticks: { color: '#c084fc', font: { size: 10 } }
+                    },
+                    y1: {
+                        type: 'linear',
+                        position: 'right',
+                        grid: { drawOnChartArea: false },
+                        ticks: { color: '#38bdf8', font: { size: 10 } }
+                    },
+                    y2: {
+                        type: 'linear',
+                        position: 'right',
+                        min: 0,
+                        grid: { drawOnChartArea: false },
+                        ticks: { color: '#f87171', font: { size: 10 }, stepSize: 1 }
+                    }
+                },
+                plugins: {
+                    legend: { labels: { color: '#f8fafc', font: { size: 11 } } }
                 },
                 animation: false
             }
         });
+
+        return homeSystemChart;
     }
 
-    function addHomeDataPoint(timeLabel, cpuVal, memVal) {
-        if (!homeSystemChart) return;
-        if (homeSystemChart.data.labels.length >= maxDataPoints) {
-            homeSystemChart.data.labels.shift();
-            homeSystemChart.data.datasets[0].data.shift();
-            homeSystemChart.data.datasets[1].data.shift();
+    function addHomeDataPoint(timeLabel, cpuVal, memVal, errVal) {
+        const chart = initHomeChart();
+        if (!chart) return;
+
+        if (chart.data.labels.length >= maxDataPoints) {
+            chart.data.labels.shift();
+            chart.data.datasets[0].data.shift();
+            chart.data.datasets[1].data.shift();
+            chart.data.datasets[2].data.shift();
         }
-        homeSystemChart.data.labels.push(timeLabel);
-        homeSystemChart.data.datasets[0].data.push(cpuVal);
-        homeSystemChart.data.datasets[1].data.push(memVal);
-        homeSystemChart.update();
+        chart.data.labels.push(timeLabel);
+        chart.data.datasets[0].data.push(cpuVal);
+        chart.data.datasets[1].data.push(memVal);
+        chart.data.datasets[2].data.push(errVal);
+        chart.update('none');
     }
 
-    // Проверка статуса окружений (портов)
-    // Честная проверка статуса окружений (портов)
     async function checkEnvironmentsStatus() {
-        const ports = ['80', '3000', '3001'];
+        // 1. Проверяем ПРОД через ваш эндпоинт /v1/api/health
+        await checkCustomApiHealth('/v1/api/health', 'env-status-prod');
 
-        for (const port of ports) {
-            const statusEl = document.getElementById(`env-status-${port}`);
-            if (!statusEl) continue;
+        // 2. Дев (порт 8099)
+        const proto = window.location.protocol;
+        const host = window.location.hostname || 'localhost';
+        await checkCustomApiHealth(`${proto}//${host}:8099/v1/api/health`, 'env-status-dev');
 
-            const protocol = window.location.protocol;
-            const hostname = window.location.hostname || 'localhost';
-            // Используем стандартный эндпоинт или favicon, чтобы проверить доступность порта
-            const testUrl = `${protocol}//${hostname}${port === '80' ? '' : ':' + port}/favicon.ico?t=` + Date.now();
+        // 3. Нестабильная (порт 3001)
+        await checkCustomApiHealth('http://oracle-rest-api.ars:3001/v1/api/health', 'env-status-unstable');
+    }
 
-            const isAlive = await new Promise((resolve) => {
-                const img = new Image();
-                const timer = setTimeout(() => {
-                    img.src = '';
-                    resolve(false); // Таймаут — считаем недоступным
-                }, 2000);
+    async function checkCustomApiHealth(url, elementId) {
+        const statusEl = document.getElementById(elementId);
+        if (!statusEl) return;
 
-                img.onload = () => {
-                    clearTimeout(timer);
-                    resolve(true); // Успех — сервер ответил
-                };
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 2500); // Таймаут 2.5 секунды, чтобы не зависать
 
-                img.onerror = () => {
-                    clearTimeout(timer);
-                    // Даже если favicon.ico не найден (ошибка 404), но сервер ответил — порт работает!
-                    resolve(true);
-                };
-
-                img.src = testUrl;
+            const response = await fetch(url, {
+                method: 'GET',
+                signal: controller.signal,
+                cache: 'no-cache'
             });
+            clearTimeout(timeoutId);
 
-            if (isAlive) {
-                statusEl.textContent = 'Работает';
-                statusEl.style.background = '#dcfce7';
-                statusEl.style.color = '#166534';
+            if (response.ok) {
+                const json = await response.json();
+                const isUp = json.success && json.data && json.data.status === "UP";
+                setEnvStatus(statusEl, isUp);
             } else {
-                statusEl.textContent = 'Недоступна';
-                statusEl.style.background = '#fee2e2';
-                statusEl.style.color = '#991b1b';
+                setEnvStatus(statusEl, false);
             }
+        } catch (e) {
+            // Если сервер недоступен или сработал CORS — кнопка сразу станет красной
+            setEnvStatus(statusEl, false);
+        }
+    }
+
+    function setEnvStatus(el, isUp) {
+        if (isUp) {
+            el.textContent = 'Работает';
+            el.style.background = '#dcfce7';
+            el.style.color = '#166534';
+        } else {
+            el.textContent = 'Недоступна';
+            el.style.background = '#fee2e2';
+            el.style.color = '#991b1b';
         }
     }
 
     async function updateTopStatusBar() {
+
         try {
             const bar = document.getElementById('top-status-bar');
             const dbStatusEl = document.getElementById('top-db-status');
@@ -421,6 +492,7 @@
             }
 
             let errMin = 0;
+            let errorsLastMinute = 0;
             const token = localStorage.getItem('accessToken');
             const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
 
@@ -428,6 +500,7 @@
                 const errRes = await fetch('/v1/monitoring/errors-hour', { headers });
                 if (errRes.ok) {
                     const errData = await errRes.json();
+                    errorsLastMinute = errData.lastMinute || 0;
                     errMin = errData.lastMinute || 0;
                     const errHour = errData.lastHour || 0;
                     errStatsEl.textContent = `${errMin} / ${errHour}`;
@@ -495,7 +568,7 @@
 
             // Проверяем и инициализируем график, если мы на главной
             initHomeChart();
-            addHomeDataPoint(timeNow, cpuPercent, usedMb);
+            addHomeDataPoint(timeNow, cpuPercent, usedMb, errorsLastMinute);
 
             if (!dbIsUp || errMin > 0) {
                 bar.style.background = '#7f1d1d';

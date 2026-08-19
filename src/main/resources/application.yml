@@ -1,3 +1,9 @@
+spring:
+  datasource:
+ิ  hikari:
+  # Время в миллисекундах. Если соединение удерживается дольше,
+  # HikariCP запишет тревожный лог со стектрейсом.
+  leak-detection-threshold: 30000 # например, 30 секунд
 knife4j:
   enable: true
   setting:
