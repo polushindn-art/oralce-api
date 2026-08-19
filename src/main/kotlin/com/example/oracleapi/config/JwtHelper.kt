@@ -31,7 +31,7 @@ class JwtHelper(
             "/v*/wakeup/**",
             "/v*/tsdlist/snByDeviceId/**",
             "/pictures/**",
-            "/v*/api/health",
+            "/v1/api/health",
             "/login",
             "/swagger-ui/**",
             "/v3/api-docs/**",
