@@ -1,5 +1,6 @@
 package com.example.oracleapi.dto.tohead
 
+import com.example.oracleapi.annotation.BindingDateFormat
 import com.example.oracleapi.dto.agn.AgnListSimpleDto
 import com.example.oracleapi.entity.table.AgnList
 import com.example.oracleapi.entity.table.Tohead
@@ -16,6 +17,7 @@ data class ToheadDto(
     val rn: Long? = null,
     @field:NotNull val doctype: Long? = null,
     @field:NotNull @field:Size(max = 10) val docpref: String? = null,
+    @BindingDateFormat
     @field:NotNull val docdate: LocalDate? = null,
     @field:NotNull val client: Long? = null,
     val clientEntity: AgnListSimpleDto? = null,

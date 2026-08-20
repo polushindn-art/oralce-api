@@ -89,37 +89,21 @@ class SecurityConfig(
     fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration = CorsConfiguration()
 
-        configuration.allowedOrigins = listOf(
-            "http://localhost:8080",
-            "http://localhost:3000",
-            "http://localhost:5173",
-            "http://127.0.0.1:8080",
-            "https://localhost:8080",
-            "https://127.0.0.1:8080",
-            "https://sdl-arsenal.ru",
-            "https://ya.ars",
-            "https://ya.ars:443",
+        // 🌟 Используем паттерны со звёздочкой вместо жесткого списка портов
+        configuration.allowedOriginPatterns = listOf(
+            "http://localhost:*",
+            "https://localhost:*",
             "http://oracle-rest-api.ars",
-            "http://oracle-rest-api.ars:80",
-            "http://oracle-rest-api.ars:3001",
-            "http://oracle-rest-api.ars:3000",
-            "http://192.168.1.198:80",
+            "http://oracle-rest-api.ars:*",
+            "https://oracle-rest-api.ars",
+            "https://oracle-rest-api.ars:*"
         )
 
         configuration.allowedMethods = listOf(
             "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"
         )
 
-        configuration.allowedHeaders = listOf(
-            "Authorization",
-            "Content-Type",
-            "X-Requested-With",
-            "Accept",
-            "Origin",
-            "Access-Control-Request-Method",
-            "Access-Control-Request-Headers"
-        )
-
+        configuration.allowedHeaders = listOf("*") // Разрешаем вообще все заголовки, включая Authorization
         configuration.allowCredentials = true
 
         configuration.exposedHeaders = listOf(
