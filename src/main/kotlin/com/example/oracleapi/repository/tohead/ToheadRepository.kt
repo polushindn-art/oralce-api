@@ -1,7 +1,5 @@
 package com.example.oracleapi.repository.tohead
 
-import com.example.oracleapi.dto.tohead.ToheadDto
-import com.example.oracleapi.entity.table.Idhead
 import com.example.oracleapi.entity.table.Tohead
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable

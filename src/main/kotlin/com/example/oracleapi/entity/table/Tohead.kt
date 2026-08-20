@@ -57,11 +57,18 @@ open class Tohead {
     @JoinColumn(name = "PBE", nullable = false, insertable = false, updatable = false)
     open var pbeEntity: Pbe? = null
 
+    @Column(name = "MANAGER", nullable = false)
+    open var manager: Long? = null
+
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "MANAGER", nullable = false, insertable = false, updatable = false)
     open var managerEntity: Userlist? = null
+
+    @NotNull
+    @Column(name = "CLIENT", nullable = false)
+    open var client: Long? = null
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

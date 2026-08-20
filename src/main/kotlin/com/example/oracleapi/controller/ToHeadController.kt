@@ -1,6 +1,7 @@
 package com.example.oracleapi.controller
 
 import com.example.oracleapi.dto.common.MyApiResponse
+import com.example.oracleapi.dto.tohead.ToHeadWithSpec
 import com.example.oracleapi.dto.tohead.ToheadDto
 import com.example.oracleapi.service.tohead.ToheadService
 import io.swagger.v3.oas.annotations.Operation
@@ -29,13 +30,21 @@ class ToHeadController(
     @GetMapping("filter/page")
     @Operation(summary = "Фильтр документов", description = "Фильтрация документов с пагинацией")
     fun getFilters(
+        @RequestParam(required = false) manager: BigDecimal?,
+        @RequestParam(required = false) client: BigDecimal?,
         @RequestParam(required = false) doctype: BigDecimal?,
         @RequestParam(required = false) dateFrom: LocalDate?,
         @RequestParam(required = false) dateTo: LocalDate?,
         @ParameterObject
         @PageableDefault(size = 20, sort = ["docdate", "rn"], direction = Sort.Direction.DESC) pageable: Pageable
     ): MyApiResponse<List<ToheadDto>> {
-        return success(toheadService.getFilterPage(doctype, dateFrom, dateTo, pageable))
+        return success(toheadService.getFilterPage(manager, client, doctype, dateFrom, dateTo, pageable))
+    }
+
+    @GetMapping("/get_head_spec/{rn}")
+    @Operation(summary = "Получить документ со спецификацией")
+    fun getToHeadWithSpec(@PathVariable rn: Long): MyApiResponse<ToHeadWithSpec> {
+        return success(toheadService.toHeadWithSpecification(rn))
     }
 
 }

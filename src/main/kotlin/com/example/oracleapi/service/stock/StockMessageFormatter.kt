@@ -1,13 +1,11 @@
 package com.example.oracleapi.service.stock
 
-import com.example.oracleapi.Helper
 import com.example.oracleapi.config.StoreNameMapper
 import com.example.oracleapi.dto.nomnlist.NomnlistDto
 import com.example.oracleapi.dto.stock.StockInfoDto
 import com.example.oracleapi.dto.website.WebSiteRequest
 import com.example.oracleapi.service.website.WebSiteService
 import com.example.oracleapi.util.Article
-import com.example.oracleapi.util.BarcodeUtils
 import org.springframework.stereotype.Component
 import java.math.BigDecimal
 
@@ -77,7 +75,10 @@ class StockMessageFormatter(
                 val emoji = storeNameMapper.getEmoji(stock.pbeCode)
 
                 appendLine("$statusEmoji $emoji *$fullName*")
-                appendLine("   📦 Остаток: *$qty шт*")
+
+                stock.meascode?.let {
+                    appendLine("   📦 Остаток: *$qty $it*")
+                }
 
                 stock.price?.let {
                     appendLine("   💰 Цена: *$it ₽*")
@@ -95,11 +96,9 @@ class StockMessageFormatter(
             appendLine("---")
             appendLine("📊 *Итого: $total шт*")
 
-            if (nomen.article != null) {
-                val link = webSiteService.getLinkWebSite(WebSiteRequest(nomen.article)).link
-                appendLine()
-                appendLine("🌐 [Открыть сайт](https://$link)")
-            }
+            val link = webSiteService.getLinkWebSite(WebSiteRequest(nomen.article)).link
+            appendLine()
+            appendLine("🌐 [Открыть сайт](https://$link)")
 
         }
     }

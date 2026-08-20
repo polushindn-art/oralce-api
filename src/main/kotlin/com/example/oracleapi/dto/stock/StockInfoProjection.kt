@@ -14,4 +14,5 @@ interface StockInfoProjection {
     fun getPriceCard(): BigDecimal?
     fun getAddress(): String?
     fun getWebStore(): Int?
+    fun getMeasCode(): String?
 }

@@ -54,8 +54,6 @@ class IdHeadService(
         val head = idheadRepository.findById(rn)
             .orElseThrow { IllegalArgumentException("Документ с RN=$rn не найден") }
 
-        //val specs = idspecRepository.findByPrnRnWithNomen(rn).map { it.toTsdResponse() }
-        //val specs = idspecRepository.findByPrnRnWithNomen2(rn)
         val specRows = idspecRepository.findByPrnRnWithNomen2(rn)
         val specs = specRows.map { it.toIdspecTsdResponse() }
 

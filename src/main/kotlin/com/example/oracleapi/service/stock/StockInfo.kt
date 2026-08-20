@@ -27,7 +27,8 @@ class StockInfo(
                 price = it.getPrice(),
                 priceCard = it.getPriceCard(),
                 address = it.getAddress(),
-                webStore = it.getWebStore()
+                webStore = it.getWebStore(),
+                meascode = it.getMeasCode()
             )
         }
     }

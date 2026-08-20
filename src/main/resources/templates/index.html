@@ -20,6 +20,11 @@
             options.headers = options.headers || {};
             const token = localStorage.getItem('accessToken');
 
+            // НЕ добавляем токен для health проверок
+            if (typeof url === 'string' && url.includes('/v1/api/health')) {
+                return originalFetch(url, options);
+            }
+
             if (token) {
                 if (options.headers instanceof Headers) {
                     if (!options.headers.has('Authorization')) {
@@ -106,7 +111,6 @@
             }
         }
 
-        /* НАСТРОЙКИ ПЕЧАТИ: скрываем лишние элементы интерфейса при печати */
         @media print {
             .sidebar, .mobile-toggle, #top-status-bar, div[style*="position: fixed; bottom: 20px;"] {
                 display: none !important;
@@ -170,19 +174,16 @@
 
         <!-- КНОПКИ ОКРУЖЕНИЙ СО СТАТУСАМИ -->
         <div class="env-switch">
-            <!-- 🔵 Рабочая (Прод) -->
             <button class="env-link" onclick="window.location.href='http://oracle-rest-api.ars/'">
                 <span>🔵 Рабочая (Прод)</span>
                 <span id="env-status-prod" class="env-status-badge" style="background: #e2e8f0; color: #64748b;">...</span>
             </button>
 
-            <!-- 🟠 Тестовая (Дев 3000) -->
             <button class="env-link" onclick="window.location.href='http://oracle-rest-api.ars:3000/'">
                 <span>🟠 Тестовая (3000)</span>
                 <span id="env-status-dev" class="env-status-badge" style="background: #e2e8f0; color: #64748b;">...</span>
             </button>
 
-            <!-- ⚠️ Нестабильная (3001) -->
             <button class="env-link" onclick="window.location.href='http://oracle-rest-api.ars:3001/'">
                 <span>⚠️ Нестабил. (3001)</span>
                 <span id="env-status-unstable" class="env-status-badge" style="background: #e2e8f0; color: #64748b;">...</span>
@@ -334,34 +335,42 @@
         if (!badge) return;
 
         try {
-            // Используем mode: 'cors' и небольшой таймаут через AbortController
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 4000);
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-            const response = await fetch(url + '/v1/api/health', {
+            // Отправляем запрос через originalFetch (обходим глобальный перехватчик)
+            // и БЕЗ токена
+            const response = await originalFetch(url + '/v1/api/health', {
                 method: 'GET',
                 signal: controller.signal,
-                cache: 'no-cache'
+                cache: 'no-cache',
+                headers: {
+                    'Accept': 'application/json'
+                }
             });
             clearTimeout(timeoutId);
 
             if (response.ok) {
-                badge.textContent = 'OK';
+                badge.textContent = '🟢';
                 badge.style.background = '#dcfce7';
                 badge.style.color = '#166534';
+                badge.title = '✅ Сервер доступен';
             } else {
-                badge.textContent = 'ERR';
+                badge.textContent = '🔴';
                 badge.style.background = '#fee2e2';
                 badge.style.color = '#991b1b';
+                badge.title = '❌ Ошибка: ' + response.status;
             }
         } catch (e) {
-            badge.textContent = 'OFF';
-            badge.style.background = '#f1f5f9';
-            badge.style.color = '#64748b';
+            badge.textContent = '❌';
+            badge.style.background = '#fee2e2';
+            badge.style.color = '#991b1b';
+            badge.title = '❌ Сервер недоступен';
         }
     }
 
     async function checkEnvironmentsStatus() {
+        // Проверяем статусы без токена (публичный эндпоинт)
         await checkCustomApiHealth('http://oracle-rest-api.ars', 'env-status-prod');
         await checkCustomApiHealth('http://oracle-rest-api.ars:3000', 'env-status-dev');
         await checkCustomApiHealth('http://oracle-rest-api.ars:3001', 'env-status-unstable');
@@ -593,7 +602,7 @@
         checkEnvironmentsStatus();
 
         setInterval(updateTopStatusBar, 1000);
-        setInterval(checkEnvironmentsStatus, 10000); // Проверка окружений каждые 10 секунд
+        setInterval(checkEnvironmentsStatus, 10000);
 
         const observer = new MutationObserver(() => {
             initHomeChart();

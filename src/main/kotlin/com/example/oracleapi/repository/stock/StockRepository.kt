@@ -26,12 +26,14 @@ interface StockRepository : JpaRepository<Stock, Long> {
                 QREAL.PKG_PRICE.GETPRICEOUT(s.NOMEN, s.STORE, 1) as priceCard,
                 pb.ADDRESS,
                 pb.PBECODE,
-                st.webstore
+                st.webstore,
+                m.MEASCODE
             FROM QREAL.stock s
             LEFT JOIN QREAL.store st ON st.RN = s.STORE
             LEFT JOIN QREAL.price p ON p.NOMEN = s.NOMEN AND p.PBE = st.STOREPBE
             LEFT JOIN QREAL.pbe pb ON pb.RN = p.PBE
             LEFT JOIN QREAL.nomnlist n ON n.RN = s.NOMEN
+            LEFT JOIN QREAL.MEASURE  m on m.rn = n.MEASURE
             WHERE s.NOMEN = :nomen
         """,
             nativeQuery = true

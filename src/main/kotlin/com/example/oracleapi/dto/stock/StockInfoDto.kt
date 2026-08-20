@@ -17,4 +17,5 @@ data class StockInfoDto(
     val priceCard: BigDecimal? = null,      // цена по карте
     val address: String? = null,        // адрес
     val webStore: Int? = null,
+    val meascode: String? = null,
 )
