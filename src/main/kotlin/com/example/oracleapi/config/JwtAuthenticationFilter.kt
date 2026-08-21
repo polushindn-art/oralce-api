@@ -29,65 +29,36 @@ class JwtAuthenticationFilter(
     ) {
         val path = request.servletPath
 
-        // Пропускаем публичные эндпоинты (не требуют аутентификации)
-        if (isPublicPath(path)) {
-            //log.debug("Skipping authentication for public path: $path")
+        if (isPublicPath(path) || request.method.equals("OPTIONS", ignoreCase = true)) {
             filterChain.doFilter(request, response)
             return
         }
 
-        // Для preflight запросов OPTIONS пропускаем без аутентификации (важно для CORS)
-        if (request.method.equals("OPTIONS", ignoreCase = true)) {
-            log.debug("Skipping authentication for OPTIONS request")
-            filterChain.doFilter(request, response)
-            return
-        }
-
-        // Извлекаем токен из запроса
         val token = extractToken(request)
         if (token == null) {
-            log.debug("No token found for path: $path")
+            // Оставляем WARN или DEBUG только для реальных проблем безопасности
+            log.debug("В доступе отказано: не найден токен для пути {}", path)
             sendErrorResponse(response, HttpStatus.UNAUTHORIZED.value(), "Токен не найден")
             return
         }
 
-        // Проверяем валидность токена
         if (!jwtHelper.validateToken(token)) {
-            log.debug("Invalid token for path: $path")
+            log.warn("Попытка доступа с недействительным токеном для пути {}", path)
             sendErrorResponse(response, HttpStatus.UNAUTHORIZED.value(), "Неверный или просроченный токен")
             return
         }
 
-        // Извлекаем данные из токена
         val username = jwtHelper.extractUsername(token)
-
         if (username == null) {
-            log.debug("No username in token for path: $path")
+            log.warn("Токен валиден, но не удалось извлечь имя пользователя для пути {}", path)
             sendErrorResponse(response, HttpStatus.UNAUTHORIZED.value(), "Неверный токен")
             return
         }
 
-        // Создаем UserDetails
-        val userDetails: UserDetails = User.builder()
-            .username(username)
-            .password("")
-            .authorities(emptyList())
-            .build()
-
-        // Устанавливаем аутентификацию в контекст Spring Security с дополнительными данными
-        val authentication = UsernamePasswordAuthenticationToken(
-            userDetails,
-            null,
-            userDetails.authorities
-        )
+        val userDetails = User.builder().username(username).password("").authorities(emptyList()).build()
+        val authentication = UsernamePasswordAuthenticationToken(userDetails, null, userDetails.authorities)
         SecurityContextHolder.getContext().authentication = authentication
 
-        // Логируем только обычные запросы пользователей (не actuator)
-        if (!path.startsWith("/actuator")) {
-            log.debug("User '{}' authenticated for path: {}", username, path)
-        }
-
-        // Продолжаем цепочку фильтров
         filterChain.doFilter(request, response)
     }
 
@@ -107,7 +78,7 @@ class JwtAuthenticationFilter(
     private fun extractToken(request: HttpServletRequest): String? {
         // 1. Проверяем cookie
         request.cookies?.firstOrNull { it.name == JwtHelper.COOCKIENAME }?.let { cookie ->
-            log.debug("Token found in cookie")
+            //log.debug("Token found in cookie")
             return cookie.value
         }
 

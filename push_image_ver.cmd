@@ -45,13 +45,14 @@ echo %YELLOW%[2/5] Генерация версии...%RESET%
 
 for /f %%i in ('git rev-list --count HEAD 2^>nul') do set VERSION_NUMBER=%%i
 if not defined VERSION_NUMBER set VERSION_NUMBER=0
-set FULL_VERSION=1.25.!VERSION_NUMBER!
-:: Расчет порта: 8000 + номер сборки (например, для 161 будет 8161)
+
+set FULL_VERSION=1.25.%VERSION_NUMBER%
 set /a APP_PORT=8000 + VERSION_NUMBER
-set CONTAINER_GREEN=oracle-prod-green-%VERSION_NUMBER%
+set CONTAINER_NAME=oracle-prod-%VERSION_NUMBER%
 
 echo %GREEN%Версия: %FULL_VERSION%%RESET%
-echo %GREEN%Порт для запуска: %APP_PORT%%RESET%
+echo %GREEN%Имя контейнера: %CONTAINER_NAME%%RESET%
+echo %GREEN%Порт: %APP_PORT%%RESET%
 echo.
 
 :: ============================================
@@ -111,22 +112,27 @@ echo ============================================
 echo ЗАПУСК И ОБНОВЛЕНИЕ НА СЕРВЕРЕ
 echo ============================================
 echo.
-echo 1. Запустить новый контейнер:
+echo 1. Запустить DEV (тестовая среда на порту 8099):
+echo    docker stop oracle-dev 2^>nul
+echo    docker rm oracle-dev 2^>nul
+echo    docker run -d --name oracle-dev --restart=always -p 8099:8080 -e SPRING_PROFILES_ACTIVE=dev %REGISTRY%/%IMAGE_NAME%:%FULL_VERSION%
+echo.
+echo 2. Запустить новый PROD контейнер (%CONTAINER_NAME% на порту %APP_PORT%):
 echo    docker run -d --name %CONTAINER_NAME% --restart=always -p %APP_PORT%:8080 -e SPRING_PROFILES_ACTIVE=prod %REGISTRY%/%IMAGE_NAME%:%FULL_VERSION%
 echo.
-echo 2. Обновить порт в Nginx:
+echo 3. Обновить порт в Nginx:
 echo    nano /etc/nginx/nginx.conf
 echo    (Измените строку server 127.0.0.1:[старый_порт]; на server 127.0.0.1:%APP_PORT%;)
 echo.
-echo 3. Применить конфигурацию Nginx:
+echo 4. Применить конфигурацию Nginx:
 echo    nginx -t
 echo    systemctl reload nginx
 echo.
-echo 4. Остановить и удалить старый контейнер:
+echo 5. Остановить и удалить старый PROD контейнер:
 echo    docker stop oracle-prod-[старый_номер]
 echo    docker rm oracle-prod-[старый_номер]
 echo.
-echo 5. Очистка места в Docker Registry (если удаляли старые образы через Web http://oracle-rest-api.ars:7000):
+echo 6. Очистка места в Docker Registry (если удаляли старые образы через Web http://oracle-rest-api.ars:7000):
 echo    docker exec -it registry-registry-1 bin/registry garbage-collect --delete-untagged /etc/docker/registry/config.yml
 echo.
 pause

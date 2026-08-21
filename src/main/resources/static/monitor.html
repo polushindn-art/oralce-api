@@ -53,11 +53,40 @@
         .status-up { color: #4ade80; }
         .status-down { color: #f87171; }
 
-        /* Увеличенная и более заметная таблица сбоев */
+        /* Интерактивные кнопки в карточках */
+        .card-btn {
+            background: #334155;
+            color: #fff;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: background 0.2s;
+        }
+        .card-btn:hover { background: #475569; }
+
+        /* Таблица сбоев */
         .error-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 14px; }
         .error-table th { text-align: left; color: #fca5a5; padding: 10px; border-bottom: 2px solid #334155; font-size: 13px; text-transform: uppercase; }
         .error-table td { padding: 10px; border-bottom: 1px solid #33415544; color: #f1f5f9; }
         .error-table tr:hover { background: rgba(239, 68, 68, 0.05); }
+
+        /* Терминал логов */
+        .logs-terminal {
+            background: #090d16;
+            border-radius: 8px;
+            padding: 12px;
+            height: 220px;
+            overflow-y: auto;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 12px;
+            color: #cbd5e1;
+            margin-top: 10px;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            border: 1px solid #334155;
+        }
 
         .footer { text-align: center; margin-top: 30px; font-size: 12px; color: #64748b; }
     </style>
@@ -142,9 +171,22 @@
             </div>
         </div>
 
-        <!-- КРУПНАЯ ЛЕНТА ПОСЛЕДНИХ СБОЕВ -->
-        <div class="card card-full down" id="recent-errors-card" style="display: none;">
-            <div class="metric-title" style="color: #f87171; font-size: 14px; font-weight: bold;">⚠️ Последние сбои в системе (Внимание)</div>
+        <!-- 📜 ЖИВЫЕ ЛОГИ ПРИЛОЖЕНИЯ -->
+        <div class="card card-full info">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="metric-title" style="color: #38bdf8; font-size: 14px; font-weight: bold; margin-bottom: 0;">📜 Живые логи приложения</div>
+                <div style="display: flex; gap: 10px; align-items: center; font-size: 12px; color: #94a3b8;">
+                    <span id="log-counter">Строк: 0</span>
+                    <button id="logs-copy-btn" class="card-btn" onclick="copyLogs()">📋 Скопировать</button>
+                    <button id="logs-pause-btn" class="card-btn" onclick="toggleLogsPause()">⏸️ Пауза</button>
+                </div>
+            </div>
+            <div id="logs-terminal" class="logs-terminal">Подключение к логам...</div>
+        </div>
+
+        <!-- ⚠️ ЛЕНТА ПОСЛЕДНИХ СБОЕВ -->
+        <div class="card card-full down" id="recent-errors-card">
+            <div class="metric-title" style="color: #f87171; font-size: 14px; font-weight: bold;">⚠️ Последние сбои в системе</div>
             <table class="error-table">
                 <thead>
                 <tr>
@@ -153,7 +195,11 @@
                     <th>Путь (URL)</th>
                 </tr>
                 </thead>
-                <tbody id="recent-errors-body"></tbody>
+                <tbody id="recent-errors-body">
+                <tr>
+                    <td colspan="3" style="text-align: center; color: #4ade80; padding: 12px;">✅ Критических сбоев не зафиксировано</td>
+                </tr>
+                </tbody>
             </table>
         </div>
 
@@ -227,7 +273,70 @@
         window.location.href = '/login.html';
     }
 
-    // 📈 Инициализация графиков Chart.js (включая трекер ошибок)
+    // ⏸️ Управление паузой логов
+    let isLogsPaused = false;
+
+    function toggleLogsPause() {
+        isLogsPaused = !isLogsPaused;
+        const btn = document.getElementById("logs-pause-btn");
+        if (isLogsPaused) {
+            btn.innerText = "▶️ Продолжить";
+            btn.style.background = "#047857";
+        } else {
+            btn.innerText = "⏸️ Пауза";
+            btn.style.background = "#334155";
+        }
+    }
+
+    // 📋 Универсальная функция копирования (работает везде, включая HTTP-IP адреса)
+    function copyLogs() {
+        const terminal = document.getElementById("logs-terminal");
+        const textToCopy = terminal.innerText;
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(textToCopy).then(showCopySuccess).catch(fallbackCopyText);
+        } else {
+            fallbackCopyText();
+        }
+    }
+
+    function fallbackCopyText() {
+        const terminal = document.getElementById("logs-terminal");
+        const textArea = document.createElement("textarea");
+        textArea.value = terminal.innerText;
+        textArea.style.position = "fixed";
+        textArea.style.top = "0";
+        textArea.style.left = "0";
+        textArea.style.opacity = "0";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+            const successful = document.execCommand('copy');
+            if (successful) {
+                showCopySuccess();
+            } else {
+                alert('Не удалось скопировать текст');
+            }
+        } catch (err) {
+            console.error('Ошибка копирования: ', err);
+            alert('Ошибка копирования в буфер обмена');
+        }
+        document.body.removeChild(textArea);
+    }
+
+    function showCopySuccess() {
+        const btn = document.getElementById("logs-copy-btn");
+        const originalText = btn.innerText;
+        btn.innerText = "✅ Скопировано!";
+        btn.style.background = "#047857";
+        setTimeout(() => {
+            btn.innerText = originalText;
+            btn.style.background = "#334155";
+        }, 2000);
+    }
+
+    // 📈 Инициализация графиков Chart.js
     const ctx = document.getElementById('systemChart').getContext('2d');
     const maxDataPoints = 120;
 
@@ -320,6 +429,31 @@
 
     const API_URL = "/actuator";
 
+    // 📜 Функция для подгрузки живых логов (с учетом паузы)
+    async function fetchLogs() {
+        if (isLogsPaused) return;
+
+        try {
+            const res = await fetch('/v1/logs/recent');
+            if (res.ok) {
+                const logs = await res.json();
+                const terminal = document.getElementById("logs-terminal");
+
+                document.getElementById("log-counter").innerText = `Строк: ${logs.length}`;
+
+                const isAtBottom = terminal.scrollHeight - terminal.clientHeight <= terminal.scrollTop + 20;
+
+                terminal.innerText = logs.length > 0 ? logs.join('\n') : "Логи пока отсутствуют...";
+
+                if (isAtBottom) {
+                    terminal.scrollTop = terminal.scrollHeight;
+                }
+            }
+        } catch (e) {
+            console.error("Не удалось получить логи", e);
+        }
+    }
+
     async function updateMetrics() {
         try {
             const timeNow = new Date().toLocaleTimeString();
@@ -387,10 +521,8 @@
                         errTypesContainer.style.display = "none";
                     }
 
-                    const recentCard = document.getElementById("recent-errors-card");
                     const recentBody = document.getElementById("recent-errors-body");
                     if (errData.recentErrors && errData.recentErrors.length > 0) {
-                        recentCard.style.display = "block";
                         recentBody.innerHTML = errData.recentErrors.map(e => `
                             <tr>
                                 <td style="font-weight: bold; color: #fca5a5;">${e.timestamp}</td>
@@ -399,7 +531,11 @@
                             </tr>
                         `).join('');
                     } else {
-                        recentCard.style.display = "none";
+                        recentBody.innerHTML = `
+                            <tr>
+                                <td colspan="3" style="text-align: center; color: #4ade80; padding: 12px;">✅ Критических сбоев не зафиксировано</td>
+                            </tr>
+                        `;
                     }
 
                     const cardErrors = document.getElementById("card-errors");
@@ -430,7 +566,6 @@
                 document.getElementById("jvm-memory-max").innerText = `Из ${maxMb} МБ`;
             }
 
-            // Передаем все метрики на график (включая кол-во ошибок)
             addDataPoint(timeNow, cpuPercent, usedMb, errorsLastMinute);
 
             fetchMetric("http.server.requests.active", "http-active");
@@ -443,6 +578,8 @@
                 const seconds = Math.floor(uptimeSec % 60);
                 document.getElementById("app-uptime").innerText = `${hours}ч ${minutes}м ${seconds}с`;
             }
+
+            await fetchLogs();
 
             document.getElementById("last-update").innerText = new Date().toLocaleTimeString();
 
