@@ -13,19 +13,16 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 
-    <!-- ГЛОБАЛЬНЫЙ ПЕРЕХВАТЧИК FETCH: автоматически передает JWT-токен для api-docs.js -->
+    <!-- ГЛОБАЛЬНЫЙ ПЕРЕХВАТЧИК FETCH: автоматически передает JWT-токен ТОЛЬКО для API и Actuator -->
     <script>
         const originalFetch = window.fetch;
         window.fetch = async function(url, options = {}) {
             options.headers = options.headers || {};
             const token = localStorage.getItem('accessToken');
 
-            // НЕ добавляем токен для health проверок
-            if (typeof url === 'string' && url.includes('/v1/api/health')) {
-                return originalFetch(url, options);
-            }
+            const isApiRequest = typeof url === 'string' && (url.includes('/v1/') || url.includes('/actuator/'));
 
-            if (token) {
+            if (isApiRequest && token) {
                 if (options.headers instanceof Headers) {
                     if (!options.headers.has('Authorization')) {
                         options.headers.append('Authorization', 'Bearer ' + token);
@@ -131,7 +128,6 @@
             port: /*[[${host.second}]]*/ '',
             sid: /*[[${host.third}]]*/ ''
         };
-        console.log('Host from server:', window.currentHost);
         /*]]>*/
     </script>
 
@@ -278,9 +274,10 @@
 
             <div style="display: flex; flex-wrap: wrap; gap: 20px; font-size: 13px;">
                 <div><span style="color: #94a3b8; font-size: 11px;">Ошибки (мин/ч):</span> <strong id="top-err-stats" style="color: #f8fafc;">0 / 0</strong></div>
-                <div><span style="color: #94a3b8; font-size: 11px;">Актив. соед:</span> <strong id="top-active-conn" style="color: #f8fafc;">-</strong></div>
+                <div><span style="color: #94a3b8; font-size: 11px;">Соед (Act/Pend):</span> <strong id="top-conn-stats" style="color: #f8fafc;">- / -</strong></div>
                 <div><span style="color: #94a3b8; font-size: 11px;">CPU:</span> <strong id="top-cpu" style="color: #f8fafc;">-</strong></div>
                 <div><span style="color: #94a3b8; font-size: 11px;">Память:</span> <strong id="top-mem" style="color: #f8fafc;">-</strong></div>
+                <div><span style="color: #94a3b8; font-size: 11px;">Ответ:</span> <strong id="top-latency" style="color: #f8fafc;">0 мс</strong></div>
             </div>
 
             <div>
@@ -290,7 +287,7 @@
             </div>
         </div>
 
-        <!-- ОСНОВНОЙ КОНТЕЙНЕР -->
+        <!-- ОСНОВНОЙ КОНТЕЙНЕР (сюда подгружается start_page.md со своим графиком) -->
         <div id="md-content" class="markdown-body" style="max-width: 1100px; margin: 0 auto;">
             <div class="loading">Загрузка главной страницы...</div>
         </div>
@@ -329,7 +326,6 @@
         window.location.reload();
     }
 
-    // Проверка состояния окружений для кнопок в меню
     async function checkCustomApiHealth(url, badgeId) {
         const badge = document.getElementById(badgeId);
         if (!badge) return;
@@ -342,9 +338,7 @@
                 method: 'GET',
                 signal: controller.signal,
                 cache: 'no-cache',
-                headers: {
-                    'Accept': 'application/json'
-                }
+                headers: { 'Accept': 'application/json' }
             });
             clearTimeout(timeoutId);
 
@@ -373,6 +367,7 @@
         await checkCustomApiHealth('http://oracle-rest-api.ars:3001', 'env-status-unstable');
     }
 
+    // 📈 Логика графика, который находится внутри start_page.md
     let homeSystemChart = null;
     let maxDataPoints = 30;
 
@@ -380,7 +375,7 @@
         if (homeSystemChart) return homeSystemChart;
 
         const canvas = document.getElementById('homeSystemChart');
-        if (!canvas) return null;
+        if (!canvas) return null; // Холст еще не загружен из markdown
 
         const ctx = canvas.getContext('2d');
         homeSystemChart = new Chart(ctx, {
@@ -461,7 +456,7 @@
 
     function addHomeDataPoint(timeLabel, cpuVal, memVal, errVal) {
         const chart = initHomeChart();
-        if (!chart) return;
+        if (!chart) return; // Если markdown-страница еще не отрисована, пропускаем
 
         if (chart.data.labels.length >= maxDataPoints) {
             chart.data.labels.shift();
@@ -476,113 +471,114 @@
         chart.update('none');
     }
 
+    // Функция обновления верхнего статус-бара и графика из start_page.md
     async function updateTopStatusBar() {
+        const bar = document.getElementById('top-status-bar');
+        const dbStatusEl = document.getElementById('top-db-status');
+        const errStatsEl = document.getElementById('top-err-stats');
+        const connStatsEl = document.getElementById('top-conn-stats');
+        const cpuEl = document.getElementById('top-cpu');
+        const memEl = document.getElementById('top-mem');
+        const latencyEl = document.getElementById('top-latency');
+
+        const timeNow = new Date().toLocaleTimeString();
+
+        let dbIsUp = false;
+        let errMin = 0;
+        let errHour = 0;
+        let activeConn = '-';
+        let pendingConn = '0';
+        let cpuPercent = 0;
+        let usedMb = 0;
+        let avgMs = 0;
+
+        // 1. Проверка здоровья БД
         try {
-            const bar = document.getElementById('top-status-bar');
-            const dbStatusEl = document.getElementById('top-db-status');
-            const errStatsEl = document.getElementById('top-err-stats');
-            const activeConnEl = document.getElementById('top-active-conn');
-            const cpuEl = document.getElementById('top-cpu');
-            const memEl = document.getElementById('top-mem');
-            const errorsBody = document.getElementById('home-errors-body');
-
-            const timeNow = new Date().toLocaleTimeString();
-
-            const healthRes = await fetch('/actuator/health');
-            let dbIsUp = false;
+            const healthRes = await originalFetch('/actuator/health');
             if (healthRes.ok) {
                 const healthData = await healthRes.json();
                 dbIsUp = healthData.components?.db?.status === "UP" || healthData.status === "UP";
             }
+        } catch (e) {}
 
-            let errMin = 0;
-            let errorsLastMinute = 0;
-            const token = localStorage.getItem('accessToken');
-            const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
-
-            try {
-                const errRes = await fetch('/v1/monitoring/errors-hour', { headers });
-                if (errRes.ok) {
-                    const errData = await errRes.json();
-                    errorsLastMinute = errData.lastMinute || 0;
-                    errMin = errData.lastMinute || 0;
-                    const errHour = errData.lastHour || 0;
-                    errStatsEl.textContent = `${errMin} / ${errHour}`;
-
-                    if (errorsBody) {
-                        // Сохраняем текущую позицию скролла перед обновлением, чтобы страницу не дергало
-                        const existingScrollBox = errorsBody.querySelector('.error-scroll-box');
-                        const savedScrollTop = existingScrollBox ? existingScrollBox.scrollTop : 0;
-
-                        if (errData.recentErrors && errData.recentErrors.length > 0) {
-                            errorsBody.innerHTML = `
-                                <div class="error-scroll-box" style="max-height: 300px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px;">
-                                    <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
-                                        <thead>
-                                            <tr style="background: #f8fafc; text-align: left; position: sticky; top: 0; border-bottom: 2px solid #e2e8f0;">
-                                                <th style="padding: 8px 10px;">Время</th>
-                                                <th style="padding: 8px 10px;">Ошибка</th>
-                                                <th style="padding: 8px 10px;">Путь</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            ${errData.recentErrors.map(e => `
-                                                <tr style="border-bottom: 1px solid #f1f5f9;">
-                                                    <td style="padding: 8px 10px; white-space: nowrap;">${e.timestamp}</td>
-                                                    <td style="padding: 8px 10px; color: #dc2626; font-weight: 500;">${e.type}</td>
-                                                    <td style="padding: 8px 10px;"><code>${e.path}</code></td>
-                                                </tr>
-                                            `).join('')}
-                                        </tbody>
-                                    </table>
-                                </div>`;
-                        } else {
-                            errorsBody.innerHTML = '🟢 Сбоев не зафиксировано.';
-                        }
-
-                        // Возвращаем позицию скролла обратно
-                        const newScrollBox = errorsBody.querySelector('.error-scroll-box');
-                        if (newScrollBox) {
-                            newScrollBox.scrollTop = savedScrollTop;
-                        }
-                    }
-                }
-
-                const connRes = await fetch('/actuator/metrics/hikaricp.connections.active', { headers });
-                if (connRes.ok) {
-                    const connData = await connRes.json();
-                    activeConnEl.textContent = connData.measurements ? connData.measurements[0].value : '-';
-                }
-
-                const cpuRes = await fetch('/actuator/metrics/system.cpu.usage', { headers });
-                if (cpuRes.ok) {
-                    const cpuData = await cpuRes.json();
-                    if (cpuData.measurements) {
-                        let cpuPercent = Math.round(cpuData.measurements[0].value * 100);
-                        cpuEl.textContent = `${cpuPercent}%`;
-                    }
-                }
-
-                const memRes = await fetch('/actuator/metrics/jvm.memory.used', { headers });
-                if (memRes.ok) {
-                    const memData = await memRes.json();
-                    if (memData.measurements) {
-                        let usedMb = Math.round(memData.measurements[0].value / (1024 * 1024));
-                        memEl.textContent = `${usedMb} МБ`;
-                    }
-                }
-            } catch (metricErr) {
-                console.warn('Метрики частично недоступны:', metricErr);
+        // 2. Статистика ошибок
+        try {
+            const errRes = await fetch('/v1/monitoring/errors-hour');
+            if (errRes.ok) {
+                const errData = await errRes.json();
+                errMin = errData.lastMinute || 0;
+                errHour = errData.lastHour || 0;
+                if (errStatsEl) errStatsEl.textContent = `${errMin} / ${errHour}`;
             }
+        } catch (e) {}
 
-            let cpuValText = cpuEl.textContent.replace('%', '');
-            let memValText = memEl.textContent.replace(' МБ', '');
-            let cpuPercent = !isNaN(cpuValText) && cpuValText !== '-' ? parseInt(cpuValText) : 0;
-            let usedMb = !isNaN(memValText) && memValText !== '-' ? parseInt(memValText) : 0;
+        // 3. Соединения (Active / Pending)
+        try {
+            const activeRes = await fetch('/actuator/metrics/hikaricp.connections.active');
+            if (activeRes.ok) {
+                const d = await activeRes.json();
+                activeConn = d.measurements ? d.measurements[0].value : '-';
+            }
+            const pendingRes = await fetch('/actuator/metrics/hikaricp.connections.pending');
+            if (pendingRes.ok) {
+                const d = await pendingRes.json();
+                pendingConn = d.measurements ? d.measurements[0].value : '0';
+            }
+            if (connStatsEl) {
+                connStatsEl.textContent = `${activeConn} / ${pendingConn}`;
+                connStatsEl.style.color = Number(pendingConn) > 0 ? '#f87171' : '#f8fafc';
+            }
+        } catch (e) {}
 
-            initHomeChart();
-            addHomeDataPoint(timeNow, cpuPercent, usedMb, errorsLastMinute);
+        // 4. CPU
+        try {
+            const cpuRes = await fetch('/actuator/metrics/system.cpu.usage');
+            if (cpuRes.ok) {
+                const cpuData = await cpuRes.json();
+                if (cpuData.measurements) {
+                    cpuPercent = Math.round(cpuData.measurements[0].value * 100);
+                    if (cpuEl) cpuEl.textContent = `${cpuPercent}%`;
+                }
+            }
+        } catch (e) {}
 
+        // 5. Память
+        try {
+            const memRes = await fetch('/actuator/metrics/jvm.memory.used');
+            if (memRes.ok) {
+                const memData = await memRes.json();
+                if (memData.measurements) {
+                    usedMb = Math.round(memData.measurements[0].value / (1024 * 1024));
+                    if (memEl) memEl.textContent = `${usedMb} МБ`;
+                }
+            }
+        } catch (e) {}
+
+        // 6. Время ответа API
+        try {
+            const reqRes = await fetch('/actuator/metrics/http.server.requests');
+            if (reqRes.ok) {
+                const reqData = await reqRes.json();
+                if (reqData.measurements) {
+                    let count = 0;
+                    let totalTime = 0;
+                    reqData.measurements.forEach(m => {
+                        if (m.statistic === 'COUNT') count = m.value;
+                        if (m.statistic === 'TOTAL_TIME') totalTime = m.value;
+                    });
+                    if (count > 0) {
+                        avgMs = Math.round((totalTime / count) * 1000);
+                        if (latencyEl) latencyEl.innerText = `${avgMs} мс`;
+                    }
+                }
+            }
+        } catch (e) {}
+
+        // Передаем данные на график внутри start_page.md (как только он загрузится)
+        addHomeDataPoint(timeNow, cpuPercent, usedMb, errMin);
+
+        // Обновляем статус бар
+        if (bar && dbStatusEl) {
             if (!dbIsUp || errMin > 0) {
                 bar.style.background = '#7f1d1d';
                 dbStatusEl.textContent = '⚠️ ОШИБКА';
@@ -590,8 +586,6 @@
                 bar.style.background = '#1e293b';
                 dbStatusEl.textContent = '🟢 В норме';
             }
-        } catch (e) {
-            console.error(e);
         }
     }
 
@@ -610,11 +604,6 @@
 
         setInterval(updateTopStatusBar, 1000);
         setInterval(checkEnvironmentsStatus, 10000);
-
-        const observer = new MutationObserver(() => {
-            initHomeChart();
-        });
-        observer.observe(document.getElementById('md-content'), { childList: true, subtree: true });
 
         const mobileToggle = document.getElementById('mobileToggle');
         const sidebar = document.getElementById('sidebar');

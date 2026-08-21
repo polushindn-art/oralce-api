@@ -7,18 +7,29 @@
     <!-- Подключаем Chart.js для графиков -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #0f172a; color: #fff; padding: 20px; margin: 0; }
-        .container { max-width: 1000px; margin: 0 auto; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #0f172a;
+            color: #fff;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
 
         .top-nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             background: #1e293b;
             padding: 12px 20px;
             border-radius: 10px;
         }
+
         .top-nav a, .top-nav button {
             background: #334155;
             color: #fff;
@@ -30,94 +41,189 @@
             font-size: 13px;
             transition: background 0.2s;
         }
+
         .top-nav a:hover, .top-nav button:hover { background: #475569; }
         .top-nav button.logout-btn { background: #7f1d1d; }
         .top-nav button.logout-btn:hover { background: #991b1b; }
 
-        h1 { text-align: center; color: #38bdf8; font-size: 24px; margin: 0 0 30px 0; }
+        h1 {
+            text-align: center;
+            color: #38bdf8;
+            font-size: 24px;
+            margin: 0 0 10px 0;
+        }
 
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
-        .card { background: #1e293b; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); position: relative; overflow: hidden; }
+        /* Заголовки секций */
+        .section-header {
+            font-size: 14px;
+            font-weight: 600;
+            color: #94a3b8;
+            margin: 35px 0 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid #1e293b;
+            padding-bottom: 8px;
+        }
+        .section-header span {
+            font-size: 18px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: visible; /* Разрешаем выход подсказок за границы карточки */
+        }
+
         .card-full { grid-column: 1 / -1; }
 
-        .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: #475569; }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: #475569;
+            border-radius: 12px 12px 0 0;
+        }
         .card.up::before { background: #4ade80; }
         .card.down::before { background: #f87171; }
         .card.info::before { background: #38bdf8; }
         .card.purple::before { background: #c084fc; }
+        .card.yellow::before { background: #facc15; }
 
-        .metric-title { font-size: 13px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+        .metric-title {
+            font-size: 13px; color: #94a3b8; text-transform: uppercase;
+            letter-spacing: 0.5px; margin-bottom: 10px;
+            display: flex; align-items: center; gap: 6px;
+        }
+
+        /* 💡 СТИЛИ ДЛЯ ВСПЛЫВАЮЩИХ ПОДСКАЗОК */
+        .tooltip {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #334155;
+            color: #94a3b8;
+            font-size: 10px;
+            font-weight: bold;
+            cursor: help;
+            position: relative;
+            text-transform: none;
+            transition: all 0.2s;
+        }
+        .tooltip:hover {
+            background: #38bdf8;
+            color: #0f172a;
+        }
+        .tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 150%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            white-space: normal;
+            width: 220px;
+            text-align: center;
+            z-index: 1000;
+            border: 1px solid #334155;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5);
+            font-weight: normal;
+            line-height: 1.4;
+            letter-spacing: normal;
+        }
+        /* Маленький треугольник под подсказкой */
+        .tooltip:hover::before {
+            content: '';
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 6px;
+            border-style: solid;
+            border-color: #334155 transparent transparent transparent;
+            z-index: 1000;
+        }
+
         .metric-value { font-size: 32px; font-weight: bold; color: #f8fafc; }
         .metric-sub { font-size: 12px; color: #64748b; margin-top: 5px; }
+        .metric-peak { font-size: 11px; color: #c084fc; margin-top: 3px; font-weight: 500; }
 
         .status-up { color: #4ade80; }
         .status-down { color: #f87171; }
 
-        /* Интерактивные кнопки в карточках */
+        /* Прогресс-бары */
+        .progress-bar-container {
+            background: #334155; border-radius: 4px; height: 8px; width: 100%;
+            margin-top: 10px; position: relative; overflow: visible;
+        }
+        .progress-bar-fill {
+            height: 100%; width: 0%; border-radius: 4px;
+            transition: width 0.4s ease, background-color 0.4s ease; background: #4ade80;
+        }
+        .progress-peak-marker {
+            position: absolute; top: -3px; width: 3px; height: 14px; background: #f87171;
+            border-radius: 2px; transform: translateX(-50%); transition: left 0.4s ease; z-index: 3;
+        }
+
+        /* Гистограммы распределения */
+        .load-distribution {
+            display: flex; align-items: flex-end; gap: 3px; height: 45px;
+            margin-top: 15px; padding-top: 5px; border-top: 1px solid #334155;
+        }
+        .load-col-wrapper { flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; }
+        .load-col { width: 100%; background: #38bdf8; border-radius: 2px 2px 0 0; transition: height 0.3s ease; min-height: 2px; }
+        .load-col-label { font-size: 8px; color: #94a3b8; margin-top: 3px; }
+
+        /* Кнопки и инпуты */
         .card-btn {
-            background: #334155;
-            color: #fff;
-            border: none;
-            padding: 5px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 11px;
-            transition: background 0.2s;
+            background: #334155; color: #fff; border: none; padding: 5px 12px;
+            border-radius: 4px; cursor: pointer; font-size: 11px; transition: background 0.2s;
         }
         .card-btn:hover { background: #475569; }
 
-        /* Поле поиска (фильтрации) логов */
-        .log-filter-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
+        .log-filter-wrapper { position: relative; display: flex; align-items: center; }
         .log-filter-input {
-            background: #0f172a;
-            border: 1px solid #334155;
-            color: #fff;
-            padding: 6px 28px 6px 10px;
-            border-radius: 6px;
-            font-size: 12px;
-            outline: none;
-            width: 220px;
-            transition: border-color 0.2s;
+            background: #0f172a; border: 1px solid #334155; color: #fff;
+            padding: 6px 28px 6px 10px; border-radius: 6px; font-size: 12px;
+            outline: none; width: 220px; transition: border-color 0.2s;
         }
         .log-filter-input:focus { border-color: #38bdf8; }
         .log-clear-btn {
-            position: absolute;
-            right: 8px;
-            background: none;
-            border: none;
-            color: #94a3b8;
-            cursor: pointer;
-            font-size: 13px;
-            display: none;
-            padding: 0;
+            position: absolute; right: 8px; background: none; border: none;
+            color: #94a3b8; cursor: pointer; font-size: 13px; display: none; padding: 0;
         }
         .log-clear-btn:hover { color: #fff; }
 
-        /* Таблица сбоев */
+        /* Таблицы и терминал */
         .error-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 14px; }
         .error-table th { text-align: left; color: #fca5a5; padding: 10px; border-bottom: 2px solid #334155; font-size: 13px; text-transform: uppercase; }
         .error-table td { padding: 10px; border-bottom: 1px solid #33415544; color: #f1f5f9; }
         .error-table tr:hover { background: rgba(239, 68, 68, 0.05); }
 
-        /* Терминал логов */
         .logs-terminal {
-            background: #090d16;
-            border-radius: 8px;
-            padding: 12px;
-            height: 220px;
-            overflow-y: auto;
-            font-family: 'Consolas', 'Courier New', monospace;
-            font-size: 12px;
-            color: #cbd5e1;
-            margin-top: 10px;
-            line-height: 1.4;
-            white-space: pre-wrap;
-            border: 1px solid #334155;
-            user-select: text;
+            background: #090d16; border-radius: 8px; padding: 12px; height: 220px;
+            overflow-y: auto; font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 12px; color: #cbd5e1; margin-top: 10px; line-height: 1.4;
+            white-space: pre-wrap; border: 1px solid #334155; user-select: text;
         }
 
         .footer { text-align: center; margin-top: 30px; font-size: 12px; color: #64748b; }
@@ -134,47 +240,161 @@
 
     <h1>🛠️ Мониторинг Oracle API & Системы</h1>
 
+    <!-- РАЗДЕЛ 1: БАЗА ДАННЫХ -->
+    <div class="section-header">
+        <span>🗄️</span> База данных (Oracle & HikariCP)
+    </div>
     <div class="grid">
-        <!-- БАЗА ДАННЫХ -->
         <div class="card" id="card-status">
-            <div class="metric-title">Статус базы данных (Oracle)</div>
+            <div class="metric-title">
+                Статус БД
+                <span class="tooltip" data-tooltip="Текущее состояние подключения сервера к базе данных Oracle. Должно быть UP.">?</span>
+            </div>
             <div class="metric-value" id="db-status">Загрузка...</div>
         </div>
 
+        <div class="card">
+            <div class="metric-title">
+                Отклик пула БД
+                <span class="tooltip" data-tooltip="Сколько миллисекунд поток приложения ждет свободного коннекта к БД. В норме 1-5 мс. Если выше — пулу не хватает соединений.">?</span>
+            </div>
+            <div class="metric-value" id="db-acquire-time">-</div>
+            <div class="metric-sub">Ожидание коннекта (мс)</div>
+        </div>
+
         <div class="card info">
-            <div class="metric-title">Активные соединения (Active)</div>
+            <div class="metric-title">
+                Активные соединения
+                <span class="tooltip" data-tooltip="Сколько коннектов к Oracle выполняют SQL-запросы прямо в эту секунду.">?</span>
+            </div>
             <div class="metric-value" id="active-conn">-</div>
         </div>
 
-        <div class="card up">
-            <div class="metric-title">Свободные соединения (Idle)</div>
-            <div class="metric-value" id="idle-conn">-</div>
+        <div class="card" id="card-pending">
+            <div class="metric-title">
+                Очередь ожидания
+                <span class="tooltip" data-tooltip="Количество запросов, которым не хватило соединений, и они ждут в очереди. Идеально: 0.">?</span>
+            </div>
+            <div class="metric-value" id="pending-conn" style="color: #4ade80;">0</div>
         </div>
 
-        <div class="card" id="card-pending">
-            <div class="metric-title">Очередь ожидания (Pending)</div>
-            <div class="metric-value" id="pending-conn" style="color: #4ade80;">0</div>
+        <div class="card up">
+            <div class="metric-title">Свободные соединения</div>
+            <div class="metric-value" id="idle-conn">-</div>
         </div>
 
         <div class="card">
             <div class="metric-title">Лимит соединений (Max)</div>
             <div class="metric-value" id="max-conn" style="color: #94a3b8;">-</div>
         </div>
+    </div>
 
-        <!-- ДИСК И ПРОЦЕССОР -->
+    <!-- РАЗДЕЛ 2: СИСТЕМНЫЕ РЕСУРСЫ -->
+    <div class="section-header">
+        <span>💻</span> Системные ресурсы (Сервер & JVM)
+    </div>
+    <div class="grid">
+        <div class="card purple">
+            <div class="metric-title">Загрузка CPU</div>
+            <div class="metric-value" id="cpu-usage">-</div>
+            <div class="metric-peak" id="cpu-peak">Пик: 0%</div>
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" id="cpu-progress"></div>
+                <div class="progress-peak-marker" id="cpu-peak-marker" title="Плавающий пик CPU"></div>
+            </div>
+            <div class="load-distribution" title="Распределение нагрузки CPU по 10% интервалам">
+                <div class="load-col-wrapper"><div class="load-col" id="cpu-col-0" style="height: 2%;"></div><div class="load-col-label">10</div></div>
+                <div class="load-col-wrapper"><div class="load-col" id="cpu-col-1" style="height: 2%;"></div><div class="load-col-label">20</div></div>
+                <div class="load-col-wrapper"><div class="load-col" id="cpu-col-2" style="height: 2%;"></div><div class="load-col-label">30</div></div>
+                <div class="load-col-wrapper"><div class="load-col" id="cpu-col-3" style="height: 2%;"></div><div class="load-col-label">40</div></div>
+                <div class="load-col-wrapper"><div class="load-col" id="cpu-col-4" style="height: 2%;"></div><div class="load-col-label">50</div></div>
+                <div class="load-col-wrapper"><div class="load-col" id="cpu-col-5" style="height: 2%;"></div><div class="load-col-label">60</div></div>
+                <div class="load-col-wrapper"><div class="load-col" id="cpu-col-6" style="height: 2%;"></div><div class="load-col-label">70</div></div>
+                <div class="load-col-wrapper"><div class="load-col" id="cpu-col-7" style="height: 2%;"></div><div class="load-col-label">80</div></div>
+                <div class="load-col-wrapper"><div class="load-col" id="cpu-col-8" style="height: 2%;"></div><div class="load-col-label">90</div></div>
+                <div class="load-col-wrapper"><div class="load-col" id="cpu-col-9" style="height: 2%;"></div><div class="load-col-label">100</div></div>
+            </div>
+        </div>
+
+        <div class="card purple">
+            <div class="metric-title">Память (JVM Heap)</div>
+            <div class="metric-value" id="jvm-memory">-</div>
+            <div class="metric-sub" id="jvm-memory-max">Максимум: -</div>
+            <div class="metric-peak" id="jvm-peak">Пик: 0 МБ</div>
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" id="jvm-progress"></div>
+                <div class="progress-peak-marker" id="jvm-peak-marker" title="Плавающий пик памяти"></div>
+            </div>
+            <div class="load-distribution" title="Распределение использования памяти по 10% интервалам">
+                <div class="load-col-wrapper"><div class="load-col" id="jvm-col-0" style="height: 2%;"></div><div class="load-col-label">10</div></div>
+                <div class="load-col-wrapper"><div class="load-col" id="jvm-col-1" style="height: 2%;"></div><div class="load-col-label">20</div></div>
+                <div class="load-col-wrapper"><div class="load-col" id="jvm-col-2" style="height: 2%;"></div><div class="load-col-label">30</div></div>
+                <div class="load-col-wrapper"><div class="load-col" id="jvm-col-3" style="height: 2%;"></div><div class="load-col-label">40</div></div>
+                <div class="load-col-wrapper"><div class="load-col" id="jvm-col-4" style="height: 2%;"></div><div class="load-col-label">50</div></div>
+                <div class="load-col-wrapper"><div class="load-col" id="jvm-col-5" style="height: 2%;"></div><div class="load-col-label">60</div></div>
+                <div class="load-col-wrapper"><div class="load-col" id="jvm-col-6" style="height: 2%;"></div><div class="load-col-label">70</div></div>
+                <div class="load-col-wrapper"><div class="load-col" id="jvm-col-7" style="height: 2%;"></div><div class="load-col-label">80</div></div>
+                <div class="load-col-wrapper"><div class="load-col" id="jvm-col-8" style="height: 2%;"></div><div class="load-col-label">90</div></div>
+                <div class="load-col-wrapper"><div class="load-col" id="jvm-col-9" style="height: 2%;"></div><div class="load-col-label">100</div></div>
+            </div>
+        </div>
+
+        <div class="card purple">
+            <div class="metric-title">
+                Сборщик мусора (GC Pause)
+                <span class="tooltip" data-tooltip="Максимальное время «заморозки» приложения (Stop-The-World), пока Java очищает мусор в памяти.">?</span>
+            </div>
+            <div class="metric-value" id="gc-pause">-</div>
+            <div class="metric-sub">Макс. заморозка (мс)</div>
+        </div>
+
+        <div class="card purple">
+            <div class="metric-title">Активные потоки (Threads)</div>
+            <div class="metric-value" id="jvm-threads">-</div>
+        </div>
+
         <div class="card info" id="card-disk">
             <div class="metric-title">Свободно на диске</div>
             <div class="metric-value" id="disk-space">-</div>
             <div class="metric-sub" id="disk-total">Всего: -</div>
         </div>
 
-        <div class="card purple">
-            <div class="metric-title">Загрузка CPU</div>
-            <div class="metric-value" id="cpu-usage">-</div>
+        <div class="card">
+            <div class="metric-title">Время работы (Uptime)</div>
+            <div class="metric-value" id="app-uptime" style="font-size: 24px;">-</div>
+        </div>
+    </div>
+
+    <!-- РАЗДЕЛ 3: СЕТЬ И ТРАФИК -->
+    <div class="section-header">
+        <span>⚡</span> Сеть и API
+    </div>
+    <div class="grid">
+        <div class="card info">
+            <div class="metric-title">
+                Трафик API (RPS)
+                <span class="tooltip" data-tooltip="Пропускная способность: сколько запросов сервер УСПЕЛ полностью обработать за прошедшую секунду.">?</span>
+            </div>
+            <div class="metric-value" id="api-rps" style="color: #38bdf8;">0 req/s</div>
+            <div class="metric-sub">Запросов завершено за секунду</div>
         </div>
 
-        <!-- ОШИБКИ -->
-        <div class="card" id="card-errors">
+        <div class="card yellow">
+            <div class="metric-title">
+                Активные HTTP-запросы
+                <span class="tooltip" data-tooltip="Снимок: сколько запросов находилось в процессе выполнения ровно в ту долю секунды, когда дашборд опросил метрики. Нормально, если тут 0 или 1 при высоком RPS.">?</span>
+            </div>
+            <div class="metric-value" id="http-active" style="color: #facc15;">0</div>
+            <div class="metric-sub">Обрабатываются прямо сейчас</div>
+        </div>
+
+        <div class="card up">
+            <div class="metric-title">Среднее время ответа API</div>
+            <div class="metric-value" id="api-latency" style="color: #4ade80;">0 мс</div>
+            <div class="metric-sub">Avg Latency (мс)</div>
+        </div>
+
+        <div class="card" id="card-errors" style="grid-column: span 1;">
             <div class="metric-title">Ошибки (Мин / Час / День)</div>
             <div style="display: flex; justify-content: space-between; margin-top: 10px;">
                 <div style="text-align: center; flex: 1;">
@@ -194,21 +414,31 @@
                 Типы за час: <span id="err-types-list" style="color: #cbd5e1;">-</span>
             </div>
         </div>
+    </div>
 
-        <!-- 📈 РАСШИРЕННЫЙ ГРАФИК CPU, ПАМЯТИ И ОШИБОК -->
+    <!-- РАЗДЕЛ 4: АНАЛИТИКА, ГРАФИКИ И ЛОГИ -->
+    <div class="section-header">
+        <span>📈</span> Аналитика и логи
+    </div>
+    <div class="grid">
         <div class="card card-full">
-            <div class="metric-title">📈 Динамика CPU, Памяти и Сбоев (за последние 2 минуты)</div>
-            <div style="position: relative; height: 260px; width: 100%;">
+            <div class="metric-title">📈 Системные ресурсы: CPU, Память и Сбои</div>
+            <div style="position: relative; height: 240px; width: 100%;">
                 <canvas id="systemChart"></canvas>
             </div>
         </div>
 
-        <!-- 📜 ЖИВЫЕ ЛОГИ ПРИЛОЖЕНИЯ -->
+        <div class="card card-full">
+            <div class="metric-title">⚡ Сетевая активность: Трафик (RPS), Активные запросы и Время ответа (мс)</div>
+            <div style="position: relative; height: 220px; width: 100%;">
+                <canvas id="httpChart"></canvas>
+            </div>
+        </div>
+
         <div class="card card-full info">
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                 <div class="metric-title" style="color: #38bdf8; font-size: 14px; font-weight: bold; margin-bottom: 0;">📜 Живые логи приложения</div>
                 <div style="display: flex; gap: 10px; align-items: center; font-size: 12px; color: #94a3b8; flex-wrap: wrap;">
-                    <!-- Увеличенная строка поиска с кнопкой очистки -->
                     <div class="log-filter-wrapper">
                         <input type="text" id="log-filter" class="log-filter-input" placeholder="🔍 Поиск в логах..." oninput="onFilterInput()">
                         <button id="log-clear-btn" class="log-clear-btn" onclick="clearFilter()" title="Очистить фильтр">✕</button>
@@ -221,7 +451,6 @@
             <div id="logs-terminal" class="logs-terminal">Подключение к логам...</div>
         </div>
 
-        <!-- ⚠️ ЛЕНТА ПОСЛЕДНИХ СБОЕВ -->
         <div class="card card-full down" id="recent-errors-card">
             <div class="metric-title" style="color: #f87171; font-size: 14px; font-weight: bold;">⚠️ Последние сбои в системе</div>
             <table class="error-table">
@@ -239,28 +468,6 @@
                 </tbody>
             </table>
         </div>
-
-        <!-- СИСТЕМНЫЕ МЕТРИКИ -->
-        <div class="card purple">
-            <div class="metric-title">Использование памяти (JVM Heap)</div>
-            <div class="metric-value" id="jvm-memory">-</div>
-            <div class="metric-sub" id="jvm-memory-max">Максимум: -</div>
-        </div>
-
-        <div class="card info">
-            <div class="metric-title">Активные HTTP-запросы</div>
-            <div class="metric-value" id="http-active">0</div>
-        </div>
-
-        <div class="card purple">
-            <div class="metric-title">Активные потоки (Threads)</div>
-            <div class="metric-value" id="jvm-threads">-</div>
-        </div>
-
-        <div class="card">
-            <div class="metric-title">Время работы (Uptime)</div>
-            <div class="metric-value" id="app-uptime" style="font-size: 24px;">-</div>
-        </div>
     </div>
 
     <div class="footer">
@@ -269,7 +476,7 @@
 </div>
 
 <script>
-    // 🔐 Проверка авторизации сразу при загрузке дашборда
+    // 🔐 Проверка авторизации
     function checkMonitorAuth() {
         const token = localStorage.getItem('accessToken');
         if (!token) {
@@ -284,34 +491,29 @@
             const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
             const payload = JSON.parse(jsonPayload);
             const currentTime = Math.floor(Date.now() / 1000);
+
             if (payload.exp && payload.exp < currentTime) {
                 localStorage.removeItem('accessToken');
-                localStorage.removeItem('username');
-                localStorage.setItem('redirectAfterLogin', window.location.pathname);
                 window.location.href = '/login.html';
                 return false;
             }
         } catch (e) {
-            localStorage.removeItem('accessToken');
             window.location.href = '/login.html';
             return false;
         }
         return true;
     }
 
-    if (!checkMonitorAuth()) {
-        throw new Error('Unauthorized');
-    }
+    if (!checkMonitorAuth()) throw new Error('Unauthorized');
 
     function logout() {
         localStorage.removeItem('accessToken');
-        localStorage.removeItem('username');
-        localStorage.removeItem('redirectAfterLogin');
         window.location.href = '/login.html';
     }
 
-    // ⏸️ Управление паузой логов
+    // ЛОГИ
     let isLogsPaused = false;
+    let rawLogs = [];
 
     function toggleLogsPause() {
         isLogsPaused = !isLogsPaused;
@@ -325,41 +527,11 @@
         }
     }
 
-    // 📋 Универсальная функция копирования
     function copyLogs() {
         const terminal = document.getElementById("logs-terminal");
-        const textToCopy = terminal.innerText;
-
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(textToCopy).then(showCopySuccess).catch(fallbackCopyText);
-        } else {
-            fallbackCopyText();
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(terminal.innerText).then(showCopySuccess);
         }
-    }
-
-    function fallbackCopyText() {
-        const terminal = document.getElementById("logs-terminal");
-        const textArea = document.createElement("textarea");
-        textArea.value = terminal.innerText;
-        textArea.style.position = "fixed";
-        textArea.style.top = "0";
-        textArea.style.left = "0";
-        textArea.style.opacity = "0";
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-        try {
-            const successful = document.execCommand('copy');
-            if (successful) {
-                showCopySuccess();
-            } else {
-                alert('Не удалось скопировать текст');
-            }
-        } catch (err) {
-            console.error('Ошибка копирования: ', err);
-            alert('Ошибка копирования в буфер обмена');
-        }
-        document.body.removeChild(textArea);
     }
 
     function showCopySuccess() {
@@ -367,134 +539,24 @@
         const originalText = btn.innerText;
         btn.innerText = "✅ Скопировано!";
         btn.style.background = "#047857";
-        setTimeout(() => {
-            btn.innerText = originalText;
-            btn.style.background = "#334155";
-        }, 2000);
+        setTimeout(() => { btn.innerText = originalText; btn.style.background = "#334155"; }, 2000);
     }
 
-    // 📈 Инициализация графиков Chart.js
-    const ctx = document.getElementById('systemChart').getContext('2d');
-    const maxDataPoints = 120;
-
-    const systemChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: [],
-            datasets: [
-                {
-                    label: 'CPU (%)',
-                    data: [],
-                    borderColor: '#c084fc',
-                    backgroundColor: 'rgba(192, 132, 252, 0.1)',
-                    borderWidth: 2,
-                    tension: 0.3,
-                    fill: true
-                },
-                {
-                    label: 'Heap Память (МБ)',
-                    data: [],
-                    borderColor: '#38bdf8',
-                    backgroundColor: 'rgba(56, 189, 248, 0.1)',
-                    borderWidth: 2,
-                    tension: 0.3,
-                    fill: true,
-                    yAxisID: 'y1'
-                },
-                {
-                    label: 'Ошибки (за мин)',
-                    data: [],
-                    borderColor: '#f87171',
-                    backgroundColor: 'rgba(248, 113, 113, 0.1)',
-                    borderWidth: 2,
-                    tension: 0.3,
-                    fill: true,
-                    yAxisID: 'y2'
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                x: {
-                    grid: { color: '#334155' },
-                    ticks: { color: '#94a3b8', font: { size: 11 }, maxTicksLimit: 12 }
-                },
-                y: {
-                    type: 'linear',
-                    position: 'left',
-                    min: 0,
-                    max: 100,
-                    grid: { color: '#334155' },
-                    ticks: { color: '#c084fc', font: { size: 11 } }
-                },
-                y1: {
-                    type: 'linear',
-                    position: 'right',
-                    grid: { drawOnChartArea: false },
-                    ticks: { color: '#38bdf8', font: { size: 11 } }
-                },
-                y2: {
-                    type: 'linear',
-                    position: 'right',
-                    min: 0,
-                    grid: { drawOnChartArea: false },
-                    ticks: { color: '#f87171', font: { size: 11 }, stepSize: 1 }
-                }
-            },
-            plugins: {
-                legend: { labels: { color: '#f8fafc', font: { size: 12 } } }
-            },
-            animation: false
-        }
-    });
-
-    function addDataPoint(timeLabel, cpuVal, memVal, errVal) {
-        if (systemChart.data.labels.length >= maxDataPoints) {
-            systemChart.data.labels.shift();
-            systemChart.data.datasets[0].data.shift();
-            systemChart.data.datasets[1].data.shift();
-            systemChart.data.datasets[2].data.shift();
-        }
-        systemChart.data.labels.push(timeLabel);
-        systemChart.data.datasets[0].data.push(cpuVal);
-        systemChart.data.datasets[1].data.push(memVal);
-        systemChart.data.datasets[2].data.push(errVal);
-        systemChart.update();
-    }
-
-    const API_URL = "/actuator";
-
-    // Хранилище сырых логов для фильтрации
-    let rawLogs = [];
-
-    // 📜 Функция для подгрузки живых логов
     async function fetchLogs() {
         if (isLogsPaused) return;
-
         try {
             const res = await fetch('/v1/logs/recent');
-            if (res.ok) {
-                rawLogs = await res.json();
-                renderLogs();
-            }
-        } catch (e) {
-            console.error("Не удалось получить логи", e);
-        }
+            if (res.ok) { rawLogs = await res.json(); renderLogs(); }
+        } catch (e) {}
     }
 
-    // Обработка ввода в поле фильтра (показывает/скрывает крестик сброса)
     function onFilterInput() {
         const filterInput = document.getElementById("log-filter");
         const clearBtn = document.getElementById("log-clear-btn");
-        if (clearBtn && filterInput) {
-            clearBtn.style.display = filterInput.value ? "block" : "none";
-        }
+        if (clearBtn && filterInput) clearBtn.style.display = filterInput.value ? "block" : "none";
         renderLogs();
     }
 
-    // Сброс фильтра
     function clearFilter() {
         const filterInput = document.getElementById("log-filter");
         if (filterInput) {
@@ -504,95 +566,169 @@
         }
     }
 
-    // 🔍 Функция отрисовки и фильтрации логов на лету
     function renderLogs() {
         const terminal = document.getElementById("logs-terminal");
+        if (window.getSelection().toString().length > 0 && terminal.contains(window.getSelection().anchorNode)) return;
 
-        // 🛡️ ЗАЩИТА: Если пользователь выделяет текст мышкой внутри терминала, НЕ обновляем экран
-        const selection = window.getSelection();
-        if (selection.toString().length > 0 && terminal.contains(selection.anchorNode)) {
-            return;
-        }
-
-        const filterInput = document.getElementById("log-filter");
-        const filterText = filterInput ? filterInput.value.toLowerCase().trim() : "";
-
-        const filteredLogs = filterText
-            ? rawLogs.filter(line => line.toLowerCase().includes(filterText))
-            : rawLogs;
+        const filterText = document.getElementById("log-filter")?.value.toLowerCase().trim() || "";
+        const filteredLogs = filterText ? rawLogs.filter(line => line.toLowerCase().includes(filterText)) : rawLogs;
 
         const counterEl = document.getElementById("log-counter");
-        if (counterEl) {
-            counterEl.innerText = filterText ? `Найдено: ${filteredLogs.length}/${rawLogs.length}` : `Строк: ${rawLogs.length}`;
-        }
+        if (counterEl) counterEl.innerText = filterText ? `Найдено: ${filteredLogs.length}/${rawLogs.length}` : `Строк: ${rawLogs.length}`;
 
-        const newText = filteredLogs.length > 0 ? filteredLogs.join('\n') : "Нет логов, соответствующих фильтру...";
-
-        // Обновляем текст только если он реально изменился
+        const newText = filteredLogs.length > 0 ? filteredLogs.join('\n') : "Нет логов...";
         if (terminal.innerText !== newText) {
             const isAtBottom = terminal.scrollHeight - terminal.clientHeight <= terminal.scrollTop + 20;
             terminal.innerText = newText;
-
-            // Автоскролл вниз работает, если пользователь находится в самом низу (даже с включенным фильтром)
-            if (isAtBottom) {
-                terminal.scrollTop = terminal.scrollHeight;
-            }
+            if (isAtBottom) terminal.scrollTop = terminal.scrollHeight;
         }
+    }
+
+    // ГРАФИКИ
+    const maxDataPoints = 120;
+    const systemChart = new Chart(document.getElementById('systemChart').getContext('2d'), {
+        type: 'line',
+        data: { labels: [], datasets: [
+                { label: 'CPU (%)', data: [], borderColor: '#c084fc', backgroundColor: 'rgba(192, 132, 252, 0.1)', borderWidth: 2, fill: true, tension: 0.3 },
+                { label: 'Heap Память (МБ)', data: [], borderColor: '#38bdf8', backgroundColor: 'rgba(56, 189, 248, 0.1)', borderWidth: 2, fill: true, tension: 0.3, yAxisID: 'y1' },
+                { label: 'Ошибки (мин)', data: [], borderColor: '#f87171', backgroundColor: 'rgba(248, 113, 113, 0.1)', borderWidth: 2, fill: true, tension: 0.3, yAxisID: 'y2' }
+            ]},
+        options: {
+            responsive: true, maintainAspectRatio: false, animation: false,
+            scales: {
+                x: { ticks: { color: '#94a3b8' } },
+                y: { min: 0, max: 100, ticks: { color: '#c084fc' } },
+                y1: { position: 'right', grid: { drawOnChartArea: false }, ticks: { color: '#38bdf8' } },
+                y2: { position: 'right', min: 0, grid: { drawOnChartArea: false }, ticks: { color: '#f87171', stepSize: 1 } }
+            },
+            plugins: { legend: { labels: { color: '#f8fafc' } } }
+        }
+    });
+
+    const httpChart = new Chart(document.getElementById('httpChart').getContext('2d'), {
+        type: 'line',
+        data: { labels: [], datasets: [
+                { label: 'Трафик (RPS)', data: [], borderColor: '#38bdf8', backgroundColor: 'rgba(56, 189, 248, 0.1)', borderWidth: 2, fill: true, tension: 0.3, yAxisID: 'y' },
+                { label: 'Активные запросы', data: [], borderColor: '#facc15', backgroundColor: 'rgba(250, 204, 21, 0.1)', borderWidth: 2, fill: true, tension: 0.3, yAxisID: 'y' },
+                { label: 'Время ответа (мс)', data: [], borderColor: '#4ade80', backgroundColor: 'rgba(74, 222, 128, 0.1)', borderWidth: 2, fill: true, tension: 0.3, yAxisID: 'y1' }
+            ]},
+        options: {
+            responsive: true, maintainAspectRatio: false, animation: false,
+            scales: {
+                x: { ticks: { color: '#94a3b8' } },
+                y: { type: 'linear', position: 'left', min: 0, grid: { color: '#334155' }, ticks: { color: '#38bdf8', stepSize: 1 } },
+                y1: { type: 'linear', position: 'right', min: 0, grid: { drawOnChartArea: false }, ticks: { color: '#4ade80' } }
+            },
+            plugins: { legend: { labels: { color: '#f8fafc' } } }
+        }
+    });
+
+    function addDataPoint(timeLabel, cpuVal, memVal, errVal, rpsVal, activeReqVal, latVal) {
+        if (systemChart.data.labels.length >= maxDataPoints) {
+            systemChart.data.labels.shift();
+            systemChart.data.datasets.forEach(d => d.data.shift());
+            httpChart.data.labels.shift();
+            httpChart.data.datasets.forEach(d => d.data.shift());
+        }
+        systemChart.data.labels.push(timeLabel);
+        systemChart.data.datasets[0].data.push(cpuVal);
+        systemChart.data.datasets[1].data.push(memVal);
+        systemChart.data.datasets[2].data.push(errVal);
+        systemChart.update();
+
+        httpChart.data.labels.push(timeLabel);
+        httpChart.data.datasets[0].data.push(rpsVal);
+        httpChart.data.datasets[1].data.push(activeReqVal);
+        httpChart.data.datasets[2].data.push(latVal);
+        httpChart.update();
+    }
+
+    // МЕТРИКИ
+    const API_URL = "/actuator";
+    let maxCpuSeen = 0, maxMemSeen = 0;
+    let cpuBuckets = Array(10).fill(0), jvmBuckets = Array(10).fill(0);
+    let lastTotalRequests = null;
+
+    function updateProgress(elementId, markerId, currentPercent, peakPercent) {
+        const bar = document.getElementById(elementId);
+        const marker = document.getElementById(markerId);
+        if (!bar) return;
+        const clamped = Math.min(Math.max(currentPercent, 0), 100);
+        bar.style.width = clamped + '%';
+        if (marker) marker.style.left = Math.min(Math.max(peakPercent, 0), 100) + '%';
+        bar.style.background = clamped > 80 ? '#f87171' : clamped > 60 ? '#facc15' : '#4ade80';
+    }
+
+    function updateDist(buckets, val, prefix) {
+        let idx = Math.min(Math.floor(val / 10), 9);
+        buckets[idx]++;
+        const maxVal = Math.max(...buckets, 1);
+        for (let i = 0; i < 10; i++) {
+            const col = document.getElementById(`${prefix}-col-${i}`);
+            if (col) col.style.height = Math.max(Math.round((buckets[i] / maxVal) * 100), 4) + '%';
+        }
+    }
+
+    async function fetchMetricValue(metricName) {
+        try {
+            const res = await fetch(`${API_URL}/metrics/${metricName}`);
+            if (!res.ok) return "-";
+            const data = await res.json();
+            return data.measurements ? data.measurements[0].value : "-";
+        } catch { return "-"; }
     }
 
     async function updateMetrics() {
         try {
             const timeNow = new Date().toLocaleTimeString();
 
+            // 1. Health
             const healthRes = await fetch(`${API_URL}/health`);
             const healthData = await healthRes.json();
-            const dbStatusEl = document.getElementById("db-status");
-            const cardStatus = document.getElementById("card-status");
             const dbIsUp = healthData.components?.db?.status === "UP" || healthData.status === "UP";
+            const cardStatus = document.getElementById("card-status");
+            const dbStatusEl = document.getElementById("db-status");
 
-            if (dbIsUp) {
-                dbStatusEl.innerHTML = "UP";
-                dbStatusEl.className = "metric-value status-up";
-                cardStatus.className = "card up";
-            } else {
-                dbStatusEl.innerHTML = "DOWN";
-                dbStatusEl.className = "metric-value status-down";
-                cardStatus.className = "card down";
-            }
+            dbStatusEl.innerHTML = dbIsUp ? "UP" : "DOWN";
+            dbStatusEl.className = dbIsUp ? "metric-value status-up" : "metric-value status-down";
+            cardStatus.className = dbIsUp ? "card up" : "card down";
 
             const disk = healthData.components?.diskSpace?.details;
             if (disk) {
-                const freeGb = (disk.free / (1024 * 1024 * 1024)).toFixed(1);
-                const totalGb = (disk.total / (1024 * 1024 * 1024)).toFixed(1);
-                document.getElementById("disk-space").innerText = `${freeGb} ГБ`;
-                document.getElementById("disk-total").innerText = `Всего: ${totalGb} ГБ`;
+                document.getElementById("disk-space").innerText = `${(disk.free / 1073741824).toFixed(1)} ГБ`;
+                document.getElementById("disk-total").innerText = `Всего: ${(disk.total / 1073741824).toFixed(1)} ГБ`;
             }
 
-            fetchMetric("hikaricp.connections.active", "active-conn");
-            fetchMetric("hikaricp.connections.idle", "idle-conn");
-            fetchMetric("hikaricp.connections.max", "max-conn");
+            // 2. БД и HikariCP
+            const activeConn = await fetchMetricValue("hikaricp.connections.active");
+            document.getElementById("active-conn").innerText = activeConn;
+            document.getElementById("idle-conn").innerText = await fetchMetricValue("hikaricp.connections.idle");
+            document.getElementById("max-conn").innerText = await fetchMetricValue("hikaricp.connections.max");
 
             const pendingVal = await fetchMetricValue("hikaricp.connections.pending");
             const pendingEl = document.getElementById("pending-conn");
-            const cardPending = document.getElementById("card-pending");
             pendingEl.innerText = pendingVal;
-            if (pendingVal > 0) {
-                pendingEl.style.color = "#f87171";
-                cardPending.className = "card down";
-            } else {
-                pendingEl.style.color = "#4ade80";
-                cardPending.className = "card up";
+            pendingEl.style.color = pendingVal > 0 ? "#f87171" : "#4ade80";
+
+            const acqRes = await fetch(`${API_URL}/metrics/hikaricp.connections.acquire`);
+            if (acqRes.ok) {
+                const acqData = await acqRes.json();
+                let maxAcq = 0;
+                if (acqData.measurements) acqData.measurements.forEach(m => { if (m.statistic === 'MAX') maxAcq = m.value * 1000; });
+                const acqEl = document.getElementById("db-acquire-time");
+                if (acqEl) {
+                    acqEl.innerText = `${Math.round(maxAcq)} мс`;
+                    acqEl.style.color = maxAcq > 500 ? "#f87171" : "#f8fafc";
+                }
             }
 
+            // 3. Ошибки
             let errorsLastMinute = 0;
-
             try {
                 const errRes = await fetch('/v1/monitoring/errors-hour');
                 if (errRes.ok) {
                     const errData = await errRes.json();
-
                     errorsLastMinute = errData.lastMinute || 0;
-
                     document.getElementById("err-min").innerText = errData.lastMinute;
                     document.getElementById("err-hour").innerText = errData.lastHour;
                     document.getElementById("err-day").innerText = errData.lastDay;
@@ -603,8 +739,6 @@
                     if (typeEntries.length > 0) {
                         errTypesContainer.style.display = "block";
                         document.getElementById("err-types-list").innerHTML = typeEntries.map(([t, c]) => `<b style="color:#f87171">${t}</b>: ${c}`).join(' | ');
-                    } else {
-                        errTypesContainer.style.display = "none";
                     }
 
                     const recentBody = document.getElementById("recent-errors-body");
@@ -616,77 +750,100 @@
                                 <td><code style="background: rgba(0,0,0,0.2); padding: 2px 6px; border-radius: 4px;">${e.path}</code></td>
                             </tr>
                         `).join('');
-                    } else {
-                        recentBody.innerHTML = `
-                            <tr>
-                                <td colspan="3" style="text-align: center; color: #4ade80; padding: 12px;">✅ Критических сбоев не зафиксировано</td>
-                            </tr>
-                        `;
                     }
-
-                    const cardErrors = document.getElementById("card-errors");
-                    if (errData.lastHour > 0 || errData.lastMinute > 0) {
-                        cardErrors.className = "card down";
-                    } else {
-                        cardErrors.className = "card up";
-                    }
+                    document.getElementById("card-errors").className = (errData.lastHour > 0 || errData.lastMinute > 0) ? "card down" : "card up";
                 }
-            } catch (e) {
-                console.error("Не удалось получить статистику ошибок", e);
+            } catch (e) {}
+
+            // GC Паузы
+            const gcRes = await fetch(`${API_URL}/metrics/jvm.gc.pause`);
+            if (gcRes.ok) {
+                const gcData = await gcRes.json();
+                let maxGc = 0;
+                if (gcData.measurements) gcData.measurements.forEach(m => { if (m.statistic === 'MAX') maxGc = m.value * 1000; });
+                if (document.getElementById("gc-pause")) document.getElementById("gc-pause").innerText = `${Math.round(maxGc)} мс`;
             }
 
-            let cpuPercent = 0;
+            // 4. CPU & Memory
+            let cpuPercent = 0, usedMb = 0;
             const cpuVal = await fetchMetricValue("system.cpu.usage");
             if (cpuVal !== "-") {
                 cpuPercent = Math.round(cpuVal * 100);
                 document.getElementById("cpu-usage").innerText = `${cpuPercent}%`;
+                maxCpuSeen = cpuPercent > maxCpuSeen ? cpuPercent : Math.max(cpuPercent, maxCpuSeen - 1);
+                document.getElementById("cpu-peak").innerText = `Пик: ${maxCpuSeen}%`;
+                updateProgress("cpu-progress", "cpu-peak-marker", cpuPercent, maxCpuSeen);
+                updateDist(cpuBuckets, cpuPercent, "cpu");
             }
 
-            let usedMb = 0;
             const memUsedBytes = await fetchMetricValue("jvm.memory.used");
             const memMaxBytes = await fetchMetricValue("jvm.memory.max");
             if (memUsedBytes !== "-" && memMaxBytes !== "-") {
-                usedMb = Math.round(memUsedBytes / (1024 * 1024));
-                const maxMb = Math.round(memMaxBytes / (1024 * 1024));
+                usedMb = Math.round(memUsedBytes / 1048576);
+                const maxMb = Math.round(memMaxBytes / 1048576);
                 document.getElementById("jvm-memory").innerText = `${usedMb} МБ`;
                 document.getElementById("jvm-memory-max").innerText = `Из ${maxMb} МБ`;
+
+                const memPercent = Math.round((usedMb / maxMb) * 100);
+                maxMemSeen = memPercent > maxMemSeen ? memPercent : Math.max(memPercent, maxMemSeen - 1);
+                document.getElementById("jvm-peak").innerText = `Пик: ${Math.round((maxMemSeen/100)*maxMb)} МБ`;
+
+                updateProgress("jvm-progress", "jvm-peak-marker", memPercent, maxMemSeen);
+                updateDist(jvmBuckets, memPercent, "jvm");
             }
 
-            addDataPoint(timeNow, cpuPercent, usedMb, errorsLastMinute);
+            // 5. HTTP Запросы, Latency и RPS
+            let activeRequests = 0, avgLatencyMs = 0, currentRps = 0;
 
-            fetchMetric("http.server.requests.active", "http-active");
-            fetchMetric("jvm.threads.live", "jvm-threads");
+            const activeReqVal = await fetchMetricValue("http.server.requests.active");
+            if (activeReqVal !== "-") {
+                activeRequests = Number(activeReqVal);
+                document.getElementById("http-active").innerText = activeRequests;
+            }
+
+            try {
+                const reqRes = await fetch(`${API_URL}/metrics/http.server.requests`);
+                if (reqRes.ok) {
+                    const reqData = await reqRes.json();
+                    if (reqData.measurements) {
+                        let count = 0, totalTime = 0;
+                        reqData.measurements.forEach(m => {
+                            if (m.statistic === 'COUNT') count = m.value;
+                            if (m.statistic === 'TOTAL_TIME') totalTime = m.value;
+                        });
+
+                        if (count > 0) {
+                            avgLatencyMs = Math.round((totalTime / count) * 1000);
+                            document.getElementById("api-latency").innerText = `${avgLatencyMs} мс`;
+                        }
+
+                        if (lastTotalRequests !== null) {
+                            currentRps = count - lastTotalRequests;
+                            if (currentRps < 0) currentRps = 0;
+                            document.getElementById("api-rps").innerText = `${currentRps} req/s`;
+                        }
+                        lastTotalRequests = count;
+                    }
+                }
+            } catch (e) {}
+
+            document.getElementById("jvm-threads").innerText = await fetchMetricValue("jvm.threads.live");
 
             const uptimeSec = await fetchMetricValue("process.uptime");
             if (uptimeSec !== "-") {
-                const hours = Math.floor(uptimeSec / 3600);
-                const minutes = Math.floor((uptimeSec % 3600) / 60);
-                const seconds = Math.floor(uptimeSec % 60);
-                document.getElementById("app-uptime").innerText = `${hours}ч ${minutes}м ${seconds}с`;
+                const h = Math.floor(uptimeSec / 3600);
+                const m = Math.floor((uptimeSec % 3600) / 60);
+                const s = Math.floor(uptimeSec % 60);
+                document.getElementById("app-uptime").innerText = `${h}ч ${m}м ${s}с`;
             }
 
-            await fetchLogs();
+            addDataPoint(timeNow, cpuPercent, usedMb, errorsLastMinute, currentRps, activeRequests, avgLatencyMs);
 
+            await fetchLogs();
             document.getElementById("last-update").innerText = new Date().toLocaleTimeString();
 
         } catch (e) {
-            console.error("Ошибка соединения с Actuator", e);
-        }
-    }
-
-    async function fetchMetric(metricName, elementId) {
-        const val = await fetchMetricValue(metricName);
-        document.getElementById(elementId).innerText = val;
-    }
-
-    async function fetchMetricValue(metricName) {
-        try {
-            const res = await fetch(`${API_URL}/metrics/${metricName}`);
-            if (!res.ok) return "-";
-            const data = await res.json();
-            return data.measurements ? data.measurements[0].value : "-";
-        } catch {
-            return "-";
+            console.error("Monitoring error", e);
         }
     }
 

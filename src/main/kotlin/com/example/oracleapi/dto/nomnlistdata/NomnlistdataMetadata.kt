@@ -14,7 +14,7 @@ data class NomnlistdataMetadata(
     companion object {
         fun fromEntity(entity: Nomnlistdata): NomnlistdataMetadata {
             return NomnlistdataMetadata(
-                rn = entity.rn ?: 0,
+                rn = entity.rn,
                 nomen = entity.nomen ?: 0,
                 needDownload = (entity.needdownload as? Number)?.toInt() == 1,
                 created = entity.created as? String,

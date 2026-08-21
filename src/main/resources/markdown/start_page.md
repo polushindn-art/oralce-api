@@ -3,15 +3,8 @@
 ## 📈 Динамика ресурсов системы (CPU & Memory)
 <div style="background: #1e293b; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); margin-bottom: 20px; border-top: 4px solid #38bdf8;">
     <div style="font-size: 13px; color: #94a3b8; text-transform: uppercase; margin-bottom: 10px; font-weight: bold;">📈 Динамика ресурсов системы (CPU, Память и Сбои)</div>
-    <div style="position: relative; height: 260px; width: 100%;">
+    <div style="position: relative; height: 160px; width: 100%;">
         <canvas id="homeSystemChart"></canvas>
-    </div>
-</div>
-
-## ⚠️ Последние сбои в системе
-<div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); margin-bottom: 20px;" id="home-errors-card">
-    <div id="home-errors-body" style="font-size: 13px; color: #64748b;">
-        Загрузка информации о сбоях...
     </div>
 </div>
 
