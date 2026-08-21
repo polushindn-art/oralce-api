@@ -9,6 +9,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.web.servlet.resource.NoResourceFoundException
 
+/**
+ * Глобальный перехватчик исключений для обработки непредвиденных ошибок в контроллерах.
+ * Автоматически регистрирует сбои в счетчике для мониторинга, логирует их
+ * и возвращает клиенту стандартизированный ответ в формате JSON.
+ */
 @ControllerAdvice
 class GlobalErrorCounterAdvice(private val errorCounter: ErrorCounter) {
 
@@ -18,15 +23,19 @@ class GlobalErrorCounterAdvice(private val errorCounter: ErrorCounter) {
     fun handleAllExceptions(ex: Exception, request: HttpServletRequest): ResponseEntity<Any> {
         val path = request.servletPath
 
+        // Пропускаем системные 404 и эндпоинты actuator, чтобы не портить статистику
         if (ex is NoResourceFoundException || path.startsWith("/actuator")) {
             throw ex
         }
 
         val errorType = ex.javaClass.simpleName
-        errorCounter.recordError(errorType, path) // Передаем тип и путь
+
+        // Передаем ошибку в счетчик для дашборда
+        errorCounter.recordError(errorType, path)
 
         log.error("❌ [Global Error] Тип: {}, Путь: {}, Сообщение: {}", errorType, path, ex.message)
 
+        // Формируем стандартизированный JSON-ответ для клиента
         val errorBody = mapOf(
             "timestamp" to java.time.Instant.now().toString(),
             "status" to HttpStatus.INTERNAL_SERVER_ERROR.value(),

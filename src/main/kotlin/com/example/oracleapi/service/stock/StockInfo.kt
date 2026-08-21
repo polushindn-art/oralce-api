@@ -3,6 +3,7 @@ package com.example.oracleapi.service.stock
 import com.example.oracleapi.config.StoreNameMapper
 import com.example.oracleapi.dto.stock.StockInfoDto
 import com.example.oracleapi.repository.stock.StockRepository
+import jakarta.transaction.Transactional
 import org.springframework.stereotype.Component
 import java.math.BigDecimal
 

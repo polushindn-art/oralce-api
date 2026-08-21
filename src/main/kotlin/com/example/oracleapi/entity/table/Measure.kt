@@ -10,7 +10,7 @@ import jakarta.validation.constraints.Size
 import org.hibernate.annotations.ColumnDefault
 
 @Entity
-@Table(name = "MEASURE", schema = Helper.Companion.SCHEME)
+@Table(name = "MEASURE", schema = Helper.SCHEME)
 open class Measure {
     @Id
     @Column(name = "RN", nullable = false)

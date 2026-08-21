@@ -3,6 +3,7 @@ package com.example.oracleapi.service.stock
 import com.example.oracleapi.dto.stock.StockDto
 import com.example.oracleapi.dto.stock.StockInfoDto
 import com.example.oracleapi.service.nomnlist.NomnlistService
+import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 
@@ -25,6 +26,7 @@ class StockService(
         return stockInfoPipelineGet.getStockInfo(nomen)
     }
 
+    @Transactional
     fun getFullStockMessageByBarcode(barcode: String): String {
         val nomen = nomnlistService.findByBarcode(barcode)
         val nomenId = if (nomen?.rn != null) BigDecimal.valueOf(nomen.rn) else null
