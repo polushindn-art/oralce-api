@@ -46,7 +46,12 @@ echo %YELLOW%[2/5] Генерация версии...%RESET%
 for /f %%i in ('git rev-list --count HEAD 2^>nul') do set VERSION_NUMBER=%%i
 if not defined VERSION_NUMBER set VERSION_NUMBER=0
 set FULL_VERSION=1.25.!VERSION_NUMBER!
+:: Расчет порта: 8000 + номер сборки (например, для 161 будет 8161)
+set /a APP_PORT=8000 + VERSION_NUMBER
+set CONTAINER_GREEN=oracle-prod-green-%VERSION_NUMBER%
+
 echo %GREEN%Версия: %FULL_VERSION%%RESET%
+echo %GREEN%Порт для запуска: %APP_PORT%%RESET%
 echo.
 
 :: ============================================
@@ -94,47 +99,34 @@ echo %YELLOW%[5/5] Очистка старых локальных образов
 docker image prune -f
 echo %GREEN%[OK] Очистка завершена%RESET%
 echo.
-:: ============================================
-:: РЕЗУЛЬТАТ
-:: ============================================
 echo %GREEN%========================================%RESET%
 echo %GREEN%        СБОРКА ЗАВЕРШЕНА!%RESET%
 echo %GREEN%========================================%RESET%
 echo.
-echo Образ: %FULL_VERSION%
+echo Версия: %FULL_VERSION%
+echo Порт: %APP_PORT%
+echo Имя контейнера: %CONTAINER_NAME%
 echo.
 echo ============================================
-echo ЗАПУСК НА СЕРВЕРЕ
+echo ЗАПУСК И ОБНОВЛЕНИЕ НА СЕРВЕРЕ
 echo ============================================
 echo.
-echo 1. Остановить старые контейнеры:
-echo    docker stop oracle-dev oracle-prod-blue oracle-prod-green 2^>nul
-echo    docker rm oracle-dev oracle-prod-blue oracle-prod-green 2^>nul
-echo    Или через Web http://oracle-rest-api.ars:9000
+echo 1. Запустить новый контейнер:
+echo    docker run -d --name %CONTAINER_NAME% --restart=always -p %APP_PORT%:8080 -e SPRING_PROFILES_ACTIVE=prod %REGISTRY%/%IMAGE_NAME%:%FULL_VERSION%
 echo.
-echo 2. Запустить DEV (тестовая):
-echo    docker run -d --name oracle-dev --restart=always -p 8099:8080 -e SPRING_PROFILES_ACTIVE=dev %REGISTRY%/%IMAGE_NAME%:%FULL_VERSION%
+echo 2. Обновить порт в Nginx:
+echo    nano /etc/nginx/nginx.conf
+echo    (Измените строку server 127.0.0.1:[старый_порт]; на server 127.0.0.1:%APP_PORT%;)
 echo.
-echo 3. Запустить PROD BLUE если не запущена (текущая рабочая):
-echo    docker run -d --name oracle-prod-blue --restart=always -p 8090:8080 -e SPRING_PROFILES_ACTIVE=prod %REGISTRY%/%IMAGE_NAME%:%FULL_VERSION%
+echo 3. Применить конфигурацию Nginx:
+echo    nginx -t
+echo    systemctl reload nginx
 echo.
-echo    Перед запуском проверить свободные порты и запустить на нем. Например: 8092
-echo 4. Запустить PROD GREEN (новая версия для теста):
-echo    docker run -d --name oracle-prod-green --restart=always -p 8092:8080 -e SPRING_PROFILES_ACTIVE=prod %REGISTRY%/%IMAGE_NAME%:%FULL_VERSION%
+echo 4. Остановить и удалить старый контейнер:
+echo    docker stop oracle-prod-[старый_номер]
+echo    docker rm oracle-prod-[старый_номер]
 echo.
-echo    После проверки green версии перенаправить запросы на нужный порт
-echo    Изменить порт в nginx.conf (nano /etc/nginx/nginx.conf) server 127.0.0.1:8092;  # Внутренний порт контейнера (blue)
-echo    Проверить config: nginx -t
-echo    Перечитать config: systemctl reload nginx
-echo    Остановить blue: docker stop oracle-prod-blue
-echo    Удалить blue: docker rm oracle-prod-blue или через Web http://oracle-rest-api.ars:9000
-echo    Переименовать: docker rename oracle-prod-green oracle-prod-blue
-echo.
-echo    Если удалить старые image в Docker REGISTRY Web http://oracle-rest-api.ars:7000
-echo    Нужно запускать сборщик мусора
-echo    docker exec -it registry-registry-1 \
-echo      bin/registry garbage-collect \
-echo      --delete-untagged \
-echo      /etc/docker/registry/config.yml
+echo 5. Очистка места в Docker Registry (если удаляли старые образы через Web http://oracle-rest-api.ars:7000):
+echo    docker exec -it registry-registry-1 bin/registry garbage-collect --delete-untagged /etc/docker/registry/config.yml
 echo.
 pause
