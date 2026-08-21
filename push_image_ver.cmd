@@ -133,6 +133,8 @@ echo    docker stop oracle-prod-[старый_номер]
 echo    docker rm oracle-prod-[старый_номер]
 echo.
 echo 6. Очистка места в Docker Registry (если удаляли старые образы через Web http://oracle-rest-api.ars:7000):
+echo    docker stop registry-registry-1
 echo    docker exec -it registry-registry-1 bin/registry garbage-collect --delete-untagged /etc/docker/registry/config.yml
+echo    docker start registry-registry-1
 echo.
 pause

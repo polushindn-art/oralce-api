@@ -66,6 +66,37 @@
         }
         .card-btn:hover { background: #475569; }
 
+        /* Поле поиска (фильтрации) логов */
+        .log-filter-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .log-filter-input {
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: #fff;
+            padding: 6px 28px 6px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            outline: none;
+            width: 220px;
+            transition: border-color 0.2s;
+        }
+        .log-filter-input:focus { border-color: #38bdf8; }
+        .log-clear-btn {
+            position: absolute;
+            right: 8px;
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 13px;
+            display: none;
+            padding: 0;
+        }
+        .log-clear-btn:hover { color: #fff; }
+
         /* Таблица сбоев */
         .error-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 14px; }
         .error-table th { text-align: left; color: #fca5a5; padding: 10px; border-bottom: 2px solid #334155; font-size: 13px; text-transform: uppercase; }
@@ -86,6 +117,7 @@
             line-height: 1.4;
             white-space: pre-wrap;
             border: 1px solid #334155;
+            user-select: text;
         }
 
         .footer { text-align: center; margin-top: 30px; font-size: 12px; color: #64748b; }
@@ -173,9 +205,14 @@
 
         <!-- 📜 ЖИВЫЕ ЛОГИ ПРИЛОЖЕНИЯ -->
         <div class="card card-full info">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                 <div class="metric-title" style="color: #38bdf8; font-size: 14px; font-weight: bold; margin-bottom: 0;">📜 Живые логи приложения</div>
-                <div style="display: flex; gap: 10px; align-items: center; font-size: 12px; color: #94a3b8;">
+                <div style="display: flex; gap: 10px; align-items: center; font-size: 12px; color: #94a3b8; flex-wrap: wrap;">
+                    <!-- Увеличенная строка поиска с кнопкой очистки -->
+                    <div class="log-filter-wrapper">
+                        <input type="text" id="log-filter" class="log-filter-input" placeholder="🔍 Поиск в логах..." oninput="onFilterInput()">
+                        <button id="log-clear-btn" class="log-clear-btn" onclick="clearFilter()" title="Очистить фильтр">✕</button>
+                    </div>
                     <span id="log-counter">Строк: 0</span>
                     <button id="logs-copy-btn" class="card-btn" onclick="copyLogs()">📋 Скопировать</button>
                     <button id="logs-pause-btn" class="card-btn" onclick="toggleLogsPause()">⏸️ Пауза</button>
@@ -288,7 +325,7 @@
         }
     }
 
-    // 📋 Универсальная функция копирования (работает везде, включая HTTP-IP адреса)
+    // 📋 Универсальная функция копирования
     function copyLogs() {
         const terminal = document.getElementById("logs-terminal");
         const textToCopy = terminal.innerText;
@@ -429,28 +466,77 @@
 
     const API_URL = "/actuator";
 
-    // 📜 Функция для подгрузки живых логов (с учетом паузы)
+    // Хранилище сырых логов для фильтрации
+    let rawLogs = [];
+
+    // 📜 Функция для подгрузки живых логов
     async function fetchLogs() {
         if (isLogsPaused) return;
 
         try {
             const res = await fetch('/v1/logs/recent');
             if (res.ok) {
-                const logs = await res.json();
-                const terminal = document.getElementById("logs-terminal");
-
-                document.getElementById("log-counter").innerText = `Строк: ${logs.length}`;
-
-                const isAtBottom = terminal.scrollHeight - terminal.clientHeight <= terminal.scrollTop + 20;
-
-                terminal.innerText = logs.length > 0 ? logs.join('\n') : "Логи пока отсутствуют...";
-
-                if (isAtBottom) {
-                    terminal.scrollTop = terminal.scrollHeight;
-                }
+                rawLogs = await res.json();
+                renderLogs();
             }
         } catch (e) {
             console.error("Не удалось получить логи", e);
+        }
+    }
+
+    // Обработка ввода в поле фильтра (показывает/скрывает крестик сброса)
+    function onFilterInput() {
+        const filterInput = document.getElementById("log-filter");
+        const clearBtn = document.getElementById("log-clear-btn");
+        if (clearBtn && filterInput) {
+            clearBtn.style.display = filterInput.value ? "block" : "none";
+        }
+        renderLogs();
+    }
+
+    // Сброс фильтра
+    function clearFilter() {
+        const filterInput = document.getElementById("log-filter");
+        if (filterInput) {
+            filterInput.value = "";
+            document.getElementById("log-clear-btn").style.display = "none";
+            renderLogs();
+        }
+    }
+
+    // 🔍 Функция отрисовки и фильтрации логов на лету
+    function renderLogs() {
+        const terminal = document.getElementById("logs-terminal");
+
+        // 🛡️ ЗАЩИТА: Если пользователь выделяет текст мышкой внутри терминала, НЕ обновляем экран
+        const selection = window.getSelection();
+        if (selection.toString().length > 0 && terminal.contains(selection.anchorNode)) {
+            return;
+        }
+
+        const filterInput = document.getElementById("log-filter");
+        const filterText = filterInput ? filterInput.value.toLowerCase().trim() : "";
+
+        const filteredLogs = filterText
+            ? rawLogs.filter(line => line.toLowerCase().includes(filterText))
+            : rawLogs;
+
+        const counterEl = document.getElementById("log-counter");
+        if (counterEl) {
+            counterEl.innerText = filterText ? `Найдено: ${filteredLogs.length}/${rawLogs.length}` : `Строк: ${rawLogs.length}`;
+        }
+
+        const newText = filteredLogs.length > 0 ? filteredLogs.join('\n') : "Нет логов, соответствующих фильтру...";
+
+        // Обновляем текст только если он реально изменился
+        if (terminal.innerText !== newText) {
+            const isAtBottom = terminal.scrollHeight - terminal.clientHeight <= terminal.scrollTop + 20;
+            terminal.innerText = newText;
+
+            // Автоскролл вниз работает, если пользователь находится в самом низу (даже с включенным фильтром)
+            if (isAtBottom) {
+                terminal.scrollTop = terminal.scrollHeight;
+            }
         }
     }
 

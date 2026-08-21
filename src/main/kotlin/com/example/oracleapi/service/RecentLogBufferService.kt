@@ -5,10 +5,13 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.ConcurrentLinkedQueue
+import org.springframework.beans.factory.annotation.Value
 
 @Service
-class RecentLogBufferService {
-    private val maxLines = 1000
+class RecentLogBufferService(
+    @param:Value("\${app.logging.max-buffer-size:1000}") private val maxLines: Int
+) {
+    private val logBuffer = ArrayDeque<String>(maxLines)
     private val buffer = ConcurrentLinkedQueue<String>()
     private val dateFormatter = DateTimeFormatter.ofPattern("HH:mm:ss.SSS")
         .withZone(ZoneId.systemDefault())

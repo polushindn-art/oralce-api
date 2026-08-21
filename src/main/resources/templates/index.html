@@ -338,8 +338,6 @@
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-            // Отправляем запрос через originalFetch (обходим глобальный перехватчик)
-            // и БЕЗ токена
             const response = await originalFetch(url + '/v1/api/health', {
                 method: 'GET',
                 signal: controller.signal,
@@ -370,7 +368,6 @@
     }
 
     async function checkEnvironmentsStatus() {
-        // Проверяем статусы без токена (публичный эндпоинт)
         await checkCustomApiHealth('http://oracle-rest-api.ars', 'env-status-prod');
         await checkCustomApiHealth('http://oracle-rest-api.ars:3000', 'env-status-dev');
         await checkCustomApiHealth('http://oracle-rest-api.ars:3001', 'env-status-unstable');
@@ -513,9 +510,13 @@
                     errStatsEl.textContent = `${errMin} / ${errHour}`;
 
                     if (errorsBody) {
+                        // Сохраняем текущую позицию скролла перед обновлением, чтобы страницу не дергало
+                        const existingScrollBox = errorsBody.querySelector('.error-scroll-box');
+                        const savedScrollTop = existingScrollBox ? existingScrollBox.scrollTop : 0;
+
                         if (errData.recentErrors && errData.recentErrors.length > 0) {
                             errorsBody.innerHTML = `
-                                <div style="max-height: 300px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px;">
+                                <div class="error-scroll-box" style="max-height: 300px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px;">
                                     <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
                                         <thead>
                                             <tr style="background: #f8fafc; text-align: left; position: sticky; top: 0; border-bottom: 2px solid #e2e8f0;">
@@ -537,6 +538,12 @@
                                 </div>`;
                         } else {
                             errorsBody.innerHTML = '🟢 Сбоев не зафиксировано.';
+                        }
+
+                        // Возвращаем позицию скролла обратно
+                        const newScrollBox = errorsBody.querySelector('.error-scroll-box');
+                        if (newScrollBox) {
+                            newScrollBox.scrollTop = savedScrollTop;
                         }
                     }
                 }

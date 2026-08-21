@@ -16,6 +16,9 @@ server:
       charset: UTF-8
       enabled: true
       force: true
+app:
+  logging:
+    max-buffer-size: 10000
 max:
   api:
     age-verification-url: https://ext-api2.max.ru/v2/business/pos/age-verification
