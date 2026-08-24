@@ -1,60 +1,56 @@
 spring:
+  # ==========================================
+  # НАСТРОЙКИ ПОДКЛЮЧЕНИЯ К БАЗЕ ДАННЫХ ORACLE
+  # ==========================================
   datasource:
-ิ  hikari:
-  # Время в миллисекундах. Если соединение удерживается дольше,
-  # HikariCP запишет тревожный лог со стектрейсом.
-  leak-detection-threshold: 30000 # например, 30 секунд
+    # Настройки пула соединений HikariCP (управляет выдачей коннектов)
+    hikari:
+      # ДЕТЕКТОР УТЕЧЕК: Если коннект взят из пула и не возвращен за 30 сек (30000 мс),
+      # в логи запишется [WARN] с полным стектрейсом (цепочкой вызовов Java-кода),
+      # чтобы разработчик увидел, в какой именно строчке кода зависло соединение.
+      # Важно: это НЕ убивает запрос, а только диагностирует.
+      leak-detection-threshold: 30000
+
+    # Глубокие настройки самого JDBC драйвера Oracle (сетевой уровень)
+    properties:
+      # СЕТЕВОЙ ПАЛАЧ: Если база данных (Oracle) "задумалась" или сеть мигнула,
+      # и ответа нет дольше 60 секунд (60000 мс), драйвер принудительно разрывает
+      # сетевое TCP-соединение с ошибкой Timeout. Это спасает поток приложения.
+      oracle.jdbc.ReadTimeout: 60000
+
+  # ==========================================
+  # НАСТРОЙКИ HIBERNATE (ORM / РАБОТА С СУБД)
+  # ==========================================
+  jpa:
+    properties:
+      hibernate:
+        # SQL ПАЛАЧ: Перед каждым обращением к базе Hibernate говорит:
+        # "Если этот SQL-запрос выполняется дольше 60 секунд - отмени его внутри самой БД".
+        # Это предотвращает бесконечные блокировки (Deadlocks) на тяжелых таблицах.
+        javax.persistence.query.timeout: 60000
+
+# ==========================================
+# ДОКУМЕНТАЦИЯ API (KNIFE4J & SWAGGER)
+# ==========================================
 knife4j:
-  enable: true
+  enable: true # Включает красивый интерфейс документации Knife4j
   setting:
     language: en
     enable-group: true
-    enable-swagger-models: false
-server:
-  servlet:
-    encoding:
-      charset: UTF-8
-      enabled: true
-      force: true
-app:
-  logging:
-    max-buffer-size: 10000
-max:
-  api:
-    age-verification-url: https://ext-api2.max.ru/v2/business/pos/age-verification
-    bot-api-url: https://platform-api2.max.ru
-    connect-timeout: 5000
-    read-timeout: 60000
-sms:
-  ru:
-    api-id: ${SMS_RU_API_ID:57BF6FEA-09FE-0B41-DA0E-EB517C544A35}
-    default-from: ${SMS_RU_FROM:StroyFaktor}
-    test-mode: ${SMS_RU_TEST_MODE:false}
-    connect-timeout: 30000
-    read-timeout: 30000
-    max-numbers-per-request: 100
-asterisk:
-  ami:
-    host: asterisk.ars
-    port: 5038
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "health,metrics,hikaricp"
-  endpoint:
-    health:
-      show-details: always
+    enable-swagger-models: false # Отключаем вывод громоздких схем моделей внизу страницы
+
 springdoc:
   api-docs:
     enabled: true
-    path: /v3/api-docs
+    path: /v3/api-docs # Путь к сырому JSON-файлу со схемой API
   swagger-ui:
     enabled: true
-    path: /swagger-ui.html
+    path: /swagger-ui.html # Классический интерфейс Swagger
     groups-order: asc
-    try-it-out-enabled: true
-  show-actuator: false
+    try-it-out-enabled: true # Разрешает отправлять тестовые запросы прямо из документации
+  show-actuator: false # Прячем системные методы мониторинга из документации для безопасности
+
+  # Группировка методов в левом меню документации
   group-configs:
     - group: auth
       display-name: Авторизация
@@ -80,3 +76,61 @@ springdoc:
         - /v*/prcdoc/**
         - /v*/prcprice/**
         - /v*/tohead/**
+
+# ==========================================
+# ВСТРОЕННЫЙ СЕРВЕР (TOMCAT) И КОДИРОВКИ
+# ==========================================
+server:
+  servlet:
+    encoding:
+      charset: UTF-8 # Жестко фиксируем UTF-8, чтобы кириллица не ломалась (кракозябры)
+      enabled: true
+      force: true # Принудительно перезаписывает кодировку клиента
+
+# ==========================================
+# НАСТРОЙКИ ПРИЛОЖЕНИЯ (КАСТОМНЫЕ)
+# ==========================================
+app:
+  logging:
+    # Размер буфера оперативной памяти (в строках), который хранит "Живые логи".
+    # Эти логи отдаются на ваш дашборд мониторинга по запросу /v1/logs/recent.
+    max-buffer-size: 10000
+
+# ==========================================
+# ИНТЕГРАЦИИ СО СТОРОННИМИ СЕРВИСАМИ
+# ==========================================
+max:
+  api:
+    age-verification-url: https://ext-api2.max.ru/v2/business/pos/age-verification
+    bot-api-url: https://platform-api2.max.ru
+    connect-timeout: 5000 # 5 сек на установку связи со сторонним API
+    read-timeout: 60000 # 60 сек ожидание ответа от стороннего API
+
+sms:
+  ru:
+    # Ключ авторизации (берется из переменных окружения ОС или используется дефолтный)
+    api-id: ${SMS_RU_API_ID:57BF6FEA-09FE-0B41-DA0E-EB517C544A35}
+    default-from: ${SMS_RU_FROM:StroyFaktor}
+    test-mode: ${SMS_RU_TEST_MODE:false}
+    connect-timeout: 30000 # Время на подключение к SMS-шлюзу (30 сек)
+    read-timeout: 30000    # Время ожидания ответа от SMS-шлюза (30 сек)
+    max-numbers-per-request: 100 # Лимит номеров телефонов в одном массиве рассылки
+
+asterisk:
+  ami:
+    host: asterisk.ars # IP или домен сервера IP-телефонии
+    port: 5038 # Стандартный порт AMI (Asterisk Manager Interface)
+
+# ==========================================
+# МОНИТОРИНГ И ЗДОРОВЬЕ (ACTUATOR)
+# ==========================================
+management:
+  endpoints:
+    web:
+      exposure:
+        # Открываем системные эндпоинты для веб-запросов (нужны для вашего дашборда мониторинга)
+        include: "health,metrics,hikaricp"
+  endpoint:
+    health:
+      # Показывать полную детализацию здоровья (состояние диска, БД), а не просто статус "UP"
+      show-details: always

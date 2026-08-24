@@ -208,7 +208,33 @@
                 <span>🐳 Registry UI (7000)</span>
                 <span style="font-size: 11px; background: #dcfce7; padding: 2px 6px; border-radius: 4px;">Открыть ↗</span>
             </button>
+            <div style="padding: 10px 15px; background: #fdf4ff; border: 1px solid #f5d0fe; border-radius: 8px; font-size: 12px;">
+                <div style="font-weight: bold; color: #86198f; margin-bottom: 4px;">🗄️ Структура БД (SchemaSpy):</div>
+                <div style="color: #64748b; margin-bottom: 4px;" id="schemaspy-sync-time">⏳ Проверка времени...</div>
+                <a href="http://oracle-rest-api.ars:8070" target="_blank" style="display: inline-block; color: #2563eb; text-decoration: none; font-weight: bold;">Открыть документацию ↗</a>
+            </div>
         </div>
+
+        <script>
+            async function loadSchemaSpyUpdateTime() {
+                const timeEl = document.getElementById('schemaspy-sync-time');
+                try {
+                    // Заменяем IP_СЕРВЕРА_SCHEMASPY на ваш домен/IP (например, oracle-rest-api.ars)
+                    const response = await fetch('http://oracle-rest-api.ars:8070/updated.txt', { cache: 'no-cache' });
+                    if (response.ok) {
+                        const updateTime = await response.text();
+                        timeEl.innerHTML = `🔄 Обновлено: <b style="color: #1e293b;">${updateTime.trim()} (Барнаул)</b>`;
+                    } else {
+                        timeEl.textContent = '⚠️ Не удалось получить время';
+                    }
+                } catch (e) {
+                    timeEl.textContent = '🔴 Сервер SchemaSpy недоступен';
+                }
+            }
+            loadSchemaSpyUpdateTime();
+            // Обновляем статус каждые 30 секунд
+            setInterval(loadSchemaSpyUpdateTime, 30000);
+        </script>
 
         <!-- 🚀 ГЛАВНЫЕ РАЗДЕЛЫ -->
         <div class="group-title" style="font-size: 12px; text-transform: uppercase; color: #2563eb; font-weight: 700; margin: 10px 0 8px 15px; letter-spacing: 0.5px;">

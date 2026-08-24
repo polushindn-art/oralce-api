@@ -18,8 +18,8 @@ object Article {
         return sb.toString().take(13).trim()
     }
 
-    fun shortArticle(article: String): String {
-        if (article.isEmpty()) return ""
+    fun shortArticle(article: String?): String {
+        if (article.isNullOrEmpty()) return ""
         if (article.length <= 11) return article
         return article.take(11).trim()
     }

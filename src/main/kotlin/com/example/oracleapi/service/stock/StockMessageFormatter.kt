@@ -39,6 +39,8 @@ class StockMessageFormatter(
             }
         }
 
+        val article = Article.shortArticle(nomen.article)
+
         // Только склады с наличием
         val available = stocks.filter { it.quantToSale != null && it.quantToSale > BigDecimal.ZERO }
 
@@ -48,7 +50,7 @@ class StockMessageFormatter(
                 appendLine("📦 *Товар найден, но отсутствует на складах*")
                 appendLine()
                 appendLine("📌 *${nomen.nomenname ?: "Без названия"}*")
-                appendLine("🔢 Артикул: ${nomen.article ?: "не указан"}")
+                appendLine("🔢 Артикул: `$article`")
                 appendLine()
                 appendLine("Товар временно отсутствует.")
                 appendLine("Обратитесь к менеджеру для уточнения.")
@@ -60,7 +62,6 @@ class StockMessageFormatter(
             appendLine("📦 *Остатки товара*")
             appendLine()
             appendLine("📌 *${nomen.nomenname ?: "Без названия"}*")
-            val article = Article.shortArticle(nomen.article!!)
             appendLine("🔢 Артикул: `$article`")
             appendLine()
 
@@ -96,9 +97,11 @@ class StockMessageFormatter(
             appendLine("---")
             appendLine("📊 *Итого: $total шт*")
 
-            val link = webSiteService.getLinkWebSite(WebSiteRequest(nomen.article)).link
-            appendLine()
-            appendLine("🌐 [Открыть сайт](https://$link)")
+            if (nomen.article != null) {
+                val link = webSiteService.getLinkWebSite(WebSiteRequest(nomen.article)).link
+                appendLine()
+                appendLine("🌐 [Открыть сайт](https://$link)")
+            }
 
         }
     }
