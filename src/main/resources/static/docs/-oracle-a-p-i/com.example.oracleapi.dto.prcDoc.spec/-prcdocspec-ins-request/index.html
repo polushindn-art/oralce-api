@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>PrcdocspecInsRequest</title>
+    <link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer="defer"></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
+</head>
+<body>
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+                    <a class="library-name--link" href="../../../index.html">
+                            OracleAPI
+                    </a>
+            </div>
+            <div class="library-version">
+            </div>
+        </div>
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter="OracleAPI/JVM">JVM</button>
+        </div>
+    </div>
+    <div class="navigation-controls">
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
+    </div>
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageIds="OracleAPI::com.example.oracleapi.dto.prcDoc.spec/PrcdocspecInsRequest///PointingToDeclaration//-1243844382">
+  <div class="breadcrumbs"><a href="../../../index.html">OracleAPI</a><span class="delimiter">/</span><a href="../index.html">com.example.oracleapi.dto.prcDoc.spec</a><span class="delimiter">/</span><span class="current">PrcdocspecInsRequest</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Prcdocspec</span><wbr></wbr><span>Ins</span><wbr></wbr><span><span>Request</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="index.html">PrcdocspecInsRequest</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>prn<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>nomen<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>pricecs<span class="token operator">: </span><span data-unresolved-link="java.math/BigDecimal///PointingToDeclaration/">BigDecimal</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>price1<span class="token operator">: </span><span data-unresolved-link="java.math/BigDecimal///PointingToDeclaration/">BigDecimal</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>price2<span class="token operator">: </span><span data-unresolved-link="java.math/BigDecimal///PointingToDeclaration/">BigDecimal</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>price3<span class="token operator">: </span><span data-unresolved-link="java.math/BigDecimal///PointingToDeclaration/">BigDecimal</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>price4<span class="token operator">: </span><span data-unresolved-link="java.math/BigDecimal///PointingToDeclaration/">BigDecimal</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>price5<span class="token operator">: </span><span data-unresolved-link="java.math/BigDecimal///PointingToDeclaration/">BigDecimal</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>enabled<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator"> = </span><span class="token constant">1</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>overhaul<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator"> = </span><span class="token constant">0</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>kopeck<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator"> = </span><span class="token constant">0</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>whsconst<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator"> = </span><span class="token constant">1</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>checkRoznPrice<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator"> = </span><span class="token string">&quot;111111&quot;</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>nomncat1<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>nomncat2<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>nomncat3<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>nomncat4<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>nomncat5<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>nomncatCS<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>overhaulpricepr<span class="token operator">: </span><span data-unresolved-link="java.math/BigDecimal///PointingToDeclaration/">BigDecimal</span><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>typepriceactioncs<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>typepriceaction1<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>typepriceaction2<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>typepriceaction3<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>typepriceaction4<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>typepriceaction5<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>rn<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>isUpdate<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>isWS<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">true</span></span></span><span class="token punctuation">)</span></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="">Constructors</h2>
+        <div class="table"><a data-name="-1302853065%2FConstructors%2F-1243844382" anchor-label="PrcdocspecInsRequest" id="-1302853065%2FConstructors%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-prcdocspec-ins-request.html"><span>Prcdocspec</span><wbr></wbr><span>Ins</span><wbr></wbr><span><span>Request</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1302853065%2FConstructors%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">prn<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span></span><span class="parameter ">nomen<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span></span><span class="parameter ">pricecs<span class="token operator">: </span><span data-unresolved-link="java.math/BigDecimal///PointingToDeclaration/">BigDecimal</span><span class="token punctuation">, </span></span><span class="parameter ">price1<span class="token operator">: </span><span data-unresolved-link="java.math/BigDecimal///PointingToDeclaration/">BigDecimal</span><span class="token punctuation">, </span></span><span class="parameter ">price2<span class="token operator">: </span><span data-unresolved-link="java.math/BigDecimal///PointingToDeclaration/">BigDecimal</span><span class="token punctuation">, </span></span><span class="parameter ">price3<span class="token operator">: </span><span data-unresolved-link="java.math/BigDecimal///PointingToDeclaration/">BigDecimal</span><span class="token punctuation">, </span></span><span class="parameter ">price4<span class="token operator">: </span><span data-unresolved-link="java.math/BigDecimal///PointingToDeclaration/">BigDecimal</span><span class="token punctuation">, </span></span><span class="parameter ">price5<span class="token operator">: </span><span data-unresolved-link="java.math/BigDecimal///PointingToDeclaration/">BigDecimal</span><span class="token punctuation">, </span></span><span class="parameter ">enabled<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator"> = </span><span class="token constant">1</span><span class="token punctuation">, </span></span><span class="parameter ">overhaul<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator"> = </span><span class="token constant">0</span><span class="token punctuation">, </span></span><span class="parameter ">kopeck<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator"> = </span><span class="token constant">0</span><span class="token punctuation">, </span></span><span class="parameter ">whsconst<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator"> = </span><span class="token constant">1</span><span class="token punctuation">, </span></span><span class="parameter ">checkRoznPrice<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator"> = </span><span class="token string">&quot;111111&quot;</span><span class="token punctuation">, </span></span><span class="parameter ">nomncat1<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">nomncat2<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">nomncat3<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">nomncat4<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">nomncat5<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">nomncatCS<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">overhaulpricepr<span class="token operator">: </span><span data-unresolved-link="java.math/BigDecimal///PointingToDeclaration/">BigDecimal</span><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">typepriceactioncs<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">typepriceaction1<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">typepriceaction2<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">typepriceaction3<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">typepriceaction4<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">typepriceaction5<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">rn<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">isUpdate<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span><span class="token punctuation">, </span></span><span class="parameter ">isWS<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">true</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="">Properties</h2>
+        <div class="table"><a data-name="-526002816%2FProperties%2F-1243844382" anchor-label="checkRoznPrice" id="-526002816%2FProperties%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="check-rozn-price.html"><span>check</span><wbr></wbr><span>Rozn</span><wbr></wbr><span><span>Price</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-526002816%2FProperties%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/Pattern///PointingToDeclaration/"><span class="token annotation builtin">Pattern</span></span><span class="token punctuation">(</span><span>regexp<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;^\d{6}$&quot;</span></span><span class="token punctuation">, </span></span><wbr></wbr><span>message<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;должен содержать 6 цифр&quot;</span></span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">val </span><a href="check-rozn-price.html">checkRoznPrice</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-645682743%2FProperties%2F-1243844382" anchor-label="enabled" id="-645682743%2FProperties%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="enabled.html"><span><span>enabled</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-645682743%2FProperties%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/PositiveOrZero///PointingToDeclaration/"><span class="token annotation builtin">PositiveOrZero</span></span><span class="token punctuation">(</span><span>message<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;enabled должен быть &gt;= 0&quot;</span></span></span><wbr></wbr><span class="token punctuation">)</span></div><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/Min///PointingToDeclaration/"><span class="token annotation builtin">Min</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="breakable-word"><span class="token constant">0</span></span></span><wbr></wbr><span class="token punctuation">)</span></div><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/Max///PointingToDeclaration/"><span class="token annotation builtin">Max</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="breakable-word"><span class="token constant">2</span></span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">val </span><a href="enabled.html">enabled</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator"> = </span><span class="token constant">1</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-795859971%2FProperties%2F-1243844382" anchor-label="isUpdate" id="-795859971%2FProperties%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="is-update.html"><span>is</span><wbr></wbr><span><span>Update</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-795859971%2FProperties%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><span class="token keyword">val </span><a href="is-update.html">isUpdate</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-72568342%2FProperties%2F-1243844382" anchor-label="isWS" id="-72568342%2FProperties%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="is-w-s.html"><span>is</span><wbr></wbr><span><span>WS</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-72568342%2FProperties%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><span class="token keyword">val </span><a href="is-w-s.html">isWS</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">true</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-378549617%2FProperties%2F-1243844382" anchor-label="kopeck" id="-378549617%2FProperties%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="kopeck.html"><span><span>kopeck</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-378549617%2FProperties%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/PositiveOrZero///PointingToDeclaration/"><span class="token annotation builtin">PositiveOrZero</span></span><span class="token punctuation">(</span><span>message<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;kopeck должен быть &gt;= 0&quot;</span></span></span><wbr></wbr><span class="token punctuation">)</span></div><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/Min///PointingToDeclaration/"><span class="token annotation builtin">Min</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="breakable-word"><span class="token constant">0</span></span></span><wbr></wbr><span class="token punctuation">)</span></div><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/Max///PointingToDeclaration/"><span class="token annotation builtin">Max</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="breakable-word"><span class="token constant">1</span></span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">val </span><a href="kopeck.html">kopeck</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator"> = </span><span class="token constant">0</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-439375275%2FProperties%2F-1243844382" anchor-label="nomen" id="-439375275%2FProperties%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="nomen.html"><span><span>nomen</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-439375275%2FProperties%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/NotNull///PointingToDeclaration/"><span class="token annotation builtin">NotNull</span></span><span class="token punctuation">(</span><span>message<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;nomen обязателен&quot;</span></span></span><wbr></wbr><span class="token punctuation">)</span></div><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/Positive///PointingToDeclaration/"><span class="token annotation builtin">Positive</span></span><span class="token punctuation">(</span><span>message<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;nomen должен быть положительным&quot;</span></span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">val </span><a href="nomen.html">nomen</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1878361965%2FProperties%2F-1243844382" anchor-label="nomncat1" id="-1878361965%2FProperties%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="nomncat1.html"><span><span>nomncat1</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1878361965%2FProperties%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/Positive///PointingToDeclaration/"><span class="token annotation builtin">Positive</span></span><span class="token punctuation">(</span><span>message<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;nomncat1 должен быть положительным&quot;</span></span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">val </span><a href="nomncat1.html">nomncat1</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token operator"> = </span>null</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1847342158%2FProperties%2F-1243844382" anchor-label="nomncat2" id="-1847342158%2FProperties%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="nomncat2.html"><span><span>nomncat2</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1847342158%2FProperties%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/Positive///PointingToDeclaration/"><span class="token annotation builtin">Positive</span></span><span class="token punctuation">(</span><span>message<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;nomncat2 должен быть положительным&quot;</span></span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">val </span><a href="nomncat2.html">nomncat2</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token operator"> = </span>null</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1816322351%2FProperties%2F-1243844382" anchor-label="nomncat3" id="-1816322351%2FProperties%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="nomncat3.html"><span><span>nomncat3</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1816322351%2FProperties%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/Positive///PointingToDeclaration/"><span class="token annotation builtin">Positive</span></span><span class="token punctuation">(</span><span>message<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;nomncat3 должен быть положительным&quot;</span></span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">val </span><a href="nomncat3.html">nomncat3</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token operator"> = </span>null</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1785302544%2FProperties%2F-1243844382" anchor-label="nomncat4" id="-1785302544%2FProperties%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="nomncat4.html"><span><span>nomncat4</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1785302544%2FProperties%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/Positive///PointingToDeclaration/"><span class="token annotation builtin">Positive</span></span><span class="token punctuation">(</span><span>message<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;nomncat4 должен быть положительным&quot;</span></span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">val </span><a href="nomncat4.html">nomncat4</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token operator"> = </span>null</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1754282737%2FProperties%2F-1243844382" anchor-label="nomncat5" id="-1754282737%2FProperties%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="nomncat5.html"><span><span>nomncat5</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1754282737%2FProperties%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/Positive///PointingToDeclaration/"><span class="token annotation builtin">Positive</span></span><span class="token punctuation">(</span><span>message<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;nomncat5 должен быть положительным&quot;</span></span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">val </span><a href="nomncat5.html">nomncat5</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token operator"> = </span>null</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1691841978%2FProperties%2F-1243844382" anchor-label="nomncatCS" id="-1691841978%2FProperties%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="nomncat-c-s.html"><span>nomncat</span><wbr></wbr><span><span>CS</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1691841978%2FProperties%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/Positive///PointingToDeclaration/"><span class="token annotation builtin">Positive</span></span><span class="token punctuation">(</span><span>message<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;nomncatCS должен быть положительным&quot;</span></span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">val </span><a href="nomncat-c-s.html">nomncatCS</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token operator"> = </span>null</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1751707764%2FProperties%2F-1243844382" anchor-label="overhaul" id="-1751707764%2FProperties%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="overhaul.html"><span><span>overhaul</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1751707764%2FProperties%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/PositiveOrZero///PointingToDeclaration/"><span class="token annotation builtin">PositiveOrZero</span></span><span class="token punctuation">(</span><span>message<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;overhaul должен быть &gt;= 0&quot;</span></span></span><wbr></wbr><span class="token punctuation">)</span></div><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/Min///PointingToDeclaration/"><span class="token annotation builtin">Min</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="breakable-word"><span class="token constant">0</span></span></span><wbr></wbr><span class="token punctuation">)</span></div><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/Max///PointingToDeclaration/"><span class="token annotation builtin">Max</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="breakable-word"><span class="token constant">1</span></span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">val </span><a href="overhaul.html">overhaul</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator"> = </span><span class="token constant">0</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="843072099%2FProperties%2F-1243844382" anchor-label="overhaulpricepr" id="843072099%2FProperties%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="overhaulpricepr.html"><span><span>overhaulpricepr</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="843072099%2FProperties%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/DecimalMin///PointingToDeclaration/"><span class="token annotation builtin">DecimalMin</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;0.0&quot;</span></span><span class="token punctuation">, </span></span><wbr></wbr><span>inclusive<span class="token operator"> = </span><span class="breakable-word"><span class="token boolean">true</span></span><span class="token punctuation">, </span></span><wbr></wbr><span>message<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;overhaulpricepr не может быть отрицательным&quot;</span></span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">val </span><a href="overhaulpricepr.html">overhaulpricepr</a><span class="token operator">: </span><span data-unresolved-link="java.math/BigDecimal///PointingToDeclaration/">BigDecimal</span><span class="token operator">?</span><span class="token operator"> = </span>null</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1486206184%2FProperties%2F-1243844382" anchor-label="price1" id="1486206184%2FProperties%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="price1.html"><span><span>price1</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1486206184%2FProperties%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/NotNull///PointingToDeclaration/"><span class="token annotation builtin">NotNull</span></span><span class="token punctuation">(</span><span>message<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;price1 обязателен&quot;</span></span></span><wbr></wbr><span class="token punctuation">)</span></div><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/DecimalMin///PointingToDeclaration/"><span class="token annotation builtin">DecimalMin</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;0.0&quot;</span></span><span class="token punctuation">, </span></span><wbr></wbr><span>inclusive<span class="token operator"> = </span><span class="breakable-word"><span class="token boolean">true</span></span><span class="token punctuation">, </span></span><wbr></wbr><span>message<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;price1 не может быть отрицательным&quot;</span></span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">val </span><a href="price1.html">price1</a><span class="token operator">: </span><span data-unresolved-link="java.math/BigDecimal///PointingToDeclaration/">BigDecimal</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1517225991%2FProperties%2F-1243844382" anchor-label="price2" id="1517225991%2FProperties%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="price2.html"><span><span>price2</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1517225991%2FProperties%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/NotNull///PointingToDeclaration/"><span class="token annotation builtin">NotNull</span></span><span class="token punctuation">(</span><span>message<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;price2 обязателен&quot;</span></span></span><wbr></wbr><span class="token punctuation">)</span></div><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/DecimalMin///PointingToDeclaration/"><span class="token annotation builtin">DecimalMin</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;0.0&quot;</span></span><span class="token punctuation">, </span></span><wbr></wbr><span>inclusive<span class="token operator"> = </span><span class="breakable-word"><span class="token boolean">true</span></span><span class="token punctuation">, </span></span><wbr></wbr><span>message<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;price2 не может быть отрицательным&quot;</span></span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">val </span><a href="price2.html">price2</a><span class="token operator">: </span><span data-unresolved-link="java.math/BigDecimal///PointingToDeclaration/">BigDecimal</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1548245798%2FProperties%2F-1243844382" anchor-label="price3" id="1548245798%2FProperties%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="price3.html"><span><span>price3</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1548245798%2FProperties%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/NotNull///PointingToDeclaration/"><span class="token annotation builtin">NotNull</span></span><span class="token punctuation">(</span><span>message<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;price3 обязателен&quot;</span></span></span><wbr></wbr><span class="token punctuation">)</span></div><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/DecimalMin///PointingToDeclaration/"><span class="token annotation builtin">DecimalMin</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;0.0&quot;</span></span><span class="token punctuation">, </span></span><wbr></wbr><span>inclusive<span class="token operator"> = </span><span class="breakable-word"><span class="token boolean">true</span></span><span class="token punctuation">, </span></span><wbr></wbr><span>message<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;price3 не может быть отрицательным&quot;</span></span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">val </span><a href="price3.html">price3</a><span class="token operator">: </span><span data-unresolved-link="java.math/BigDecimal///PointingToDeclaration/">BigDecimal</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1579265605%2FProperties%2F-1243844382" anchor-label="price4" id="1579265605%2FProperties%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="price4.html"><span><span>price4</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1579265605%2FProperties%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/NotNull///PointingToDeclaration/"><span class="token annotation builtin">NotNull</span></span><span class="token punctuation">(</span><span>message<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;price4 обязателен&quot;</span></span></span><wbr></wbr><span class="token punctuation">)</span></div><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/DecimalMin///PointingToDeclaration/"><span class="token annotation builtin">DecimalMin</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;0.0&quot;</span></span><span class="token punctuation">, </span></span><wbr></wbr><span>inclusive<span class="token operator"> = </span><span class="breakable-word"><span class="token boolean">true</span></span><span class="token punctuation">, </span></span><wbr></wbr><span>message<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;price4 не может быть отрицательным&quot;</span></span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">val </span><a href="price4.html">price4</a><span class="token operator">: </span><span data-unresolved-link="java.math/BigDecimal///PointingToDeclaration/">BigDecimal</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1610285412%2FProperties%2F-1243844382" anchor-label="price5" id="1610285412%2FProperties%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="price5.html"><span><span>price5</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1610285412%2FProperties%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/NotNull///PointingToDeclaration/"><span class="token annotation builtin">NotNull</span></span><span class="token punctuation">(</span><span>message<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;price5 обязателен&quot;</span></span></span><wbr></wbr><span class="token punctuation">)</span></div><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/DecimalMin///PointingToDeclaration/"><span class="token annotation builtin">DecimalMin</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;0.0&quot;</span></span><span class="token punctuation">, </span></span><wbr></wbr><span>inclusive<span class="token operator"> = </span><span class="breakable-word"><span class="token boolean">true</span></span><span class="token punctuation">, </span></span><wbr></wbr><span>message<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;price5 не может быть отрицательным&quot;</span></span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">val </span><a href="price5.html">price5</a><span class="token operator">: </span><span data-unresolved-link="java.math/BigDecimal///PointingToDeclaration/">BigDecimal</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1230066833%2FProperties%2F-1243844382" anchor-label="pricecs" id="1230066833%2FProperties%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="pricecs.html"><span><span>pricecs</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1230066833%2FProperties%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/NotNull///PointingToDeclaration/"><span class="token annotation builtin">NotNull</span></span><span class="token punctuation">(</span><span>message<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;pricecs обязателен&quot;</span></span></span><wbr></wbr><span class="token punctuation">)</span></div><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/DecimalMin///PointingToDeclaration/"><span class="token annotation builtin">DecimalMin</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;0.0&quot;</span></span><span class="token punctuation">, </span></span><wbr></wbr><span>inclusive<span class="token operator"> = </span><span class="breakable-word"><span class="token boolean">true</span></span><span class="token punctuation">, </span></span><wbr></wbr><span>message<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;pricecs не может быть отрицательным&quot;</span></span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">val </span><a href="pricecs.html">pricecs</a><span class="token operator">: </span><span data-unresolved-link="java.math/BigDecimal///PointingToDeclaration/">BigDecimal</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-528138434%2FProperties%2F-1243844382" anchor-label="prn" id="-528138434%2FProperties%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="--prn--.html"><span><span>prn</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-528138434%2FProperties%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/NotNull///PointingToDeclaration/"><span class="token annotation builtin">NotNull</span></span><span class="token punctuation">(</span><span>message<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;prn обязателен&quot;</span></span></span><wbr></wbr><span class="token punctuation">)</span></div><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/Positive///PointingToDeclaration/"><span class="token annotation builtin">Positive</span></span><span class="token punctuation">(</span><span>message<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;prn должен быть положительным&quot;</span></span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">val </span><a href="--prn--.html">prn</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="766759604%2FProperties%2F-1243844382" anchor-label="rn" id="766759604%2FProperties%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="rn.html"><span><span>rn</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="766759604%2FProperties%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/Positive///PointingToDeclaration/"><span class="token annotation builtin">Positive</span></span><span class="token punctuation">(</span><span>message<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;rn должен быть положительным&quot;</span></span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">val </span><a href="rn.html">rn</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token operator"> = </span>null</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1236452828%2FProperties%2F-1243844382" anchor-label="typepriceaction1" id="-1236452828%2FProperties%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="typepriceaction1.html"><span><span>typepriceaction1</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1236452828%2FProperties%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/Positive///PointingToDeclaration/"><span class="token annotation builtin">Positive</span></span><span class="token punctuation">(</span><span>message<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;typepriceaction1 должен быть положительным&quot;</span></span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">val </span><a href="typepriceaction1.html">typepriceaction1</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token operator"> = </span>null</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1205433021%2FProperties%2F-1243844382" anchor-label="typepriceaction2" id="-1205433021%2FProperties%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="typepriceaction2.html"><span><span>typepriceaction2</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1205433021%2FProperties%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/Positive///PointingToDeclaration/"><span class="token annotation builtin">Positive</span></span><span class="token punctuation">(</span><span>message<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;typepriceaction2 должен быть положительным&quot;</span></span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">val </span><a href="typepriceaction2.html">typepriceaction2</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token operator"> = </span>null</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1174413214%2FProperties%2F-1243844382" anchor-label="typepriceaction3" id="-1174413214%2FProperties%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="typepriceaction3.html"><span><span>typepriceaction3</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1174413214%2FProperties%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/Positive///PointingToDeclaration/"><span class="token annotation builtin">Positive</span></span><span class="token punctuation">(</span><span>message<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;typepriceaction3 должен быть положительным&quot;</span></span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">val </span><a href="typepriceaction3.html">typepriceaction3</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token operator"> = </span>null</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1143393407%2FProperties%2F-1243844382" anchor-label="typepriceaction4" id="-1143393407%2FProperties%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="typepriceaction4.html"><span><span>typepriceaction4</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1143393407%2FProperties%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/Positive///PointingToDeclaration/"><span class="token annotation builtin">Positive</span></span><span class="token punctuation">(</span><span>message<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;typepriceaction4 должен быть положительным&quot;</span></span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">val </span><a href="typepriceaction4.html">typepriceaction4</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token operator"> = </span>null</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1112373600%2FProperties%2F-1243844382" anchor-label="typepriceaction5" id="-1112373600%2FProperties%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="typepriceaction5.html"><span><span>typepriceaction5</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1112373600%2FProperties%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/Positive///PointingToDeclaration/"><span class="token annotation builtin">Positive</span></span><span class="token punctuation">(</span><span>message<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;typepriceaction5 должен быть положительным&quot;</span></span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">val </span><a href="typepriceaction5.html">typepriceaction5</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token operator"> = </span>null</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1567983915%2FProperties%2F-1243844382" anchor-label="typepriceactioncs" id="-1567983915%2FProperties%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="typepriceactioncs.html"><span><span>typepriceactioncs</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1567983915%2FProperties%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/Positive///PointingToDeclaration/"><span class="token annotation builtin">Positive</span></span><span class="token punctuation">(</span><span>message<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;typepriceactioncs должен быть положительным&quot;</span></span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">val </span><a href="typepriceactioncs.html">typepriceactioncs</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token operator"> = </span>null</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="641953135%2FProperties%2F-1243844382" anchor-label="whsconst" id="641953135%2FProperties%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="whsconst.html"><span><span>whsconst</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="641953135%2FProperties%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/PositiveOrZero///PointingToDeclaration/"><span class="token annotation builtin">PositiveOrZero</span></span><span class="token punctuation">(</span><span>message<span class="token operator"> = </span><span class="breakable-word"><span class="token string">&quot;whsconst должен быть &gt;= 0&quot;</span></span></span><wbr></wbr><span class="token punctuation">)</span></div><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/Min///PointingToDeclaration/"><span class="token annotation builtin">Min</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="breakable-word"><span class="token constant">0</span></span></span><wbr></wbr><span class="token punctuation">)</span></div><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation.constraints/Max///PointingToDeclaration/"><span class="token annotation builtin">Max</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="breakable-word"><span class="token constant">1</span></span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">val </span><a href="whsconst.html">whsconst</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator"> = </span><span class="token constant">1</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2026 Copyright</span><span
+                class="pull-right"><span>Generated by </span><a
+                href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

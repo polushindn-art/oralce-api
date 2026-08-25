@@ -35,7 +35,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 class MaxMainPollingService(
     private val restTemplate: RestTemplate,
     private val properties: MaxApiProperties,
-    private val botClient: MaxBotMainClient,
+    private val botClient: MaxBotMainClientService,
     private val agnPhoneService: AgnPhoneService,
     private val maxUserAgnService: MaxUserAgnService,
     private val barcodeService: BarcodeService,

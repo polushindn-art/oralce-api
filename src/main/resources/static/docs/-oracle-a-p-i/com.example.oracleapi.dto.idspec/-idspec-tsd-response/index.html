@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>IdspecTsdResponse</title>
+    <link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer="defer"></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
+</head>
+<body>
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+                    <a class="library-name--link" href="../../../index.html">
+                            OracleAPI
+                    </a>
+            </div>
+            <div class="library-version">
+            </div>
+        </div>
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter="OracleAPI/JVM">JVM</button>
+        </div>
+    </div>
+    <div class="navigation-controls">
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
+    </div>
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageIds="OracleAPI::com.example.oracleapi.dto.idspec/IdspecTsdResponse///PointingToDeclaration//-1243844382">
+  <div class="breadcrumbs"><a href="../../../index.html">OracleAPI</a><span class="delimiter">/</span><a href="../index.html">com.example.oracleapi.dto.idspec</a><span class="delimiter">/</span><span class="current">IdspecTsdResponse</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Idspec</span><wbr></wbr><span>Tsd</span><wbr></wbr><span><span>Response</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="index.html">IdspecTsdResponse</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>rn<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>nomenId<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>nomenCode<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>article<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>nomenName<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>quant<span class="token operator">: </span><span data-unresolved-link="java.math/BigDecimal///PointingToDeclaration/">BigDecimal</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>summ<span class="token operator">: </span><span data-unresolved-link="java.math/BigDecimal///PointingToDeclaration/">BigDecimal</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>inprice<span class="token operator">: </span><span data-unresolved-link="java.math/BigDecimal///PointingToDeclaration/">BigDecimal</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>storein<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>storeout<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>km<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator">?</span><span class="token operator"> = </span>emptyList()</span></span><span class="token punctuation">)</span></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="">Constructors</h2>
+        <div class="table"><a data-name="-681439771%2FConstructors%2F-1243844382" anchor-label="IdspecTsdResponse" id="-681439771%2FConstructors%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-idspec-tsd-response.html"><span>Idspec</span><wbr></wbr><span>Tsd</span><wbr></wbr><span><span>Response</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-681439771%2FConstructors%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">rn<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span></span><span class="parameter ">nomenId<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span></span><span class="parameter ">nomenCode<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">article<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">nomenName<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">quant<span class="token operator">: </span><span data-unresolved-link="java.math/BigDecimal///PointingToDeclaration/">BigDecimal</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">summ<span class="token operator">: </span><span data-unresolved-link="java.math/BigDecimal///PointingToDeclaration/">BigDecimal</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">inprice<span class="token operator">: </span><span data-unresolved-link="java.math/BigDecimal///PointingToDeclaration/">BigDecimal</span><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">storein<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">storeout<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span><span class="token punctuation">, </span></span><span class="parameter ">km<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator">?</span><span class="token operator"> = </span>emptyList()</span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="">Properties</h2>
+        <div class="table"><a data-name="1415310445%2FProperties%2F-1243844382" anchor-label="article" id="1415310445%2FProperties%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="article.html"><span><span>article</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1415310445%2FProperties%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><span class="token keyword">val </span><a href="article.html">article</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1415821791%2FProperties%2F-1243844382" anchor-label="inprice" id="1415821791%2FProperties%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="inprice.html"><span><span>inprice</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1415821791%2FProperties%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><span class="token keyword">val </span><a href="inprice.html">inprice</a><span class="token operator">: </span><span data-unresolved-link="java.math/BigDecimal///PointingToDeclaration/">BigDecimal</span><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="688413685%2FProperties%2F-1243844382" anchor-label="km" id="688413685%2FProperties%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="km.html"><span><span>km</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="688413685%2FProperties%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><span class="token keyword">val </span><a href="km.html">km</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1220528481%2FProperties%2F-1243844382" anchor-label="nomenCode" id="1220528481%2FProperties%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="nomen-code.html"><span>nomen</span><wbr></wbr><span><span>Code</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1220528481%2FProperties%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><span class="token keyword">val </span><a href="nomen-code.html">nomenCode</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-685161933%2FProperties%2F-1243844382" anchor-label="nomenId" id="-685161933%2FProperties%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="nomen-id.html"><span>nomen</span><wbr></wbr><span><span>Id</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-685161933%2FProperties%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><span class="token keyword">val </span><a href="nomen-id.html">nomenId</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-409351549%2FProperties%2F-1243844382" anchor-label="nomenName" id="-409351549%2FProperties%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="nomen-name.html"><span>nomen</span><wbr></wbr><span><span>Name</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-409351549%2FProperties%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><span class="token keyword">val </span><a href="nomen-name.html">nomenName</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1702048320%2FProperties%2F-1243844382" anchor-label="quant" id="1702048320%2FProperties%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="quant.html"><span><span>quant</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1702048320%2FProperties%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><span class="token keyword">val </span><a href="quant.html">quant</a><span class="token operator">: </span><span data-unresolved-link="java.math/BigDecimal///PointingToDeclaration/">BigDecimal</span><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1139202981%2FProperties%2F-1243844382" anchor-label="rn" id="-1139202981%2FProperties%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="rn.html"><span><span>rn</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1139202981%2FProperties%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><span class="token keyword">val </span><a href="rn.html">rn</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-933989987%2FProperties%2F-1243844382" anchor-label="storein" id="-933989987%2FProperties%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="storein.html"><span><span>storein</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-933989987%2FProperties%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><span class="token keyword">val </span><a href="storein.html">storein</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-678699670%2FProperties%2F-1243844382" anchor-label="storeout" id="-678699670%2FProperties%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="storeout.html"><span><span>storeout</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-678699670%2FProperties%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><span class="token keyword">val </span><a href="storeout.html">storeout</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="567219029%2FProperties%2F-1243844382" anchor-label="summ" id="567219029%2FProperties%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="summ.html"><span><span>summ</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="567219029%2FProperties%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><span class="token keyword">val </span><a href="summ.html">summ</a><span class="token operator">: </span><span data-unresolved-link="java.math/BigDecimal///PointingToDeclaration/">BigDecimal</span><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2026 Copyright</span><span
+                class="pull-right"><span>Generated by </span><a
+                href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

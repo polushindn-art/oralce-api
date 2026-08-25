@@ -6,7 +6,7 @@ import com.example.oracleapi.dto.orderNakl.OrderNaklHeadDelRequest
 import com.example.oracleapi.dto.orderNakl.OrderNaklHeadRequest
 import com.example.oracleapi.dto.orderNakl.OrderNaklSpecRequest
 import com.example.oracleapi.dto.orderNakl.OrderNaklSpecResponse
-import com.example.oracleapi.service.ordernaklhead.NaklHeadServise
+import com.example.oracleapi.service.ordernaklhead.NaklHeadService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/v1/naklhead")
 @Tag(name = "Документ Накладные расходы")
 class OrderNaklController(
-    private val naklHeadService: NaklHeadServise
+    private val naklHeadService: NaklHeadService
 ) : BaseController() {
 
     @PostMapping("/ins_head")

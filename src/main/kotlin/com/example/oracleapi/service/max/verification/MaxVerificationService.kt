@@ -6,13 +6,13 @@ import com.example.oracleapi.dto.max.LargeFamilyStatus
 import com.example.oracleapi.dto.max.StudentStatus
 import com.example.oracleapi.dto.max.common.MaxApiResponse
 import com.example.oracleapi.dto.max.common.MaxError
-import com.example.oracleapi.service.max.common.MaxApiClient
+import com.example.oracleapi.service.max.common.MaxApiClientService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 @Service
 class MaxVerificationService(
-    private val apiClient: MaxApiClient
+    private val apiClient: MaxApiClientService
 ) {
 
     private val log = LoggerFactory.getLogger(this::class.java)

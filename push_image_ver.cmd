@@ -12,7 +12,7 @@ set IMAGE_NAME=oracle-api
 
 cls
 echo %GREEN%========================================%RESET%
-echo %GREEN%    СБОРКА DOCKER ОБРАЗА%RESET%
+echo %GREEN%    СБОРКА DOCKER ОБРАЗА И ДОКУМЕНТАЦИИ%RESET%
 echo %GREEN%========================================%RESET%
 echo.
 
@@ -56,11 +56,21 @@ echo %GREEN%Порт: %APP_PORT%%RESET%
 echo.
 
 :: ============================================
-:: 3. СБОРКА JAR
+:: 3. ГЕНЕРАЦИЯ ДОКУМЕНТАЦИИ И СБОРКА JAR
 :: ============================================
-echo %YELLOW%[3/5] Сборка JAR...%RESET%
+echo %YELLOW%[3/5] Генерация документации Dokka и сборка JAR...%RESET%
 
-call mvn clean package -DskipTests
+:: Генерация HTML-документации по коду (KDoc)
+call mvn dokka:dokka
+if exist target\dokka (
+    xcopy /E /I /Y target\dokka src\main\resources\static\docs >nul
+    echo %GREEN%[OK] Документация KDoc успешно встроена в ресурсы%RESET%
+) else (
+    echo %YELLOW%[ПРЕДУПРЕЖДЕНИЕ] Папка target\dokka не найдена, пропускаем копирование документации%RESET%
+)
+
+:: Сборка проекта и тестов (включая ArchUnit)
+call mvn clean package
 if %errorlevel% neq 0 (
     echo %RED%[ОШИБКА] Сборка Maven не удалась!%RESET%
     pause

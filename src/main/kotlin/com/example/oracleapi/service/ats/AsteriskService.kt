@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class AsteriskService(
-    private val amiClient: AmiClient
+    private val amiClient: AmiClientService
 ) {
 
     private val log = LoggerFactory.getLogger(this::class.java)

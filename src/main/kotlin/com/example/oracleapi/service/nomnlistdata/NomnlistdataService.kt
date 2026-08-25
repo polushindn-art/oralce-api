@@ -1,9 +1,9 @@
 package com.example.oracleapi.service.nomnlistdata
 
 import com.example.oracleapi.config.UserDetailsFromToken
+import com.example.oracleapi.dto.nomnlistdata.NomnlistdataMetadata
 import com.example.oracleapi.entity.nomnlistdata.Nomnlistdata
 import com.example.oracleapi.repository.nomnlistdata.NomnlistdataRepository
-import com.example.oracleapi.repository.userlist.UserlistRepository
 import com.example.oracleapi.service.ImageService
 import com.example.oracleapi.service.public.PublicGenIdRnProcedur
 import org.springframework.security.core.context.SecurityContextHolder
@@ -18,64 +18,86 @@ class NomnlistdataService(
     private val genIdRnProcedur: PublicGenIdRnProcedur,
     private val imageService: ImageService
 ) {
-    /**
-     * Получить userAgn из SecurityContext (из токена)
-     */
+
     private fun getCurrentUserAgn(): Long? {
         val authentication = SecurityContextHolder.getContext().authentication
         val userDetails = authentication?.principal as? UserDetailsFromToken
         return userDetails?.userAgn
     }
 
-    fun getByRn(rn: Long): Nomnlistdata? = repository.findByRnNative(rn)
+    // ========== МЕТОДЫ ДЛЯ INFO (Возвращают DTO) ==========
 
-    fun getByNomen(nomen: Long): List<Nomnlistdata> = repository.findByNomenNative(nomen)
-
-    fun getByNomenAndPhotonum(nomen: Long, photonum: Int): Nomnlistdata? =
-        repository.findByNomenAndPhotonumNative(nomen, photonum)
-
-    fun getFirstByNomen(nomen: Long): Nomnlistdata? {
-        return repository.findByNomenNative(nomen).firstOrNull()
+    fun getInfoByNomen(nomen: Long): List<NomnlistdataMetadata> {
+        return repository.findByNomenNative(nomen).map { NomnlistdataMetadata.fromEntity(it) }
     }
 
-    fun getMainByNomen(nomen: Long): Nomnlistdata? {
-        return repository.findByNomenAndPhotonumNative(nomen, 1)
+    fun getPhotoInfoByNomen(nomen: Long, photonum: Int): NomnlistdataMetadata? {
+        val photo = repository.findByNomenAndPhotonumNative(nomen, photonum) ?: return null
+        return NomnlistdataMetadata.fromEntity(photo)
     }
 
-    fun getAllByNomen(nomen: Long): List<Nomnlistdata> = repository.findByNomenNative(nomen)
+    // ========== МЕТОДЫ ДЛЯ ПРОСМОТРА И СКАЧИВАНИЯ БАЙТОВ ==========
 
-    fun getPhotoCount(nomen: Long): Long = repository.countByNomenNative(nomen)
+    fun getPhotoData(nomen: Long, photonum: Int, isPreview: Boolean = false): ByteArray? {
+        val photo = repository.findByNomenAndPhotonumNative(nomen, photonum) ?: return null
+        val data = if (isPreview) photo.minidata else photo.imageData
+        if (data == null || data.isEmpty()) return null
+        return data
+    }
 
-    // ========== INSERT/UPDATE через NATIVE QUERIES ==========
+    fun getMainPhotoData(nomen: Long): ByteArray? {
+        val photo = repository.findByNomenAndPhotonumNative(nomen, 1) ?: return null
+        val data = photo.imageData
+        if (data == null || data.isEmpty()) return null
+        return data
+    }
+
+    fun getFirstPhotoData(nomen: Long): ByteArray? {
+        val photo = repository.findByNomenNative(nomen).firstOrNull() ?: return null
+        val data = photo.imageData
+        if (data == null || data.isEmpty()) return null
+        return data
+    }
+
+    fun getPhotoDownloadData(nomen: Long, photonum: Int, isPreview: Boolean = false): DownloadResult {
+        val photo = repository.findByNomenAndPhotonumNative(nomen, photonum)
+            ?: return DownloadResult.NotFound("Фото для номенклатуры $nomen (№$photonum) не найдено")
+
+        val data = if (isPreview) photo.minidata else photo.imageData
+        if (data == null || data.isEmpty()) {
+            return DownloadResult.EmptyData(if (isPreview) "Превью для фото не найдено" else "Фото не содержит данных")
+        }
+
+        val prefix = if (isPreview) "preview" else "photo"
+        val filename = "${prefix}_${nomen}_${photonum}.jpg"
+        return DownloadResult.Success(data, filename)
+    }
+
+    // ========== ЗАГРУЗКА (Возвращает DTO) ==========
 
     @Transactional
     fun uploadPhoto(
         nomen: Long,
         file: MultipartFile,
         needDownload: Boolean? = null
-    ): Nomnlistdata {
+    ): NomnlistdataMetadata {
         if (file.isEmpty) {
             throw IllegalArgumentException("Файл не может быть пустым")
         }
 
         val data = file.bytes
         val extension = imageService.getFileExtension(file)
-
-        // Получаем manager из текущего пользователя
         val manager = getCurrentUserAgn()
 
-        // Проверка формата
         if (!imageService.isSupportedFormat(extension)) {
             val supported = listOf("jpg", "jpeg", "png", "gif", "webp", "bmp")
             throw IllegalArgumentException("Неподдерживаемый формат: $extension. Поддерживаются: ${supported.joinToString()}")
         }
 
-        // Валидация изображения
         if (!imageService.isValidImage(file)) {
             throw IllegalArgumentException("Файл не является корректным изображением")
         }
 
-        // Получаем информацию об изображении
         val imageInfo = imageService.getImageInfo(data)
         val (width, height) = if (imageInfo != null && imageInfo.width > 0) {
             Pair(imageInfo.width, imageInfo.height)
@@ -83,20 +105,11 @@ class NomnlistdataService(
             Pair(0, 0)
         }
 
-        // Получаем максимальный номер фото
         val maxPhotonum = repository.findMaxPhotonumByNomenNative(nomen) ?: 0
         val newPhotonum = maxPhotonum + 1
-
-        println("Adding new photo for nomen=$nomen, new photonum=$newPhotonum, size=${width}x${height}")
-
         val size = file.size
-
-        // Генерируем превью через ImageService
         val preview = imageService.generatePreview(data)
-
-        // Генерируем RN
         val newRn = genIdRnProcedur.take().rn
-
 
         repository.insertNative(
             rn = newRn,
@@ -115,15 +128,18 @@ class NomnlistdataService(
             size = size
         )
 
-        return repository.findByNomenAndPhotonumNative(nomen, newPhotonum)!!
+        val createdPhoto = repository.findByNomenAndPhotonumNative(nomen, newPhotonum)!!
+        return NomnlistdataMetadata.fromEntity(createdPhoto)
     }
 
-    // ========== DELETE ==========
+    // ========== УДАЛЕНИЕ ==========
 
     @Transactional
-    fun softDelete(rn: Long) {
+    fun softDeleteByNomenAndPhotonum(nomen: Long, photonum: Int): Boolean {
+        val photo = repository.findByNomenAndPhotonumNative(nomen, photonum) ?: return false
         val currentUserAgn = getCurrentUserAgn()
-        repository.softDeleteByRnNative(rn, LocalDateTime.now(), currentUserAgn)
+        repository.softDeleteByRnNative(photo.rn, LocalDateTime.now(), currentUserAgn)
+        return true
     }
 
     @Transactional
@@ -131,9 +147,10 @@ class NomnlistdataService(
         val currentUserAgn = getCurrentUserAgn()
         repository.softDeleteByNomenNative(nomen, LocalDateTime.now(), currentUserAgn)
     }
+}
 
-    @Transactional
-    fun hardDelete(rn: Long) {
-        repository.hardDeleteByRnNative(rn)
-    }
+sealed class DownloadResult {
+    data class Success(val data: ByteArray, val filename: String) : DownloadResult()
+    data class NotFound(val message: String) : DownloadResult()
+    data class EmptyData(val message: String) : DownloadResult()
 }

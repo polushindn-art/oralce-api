@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class MainBotMessageService(
-    private val botClient: MaxBotMainClient
+    private val botClient: MaxBotMainClientService
 ) {
 
     private val log = LoggerFactory.getLogger(this::class.java)

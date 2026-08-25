@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>OrderHeadController</title>
+    <link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer="defer"></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
+</head>
+<body>
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+                    <a class="library-name--link" href="../../../index.html">
+                            OracleAPI
+                    </a>
+            </div>
+            <div class="library-version">
+            </div>
+        </div>
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter="OracleAPI/JVM">JVM</button>
+        </div>
+    </div>
+    <div class="navigation-controls">
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
+    </div>
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageIds="OracleAPI::com.example.oracleapi.controller/OrderHeadController///PointingToDeclaration//-1243844382">
+  <div class="breadcrumbs"><a href="../../../index.html">OracleAPI</a><span class="delimiter">/</span><a href="../index.html">com.example.oracleapi.controller</a><span class="delimiter">/</span><span class="current">OrderHeadController</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Order</span><wbr></wbr><span>Head</span><wbr></wbr><span><span>Controller</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.web.bind.annotation/RestController///PointingToDeclaration/"><span class="token annotation builtin">RestController</span></span></div><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.web.bind.annotation/RequestMapping///PointingToDeclaration/"><span class="token annotation builtin">RequestMapping</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="token punctuation">[</span><span><span class="breakable-word"><span class="token string">&quot;/v1/orderhead&quot;</span></span></span><wbr></wbr><span class="token punctuation">]</span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">class </span><a href="index.html">OrderHeadController</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">orderHeadService<span class="token operator">: </span><a href="../../com.example.oracleapi.service.orderhead/-order-head-service/index.html">OrderHeadService</a><span class="token punctuation">, </span></span><span class="parameter ">orderSpecService<span class="token operator">: </span><a href="../../com.example.oracleapi.service.orderspec/-order-spec-service/index.html">OrderSpecService</a></span></span><span class="token punctuation">)</span> : <a href="../-base-controller/index.html">BaseController</a></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="">Constructors</h2>
+        <div class="table"><a data-name="-1692499795%2FConstructors%2F-1243844382" anchor-label="OrderHeadController" id="-1692499795%2FConstructors%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-order-head-controller.html"><span>Order</span><wbr></wbr><span>Head</span><wbr></wbr><span><span>Controller</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1692499795%2FConstructors%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">orderHeadService<span class="token operator">: </span><a href="../../com.example.oracleapi.service.orderhead/-order-head-service/index.html">OrderHeadService</a><span class="token punctuation">, </span></span><span class="parameter ">orderSpecService<span class="token operator">: </span><a href="../../com.example.oracleapi.service.orderspec/-order-spec-service/index.html">OrderSpecService</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="-1290016067%2FFunctions%2F-1243844382" anchor-label="clearBasisDocs" id="-1290016067%2FFunctions%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="clear-basis-docs.html"><span>clear</span><wbr></wbr><span>Basis</span><wbr></wbr><span><span>Docs</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1290016067%2FFunctions%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.web.bind.annotation/DeleteMapping///PointingToDeclaration/"><span class="token annotation builtin">DeleteMapping</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="token punctuation">[</span><span><span class="breakable-word"><span class="token string">&quot;/delete_basis_doc&quot;</span></span></span><wbr></wbr><span class="token punctuation">]</span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">fun </span><a href="clear-basis-docs.html"><span class="token function">clearBasisDocs</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation/Valid///PointingToDeclaration/"><span class="token annotation builtin">Valid</span></span> </span>rn<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../com.example.oracleapi.dto.common/-my-api-response/index.html">MyApiResponse</a><span class="token operator">&lt;</span><a href="../../com.example.oracleapi.dto/-response-r-n/index.html">ResponseRN</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1675831429%2FFunctions%2F-1243844382" anchor-label="createOrder" id="1675831429%2FFunctions%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="create-order.html"><span>create</span><wbr></wbr><span><span>Order</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1675831429%2FFunctions%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.web.bind.annotation/PostMapping///PointingToDeclaration/"><span class="token annotation builtin">PostMapping</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="token punctuation">[</span><span><span class="breakable-word"><span class="token string">&quot;/ins_head&quot;</span></span></span><wbr></wbr><span class="token punctuation">]</span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">fun </span><a href="create-order.html"><span class="token function">createOrder</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation/Valid///PointingToDeclaration/"><span class="token annotation builtin">Valid</span></span> <span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.web.bind.annotation/RequestBody///PointingToDeclaration/"><span class="token annotation builtin">RequestBody</span></span> </span>request<span class="token operator">: </span><a href="../../com.example.oracleapi.dto.orderhead.ins/-order-head-ins-request/index.html">OrderHeadInsRequest</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../com.example.oracleapi.dto.common/-my-api-response/index.html">MyApiResponse</a><span class="token operator">&lt;</span><a href="../../com.example.oracleapi.dto.orderhead.ins/-order-head-ins-response/index.html">OrderHeadInsResponse</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1254475946%2FFunctions%2F-1243844382" anchor-label="createOrderSpec" id="1254475946%2FFunctions%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="create-order-spec.html"><span>create</span><wbr></wbr><span>Order</span><wbr></wbr><span><span>Spec</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1254475946%2FFunctions%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.web.bind.annotation/PostMapping///PointingToDeclaration/"><span class="token annotation builtin">PostMapping</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="token punctuation">[</span><span><span class="breakable-word"><span class="token string">&quot;/ins_spec&quot;</span></span></span><wbr></wbr><span class="token punctuation">]</span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">fun </span><a href="create-order-spec.html"><span class="token function">createOrderSpec</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation/Valid///PointingToDeclaration/"><span class="token annotation builtin">Valid</span></span> <span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.web.bind.annotation/RequestBody///PointingToDeclaration/"><span class="token annotation builtin">RequestBody</span></span> </span>request<span class="token operator">: </span><a href="../../com.example.oracleapi.dto.orderspec.ins/-order-spec-ins-request/index.html">OrderSpecInsRequest</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../com.example.oracleapi.dto.common/-my-api-response/index.html">MyApiResponse</a><span class="token operator">&lt;</span><a href="../../com.example.oracleapi.dto.orderspec.ins/-order-spec-ins-response/index.html">OrderSpecInsResponse</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="658408909%2FFunctions%2F-1243844382" anchor-label="deleteSpec" id="658408909%2FFunctions%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="delete-spec.html"><span>delete</span><wbr></wbr><span><span>Spec</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="658408909%2FFunctions%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.web.bind.annotation/DeleteMapping///PointingToDeclaration/"><span class="token annotation builtin">DeleteMapping</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="token punctuation">[</span><span><span class="breakable-word"><span class="token string">&quot;orderspec_del&quot;</span></span></span><wbr></wbr><span class="token punctuation">]</span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">fun </span><a href="delete-spec.html"><span class="token function">deleteSpec</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation/Valid///PointingToDeclaration/"><span class="token annotation builtin">Valid</span></span> <span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.web.bind.annotation/RequestBody///PointingToDeclaration/"><span class="token annotation builtin">RequestBody</span></span> </span>request<span class="token operator">: </span><a href="../../com.example.oracleapi.dto.orderspec.del/-order-spec-del-request/index.html">OrderSpecDelRequest</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../com.example.oracleapi.dto.common/-my-api-response/index.html">MyApiResponse</a><span class="token operator">&lt;</span><a href="../../com.example.oracleapi.dto/-response-r-n/index.html">ResponseRN</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2000452060%2FFunctions%2F-1243844382" anchor-label="getOrderSpec" id="-2000452060%2FFunctions%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-order-spec.html"><span>get</span><wbr></wbr><span>Order</span><wbr></wbr><span><span>Spec</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2000452060%2FFunctions%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.web.bind.annotation/GetMapping///PointingToDeclaration/"><span class="token annotation builtin">GetMapping</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="token punctuation">[</span><span><span class="breakable-word"><span class="token string">&quot;/orderspec&quot;</span></span></span><wbr></wbr><span class="token punctuation">]</span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">fun </span><a href="get-order-spec.html"><span class="token function">getOrderSpec</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation/Valid///PointingToDeclaration/"><span class="token annotation builtin">Valid</span></span> </span>rn<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../com.example.oracleapi.dto.common/-my-api-response/index.html">MyApiResponse</a><span class="token operator">&lt;</span><a href="../../com.example.oracleapi.dto.orderspec/-order-spec-response/index.html">OrderSpecResponse</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2071068785%2FFunctions%2F-1243844382" anchor-label="getStatus" id="-2071068785%2FFunctions%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-status.html"><span>get</span><wbr></wbr><span><span>Status</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2071068785%2FFunctions%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.web.bind.annotation/GetMapping///PointingToDeclaration/"><span class="token annotation builtin">GetMapping</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="token punctuation">[</span><span><span class="breakable-word"><span class="token string">&quot;/status&quot;</span></span></span><wbr></wbr><span class="token punctuation">]</span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">fun </span><a href="get-status.html"><span class="token function">getStatus</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation/Valid///PointingToDeclaration/"><span class="token annotation builtin">Valid</span></span> </span>rn<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../com.example.oracleapi.dto.common/-my-api-response/index.html">MyApiResponse</a><span class="token operator">&lt;</span><a href="../../com.example.oracleapi.dto.orderhead.status/-order-head-status-response/index.html">OrderHeadStatusResponse</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1255444546%2FFunctions%2F-1243844382" anchor-label="updateArrivalDate" id="1255444546%2FFunctions%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="update-arrival-date.html"><span>update</span><wbr></wbr><span>Arrival</span><wbr></wbr><span><span>Date</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1255444546%2FFunctions%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.web.bind.annotation/PutMapping///PointingToDeclaration/"><span class="token annotation builtin">PutMapping</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="token punctuation">[</span><span><span class="breakable-word"><span class="token string">&quot;/update_arrivaldate&quot;</span></span></span><wbr></wbr><span class="token punctuation">]</span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">fun </span><a href="update-arrival-date.html"><span class="token function">updateArrivalDate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation/Valid///PointingToDeclaration/"><span class="token annotation builtin">Valid</span></span> <span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.web.bind.annotation/RequestBody///PointingToDeclaration/"><span class="token annotation builtin">RequestBody</span></span> </span>request<span class="token operator">: </span><a href="../../com.example.oracleapi.dto.orderhead.arrivalDate/-order-head-update-ar-date-request/index.html">OrderHeadUpdateArDateRequest</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../com.example.oracleapi.dto.common/-my-api-response/index.html">MyApiResponse</a><span class="token operator">&lt;</span><a href="../../com.example.oracleapi.dto.orderhead.arrivalDate/-order-head-update-ar-date-response/index.html">OrderHeadUpdateArDateResponse</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-683800259%2FFunctions%2F-1243844382" anchor-label="updateBasisDoc" id="-683800259%2FFunctions%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="update-basis-doc.html"><span>update</span><wbr></wbr><span>Basis</span><wbr></wbr><span><span>Doc</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-683800259%2FFunctions%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.web.bind.annotation/PutMapping///PointingToDeclaration/"><span class="token annotation builtin">PutMapping</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="token punctuation">[</span><span><span class="breakable-word"><span class="token string">&quot;/update_basis_doc&quot;</span></span></span><wbr></wbr><span class="token punctuation">]</span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">fun </span><a href="update-basis-doc.html"><span class="token function">updateBasisDoc</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation/Valid///PointingToDeclaration/"><span class="token annotation builtin">Valid</span></span> <span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.web.bind.annotation/RequestBody///PointingToDeclaration/"><span class="token annotation builtin">RequestBody</span></span> </span>request<span class="token operator">: </span><a href="../../com.example.oracleapi.dto.orderhead.basisDoc/-order-head-basis-doc-update-request/index.html">OrderHeadBasisDocUpdateRequest</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../com.example.oracleapi.dto.common/-my-api-response/index.html">MyApiResponse</a><span class="token operator">&lt;</span><a href="../../com.example.oracleapi.dto/-response-r-n/index.html">ResponseRN</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1093546555%2FFunctions%2F-1243844382" anchor-label="updateNote" id="-1093546555%2FFunctions%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="update-note.html"><span>update</span><wbr></wbr><span><span>Note</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1093546555%2FFunctions%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.web.bind.annotation/PutMapping///PointingToDeclaration/"><span class="token annotation builtin">PutMapping</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="token punctuation">[</span><span><span class="breakable-word"><span class="token string">&quot;update_note&quot;</span></span></span><wbr></wbr><span class="token punctuation">]</span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">fun </span><a href="update-note.html"><span class="token function">updateNote</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation/Valid///PointingToDeclaration/"><span class="token annotation builtin">Valid</span></span> <span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.web.bind.annotation/RequestBody///PointingToDeclaration/"><span class="token annotation builtin">RequestBody</span></span> </span>request<span class="token operator">: </span><a href="../../com.example.oracleapi.dto.orderhead.note/-order-head-update-note-request/index.html">OrderHeadUpdateNoteRequest</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../com.example.oracleapi.dto.common/-my-api-response/index.html">MyApiResponse</a><span class="token operator">&lt;</span><a href="../../com.example.oracleapi.dto/-response-r-n/index.html">ResponseRN</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-557719847%2FFunctions%2F-1243844382" anchor-label="updateOrderSpec" id="-557719847%2FFunctions%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="update-order-spec.html"><span>update</span><wbr></wbr><span>Order</span><wbr></wbr><span><span>Spec</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-557719847%2FFunctions%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.web.bind.annotation/PutMapping///PointingToDeclaration/"><span class="token annotation builtin">PutMapping</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="token punctuation">[</span><span><span class="breakable-word"><span class="token string">&quot;/update_orderspec&quot;</span></span></span><wbr></wbr><span class="token punctuation">]</span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">fun </span><a href="update-order-spec.html"><span class="token function">updateOrderSpec</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation/Valid///PointingToDeclaration/"><span class="token annotation builtin">Valid</span></span> <span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.web.bind.annotation/RequestBody///PointingToDeclaration/"><span class="token annotation builtin">RequestBody</span></span> </span>request<span class="token operator">: </span><a href="../../com.example.oracleapi.dto.orderspec.upd/-order-spec-update-request/index.html">OrderSpecUpdateRequest</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../com.example.oracleapi.dto.common/-my-api-response/index.html">MyApiResponse</a><span class="token operator">&lt;</span><a href="../../com.example.oracleapi.dto.orderspec.upd/-order-spec-update-response/index.html">OrderSpecUpdateResponse</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="785456759%2FFunctions%2F-1243844382" anchor-label="updateOrderStatus" id="785456759%2FFunctions%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="update-order-status.html"><span>update</span><wbr></wbr><span>Order</span><wbr></wbr><span><span>Status</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="785456759%2FFunctions%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.web.bind.annotation/PostMapping///PointingToDeclaration/"><span class="token annotation builtin">PostMapping</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="token punctuation">[</span><span><span class="breakable-word"><span class="token string">&quot;/update_status&quot;</span></span></span><wbr></wbr><span class="token punctuation">]</span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">fun </span><a href="update-order-status.html"><span class="token function">updateOrderStatus</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation/Valid///PointingToDeclaration/"><span class="token annotation builtin">Valid</span></span> <span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.web.bind.annotation/RequestBody///PointingToDeclaration/"><span class="token annotation builtin">RequestBody</span></span> </span>request<span class="token operator">: </span><a href="../../com.example.oracleapi.dto.orderhead.status/-order-head-status-update-request/index.html">OrderHeadStatusUpdateRequest</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../com.example.oracleapi.dto.common/-my-api-response/index.html">MyApiResponse</a><span class="token operator">&lt;</span><a href="../../com.example.oracleapi.dto.orderhead.status/-order-head-status-update-response/index.html">OrderHeadStatusUpdateResponse</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="90229826%2FFunctions%2F-1243844382" anchor-label="updateProvider" id="90229826%2FFunctions%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="update-provider.html"><span>update</span><wbr></wbr><span><span>Provider</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="90229826%2FFunctions%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.web.bind.annotation/PutMapping///PointingToDeclaration/"><span class="token annotation builtin">PutMapping</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="token punctuation">[</span><span><span class="breakable-word"><span class="token string">&quot;/update_provider&quot;</span></span></span><wbr></wbr><span class="token punctuation">]</span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">fun </span><a href="update-provider.html"><span class="token function">updateProvider</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation/Valid///PointingToDeclaration/"><span class="token annotation builtin">Valid</span></span> <span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.web.bind.annotation/RequestBody///PointingToDeclaration/"><span class="token annotation builtin">RequestBody</span></span> </span>request<span class="token operator">: </span><a href="../../com.example.oracleapi.dto.orderhead.provider/-order-head-update-provider-request/index.html">OrderHeadUpdateProviderRequest</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../com.example.oracleapi.dto.common/-my-api-response/index.html">MyApiResponse</a><span class="token operator">&lt;</span><a href="../../com.example.oracleapi.dto.orderhead.provider/-order-head-provider-update-response/index.html">OrderHeadProviderUpdateResponse</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2081351239%2FFunctions%2F-1243844382" anchor-label="updateStoreIn" id="2081351239%2FFunctions%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="update-store-in.html"><span>update</span><wbr></wbr><span>Store</span><wbr></wbr><span><span>In</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2081351239%2FFunctions%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.web.bind.annotation/PutMapping///PointingToDeclaration/"><span class="token annotation builtin">PutMapping</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="token punctuation">[</span><span><span class="breakable-word"><span class="token string">&quot;/update_store_in&quot;</span></span></span><wbr></wbr><span class="token punctuation">]</span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">fun </span><a href="update-store-in.html"><span class="token function">updateStoreIn</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation/Valid///PointingToDeclaration/"><span class="token annotation builtin">Valid</span></span> <span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.web.bind.annotation/RequestBody///PointingToDeclaration/"><span class="token annotation builtin">RequestBody</span></span> </span>request<span class="token operator">: </span><a href="../../com.example.oracleapi.dto.orderhead.storein/-order-head-update-store-in-request/index.html">OrderHeadUpdateStoreInRequest</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../com.example.oracleapi.dto.common/-my-api-response/index.html">MyApiResponse</a><span class="token operator">&lt;</span><a href="../../com.example.oracleapi.dto.orderhead.storein/-order-head-update-store-in-response/index.html">OrderHeadUpdateStoreInResponse</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2143749105%2FFunctions%2F-1243844382" anchor-label="updateStoreInAndUl" id="2143749105%2FFunctions%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="update-store-in-and-ul.html"><span>update</span><wbr></wbr><span>Store</span><wbr></wbr><span>In</span><wbr></wbr><span>And</span><wbr></wbr><span><span>Ul</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2143749105%2FFunctions%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.web.bind.annotation/PutMapping///PointingToDeclaration/"><span class="token annotation builtin">PutMapping</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="token punctuation">[</span><span><span class="breakable-word"><span class="token string">&quot;update_storein_ul&quot;</span></span></span><wbr></wbr><span class="token punctuation">]</span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">fun </span><a href="update-store-in-and-ul.html"><span class="token function">updateStoreInAndUl</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation/Valid///PointingToDeclaration/"><span class="token annotation builtin">Valid</span></span> <span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.web.bind.annotation/RequestBody///PointingToDeclaration/"><span class="token annotation builtin">RequestBody</span></span> </span>request<span class="token operator">: </span><a href="../../com.example.oracleapi.dto.orderhead/-order-head-upd-store-in-and-ul-request/index.html">OrderHeadUpdStoreInAndUlRequest</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../com.example.oracleapi.dto.common/-my-api-response/index.html">MyApiResponse</a><span class="token operator">&lt;</span><a href="../../com.example.oracleapi.dto.orderhead/-order-head-upd-store-in-and-ul-response/index.html">OrderHeadUpdStoreInAndUlResponse</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1200229428%2FFunctions%2F-1243844382" anchor-label="updateUl" id="1200229428%2FFunctions%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="update-ul.html"><span>update</span><wbr></wbr><span><span>Ul</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1200229428%2FFunctions%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.web.bind.annotation/PutMapping///PointingToDeclaration/"><span class="token annotation builtin">PutMapping</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="token punctuation">[</span><span><span class="breakable-word"><span class="token string">&quot;/update_ul&quot;</span></span></span><wbr></wbr><span class="token punctuation">]</span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">fun </span><a href="update-ul.html"><span class="token function">updateUl</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span><span class="token annotation builtin">@</span><span data-unresolved-link="jakarta.validation/Valid///PointingToDeclaration/"><span class="token annotation builtin">Valid</span></span> <span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.web.bind.annotation/RequestBody///PointingToDeclaration/"><span class="token annotation builtin">RequestBody</span></span> </span>request<span class="token operator">: </span><a href="../../com.example.oracleapi.dto.orderhead.ul/-order-head-ul-update-request/index.html">OrderHeadUlUpdateRequest</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../com.example.oracleapi.dto.common/-my-api-response/index.html">MyApiResponse</a><span class="token operator">&lt;</span><a href="../../com.example.oracleapi.dto.orderhead.ul/-order-head-ul-update-response/index.html">OrderHeadUlUpdateResponse</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2026 Copyright</span><span
+                class="pull-right"><span>Generated by </span><a
+                href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

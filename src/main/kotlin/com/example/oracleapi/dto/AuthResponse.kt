@@ -1,7 +1,7 @@
 package com.example.oracleapi.dto
 
+import com.example.oracleapi.dto.auth.DeviceInfo
 import com.example.oracleapi.dto.store.StoreSimpleResponse
-import com.example.oracleapi.dto.tsdlist.StoreInfo
 import com.example.oracleapi.dto.userpart.PartInfo
 
 data class AuthResponse(
@@ -19,10 +19,6 @@ data class AuthResponse(
     val expiresIn: Long
 )
 
-data class DeviceInfo(
-    val deviceId: String,
-    val sn: String
-)
 
 data class UserAuthInfo(
     val rn: Long,

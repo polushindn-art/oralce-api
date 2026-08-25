@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>TsdListService</title>
+    <link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer="defer"></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
+</head>
+<body>
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+                    <a class="library-name--link" href="../../../index.html">
+                            OracleAPI
+                    </a>
+            </div>
+            <div class="library-version">
+            </div>
+        </div>
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter="OracleAPI/JVM">JVM</button>
+        </div>
+    </div>
+    <div class="navigation-controls">
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
+    </div>
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageIds="OracleAPI::com.example.oracleapi.service.tsdlist/TsdListService///PointingToDeclaration//-1243844382">
+  <div class="breadcrumbs"><a href="../../../index.html">OracleAPI</a><span class="delimiter">/</span><a href="../index.html">com.example.oracleapi.service.tsdlist</a><span class="delimiter">/</span><span class="current">TsdListService</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Tsd</span><wbr></wbr><span>List</span><wbr></wbr><span><span>Service</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.stereotype/Service///PointingToDeclaration/"><span class="token annotation builtin">Service</span></span></div></div><span class="token keyword">class </span><a href="index.html">TsdListService</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">tsdHistoryRepository<span class="token operator">: </span><a href="../../com.example.oracleapi.repository.tsd/-tsd-list-history-repository/index.html">TsdListHistoryRepository</a><span class="token punctuation">, </span></span><span class="parameter ">pbeRepository<span class="token operator">: </span><a href="../../com.example.oracleapi.repository.pbe/-pbe-repository/index.html">PbeRepository</a><span class="token punctuation">, </span></span><span class="parameter ">agnListRepository<span class="token operator">: </span><a href="../../com.example.oracleapi.repository.agnlist/-agn-list-repository/index.html">AgnListRepository</a><span class="token punctuation">, </span></span><span class="parameter ">storeService<span class="token operator">: </span><a href="../../com.example.oracleapi.service/-store-service/index.html">StoreService</a><span class="token punctuation">, </span></span><span class="parameter ">tsdlistRepository<span class="token operator">: </span><a href="../../com.example.oracleapi.repository.tsd/-tsd-list-repository/index.html">TsdListRepository</a><span class="token punctuation">, </span></span><span class="parameter ">publicProcedureService<span class="token operator">: </span><a href="../../com.example.oracleapi.service.public/-public-procedure-service/index.html">PublicProcedureService</a><span class="token punctuation">, </span></span><span class="parameter ">userpartRepository<span class="token operator">: </span><a href="../../com.example.oracleapi.repository.userpart/-userpart-repository/index.html">UserpartRepository</a></span></span><span class="token punctuation">)</span></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="">Constructors</h2>
+        <div class="table"><a data-name="-736585781%2FConstructors%2F-1243844382" anchor-label="TsdListService" id="-736585781%2FConstructors%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-tsd-list-service.html"><span>Tsd</span><wbr></wbr><span>List</span><wbr></wbr><span><span>Service</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-736585781%2FConstructors%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">tsdHistoryRepository<span class="token operator">: </span><a href="../../com.example.oracleapi.repository.tsd/-tsd-list-history-repository/index.html">TsdListHistoryRepository</a><span class="token punctuation">, </span></span><span class="parameter ">pbeRepository<span class="token operator">: </span><a href="../../com.example.oracleapi.repository.pbe/-pbe-repository/index.html">PbeRepository</a><span class="token punctuation">, </span></span><span class="parameter ">agnListRepository<span class="token operator">: </span><a href="../../com.example.oracleapi.repository.agnlist/-agn-list-repository/index.html">AgnListRepository</a><span class="token punctuation">, </span></span><span class="parameter ">storeService<span class="token operator">: </span><a href="../../com.example.oracleapi.service/-store-service/index.html">StoreService</a><span class="token punctuation">, </span></span><span class="parameter ">tsdlistRepository<span class="token operator">: </span><a href="../../com.example.oracleapi.repository.tsd/-tsd-list-repository/index.html">TsdListRepository</a><span class="token punctuation">, </span></span><span class="parameter ">publicProcedureService<span class="token operator">: </span><a href="../../com.example.oracleapi.service.public/-public-procedure-service/index.html">PublicProcedureService</a><span class="token punctuation">, </span></span><span class="parameter ">userpartRepository<span class="token operator">: </span><a href="../../com.example.oracleapi.repository.userpart/-userpart-repository/index.html">UserpartRepository</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="588355257%2FFunctions%2F-1243844382" anchor-label="getPartsByUserRn" id="588355257%2FFunctions%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-parts-by-user-rn.html"><span>get</span><wbr></wbr><span>Parts</span><wbr></wbr><span>By</span><wbr></wbr><span>User</span><wbr></wbr><span><span>Rn</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="588355257%2FFunctions%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.transaction.annotation/Transactional///PointingToDeclaration/"><span class="token annotation builtin">Transactional</span></span><span class="token punctuation">(</span><span>readOnly<span class="token operator"> = </span><span class="breakable-word"><span class="token boolean">true</span></span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">fun </span><a href="get-parts-by-user-rn.html"><span class="token function">getPartsByUserRn</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">userRn<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../../com.example.oracleapi.dto.userpart/-part-info/index.html">PartInfo</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Получить все роли (part) для пользователя</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-651233540%2FFunctions%2F-1243844382" anchor-label="getRegisteredSessions" id="-651233540%2FFunctions%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-registered-sessions.html"><span>get</span><wbr></wbr><span>Registered</span><wbr></wbr><span><span>Sessions</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-651233540%2FFunctions%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.transaction.annotation/Transactional///PointingToDeclaration/"><span class="token annotation builtin">Transactional</span></span><span class="token punctuation">(</span><span>readOnly<span class="token operator"> = </span><span class="breakable-word"><span class="token boolean">true</span></span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">fun </span><a href="get-registered-sessions.html"><span class="token function">getRegisteredSessions</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">sn<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../../com.example.oracleapi.dto.tsdlist/-registeredjson/index.html">Registeredjson</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1082275445%2FFunctions%2F-1243844382" anchor-label="getSnByDeviceId" id="-1082275445%2FFunctions%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-sn-by-device-id.html"><span>get</span><wbr></wbr><span>Sn</span><wbr></wbr><span>By</span><wbr></wbr><span>Device</span><wbr></wbr><span><span>Id</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1082275445%2FFunctions%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="get-sn-by-device-id.html"><span class="token function">getSnByDeviceId</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">deviceId<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../com.example.oracleapi.dto.tsdlist/-tsd-id-response/index.html">TsdIdResponse</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1358007020%2FFunctions%2F-1243844382" anchor-label="getTerminalByDeviceId" id="1358007020%2FFunctions%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-terminal-by-device-id.html"><span>get</span><wbr></wbr><span>Terminal</span><wbr></wbr><span>By</span><wbr></wbr><span>Device</span><wbr></wbr><span><span>Id</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1358007020%2FFunctions%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.transaction.annotation/Transactional///PointingToDeclaration/"><span class="token annotation builtin">Transactional</span></span><span class="token punctuation">(</span><span>readOnly<span class="token operator"> = </span><span class="breakable-word"><span class="token boolean">true</span></span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">fun </span><a href="get-terminal-by-device-id.html"><span class="token function">getTerminalByDeviceId</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">deviceId<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../com.example.oracleapi.entity.table/-tsdlist/index.html">Tsdlist</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Получить информацию о терминале по Device ID</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-575191779%2FFunctions%2F-1243844382" anchor-label="getTerminalFullInfoAsRegisteredjson" id="-575191779%2FFunctions%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-terminal-full-info-as-registeredjson.html"><span>get</span><wbr></wbr><span>Terminal</span><wbr></wbr><span>Full</span><wbr></wbr><span>Info</span><wbr></wbr><span>As</span><wbr></wbr><span><span>Registeredjson</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-575191779%2FFunctions%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.transaction.annotation/Transactional///PointingToDeclaration/"><span class="token annotation builtin">Transactional</span></span><span class="token punctuation">(</span><span>readOnly<span class="token operator"> = </span><span class="breakable-word"><span class="token boolean">true</span></span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">fun </span><a href="get-terminal-full-info-as-registeredjson.html"><span class="token function">getTerminalFullInfoAsRegisteredjson</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">deviceId<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../com.example.oracleapi.dto.tsdlist/-registeredjson/index.html">Registeredjson</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Получить полную информацию о терминале в формате Registeredjson</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2030889184%2FFunctions%2F-1243844382" anchor-label="getUsedTsd" id="-2030889184%2FFunctions%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-used-tsd.html"><span>get</span><wbr></wbr><span>Used</span><wbr></wbr><span><span>Tsd</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2030889184%2FFunctions%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.transaction.annotation/Transactional///PointingToDeclaration/"><span class="token annotation builtin">Transactional</span></span><span class="token punctuation">(</span><span>readOnly<span class="token operator"> = </span><span class="breakable-word"><span class="token boolean">true</span></span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">fun </span><a href="get-used-tsd.html"><span class="token function">getUsedTsd</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">pbe<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../../com.example.oracleapi.dto.tsdlist/-used-json/index.html">UsedJson</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-683215529%2FFunctions%2F-1243844382" anchor-label="getUserByTerminalDeviceId" id="-683215529%2FFunctions%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-user-by-terminal-device-id.html"><span>get</span><wbr></wbr><span>User</span><wbr></wbr><span>By</span><wbr></wbr><span>Terminal</span><wbr></wbr><span>Device</span><wbr></wbr><span><span>Id</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-683215529%2FFunctions%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.transaction.annotation/Transactional///PointingToDeclaration/"><span class="token annotation builtin">Transactional</span></span><span class="token punctuation">(</span><span>readOnly<span class="token operator"> = </span><span class="breakable-word"><span class="token boolean">true</span></span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">fun </span><a href="get-user-by-terminal-device-id.html"><span class="token function">getUserByTerminalDeviceId</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">deviceId<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../-user-info/index.html">UserInfo</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Получить информацию о пользователе по Device ID терминала (для авторизации)</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1594222480%2FFunctions%2F-1243844382" anchor-label="isTerminalActiveByDeviceId" id="-1594222480%2FFunctions%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="is-terminal-active-by-device-id.html"><span>is</span><wbr></wbr><span>Terminal</span><wbr></wbr><span>Active</span><wbr></wbr><span>By</span><wbr></wbr><span>Device</span><wbr></wbr><span><span>Id</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1594222480%2FFunctions%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.transaction.annotation/Transactional///PointingToDeclaration/"><span class="token annotation builtin">Transactional</span></span><span class="token punctuation">(</span><span>readOnly<span class="token operator"> = </span><span class="breakable-word"><span class="token boolean">true</span></span></span><wbr></wbr><span class="token punctuation">)</span></div></div><span class="token keyword">fun </span><a href="is-terminal-active-by-device-id.html"><span class="token function">isTerminalActiveByDeviceId</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">deviceId<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Проверка активности терминала по Device ID</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-314912443%2FFunctions%2F-1243844382" anchor-label="upsertTerminal" id="-314912443%2FFunctions%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="upsert-terminal.html"><span>upsert</span><wbr></wbr><span><span>Terminal</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-314912443%2FFunctions%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.transaction.annotation/Transactional///PointingToDeclaration/"><span class="token annotation builtin">Transactional</span></span></div></div><span class="token keyword">fun </span><a href="upsert-terminal.html"><span class="token function">upsertTerminal</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">request<span class="token operator">: </span><a href="../../com.example.oracleapi.dto.tsdlist/-tsd-upsert-request/index.html">TsdUpsertRequest</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../com.example.oracleapi.dto.tsdlist/-tsd-upsert-response/index.html">TsdUpsertResponse</a></div><div class="brief "><p class="paragraph">Обновить существующий терминал или создать новый, если его нет При создании нового терминала генерирует случайный RFID</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2026 Copyright</span><span
+                class="pull-right"><span>Generated by </span><a
+                href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

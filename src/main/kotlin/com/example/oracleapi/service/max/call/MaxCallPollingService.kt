@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
-import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.web.client.ResourceAccessException
 import org.springframework.web.client.RestTemplate
@@ -22,7 +21,7 @@ import kotlin.collections.get
 class MaxCallPollingService(
     private val restTemplate: RestTemplate,
     private val properties: MaxApiProperties,
-    private val botClient: MaxBotCallClient,
+    private val botClient: MaxBotCallClientService,
     private val maxUserService: MaxUserService,
     private val asteriskService: AsteriskService,
     private val callNotificationService: CallNotificationService,

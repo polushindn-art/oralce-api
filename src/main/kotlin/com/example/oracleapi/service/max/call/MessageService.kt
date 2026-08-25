@@ -7,7 +7,7 @@ import kotlin.collections.get
 
 @Service
 class MessageService(
-    private val botClient: MaxBotCallClient
+    private val botClient: MaxBotCallClientService
 ) {
 
     private val log = LoggerFactory.getLogger(this::class.java)

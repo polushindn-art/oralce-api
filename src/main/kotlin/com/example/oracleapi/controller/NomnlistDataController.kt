@@ -2,6 +2,7 @@ package com.example.oracleapi.controller
 
 import com.example.oracleapi.dto.common.MyApiResponse
 import com.example.oracleapi.dto.nomnlistdata.NomnlistdataMetadata
+import com.example.oracleapi.service.nomnlistdata.DownloadResult
 import com.example.oracleapi.service.nomnlistdata.NomnlistdataService
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.swagger.v3.oas.annotations.Operation
@@ -21,16 +22,14 @@ class NomnlistDataController(
     private val objectMapper: ObjectMapper
 ) : BaseController() {
 
-    // ==================== INFO (получение информации) ====================
+    // ==================== INFO ====================
 
     @GetMapping("/by-nomen/{nomen}/info")
     @Operation(summary = "Получить список всех фото для номенклатуры")
     fun getInfoByNomen(
         @PathVariable nomen: Long
     ): MyApiResponse<List<NomnlistdataMetadata>> {
-        val photos = service.getByNomen(nomen)
-        val metadata = photos.map { NomnlistdataMetadata.fromEntity(it) }
-        return successList(metadata)
+        return successList(service.getInfoByNomen(nomen))
     }
 
     @GetMapping("/by-nomen/{nomen}/info/{photonum}")
@@ -39,16 +38,12 @@ class NomnlistDataController(
         @PathVariable nomen: Long,
         @PathVariable photonum: Int
     ): MyApiResponse<NomnlistdataMetadata> {
-        val photo = service.getByNomenAndPhotonum(nomen, photonum)
-            ?: return error(
-                message = "Фото для номенклатуры $nomen (№$photonum) не найдено"
-            )
-        return success(
-            NomnlistdataMetadata.fromEntity(photo)
-        )
+        val metadata = service.getPhotoInfoByNomen(nomen, photonum)
+            ?: return error("Фото для номенклатуры $nomen (№$photonum) не найдено")
+        return success(metadata)
     }
 
-    // ==================== VIEW (просмотр) ====================
+    // ==================== VIEW ====================
 
     @GetMapping("/by-nomen/{nomen}/view/{photonum}")
     @Operation(summary = "Просмотр конкретного фото номенклатуры")
@@ -57,27 +52,13 @@ class NomnlistDataController(
         @PathVariable photonum: Int,
         response: HttpServletResponse
     ) {
-        val photo = service.getByNomenAndPhotonum(nomen, photonum)
-
-        if (photo == null) {
-            sendErrorResponse(
-                response,
-                "Фото для номенклатуры $nomen (№$photonum) не найдено",
-                "/nomen-photos/by-nomen/$nomen/view/$photonum"
-            )
+        val data = service.getPhotoData(nomen, photonum, isPreview = false)
+        if (data == null) {
+            sendErrorResponse(response, "Фото для номенклатуры $nomen (№$photonum) не найдено или пустое", "/v1/nomnlistdata/by-nomen/$nomen/view/$photonum")
             return
         }
 
-        val data = photo.imageData
-        if (data == null || data.isEmpty()) {
-            sendErrorResponse(response, "Фото не содержит данных", "/nomen-photos/by-nomen/$nomen/view/$photonum")
-            return
-        }
-
-        response.contentType = MediaType.IMAGE_JPEG_VALUE
-        response.setHeader("Content-Disposition", "inline")
-        response.outputStream.write(data)
-        response.outputStream.flush()
+        writeImageToResponse(response, data, "inline")
     }
 
     @GetMapping("/by-nomen/{nomen}/main")
@@ -86,27 +67,13 @@ class NomnlistDataController(
         @PathVariable nomen: Long,
         response: HttpServletResponse
     ) {
-        val photo = service.getMainByNomen(nomen)
-
-        if (photo == null) {
-            sendErrorResponse(
-                response,
-                "Главное фото для номенклатуры $nomen не найдено",
-                "/nomen-photos/by-nomen/$nomen/main"
-            )
+        val data = service.getMainPhotoData(nomen)
+        if (data == null) {
+            sendErrorResponse(response, "Главное фото для номенклатуры $nomen не найдено", "/v1/nomnlistdata/by-nomen/$nomen/main")
             return
         }
 
-        val data = photo.imageData
-        if (data == null || data.isEmpty()) {
-            sendErrorResponse(response, "Фото не содержит данных", "/nomen-photos/by-nomen/$nomen/main")
-            return
-        }
-
-        response.contentType = MediaType.IMAGE_JPEG_VALUE
-        response.setHeader("Content-Disposition", "inline")
-        response.outputStream.write(data)
-        response.outputStream.flush()
+        writeImageToResponse(response, data, "inline")
     }
 
     @GetMapping("/by-nomen/{nomen}/view")
@@ -115,59 +82,29 @@ class NomnlistDataController(
         @PathVariable nomen: Long,
         response: HttpServletResponse
     ) {
-        val photo = service.getFirstByNomen(nomen)
-
-        if (photo == null) {
-            sendErrorResponse(response, "Фото для номенклатуры $nomen не найдено", "/nomen-photos/by-nomen/$nomen/view")
+        val data = service.getFirstPhotoData(nomen)
+        if (data == null) {
+            sendErrorResponse(response, "Фото для номенклатуры $nomen не найдено", "/v1/nomnlistdata/by-nomen/$nomen/view")
             return
         }
 
-        val data = photo.imageData
-        if (data == null || data.isEmpty()) {
-            sendErrorResponse(response, "Фото не содержит данных", "/nomen-photos/by-nomen/$nomen/view")
-            return
-        }
-
-        response.contentType = MediaType.IMAGE_JPEG_VALUE
-        response.setHeader("Content-Disposition", "inline")
-        response.outputStream.write(data)
-        response.outputStream.flush()
+        writeImageToResponse(response, data, "inline")
     }
 
-    // ==================== DOWNLOAD (скачивание) ====================
+    // ==================== DOWNLOAD ====================
 
     @GetMapping("/by-nomen/{nomen}/download/{photonum}")
     @Operation(summary = "Скачать конкретное фото номенклатуры")
     fun downloadByNomenAndPhotonum(
         @PathVariable nomen: Long,
         @PathVariable photonum: Int,
+        request: HttpServletRequest,
         response: HttpServletResponse
     ) {
-        val photo = service.getByNomenAndPhotonum(nomen, photonum)
-
-        if (photo == null) {
-            sendErrorResponse(
-                response,
-                "Фото для номенклатуры $nomen (№$photonum) не найдено",
-                "/nomen-photos/by-nomen/$nomen/download/$photonum"
-            )
-            return
-        }
-
-        val data = photo.imageData
-        if (data == null || data.isEmpty()) {
-            sendErrorResponse(response, "Фото не содержит данных", "/nomen-photos/by-nomen/$nomen/download/$photonum")
-            return
-        }
-
-        val filename = "photo_${nomen}_${photonum}.jpg"
-        response.contentType = MediaType.IMAGE_JPEG_VALUE
-        response.setHeader("Content-Disposition", "attachment; filename=\"$filename\"")
-        response.outputStream.write(data)
-        response.outputStream.flush()
+        handleDownload(service.getPhotoDownloadData(nomen, photonum, isPreview = false), request, response)
     }
 
-    // ==================== PREVIEW (превью) ====================
+    // ==================== PREVIEW ====================
 
     @GetMapping("/by-nomen/{nomen}/preview/{photonum}")
     @Operation(summary = "Просмотр превью конкретного фото номенклатуры")
@@ -176,27 +113,13 @@ class NomnlistDataController(
         @PathVariable photonum: Int,
         response: HttpServletResponse
     ) {
-        val photo = service.getByNomenAndPhotonum(nomen, photonum)
-
-        if (photo == null) {
-            sendErrorResponse(
-                response,
-                "Фото для номенклатуры $nomen (№$photonum) не найдено",
-                "/nomen-photos/by-nomen/$nomen/preview/$photonum"
-            )
+        val data = service.getPhotoData(nomen, photonum, isPreview = true)
+        if (data == null) {
+            sendErrorResponse(response, "Превью для фото не найдено", "/v1/nomnlistdata/by-nomen/$nomen/preview/$photonum")
             return
         }
 
-        val preview = photo.minidata
-        if (preview == null || preview.isEmpty()) {
-            sendErrorResponse(response, "Превью для фото не найдено", "/nomen-photos/by-nomen/$nomen/preview/$photonum")
-            return
-        }
-
-        response.contentType = MediaType.IMAGE_JPEG_VALUE
-        response.setHeader("Content-Disposition", "inline")
-        response.outputStream.write(preview)
-        response.outputStream.flush()
+        writeImageToResponse(response, data, "inline")
     }
 
     @GetMapping("/by-nomen/{nomen}/preview/download/{photonum}")
@@ -204,37 +127,13 @@ class NomnlistDataController(
     fun downloadPreviewByNomenAndPhotonum(
         @PathVariable nomen: Long,
         @PathVariable photonum: Int,
+        request: HttpServletRequest,
         response: HttpServletResponse
     ) {
-        val photo = service.getByNomenAndPhotonum(nomen, photonum)
-
-        if (photo == null) {
-            sendErrorResponse(
-                response,
-                "Фото для номенклатуры $nomen (№$photonum) не найдено",
-                "/nomen-photos/by-nomen/$nomen/preview/download/$photonum"
-            )
-            return
-        }
-
-        val preview = photo.minidata
-        if (preview == null || preview.isEmpty()) {
-            sendErrorResponse(
-                response,
-                "Превью для фото не найдено",
-                "/nomen-photos/by-nomen/$nomen/preview/download/$photonum"
-            )
-            return
-        }
-
-        val filename = "preview_${nomen}_${photonum}.jpg"
-        response.contentType = MediaType.IMAGE_JPEG_VALUE
-        response.setHeader("Content-Disposition", "attachment; filename=\"$filename\"")
-        response.outputStream.write(preview)
-        response.outputStream.flush()
+        handleDownload(service.getPhotoDownloadData(nomen, photonum, isPreview = true), request, response)
     }
 
-    // ==================== CRUD (создание, удаление) ====================
+    // ==================== CRUD ====================
 
     @PostMapping(consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     @Operation(summary = "Загрузить новое фото для номенклатуры")
@@ -244,12 +143,12 @@ class NomnlistDataController(
         @RequestParam(required = false) needDownload: Boolean?
     ): MyApiResponse<NomnlistdataMetadata> {
         return try {
-            val photo = service.uploadPhoto(
+            val metadata = service.uploadPhoto(
                 nomen = nomen,
                 file = file,
                 needDownload = needDownload
             )
-            success(NomnlistdataMetadata.fromEntity(photo))
+            success(metadata)
         } catch (e: IllegalArgumentException) {
             error(message = e.message.toString())
         }
@@ -262,11 +161,15 @@ class NomnlistDataController(
         @PathVariable photonum: Int,
         request: HttpServletRequest
     ): MyApiResponse<Unit> {
-        val photo = service.getByNomenAndPhotonum(nomen, photonum) ?: return MyApiResponse.unsuccess(
-            message = "Фото для номенклатуры $nomen (№$photonum) не найдено",
-            path = request.requestURI
-        )
-        service.softDelete(photo.rn)
+        val deleted = service.softDeleteByNomenAndPhotonum(nomen, photonum)
+
+        if (!deleted) {
+            return MyApiResponse.unsuccess(
+                message = "Фото для номенклатуры $nomen (№$photonum) не найдено",
+                path = request.requestURI
+            )
+        }
+
         return MyApiResponse.success(
             message = "Фото для номенклатуры $nomen (№$photonum) удалено",
             path = request.requestURI
@@ -286,21 +189,36 @@ class NomnlistDataController(
         )
     }
 
-    // ==================== Вспомогательные методы ====================
+    // ==================== Вспомогательные приватные методы ====================
 
-    private fun sendErrorResponse(
-        response: HttpServletResponse,
-        message: String,
-        path: String
+    private fun handleDownload(
+        result: DownloadResult,
+        request: HttpServletRequest,
+        response: HttpServletResponse
     ) {
+        when (result) {
+            is DownloadResult.NotFound -> sendErrorResponse(response, result.message, request.requestURI)
+            is DownloadResult.EmptyData -> sendErrorResponse(response, result.message, request.requestURI)
+            is DownloadResult.Success -> {
+                response.contentType = MediaType.IMAGE_JPEG_VALUE
+                response.setHeader("Content-Disposition", "attachment; filename=\"${result.filename}\"")
+                response.outputStream.write(result.data)
+                response.outputStream.flush()
+            }
+        }
+    }
+
+    private fun writeImageToResponse(response: HttpServletResponse, data: ByteArray, disposition: String) {
+        response.contentType = MediaType.IMAGE_JPEG_VALUE
+        response.setHeader("Content-Disposition", disposition)
+        response.outputStream.write(data)
+        response.outputStream.flush()
+    }
+
+    private fun sendErrorResponse(response: HttpServletResponse, message: String, path: String) {
         response.status = HttpStatus.NOT_FOUND.value()
         response.contentType = "application/json;charset=UTF-8"
-
-        val errorResponse = MyApiResponse.unsuccess<Nothing>(
-            message = message,
-            path = path
-        )
-
+        val errorResponse = MyApiResponse.unsuccess<Nothing>(message = message, path = path)
         response.writer.write(objectMapper.writeValueAsString(errorResponse))
     }
 }

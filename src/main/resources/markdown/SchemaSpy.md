@@ -64,7 +64,7 @@ output_docs/
 
 3. Добавьте в самый конец файла строку:
 
-   0 7 * * * docker restart schemaspy-docs
+   0 7 * * * /usr/bin/docker restart schemaspy-docs
 
 ⚠️ **Важно:** В конце файла обязательно нажмите `Enter`, чтобы оставить пустую строку перед закрытием (иначе Cron выдаст ошибку `missing newline before EOF`).
 4. Сохраните файл (`Ctrl + O`, `Enter`, `Ctrl + X`).

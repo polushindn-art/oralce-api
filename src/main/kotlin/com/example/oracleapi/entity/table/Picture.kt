@@ -9,7 +9,7 @@ import jakarta.persistence.Table
 import java.time.LocalDateTime
 
 @Entity
-@Table(name = "PICTURE", schema = Helper.Companion.SCHEME)
+@Table(name = "PICTURE", schema = Helper.SCHEME)
 class Picture(
     @Id
     @Column(name = "RN")

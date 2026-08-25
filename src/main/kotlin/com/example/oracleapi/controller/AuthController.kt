@@ -3,6 +3,7 @@ package com.example.oracleapi.controller
 import com.example.oracleapi.config.JwtConfigProperties
 import com.example.oracleapi.config.JwtHelper
 import com.example.oracleapi.dto.*
+import com.example.oracleapi.dto.auth.DeviceInfo
 import com.example.oracleapi.dto.common.MyApiResponse
 import com.example.oracleapi.dto.common.MyApiResponse.Companion.unsuccess
 import com.example.oracleapi.service.OracleAuthService
@@ -84,7 +85,7 @@ class AuthController(
         response: HttpServletResponse
     ): ResponseEntity<MyApiResponse<AuthResponse>> {
 
-        val terminal = tsdListService.getTerminalByDeviceId(deviceId) ?: return ResponseEntity
+        val terminal = tsdListService.getTerminalFullInfoAsRegisteredjson( deviceId) ?: return ResponseEntity
             .status(HttpStatus.UNAUTHORIZED)
             .body(
                 error("Терминал с Device ID=$deviceId не найден")

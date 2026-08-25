@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>OrderHeadService</title>
+    <link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer="defer"></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer="defer"></script>
+</head>
+<body>
+    <div class="root">
+<nav class="navigation" id="navigation-wrapper">
+    <div class="navigation--inner">
+        <div class="navigation-title">
+            <button class="menu-toggle" id="menu-toggle" type="button">toggle menu</button>
+            <div class="library-name">
+                    <a class="library-name--link" href="../../../index.html">
+                            OracleAPI
+                    </a>
+            </div>
+            <div class="library-version">
+            </div>
+        </div>
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter="OracleAPI/JVM">JVM</button>
+        </div>
+    </div>
+    <div class="navigation-controls">
+        <button class="navigation-controls--btn navigation-controls--theme" id="theme-toggle-button" type="button">switch theme</button>
+        <div class="navigation-controls--btn navigation-controls--search" id="searchBar" role="button">search in API</div>
+    </div>
+</nav>
+        <div id="container">
+            <div class="sidebar" id="leftColumn">
+                <div class="sidebar--inner" id="sideMenu"></div>
+            </div>
+            <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageIds="OracleAPI::com.example.oracleapi.service.orderhead/OrderHeadService///PointingToDeclaration//-1243844382">
+  <div class="breadcrumbs"><a href="../../../index.html">OracleAPI</a><span class="delimiter">/</span><a href="../index.html">com.example.oracleapi.service.orderhead</a><span class="delimiter">/</span><span class="current">OrderHeadService</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Order</span><wbr></wbr><span>Head</span><wbr></wbr><span><span>Service</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="org.springframework.stereotype/Service///PointingToDeclaration/"><span class="token annotation builtin">Service</span></span></div></div><span class="token keyword">class </span><a href="index.html">OrderHeadService</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">orderHeadInsProcedure<span class="token operator">: </span><a href="../-order-head-ins-procedure/index.html">OrderHeadInsProcedure</a><span class="token punctuation">, </span></span><span class="parameter ">orderHeadUpdProcedure<span class="token operator">: </span><a href="../-order-head-upd-procedure/index.html">OrderHeadUpdProcedure</a><span class="token punctuation">, </span></span><span class="parameter ">orderHeadStatusGet<span class="token operator">: </span><a href="../-order-head-status-get/index.html">OrderHeadStatusGet</a><span class="token punctuation">, </span></span><span class="parameter ">orderHeadStatusUpdate<span class="token operator">: </span><a href="../-order-head-status-update/index.html">OrderHeadStatusUpdate</a><span class="token punctuation">, </span></span><span class="parameter ">orderHeadBasisDocClear<span class="token operator">: </span><a href="../-order-head-basis-doc-clear/index.html">OrderHeadBasisDocClear</a><span class="token punctuation">, </span></span><span class="parameter ">orderHeadBasisDocUpdate<span class="token operator">: </span><a href="../-order-head-basis-doc-update/index.html">OrderHeadBasisDocUpdate</a><span class="token punctuation">, </span></span><span class="parameter ">orderHeadUpdateProvider<span class="token operator">: </span><a href="../-order-head-update-provider/index.html">OrderHeadUpdateProvider</a><span class="token punctuation">, </span></span><span class="parameter ">orderHeadUlUpdate<span class="token operator">: </span><a href="../-order-head-ul-update/index.html">OrderHeadUlUpdate</a><span class="token punctuation">, </span></span><span class="parameter ">orderHeadUpdateStoreIn<span class="token operator">: </span><a href="../-order-head-update-store-in/index.html">OrderHeadUpdateStoreIn</a><span class="token punctuation">, </span></span><span class="parameter ">orderHeadUpdateArrivalDate<span class="token operator">: </span><a href="../-order-head-update-arrival-date/index.html">OrderHeadUpdateArrivalDate</a><span class="token punctuation">, </span></span><span class="parameter ">orderHeadUpdateStoreInAndUl<span class="token operator">: </span><a href="../-order-head-update-store-in-and-ul/index.html">OrderHeadUpdateStoreInAndUl</a><span class="token punctuation">, </span></span><span class="parameter ">orderHeadUpdateNote<span class="token operator">: </span><a href="../-order-head-update-note/index.html">OrderHeadUpdateNote</a><span class="token punctuation">, </span></span><span class="parameter ">fieldService<span class="token operator">: </span><a href="../../com.example.oracleapi.service.field/-field-service/index.html">FieldService</a><span class="token punctuation">, </span></span><span class="parameter ">typeDocService<span class="token operator">: </span><a href="../../com.example.oracleapi.service.typedoc/-typedoc-service/index.html">TypedocService</a><span class="token punctuation">, </span></span><span class="parameter ">orderheadRepository<span class="token operator">: </span><a href="../../com.example.oracleapi.repository.orderhead/-orderhead-repository/index.html">OrderheadRepository</a></span></span><span class="token punctuation">)</span></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="">Constructors</h2>
+        <div class="table"><a data-name="1664144083%2FConstructors%2F-1243844382" anchor-label="OrderHeadService" id="1664144083%2FConstructors%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-order-head-service.html"><span>Order</span><wbr></wbr><span>Head</span><wbr></wbr><span><span>Service</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1664144083%2FConstructors%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">orderHeadInsProcedure<span class="token operator">: </span><a href="../-order-head-ins-procedure/index.html">OrderHeadInsProcedure</a><span class="token punctuation">, </span></span><span class="parameter ">orderHeadUpdProcedure<span class="token operator">: </span><a href="../-order-head-upd-procedure/index.html">OrderHeadUpdProcedure</a><span class="token punctuation">, </span></span><span class="parameter ">orderHeadStatusGet<span class="token operator">: </span><a href="../-order-head-status-get/index.html">OrderHeadStatusGet</a><span class="token punctuation">, </span></span><span class="parameter ">orderHeadStatusUpdate<span class="token operator">: </span><a href="../-order-head-status-update/index.html">OrderHeadStatusUpdate</a><span class="token punctuation">, </span></span><span class="parameter ">orderHeadBasisDocClear<span class="token operator">: </span><a href="../-order-head-basis-doc-clear/index.html">OrderHeadBasisDocClear</a><span class="token punctuation">, </span></span><span class="parameter ">orderHeadBasisDocUpdate<span class="token operator">: </span><a href="../-order-head-basis-doc-update/index.html">OrderHeadBasisDocUpdate</a><span class="token punctuation">, </span></span><span class="parameter ">orderHeadUpdateProvider<span class="token operator">: </span><a href="../-order-head-update-provider/index.html">OrderHeadUpdateProvider</a><span class="token punctuation">, </span></span><span class="parameter ">orderHeadUlUpdate<span class="token operator">: </span><a href="../-order-head-ul-update/index.html">OrderHeadUlUpdate</a><span class="token punctuation">, </span></span><span class="parameter ">orderHeadUpdateStoreIn<span class="token operator">: </span><a href="../-order-head-update-store-in/index.html">OrderHeadUpdateStoreIn</a><span class="token punctuation">, </span></span><span class="parameter ">orderHeadUpdateArrivalDate<span class="token operator">: </span><a href="../-order-head-update-arrival-date/index.html">OrderHeadUpdateArrivalDate</a><span class="token punctuation">, </span></span><span class="parameter ">orderHeadUpdateStoreInAndUl<span class="token operator">: </span><a href="../-order-head-update-store-in-and-ul/index.html">OrderHeadUpdateStoreInAndUl</a><span class="token punctuation">, </span></span><span class="parameter ">orderHeadUpdateNote<span class="token operator">: </span><a href="../-order-head-update-note/index.html">OrderHeadUpdateNote</a><span class="token punctuation">, </span></span><span class="parameter ">fieldService<span class="token operator">: </span><a href="../../com.example.oracleapi.service.field/-field-service/index.html">FieldService</a><span class="token punctuation">, </span></span><span class="parameter ">typeDocService<span class="token operator">: </span><a href="../../com.example.oracleapi.service.typedoc/-typedoc-service/index.html">TypedocService</a><span class="token punctuation">, </span></span><span class="parameter ">orderheadRepository<span class="token operator">: </span><a href="../../com.example.oracleapi.repository.orderhead/-orderhead-repository/index.html">OrderheadRepository</a></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="1309173811%2FFunctions%2F-1243844382" anchor-label="clearBasisDocs" id="1309173811%2FFunctions%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="clear-basis-docs.html"><span>clear</span><wbr></wbr><span>Basis</span><wbr></wbr><span><span>Docs</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1309173811%2FFunctions%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="clear-basis-docs.html"><span class="token function">clearBasisDocs</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">rn<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../com.example.oracleapi.dto/-response-r-n/index.html">ResponseRN</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1975063247%2FFunctions%2F-1243844382" anchor-label="createOrder" id="1975063247%2FFunctions%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="create-order.html"><span>create</span><wbr></wbr><span><span>Order</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1975063247%2FFunctions%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="create-order.html"><span class="token function">createOrder</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">request<span class="token operator">: </span><a href="../../com.example.oracleapi.dto.orderhead.ins/-order-head-ins-request/index.html">OrderHeadInsRequest</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../com.example.oracleapi.dto.orderhead.ins/-order-head-ins-response/index.html">OrderHeadInsResponse</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="227392763%2FFunctions%2F-1243844382" anchor-label="existByRn" id="227392763%2FFunctions%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="exist-by-rn.html"><span>exist</span><wbr></wbr><span>By</span><wbr></wbr><span><span>Rn</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="227392763%2FFunctions%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="exist-by-rn.html"><span class="token function">existByRn</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">rn<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1211937194%2FFunctions%2F-1243844382" anchor-label="getStatus" id="1211937194%2FFunctions%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-status.html"><span>get</span><wbr></wbr><span><span>Status</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1211937194%2FFunctions%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="get-status.html"><span class="token function">getStatus</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">rn<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token operator">?</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../com.example.oracleapi.dto.orderhead.status/-order-head-status-response/index.html">OrderHeadStatusResponse</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1859708904%2FFunctions%2F-1243844382" anchor-label="updateArDate" id="-1859708904%2FFunctions%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="update-ar-date.html"><span>update</span><wbr></wbr><span>Ar</span><wbr></wbr><span><span>Date</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1859708904%2FFunctions%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="update-ar-date.html"><span class="token function">updateArDate</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">request<span class="token operator">: </span><a href="../../com.example.oracleapi.dto.orderhead.arrivalDate/-order-head-update-ar-date-request/index.html">OrderHeadUpdateArDateRequest</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../com.example.oracleapi.dto.orderhead.arrivalDate/-order-head-update-ar-date-response/index.html">OrderHeadUpdateArDateResponse</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1711527603%2FFunctions%2F-1243844382" anchor-label="updateBasisDoc" id="1711527603%2FFunctions%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="update-basis-doc.html"><span>update</span><wbr></wbr><span>Basis</span><wbr></wbr><span><span>Doc</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1711527603%2FFunctions%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="update-basis-doc.html"><span class="token function">updateBasisDoc</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">request<span class="token operator">: </span><a href="../../com.example.oracleapi.dto.orderhead.basisDoc/-order-head-basis-doc-update-request/index.html">OrderHeadBasisDocUpdateRequest</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../com.example.oracleapi.dto/-response-r-n/index.html">ResponseRN</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1116234693%2FFunctions%2F-1243844382" anchor-label="updateNote" id="-1116234693%2FFunctions%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="update-note.html"><span>update</span><wbr></wbr><span><span>Note</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1116234693%2FFunctions%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="update-note.html"><span class="token function">updateNote</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">request<span class="token operator">: </span><a href="../../com.example.oracleapi.dto.orderhead.note/-order-head-update-note-request/index.html">OrderHeadUpdateNoteRequest</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../com.example.oracleapi.dto/-response-r-n/index.html">ResponseRN</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1251704419%2FFunctions%2F-1243844382" anchor-label="updateOrder" id="-1251704419%2FFunctions%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="update-order.html"><span>update</span><wbr></wbr><span><span>Order</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1251704419%2FFunctions%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="update-order.html"><span class="token function">updateOrder</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">request<span class="token operator">: </span><a href="../../com.example.oracleapi.dto.orderhead/-order-head-upd-request/index.html">OrderHeadUpdRequest</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../com.example.oracleapi.dto.orderhead/-order-head-upd-response/index.html">OrderHeadUpdResponse</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1809409608%2FFunctions%2F-1243844382" anchor-label="updateProvider" id="-1809409608%2FFunctions%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="update-provider.html"><span>update</span><wbr></wbr><span><span>Provider</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1809409608%2FFunctions%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="update-provider.html"><span class="token function">updateProvider</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">request<span class="token operator">: </span><a href="../../com.example.oracleapi.dto.orderhead.provider/-order-head-update-provider-request/index.html">OrderHeadUpdateProviderRequest</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../com.example.oracleapi.dto.orderhead.provider/-order-head-provider-update-response/index.html">OrderHeadProviderUpdateResponse</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1149418565%2FFunctions%2F-1243844382" anchor-label="updateStatus" id="-1149418565%2FFunctions%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="update-status.html"><span>update</span><wbr></wbr><span><span>Status</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1149418565%2FFunctions%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="update-status.html"><span class="token function">updateStatus</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">request<span class="token operator">: </span><a href="../../com.example.oracleapi.dto.orderhead.status/-order-head-status-update-request/index.html">OrderHeadStatusUpdateRequest</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../com.example.oracleapi.dto.orderhead.status/-order-head-status-update-response/index.html">OrderHeadStatusUpdateResponse</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-638911343%2FFunctions%2F-1243844382" anchor-label="updateStoreIn" id="-638911343%2FFunctions%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="update-store-in.html"><span>update</span><wbr></wbr><span>Store</span><wbr></wbr><span><span>In</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-638911343%2FFunctions%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="update-store-in.html"><span class="token function">updateStoreIn</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">request<span class="token operator">: </span><a href="../../com.example.oracleapi.dto.orderhead.storein/-order-head-update-store-in-request/index.html">OrderHeadUpdateStoreInRequest</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../com.example.oracleapi.dto.orderhead.storein/-order-head-update-store-in-response/index.html">OrderHeadUpdateStoreInResponse</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1917451367%2FFunctions%2F-1243844382" anchor-label="updateStoreInAndUl" id="1917451367%2FFunctions%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="update-store-in-and-ul.html"><span>update</span><wbr></wbr><span>Store</span><wbr></wbr><span>In</span><wbr></wbr><span>And</span><wbr></wbr><span><span>Ul</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1917451367%2FFunctions%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="update-store-in-and-ul.html"><span class="token function">updateStoreInAndUl</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">request<span class="token operator">: </span><a href="../../com.example.oracleapi.dto.orderhead/-order-head-upd-store-in-and-ul-request/index.html">OrderHeadUpdStoreInAndUlRequest</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../com.example.oracleapi.dto.orderhead/-order-head-upd-store-in-and-ul-response/index.html">OrderHeadUpdStoreInAndUlResponse</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1886481194%2FFunctions%2F-1243844382" anchor-label="updateUl" id="1886481194%2FFunctions%2F-1243844382" data-filterable-set="OracleAPI/JVM"></a>
+          <div class="table-row" data-filterable-current="OracleAPI/JVM" data-filterable-set="OracleAPI/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="update-ul.html"><span>update</span><wbr></wbr><span><span>Ul</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1886481194%2FFunctions%2F-1243844382"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="OracleAPI/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="update-ul.html"><span class="token function">updateUl</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">request<span class="token operator">: </span><a href="../../com.example.oracleapi.dto.orderhead.ul/-order-head-ul-update-request/index.html">OrderHeadUlUpdateRequest</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../com.example.oracleapi.dto.orderhead.ul/-order-head-ul-update-response/index.html">OrderHeadUlUpdateResponse</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2026 Copyright</span><span
+                class="pull-right"><span>Generated by </span><a
+                href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

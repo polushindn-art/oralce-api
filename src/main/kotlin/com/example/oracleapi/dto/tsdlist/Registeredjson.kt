@@ -2,6 +2,7 @@ package com.example.oracleapi.dto.tsdlist
 
 import com.example.oracleapi.dto.store.StoreSimpleResponse
 import com.example.oracleapi.dto.tsdparam.ParamDto
+import com.example.oracleapi.entity.table.Tsdlist
 import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(description = "Данные зарегистрированного ТСД")
@@ -41,19 +42,4 @@ data class Registeredjson(
 
     @field:Schema(description = "Параметры ТСД")
     val param: List<ParamDto>? = null
-)
-
-@Schema(description = "Информация о магазине")
-data class StoreInfo(
-    @field:Schema(description = "RN магазина")
-    val rn: Long?,
-
-    @field:Schema(description = "Код магазина")
-    val storecode: String?,
-
-    @field:Schema(description = "Используется планограмма")
-    val eschema: Long?,
-
-    @field:Schema(description = "Используется АСХ")
-    val usesas: Long?
 )
