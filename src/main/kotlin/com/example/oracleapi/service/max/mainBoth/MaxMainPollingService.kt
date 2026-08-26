@@ -471,8 +471,41 @@ class MaxMainPollingService(
                     )
                 }
             }
+            payload == "settings" -> {
+                // Получаем DTO для чтения статусов
+                val userDto = maxUserAgnService.findByChatId(chatId)
+                if (userDto == null) {
+                    botClient.sendMessageWithInlineKeyboard(chatId, "❌ Вы не зарегистрированы.", BotButtons.menuButton(), "markdown")
+                    return
+                }
+
+                val callsStatus = if (userDto.notifCalls == 1) "🟢 Включены" else "🔴 Выключены"
+                val bdayStatus = if (userDto.notifBirthday == 1) "🟢 Включены" else "🔴 Выключены"
+
+                val buttons = listOf(
+                    listOf(mapOf("type" to "callback", "text" to "📞 Звонки: $callsStatus", "payload" to "toggle_calls")),
+                    listOf(mapOf("type" to "callback", "text" to "🎂 Дни рождения: $bdayStatus", "payload" to "toggle_bday")),
+                    listOf(mapOf("type" to "callback", "text" to "◀️ В меню", "payload" to "back_to_menu"))
+                )
+
+                botClient.sendMessageWithInlineKeyboard(
+                    chatId,
+                    "⚙️ *Настройки уведомлений*\n\nНажмите на нужный пункт, чтобы изменить его статус:",
+                    buttons,
+                    "markdown"
+                )
+            }
+            payload == "toggle_calls" -> {
+                maxUserAgnService.toggleCalls(chatId)
+                handleAuthCallback(userId, chatId, "settings") // Обновляем экран
+            }
+            payload == "toggle_bday" -> {
+                maxUserAgnService.toggleBirthday(chatId)
+                handleAuthCallback(userId, chatId, "settings") // Обновляем экран
+            }
             payload == "auth_help" -> sendHelp(chatId)
             payload == "back_to_menu" -> sendMainMenu(chatId)
+
             else -> {
                 log.warn("⚠️ Неизвестный payload: $payload")
                 sendMainMenu(chatId)
@@ -607,6 +640,7 @@ class MaxMainPollingService(
                 add(listOf(mapOf("type" to "callback", "text" to "🪪 Моя дисконтная карта", "payload" to "my_qr_card")))
                 if (employee) {
                     add(listOf(mapOf("type" to "callback", "text" to "🔍 Поиск сотрудников", "payload" to "search")))
+                    add(listOf(mapOf("type" to "callback", "text" to "⚙️ Настройки", "payload" to "settings")))
                 }
                 add(listOf(mapOf("type" to "callback", "text" to "🗑️ Отписаться", "payload" to "unsubscribe")))
                 add(listOf(mapOf("type" to "callback", "text" to "ℹ️ Помощь", "payload" to "auth_help")))

@@ -20,7 +20,9 @@ data class MaxUserAgnDto(
     @field:Size(max = 50) val botType: String? = null,
     val createdAt: LocalDateTime? = null,
     val updatedAt: LocalDateTime? = null,
-    val isActive: Boolean? = null
+    val isActive: Boolean? = null,
+    var notifCalls: Int? = 1,
+    var notifBirthday: Int? = 1
 ) : Serializable {
     companion object {
 
@@ -35,7 +37,9 @@ data class MaxUserAgnDto(
                 botType = entity.botType,
                 createdAt = entity.createdAt,
                 updatedAt = entity.updatedAt,
-                isActive = entity.isActive
+                isActive = entity.isActive,
+                notifCalls = entity.notifCalls,
+                notifBirthday = entity.notifBirthday
             )
         }
 

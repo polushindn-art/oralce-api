@@ -59,6 +59,20 @@ open class MaxUserAgn {
     @Column(name = "IS_ACTIVE")
     open var isActive: Boolean? = null
 
+    /**
+     * Уведомления о входящих звонках: 1 — включены, 0 — выключены.
+     */
+    @ColumnDefault("1")
+    @Column(name = "NOTIF_CALLS", nullable = false)
+    open var notifCalls: Int? = 1
+
+    /**
+     * Уведомления о днях рождения: 1 — включены, 0 — выключены.
+     */
+    @ColumnDefault("1")
+    @Column(name = "NOTIF_BIRTHDAY", nullable = false)
+    open var notifBirthday: Int? = 1
+
     @Lob
     @Column(name = "AVATAR")
     var avatar: ByteArray? = null

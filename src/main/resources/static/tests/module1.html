@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест по Модулю 1 (1С:Предприятие)</title>
+
+    <!-- Подключаем общие стили вашего дашборда -->
+    <link rel="stylesheet" href="/css/api-docs.css">
+
+    <style>
+        body {
+            background-color: #f8fafc;
+            color: #1e293b;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .test-container {
+            max-width: 900px;
+            width: 100%;
+            background: #ffffff;
+            padding: 35px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #64748b;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+        .back-link:hover {
+            color: #0f172a;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #0f172a;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 12px;
+            margin-top: 0;
+            margin-bottom: 6px;
+        }
+
+        .subtitle {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        .question-block {
+            margin: 24px 0;
+            padding: 20px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-left: 4px solid #0284c7;
+            border-radius: 8px;
+        }
+
+        .question-text {
+            font-weight: 600;
+            font-size: 16px;
+            color: #0f172a;
+            margin-bottom: 14px;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .options label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: background 0.15s, border-color 0.15s;
+            font-size: 14px;
+            border: 1px solid transparent;
+        }
+
+        .options label:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        input[type="radio"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #0f172a;
+            flex-shrink: 0;
+        }
+
+        .result-area {
+            margin-top: 35px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            padding: 20px 25px;
+            border-radius: 10px;
+            gap: 15px;
+        }
+
+        .result-area button {
+            background: #0f172a;
+            border: none;
+            color: white;
+            font-weight: 600;
+            font-size: 15px;
+            padding: 10px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .result-area button:hover {
+            background: #1e293b;
+        }
+
+        .score-box {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .score {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .detail {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .highlight-correct {
+            background: #dcfce7 !important;
+            border-color: #bbf7d0 !important;
+            color: #166534;
+        }
+
+        .highlight-wrong {
+            background: #fee2e2 !important;
+            border-color: #fecaca !important;
+            color: #991b1b;
+        }
+
+        .explanation {
+            font-size: 13px;
+            color: #334155;
+            background: #e2e8f0;
+            padding: 6px 14px;
+            border-radius: 6px;
+            margin-top: 10px;
+            display: inline-block;
+            border-left: 3px solid #64748b;
+        }
+
+        .footer-note {
+            margin-top: 25px;
+            font-size: 13px;
+            color: #64748b;
+            text-align: center;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .test-container { padding: 20px; }
+            .result-area { flex-direction: column; align-items: stretch; }
+            .score-box { align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="test-container" id="app">
+    <a href="/tests/index.html" class="back-link">← Назад к списку тестов</a>
+
+    <h1>📘 Тест по Модулю 1</h1>
+    <div class="subtitle">Платформа и режимы работы «1С:Предприятие»</div>
+
+    <div id="questionsContainer"></div>
+
+    <div class="result-area">
+        <button id="checkBtn">✅ Проверить ответы</button>
+        <div class="score-box">
+            <div class="score" id="scoreDisplay">0 / 10</div>
+            <div class="detail" id="detailDisplay">Нажмите «Проверить» для анализа</div>
+        </div>
+    </div>
+
+    <div class="footer-note">
+        ⚡ Правильные ответы подсвечиваются зелёным, ваши неверные — красным.
+    </div>
+</div>
+
+<script>
+    (function() {
+        const questions = [
+            {
+                id: 1,
+                text: '1. Платформа «1С:Предприятие» – это:',
+                options: [
+                    'a) Готовое прикладное решение для автоматизации бухгалтерии',
+                    'b) Программная среда, обеспечивающая запуск и работу прикладных решений',
+                    'c) Инструмент для создания отчётов в Excel',
+                    'd) Облачный сервис для хранения данных'
+                ],
+                correct: 1,
+                explanation: 'Платформа — это среда выполнения (движок), на которой работают конфигурации.'
+            },
+            {
+                id: 2,
+                text: '2. Режим работы, в котором данные хранятся в файле на локальном диске или сетевом ресурсе без использования СУБД:',
+                options: [
+                    'a) Клиент-серверный',
+                    'b) Файловый',
+                    'c) Веб-режим',
+                    'd) Тонкий клиент'
+                ],
+                correct: 1,
+                explanation: 'Файловый режим использует файл *.1CD, СУБД не требуется.'
+            },
+            {
+                id: 3,
+                text: '3. Режим работы, предполагающий использование сервера баз данных:',
+                options: [
+                    'a) Файловый',
+                    'b) Толстый клиент',
+                    'c) Клиент-серверный',
+                    'd) Режим предприятия'
+                ],
+                correct: 2,
+                explanation: 'Клиент-серверный режим работает через СУБД (PostgreSQL, MS SQL и др.).'
+            },
+            {
+                id: 4,
+                text: '4. Компонент, который необходимо установить для работы в режиме «Тонкий клиент»:',
+                options: [
+                    'a) Только платформа 1С:Предприятие',
+                    'b) Сервер 1С:Предприятие и клиентское приложение',
+                    'c) Только сервер СУБД',
+                    'd) Веб-сервер Apache'
+                ],
+                correct: 1,
+                explanation: 'Тонкий клиент требует сервер 1С и само клиентское приложение.'
+            },
+            {
+                id: 5,
+                text: '5. Для чего используется «Распределённая информационная база»?',
+                options: [
+                    'a) Для ускорения отчётов',
+                    'b) Для работы нескольких организаций в одной базе',
+                    'c) Для обмена данными между географически удалёнными базами',
+                    'd) Для хранения архивных данных'
+                ],
+                correct: 2,
+                explanation: 'РИБ предназначена для синхронизации между филиалами/офисами.'
+            },
+            {
+                id: 6,
+                text: '6. Тип резервного копирования, позволяющий восстановить базу на конкретную дату и время:',
+                options: [
+                    'a) Полное копирование информационной базы',
+                    'b) Копирование конфигурации',
+                    'c) Журнал регистрации',
+                    'd) Выгрузка в формат .dt'
+                ],
+                correct: 0,
+                explanation: 'Полная копия (файла или дампа СУБД) даёт точное состояние на момент копирования.'
+            },
+            {
+                id: 7,
+                text: '7. Какой инструмент используется для создания и изменения структуры прикладного решения?',
+                options: [
+                    'a) Тестирование',
+                    'b) Конфигуратор',
+                    'c) Монопольный режим',
+                    'd) Администрирование'
+                ],
+                correct: 1,
+                explanation: 'Конфигуратор — это режим разработки и редактирования метаданных.'
+            },
+            {
+                id: 8,
+                text: '8. «Внедрение» в контексте «1С:Предприятие» – это:',
+                options: [
+                    'a) Установка платформы на компьютер',
+                    'b) Процесс адаптации типового решения под нужды конкретной организации',
+                    'c) Создание нового справочника',
+                    'd) Подключение к интернету'
+                ],
+                correct: 1,
+                explanation: 'Внедрение — это настройка, доработка, наполнение данными и обучение.'
+            },
+            {
+                id: 9,
+                text: '9. Подсистемы используются в конфигураторе для:',
+                options: [
+                    'а) хранения данных пользователей',
+                    'b) группировки объектов конфигурации и формирования навигационной структуры интерфейса',
+                    'c) подключения внешних обработок',
+                    'd) настройки прав доступа к данным'
+                ],
+                correct: 1,
+                explanation: 'Подсистемы организуют объекты метаданных и формируют меню/разделы интерфейса.'
+            },
+            {
+                id: 10,
+                text: '10. Ключевой шаг при первичном создании новой информационной базы в режиме конфигуратора:',
+                options: [
+                    'a) Создание пользователя с правами администратора сервера СУБД',
+                    'b) Установка расширения конфигурации, реализующего специфический функционал',
+                    'c) Настройка регламента резервного копирования на уровне операционной системы',
+                    'd) Выбор варианта создания ИБ (на основе шаблона, из конфигурации, пустая) и сохранение структуры метаданных'
+                ],
+                correct: 3,
+                explanation: 'При создании базы в Конфигураторе сначала выбирают способ создания и сохраняют структуру.'
+            }
+        ];
+
+        function renderQuestions() {
+            const container = document.getElementById('questionsContainer');
+            let html = '';
+            questions.forEach((q, index) => {
+                html += `<div class="question-block" id="qblock-${index}">`;
+                html += `<div class="question-text">${q.text}</div>`;
+                html += `<div class="options">`;
+                q.options.forEach((opt, optIndex) => {
+                    const radioId = `q${index}_opt${optIndex}`;
+                    html += `
+                        <label for="${radioId}" id="label-${index}-${optIndex}">
+                            <input type="radio" name="question${index}" id="${radioId}" value="${optIndex}" />
+                            ${opt}
+                        </label>
+                    `;
+                });
+                html += `</div>`;
+                html += `<div id="expl-${index}" style="margin-top: 4px;"></div>`;
+                html += `</div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function checkAnswers() {
+            let correctCount = 0;
+            const total = questions.length;
+
+            for (let i = 0; i < total; i++) {
+                for (let j = 0; j < questions[i].options.length; j++) {
+                    const label = document.getElementById(`label-${i}-${j}`);
+                    if (label) label.classList.remove('highlight-correct', 'highlight-wrong');
+                }
+                const explDiv = document.getElementById(`expl-${i}`);
+                if (explDiv) explDiv.innerHTML = '';
+            }
+
+            for (let i = 0; i < total; i++) {
+                const radios = document.querySelectorAll(`input[name="question${i}"]`);
+                let selectedValue = null;
+                for (const radio of radios) {
+                    if (radio.checked) {
+                        selectedValue = parseInt(radio.value, 10);
+                        break;
+                    }
+                }
+
+                const correctIndex = questions[i].correct;
+                const isCorrect = (selectedValue === correctIndex);
+                if (isCorrect) correctCount++;
+
+                const correctLabel = document.getElementById(`label-${i}-${correctIndex}`);
+                if (correctLabel) correctLabel.classList.add('highlight-correct');
+
+                if (selectedValue !== null && !isCorrect) {
+                    const wrongLabel = document.getElementById(`label-${i}-${selectedValue}`);
+                    if (wrongLabel) wrongLabel.classList.add('highlight-wrong');
+                }
+
+                const explDiv = document.getElementById(`expl-${i}`);
+                if (explDiv) {
+                    const statusText = (selectedValue !== null && isCorrect) ? '✅ Верно' : (selectedValue !== null ? '❌ Неверно' : '⚠️ Не выбран');
+                    explDiv.innerHTML = `
+                        <div class="explanation">
+                            <strong>${statusText}:</strong> ${questions[i].explanation}
+                        </div>
+                    `;
+                }
+            }
+
+            document.getElementById('scoreDisplay').textContent = `${correctCount} / ${total}`;
+            document.getElementById('detailDisplay').textContent = correctCount === total ? '🎉 Отлично! Все ответы верные!' : `Правильных ответов: ${correctCount}`;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            renderQuestions();
+            document.getElementById('checkBtn').addEventListener('click', checkAnswers);
+        });
+    })();
+</script>
+
+</body>
+</html>

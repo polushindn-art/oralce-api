@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Обзор тестов проекта Oracle API</title>
+    <link rel="stylesheet" href="/css/api-docs.css">
+    <style>
+        body { font-family: sans-serif; background: #f8fafc; padding: 40px; color: #1e293b; }
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        h1 { color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
+        .test-card { background: #f1f5f9; border-left: 4px solid #0284c7; padding: 15px 20px; border-radius: 6px; margin-bottom: 15px; }
+        .test-card h3 { margin: 0 0 5px 0; }
+        .test-card a { color: #0284c7; text-decoration: none; font-weight: bold; }
+        .test-card a:hover { text-decoration: underline; }
+        .back-link { display: inline-block; margin-bottom: 20px; color: #64748b; text-decoration: none; }
+        .back-link:hover { color: #0f172a; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <a href="/" class="back-link">← Вернуться на главную дашборда</a>
+    <h1>🧪 Каталог тестов и проверок</h1>
+    <p>Здесь собрана документация по автоматическим тестам, проверяющим архитектуру, изоляцию слоев и бизнес-логику бэкенда.</p>
+
+    <div class="test-list" style="margin-top: 25px;">
+        <!-- Тест 1 -->
+        <div class="test-card">
+            <h3><a href="/tests/module1.html">📘 Тест по Модулю 1 (1С:Предприятие)</a></h3>
+            <p style="margin: 5px 0 0 0; color: #475569;">Интерактивный тест по платформе и режимам работы «1С:Предприятие» с мгновенной проверкой и подсказками.</p>
+        </div>
+
+        <!-- Тест 2 -->
+        <div class="test-card">
+            <h3><a href="/tests/controller-tests.html">2. Интеграционные тесты контроллеров</a></h3>
+            <p style="margin: 5px 0 0 0; color: #475569;">Проверка REST эндпоинтов, обработки ошибок и JWT-авторизации.</p>
+        </div>
+
+        <!-- Тест 3 -->
+        <div class="test-card">
+            <h3><a href="/tests/database-tests.html">3. Тесты репозиториев и Oracle</a></h3>
+            <p style="margin: 5px 0 0 0; color: #475569;">Проверка корректности маппинга сущностей и работы с базой данных.</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

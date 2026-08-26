@@ -10,6 +10,10 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
+/**
+ * Сервис для автоматической проверки и отправки поздравлений с днем рождения сотрудникам.
+ * Запускается по расписанию и рассылает личные и общие уведомления в Telegram-бот.
+ */
 @Service
 class BirthdayNotificationService(
     private val phonebookRepository: PhonebookRepository,
@@ -19,12 +23,15 @@ class BirthdayNotificationService(
 
     private val log = LoggerFactory.getLogger(this::class.java)
 
+    /**
+     * Плановая задача для проверки дней рождения.
+     * Выполняется ежедневно в 09:30 по расписанию Cron.
+     */
     @Scheduled(cron = "0 30 9 * * *")
-    //@Scheduled(cron = "0 */1 * * * *")
     fun sendBirthdayNotifications() {
         log.info("🎂 Проверка дней рождения...")
 
-        // ✅ 1. Получаем именинников из phonebook
+        // 1. Получаем именинников из phonebook
         val today = LocalDate.now()
         val allEmployees = phonebookRepository.findAll()
         val birthdayPeople = allEmployees.filter { employee ->
@@ -40,7 +47,7 @@ class BirthdayNotificationService(
 
         log.info("🎂 Найдено именинников: ${birthdayPeople.size}")
 
-        // ✅ 2. Получаем ВСЕХ активных сотрудников в боте (JOIN)
+        // 2. Получаем ВСЕХ активных сотрудников в боте
         val allEmployeeUsers = maxUserAgnRepository.findAllActiveEmployees()
 
         if (allEmployeeUsers.isEmpty()) {
@@ -50,21 +57,23 @@ class BirthdayNotificationService(
 
         log.info("👥 Всего сотрудников в боте: ${allEmployeeUsers.size}")
 
-        // ✅ 3. Получаем именинников в боте
+        // 3. Получаем именинников в боте
         val birthdayUsers = maxUserAgnRepository.findBirthdayEmployees()
         log.info("🎂 Именинников в боте: ${birthdayUsers.size}")
 
-        // ✅ 4. Карта именинников: phoneTail → MaxUserAgn
+        // 4. Карта именинников: phoneTail → MaxUserAgn
         val birthdayUserMap = birthdayUsers.associateBy { user ->
             PhoneUtils.getPhoneTail(user.phone ?: "")
         }
 
-        // ✅ 5. Личное поздравление именинникам
+        // 5. Личное поздравление именинникам
         birthdayPeople.forEach { employee ->
             val phoneTail = PhoneUtils.getPhoneTail(employee.phoneSot ?: "")
             val user = birthdayUserMap[phoneTail]
 
             user?.let {
+                if (it.notifBirthday == 0) return@let
+
                 try {
                     mainBotMessageService.sendMessage(
                         it.chatId ?: return@forEach,
@@ -78,23 +87,31 @@ class BirthdayNotificationService(
             }
         }
 
-        // ✅ 6. Общее уведомление для ВСЕХ сотрудников
+        // 6. Общее уведомление для сотрудников (только с включенными уведомлениями о ДР)
         val generalMessage = buildGeneralBirthdayMessage(birthdayPeople)
 
-        allEmployeeUsers.forEach { user ->
-            try {
-                mainBotMessageService.sendMessage(
-                    user.chatId ?: return@forEach,
-                    generalMessage,
-                    "markdown"
-                )
-                log.info("✅ Общее уведомление отправлено пользователю ${user.userName}")
-            } catch (e: Exception) {
-                log.error("❌ Не удалось отправить уведомление пользователю ${user.userId}", e)
+        allEmployeeUsers
+            .filter { it.notifBirthday == 1 }
+            .forEach { user ->
+                try {
+                    mainBotMessageService.sendMessage(
+                        user.chatId ?: return@forEach,
+                        generalMessage,
+                        "markdown"
+                    )
+                    log.info("✅ Общее уведомление отправлено пользователю ${user.userName}")
+                } catch (e: Exception) {
+                    log.error("❌ Не удалось отправить уведомление пользователю ${user.userId}", e)
+                }
             }
-        }
     }
 
+    /**
+     * Формирует текст персонального поздравления для конкретного сотрудника.
+     *
+     * @param employee Объект [Phonebook] с данными сотрудника.
+     * @return Отформатированная строка сообщения для отправки.
+     */
     private fun buildPersonalBirthdayMessage(employee: Phonebook): String {
         val fullName = listOfNotNull(employee.fname, employee.nname).joinToString(" ")
 
@@ -114,19 +131,31 @@ class BirthdayNotificationService(
         """.trimIndent()
     }
 
+    /**
+     * Формирует общее уведомление для рассылки коллегам с указанием ФИО, должности и отдела.
+     *
+     * @[birthdayPeople] Список именинников ([Phonebook]), у которых сегодня праздник.
+     * @return Отформатированная строка общего сообщения.
+     */
     private fun buildGeneralBirthdayMessage(birthdayPeople: List<Phonebook>): String {
-        val names = birthdayPeople.joinToString("\n") { employee ->
-            listOfNotNull(employee.fname, employee.nname).joinToString(" ")
+        val names = birthdayPeople.joinToString("\n\n") { employee ->
+            val fullName = listOfNotNull(employee.fname, employee.nname).joinToString(" ")
+            val details = mutableListOf("👤 *$fullName*")
+
+            employee.dolgnost?.let { details.add("   📋 $it") }
+            employee.otdel?.let { details.add("   🏢 $it") }
+
+            details.joinToString("\n")
         }
 
         return """
-🎉 *Сегодня день рождения!* 🎉
-
-🥳 Поздравляем:
-
-$names
-
-🎂 Присоединяйтесь к поздравлениям! 🎁
+            🎉 *Сегодня день рождения!* 🎉
+            
+            🥳 Поздравляем:
+            
+            $names
+            
+            🎂 Присоединяйтесь к поздравлениям! 🎁
         """.trimIndent()
     }
 }

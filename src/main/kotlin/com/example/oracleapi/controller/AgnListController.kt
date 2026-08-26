@@ -13,6 +13,10 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.*
 
+/**
+ * Контроллер для управления справочником контрагентов (`AgnList`).
+ * Обеспечивает операции создания, обновления, получения и удаления записей о контрагентах.
+ */
 @RestController
 @RequestMapping("/v1/agnlist")
 @Tag(name = "Контрагенты")
@@ -20,6 +24,12 @@ class AgnListController(
     private val agnListService: AgnListService
 ) : BaseController() {
 
+    /**
+     * Создает новую запись контрагента в таблице `AgnList`.
+     *
+     * @param request Объект запроса [AgnListInsRequest] с данными для создания контрагента.
+     * @return [MyApiResponse] с результатом операции [AgnListInsResponse].
+     */
     @PostMapping("/insert")
     @Operation(
         description = "Создает запись в таблице AgnList",
@@ -31,6 +41,12 @@ class AgnListController(
         return success(agnListService.ins(request))
     }
 
+    /**
+     * Обновляет существующую запись контрагента в таблице `AgnList`.
+     *
+     * @param request Объект запроса [AgnListUpdRequest] с обновленными данными.
+     * @return [MyApiResponse] с результатом операции [AgnListUpdResponse].
+     */
     @PutMapping("/update")
     @Operation(
         description = "Обновляет запись в таблице AgnList",
@@ -43,6 +59,12 @@ class AgnListController(
         return success(response)
     }
 
+    /**
+     * Возвращает данные контрагента для редактирования по его регистрационному номеру (`RN`).
+     *
+     * @param rn Уникальный регистрационный номер контрагента.
+     * @return [MyApiResponse] содержащий [AgnListForUpdResponse].
+     */
     @GetMapping("/get")
     @Operation(
         description = "Возвращает запись из таблицы AgnList по RN",
@@ -52,6 +74,12 @@ class AgnListController(
         return success(agnListService.getByRnForUpdate(rn))
     }
 
+    /**
+     * Удаляет запись контрагента из таблицы `AgnList` по регистрационному номеру (`RN`).
+     *
+     * @param rn Уникальный регистрационный номер удаляемого контрагента.
+     * @return [MyApiResponse] с информацией об удаленном `RN` ([ResponseRN]).
+     */
     @DeleteMapping("/del")
     @Operation(
         description = "Удаляет запись из таблицы AgnList",

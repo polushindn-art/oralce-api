@@ -20,6 +20,28 @@ class MaxUserAgnService(
     private val log = LoggerFactory.getLogger(this::class.java)
 
     /**
+     * Переключить настройку уведомлений о звонках (0 <-> 1)
+     */
+    fun toggleCalls(chatId: String) {
+        val entity = maxUserAgnRepository.findByChatId(chatId).firstOrNull() ?: return
+        entity.notifCalls = if (entity.notifCalls == 1) 0 else 1
+        maxUserAgnRepository.save(entity)
+    }
+
+    /**
+     * Переключить настройку уведомлений о днях рождения (0 <-> 1)
+     */
+    fun toggleBirthday(chatId: String) {
+        val entity = maxUserAgnRepository.findByChatId(chatId).firstOrNull() ?: return
+        entity.notifBirthday = if (entity.notifBirthday == 1) 0 else 1
+        maxUserAgnRepository.save(entity)
+    }
+
+    fun save(user: MaxUserAgn): MaxUserAgn {
+        return maxUserAgnRepository.save(user)
+    }
+
+    /**
      * Проверить, зарегистрирован ли уже этот чат
      */
     fun isChatRegistered(chatId: String): Boolean {
