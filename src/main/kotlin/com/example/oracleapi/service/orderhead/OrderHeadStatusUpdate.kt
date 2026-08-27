@@ -20,16 +20,16 @@ class OrderHeadStatusUpdate(
 
     fun take(request: OrderHeadStatusUpdateRequest): OrderHeadStatusUpdateResponse {
 
-        return dataSource.executePrc {
+        dataSource.executePrc {
             it.setLong(1, request.rn)
             it.setLong(2, request.status)
             it.execute()
-            val field = fieldService.getFieldValue(Field.ORDER_STATUS, request.status)
-            OrderHeadStatusUpdateResponse(
-                request.rn,
-                request.status,
-                field
-            )
         }
+        val field = fieldService.getFieldValue(Field.ORDER_STATUS, request.status)
+        return OrderHeadStatusUpdateResponse(
+            request.rn,
+            request.status,
+            field
+        )
     }
 }

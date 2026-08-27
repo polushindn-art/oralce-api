@@ -12,6 +12,7 @@ import java.sql.SQLException
 import java.sql.Types
 import java.time.LocalDate
 import javax.sql.DataSource
+import org.springframework.jdbc.datasource.DataSourceUtils
 
 abstract class BasePackage(
     protected val dataSource: DataSource
@@ -47,13 +48,17 @@ abstract class BasePackage(
     ): T {
         val executeSql = toCallFnc()
         return executeLogged {
-            this.connection.use { connection ->
-                return@use connection.prepareCall(executeSql).use { stmt ->
+            // Безопасно получаем соединение через Spring DataSourceUtils
+            val connection = DataSourceUtils.getConnection(this)
+            try {
+                connection.prepareCall(executeSql).use { stmt ->
                     block(stmt)
                 }
+            } finally {
+                // Гарантированно возвращаем соединение в пул
+                DataSourceUtils.releaseConnection(connection, this)
             }
         }
-
     }
 
     protected fun <T> DataSource.executePrc(
@@ -61,10 +66,15 @@ abstract class BasePackage(
     ): T {
         val executeSql = toCallPrc()
         return executeLogged {
-            this.connection.use { connection ->
-                return@use connection.prepareCall(executeSql).use { stmt ->
+            // Безопасно получаем соединение через Spring DataSourceUtils
+            val connection = DataSourceUtils.getConnection(this)
+            try {
+                connection.prepareCall(executeSql).use { stmt ->
                     block(stmt)
                 }
+            } finally {
+                // Гарантированно возвращаем соединение в пул
+                DataSourceUtils.releaseConnection(connection, this)
             }
         }
     }

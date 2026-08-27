@@ -1,151 +1,132 @@
-// service/orderspec/OrderSpecInsProcedure.kt
 package com.example.oracleapi.service.orderspec
 
-import com.example.oracleapi.common.BasePkg
+import com.example.oracleapi.common.BasePackage
 import com.example.oracleapi.dto.orderspec.ins.OrderSpecInsRequest
 import com.example.oracleapi.dto.orderspec.ins.OrderSpecInsResponse
-import com.fasterxml.jackson.databind.ObjectMapper
-import jakarta.persistence.EntityManager
 import org.springframework.stereotype.Component
 import java.math.BigDecimal
-import java.sql.CallableStatement
 import java.sql.Types
+import javax.sql.DataSource
 
 @Component
 class OrderSpecInsProcedure(
-    entityManager: EntityManager,
-    objectMapper: ObjectMapper
-) : BasePkg(entityManager, objectMapper) {
+    dataSource: DataSource
+) : BasePackage(dataSource)  {
 
-    companion object {
-        const val ORDERSPEC = "PKG_ORDERSPEC.INS"
-    }
+    override val pkg: String = ORDERSPEC
+    override val method: String = "ins"
+    override val count = 46
+
 
     fun ins(request: OrderSpecInsRequest): OrderSpecInsResponse {
         val startTime = System.currentTimeMillis()
 
         var resultRn = 0L
 
-        execute {
-            val sql = ORDERSPEC.toCallPrc(46)
+        return dataSource.executePrc {
+            var index = 1
 
-            entityManager.unwrap(EntityManager::class.java)
-                .unwrap(org.hibernate.Session::class.java)
-                .doWork { connection ->
-                    connection.prepareCall(sql).use { stmt ->
-                        var index = 1
+            // 1-46 параметры
+            it.setLong(index++, request.prn ?: 0L)
+            it.setLong(index++, request.nomen ?: 0L)
+            it.setBigDecimal(index++, request.quant ?: BigDecimal.ZERO)
+            it.setBigDecimal(index++, request.summ ?: BigDecimal.ZERO)
+            it.setBigDecimal(index++, request.factquant ?: BigDecimal.ZERO)
+            it.setBigDecimal(index++, request.quantbreak ?: BigDecimal.ZERO)
+            it.setBigDecimal(index++, request.notconquant ?: BigDecimal.ZERO)
+            it.setBigDecimal(index++, request.undefinedquant ?: BigDecimal.ZERO)
+            it.setBigDecimal(index++, request.prquant ?: BigDecimal.ZERO)
+            it.setBigDecimal(index++, request.prsum ?: BigDecimal.ZERO)
+            it.setBigDecimal(index++, request.autozquant ?: BigDecimal.ZERO)
+            it.setBigDecimal(index++, request.srbquant ?: BigDecimal.ZERO)
+            it.setBigDecimal(index++, request.ndsrate ?: BigDecimal.ZERO)
 
-                        // 1-46 параметры
-                        stmt.setLong(index++, request.prn ?: 0L)
-                        stmt.setLong(index++, request.nomen ?: 0L)
-                        stmt.setBigDecimal(index++, request.quant ?: BigDecimal.ZERO)
-                        stmt.setBigDecimal(index++, request.summ ?: BigDecimal.ZERO)
-                        stmt.setBigDecimal(index++, request.factquant ?: BigDecimal.ZERO)
-                        stmt.setBigDecimal(index++, request.quantbreak ?: BigDecimal.ZERO)
-                        stmt.setBigDecimal(index++, request.notconquant ?: BigDecimal.ZERO)
-                        stmt.setBigDecimal(index++, request.undefinedquant ?: BigDecimal.ZERO)
-                        stmt.setBigDecimal(index++, request.prquant ?: BigDecimal.ZERO)
-                        stmt.setBigDecimal(index++, request.prsum ?: BigDecimal.ZERO)
-                        stmt.setBigDecimal(index++, request.autozquant ?: BigDecimal.ZERO)
-                        stmt.setBigDecimal(index++, request.srbquant ?: BigDecimal.ZERO)
-                        stmt.setBigDecimal(index++, request.ndsrate ?: BigDecimal.ZERO)
+            if (request.country != null) {
+                it.setLong(index++, request.country)
+            } else {
+                it.setNull(index++, Types.BIGINT)
+            }
 
-                        if (request.country != null) {
-                            stmt.setLong(index++, request.country)
-                        } else {
-                            stmt.setNull(index++, Types.BIGINT)
-                        }
+            it.setString(index++, request.gtd)
+            it.setBigDecimal(index++, request.pdpricecs ?: BigDecimal.ZERO)
+            it.setBigDecimal(index++, request.pdprice1 ?: BigDecimal.ZERO)
+            it.setBigDecimal(index++, request.pdprice2 ?: BigDecimal.ZERO)
+            it.setBigDecimal(index++, request.pdprice3 ?: BigDecimal.ZERO)
+            it.setBigDecimal(index++, request.pdprice4 ?: BigDecimal.ZERO)
+            it.setBigDecimal(index++, request.pdprice5 ?: BigDecimal.ZERO)
 
-                        stmt.setString(index++, request.gtd)
-                        stmt.setBigDecimal(index++, request.pdpricecs ?: BigDecimal.ZERO)
-                        stmt.setBigDecimal(index++, request.pdprice1 ?: BigDecimal.ZERO)
-                        stmt.setBigDecimal(index++, request.pdprice2 ?: BigDecimal.ZERO)
-                        stmt.setBigDecimal(index++, request.pdprice3 ?: BigDecimal.ZERO)
-                        stmt.setBigDecimal(index++, request.pdprice4 ?: BigDecimal.ZERO)
-                        stmt.setBigDecimal(index++, request.pdprice5 ?: BigDecimal.ZERO)
+            it.setLongOrNull( index++, request.pdnomncatcs)
+            it.setLongOrNull( index++, request.pdnomncat1)
+            it.setLongOrNull( index++, request.pdnomncat2)
+            it.setLongOrNull( index++, request.pdnomncat3)
+            it.setLongOrNull( index++, request.pdnomncat4)
+            it.setLongOrNull( index++, request.pdnomncat5)
 
-                        setLongOrNull(stmt, index++, request.pdnomncatcs)
-                        setLongOrNull(stmt, index++, request.pdnomncat1)
-                        setLongOrNull(stmt, index++, request.pdnomncat2)
-                        setLongOrNull(stmt, index++, request.pdnomncat3)
-                        setLongOrNull(stmt, index++, request.pdnomncat4)
-                        setLongOrNull(stmt, index++, request.pdnomncat5)
+            it.setString(index++, request.notelogist)
 
-                        stmt.setString(index++, request.notelogist)
+            if (request.whsconst != null) {
+                it.setLong(index++, request.whsconst)
+            } else {
+                it.setNull(index++, Types.BIGINT)
+            }
 
-                        if (request.whsconst != null) {
-                            stmt.setLong(index++, request.whsconst)
-                        } else {
-                            stmt.setNull(index++, Types.BIGINT)
-                        }
+            it.setString(index++, request.checkRoznPrice)
 
-                        stmt.setString(index++, request.checkRoznPrice)
+            if (request.storein != null) {
+                it.setLong(index++, request.storein)
+            } else {
+                it.setNull(index++, Types.BIGINT)
+            }
 
-                        if (request.storein != null) {
-                            stmt.setLong(index++, request.storein)
-                        } else {
-                            stmt.setNull(index++, Types.BIGINT)
-                        }
+            // rn_ (IN/OUT)
+            val rnParam = index++
+            it.registerOutParameter(rnParam, Types.BIGINT)
+            if (request.rn != null && request.rn != 0L) {
+                it.setLong(rnParam, request.rn)
+            } else {
+                it.setNull(rnParam, Types.BIGINT)
+            }
 
-                        // rn_ (IN/OUT)
-                        val rnParam = index++
-                        stmt.registerOutParameter(rnParam, Types.BIGINT)
-                        if (request.rn != null && request.rn != 0L) {
-                            stmt.setLong(rnParam, request.rn)
-                        } else {
-                            stmt.setNull(rnParam, Types.BIGINT)
-                        }
+            it.setBoolean(index++, request.isUpdate)
+            it.setBoolean(index++, request.isWS)
 
-                        stmt.setBoolean(index++, request.isUpdate)
-                        stmt.setBoolean(index++, request.isWS)
+            if (request.changeOverHead != null) {
+                it.setLong(index++, request.changeOverHead)
+            } else {
+                it.setNull(index++, Types.BIGINT)
+            }
 
-                        if (request.changeOverHead != null) {
-                            stmt.setLong(index++, request.changeOverHead)
-                        } else {
-                            stmt.setNull(index++, Types.BIGINT)
-                        }
+            it.setLongOrNull( index++, request.dlyaKompl)
+            it.setLongOrNull( index++, request.komplRn)
+            it.setLongOrNull( index++, request.komplQty)
 
-                        setLongOrNull(stmt, index++, request.dlyaKompl)
-                        setLongOrNull(stmt, index++, request.komplRn)
-                        setLongOrNull(stmt, index++, request.komplQty)
+            it.setBigDecimal(index++, request.qtyvKompl ?: BigDecimal.ZERO)
+            it.setBigDecimal(index++, request.calcQtyPost ?: BigDecimal.ZERO)
+            it.setBigDecimal(index++, request.docQtyPost ?: BigDecimal.ZERO)
 
-                        stmt.setBigDecimal(index++, request.qtyvKompl ?: BigDecimal.ZERO)
-                        stmt.setBigDecimal(index++, request.calcQtyPost ?: BigDecimal.ZERO)
-                        stmt.setBigDecimal(index++, request.docQtyPost ?: BigDecimal.ZERO)
+            it.setLongOrNull( index++, request.rnDEI)
 
-                        setLongOrNull(stmt, index++, request.rnDEI)
+            it.setBigDecimal(index++, request.factQtyPost ?: BigDecimal.ZERO)
 
-                        stmt.setBigDecimal(index++, request.factQtyPost ?: BigDecimal.ZERO)
+            if (request.dateProduction != null) {
+                it.setDate(index++, java.sql.Date.valueOf(request.dateProduction))
+            } else {
+                it.setNull(index++, Types.DATE)
+            }
 
-                        if (request.dateProduction != null) {
-                            stmt.setDate(index++, java.sql.Date.valueOf(request.dateProduction))
-                        } else {
-                            stmt.setNull(index++, Types.DATE)
-                        }
+            it.setBigDecimal(index++, request.quantdoc ?: BigDecimal.ZERO)
+            it.setBigDecimal(index++, request.summdoc ?: BigDecimal.ZERO)
 
-                        stmt.setBigDecimal(index++, request.quantdoc ?: BigDecimal.ZERO)
-                        stmt.setBigDecimal(index++, request.summdoc ?: BigDecimal.ZERO)
+            it.execute()
+            resultRn = it.getLong(rnParam)
 
-                        stmt.execute()
-                        resultRn = stmt.getLong(rnParam)
-                    }
-                }
-        }
+            val executionTime = System.currentTimeMillis() - startTime
 
-        val executionTime = System.currentTimeMillis() - startTime
+            OrderSpecInsResponse(
+                rn = resultRn,
+                executionTimeMs = executionTime
+            )
 
-        return OrderSpecInsResponse(
-            rn = resultRn,
-            executionTimeMs = executionTime
-        )
-    }
-
-    // Вспомогательная функция
-    private fun setLongOrNull(stmt: CallableStatement, index: Int, value: Long?) {
-        if (value != null && value != 0L) {
-            stmt.setLong(index, value)
-        } else {
-            stmt.setNull(index, Types.BIGINT)
         }
     }
 }

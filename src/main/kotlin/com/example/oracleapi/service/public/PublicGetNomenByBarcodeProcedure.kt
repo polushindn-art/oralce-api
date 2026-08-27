@@ -1,11 +1,8 @@
 package com.example.oracleapi.service.public
 
 import com.example.oracleapi.common.BasePackage
-import com.example.oracleapi.common.BasePkg
 import com.example.oracleapi.dto.public.GetNomenByBarcodeResponse
 import com.example.oracleapi.util.BarcodeUtils
-import com.fasterxml.jackson.databind.ObjectMapper
-import jakarta.persistence.EntityManager
 import org.springframework.stereotype.Component
 import java.sql.Types
 import javax.sql.DataSource
