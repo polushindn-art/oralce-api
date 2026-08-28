@@ -2,6 +2,7 @@ package com.example.oracleapi.controller
 
 import com.example.oracleapi.dto.agnphonenumberlist.AgnphonenumberlistDto
 import com.example.oracleapi.dto.agnphonenumberlist.PhoneCardDto
+import com.example.oracleapi.dto.agnphonenumberlist.PhoneListAgn
 import com.example.oracleapi.dto.common.MyApiResponse
 import com.example.oracleapi.service.agnphonenumber.AgnPhoneService
 import io.swagger.v3.oas.annotations.Operation
@@ -47,6 +48,15 @@ class AgnPhoneNumberController(
         } else {
             successList(result, "Найдено ${result.size} карт")
         }
+    }
+
+    @GetMapping("/findPhoneByAgn")
+    @Operation(
+        description = "Возвращает номера контрагенат",
+        summary = "Номера контрагента"
+    )
+    fun findPhoneByRn(@Valid rn: Long): MyApiResponse<List<PhoneListAgn>> {
+        return successList(agnPhoneService.searchPhoneByAgn(rn))
     }
 
 }

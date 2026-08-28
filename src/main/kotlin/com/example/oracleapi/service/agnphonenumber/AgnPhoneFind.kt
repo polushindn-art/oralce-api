@@ -2,6 +2,7 @@ package com.example.oracleapi.service.agnphonenumber
 
 import com.example.oracleapi.dto.agnphonenumberlist.AgnphonenumberlistDto
 import com.example.oracleapi.dto.agnphonenumberlist.PhoneCardDto
+import com.example.oracleapi.dto.agnphonenumberlist.PhoneListAgn
 import com.example.oracleapi.repository.agnphonenumberlist.AgnphonenumberlistRepository
 import com.example.oracleapi.util.PhoneUtils
 import org.springframework.stereotype.Component
@@ -28,6 +29,11 @@ class AgnPhoneFind(
                 agnname = it.getAgnname()
             )
         }
+    }
+
+    fun searchPhoneByAgn(rn: Long): List<PhoneListAgn> {
+        val result = repository.findAllByPrnagn(rn)
+        return result.map { PhoneListAgn.fromEntity(it) }
     }
 
 }

@@ -26,4 +26,6 @@ interface AgnphonenumberlistRepository : JpaRepository<Agnphonenumberlist, Long>
     """)
     fun findPhoneAndCardByPhoneTail(@Param("phoneTail") phoneTail: String): List<PhoneCardProjection>
 
+    fun findAllByPrnagn(prnagn: Long): List<Agnphonenumberlist>
+
 }
