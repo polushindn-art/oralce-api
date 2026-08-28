@@ -9,7 +9,7 @@ import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 
 @Entity
-@Table(name = "FIELD", schema = Helper.Companion.SCHEME)
+@Table(name = "FIELD", schema = Helper.SCHEME)
 open class Field {
     @Id
     @Column(name = "RN", nullable = false)
@@ -34,7 +34,12 @@ open class Field {
     open var note: String? = null
 
     companion object {
+        const val AGNTYPE = "AGNTYPE"
         const val ORDER_STATUS = "ORDER_STATUS"
         const val PRCDOC_STATUS = "PRCDOC_STATUS"
+        const val ID_STATUS = "ID_STATUS"
+
+        const val FIELD_VALUE = "FIELD_VALUE"
+        const val FIELD_NAME = "FIELD_NAME"
     }
 }

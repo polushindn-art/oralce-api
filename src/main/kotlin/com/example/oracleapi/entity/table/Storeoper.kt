@@ -13,7 +13,7 @@ import org.hibernate.annotations.ColumnDefault
 open class Storeoper {
     @Id
     @Column(name = "RN", nullable = false)
-    open var id: Long? = null
+    open var rn: Long? = null
 
     @Size(max = 20)
     @NotNull

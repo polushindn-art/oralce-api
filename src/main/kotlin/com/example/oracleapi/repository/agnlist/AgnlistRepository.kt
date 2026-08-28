@@ -9,6 +9,6 @@ interface AgnListRepository : JpaRepository<AgnList, Long> {
 
     fun findByRn(rn: Long): AgnList?
     fun existsByAgncode(agncode: String): Boolean
-    fun findByRnAndAgntype(rn: Long, type: Long): com.example.oracleapi.entity.table.AgnList?
+    fun findByRnAndAgntype(rn: Long, type: Long): AgnList?
     fun existsByRnAndAgntype(rn: Long, agntype: Long): Boolean
 }

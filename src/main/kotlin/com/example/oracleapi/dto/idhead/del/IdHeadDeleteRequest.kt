@@ -6,11 +6,10 @@ import jakarta.validation.constraints.Positive
 
 @Schema(description = "Запрос на удаление документа")
 data class IdHeadDeleteRequest(
-    @Schema(description = "RN документа", example = "12345")
+    @field:Schema(description = "RN документа", example = "12345")
     @field:NotNull(message = "RN документа обязателен")
     @field:Positive(message = "RN документа должен быть положительным числом")
-    val rn: Long,
-
-    @Schema(description = "Обновить статус перед удалением", example = "false")
+    var rn: Long,
+    @field:Schema(description = "Обновить статус перед удалением", example = "false")
     val isUpdate: Boolean = false
 )

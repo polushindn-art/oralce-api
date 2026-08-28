@@ -65,13 +65,14 @@ open class Idhead {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumnOrFormula(
         column = JoinColumn(
-            name = "ID_STATUS",
-            referencedColumnName = "FIELD_VALUE",
+            name = Field.ID_STATUS,
+            referencedColumnName = Field.FIELD_VALUE,
             insertable = false,
             updatable = false
         )
     )
-    @JoinColumnOrFormula(formula = JoinFormula(value = "'ID_STATUS'", referencedColumnName = "FIELD_NAME"))
+
+    @JoinColumnOrFormula(formula = JoinFormula(value = "'${Field.ID_STATUS}'", referencedColumnName = Field.FIELD_NAME))
     var statusEntity: Field? = null
 
     @Column(name = "DOCNUMB", nullable = false, precision = 17, scale = 2)
@@ -86,6 +87,10 @@ open class Idhead {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MANAGER", insertable = false, updatable = false)
     var userListEntity: Userlist? = null
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "STOREOPER", insertable = false, updatable = false)
+    open var storeoperEntity: Storeoper? = null
 
     @Column(name = "STOREOPER", nullable = false)
     open var storeoper: Long? = null

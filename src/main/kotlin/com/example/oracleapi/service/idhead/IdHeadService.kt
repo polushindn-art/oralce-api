@@ -88,6 +88,7 @@ class IdHeadService(
     fun getByFiltersWithPagination(
         status: String?,
         doctype: Long?,
+        storeoper: Long?,
         docnumb: BigDecimal?,
         storein: Long?,
         storeout: Long?,
@@ -95,13 +96,14 @@ class IdHeadService(
         dateTo: LocalDate?,
         pageable: Pageable
     ): Page<IdheadResponse> {
-        val spec = buildSpecification(status, doctype,docnumb, storein, storeout, dateFrom, dateTo)
-        return idheadRepository.findAll(spec, pageable) .map { it.toResponse() }
+        val spec = buildSpecification(status, doctype, storeoper, docnumb, storein, storeout, dateFrom, dateTo)
+        return idheadRepository.findAll(spec, pageable).map { it.toResponse() }
     }
 
     private fun buildSpecification(
         status: String?,
         doctypeRn: Long?,
+        storeOper: Long?,
         docnumb: BigDecimal?,
         storeIn: Long?,
         storeOut: Long?,
@@ -117,7 +119,9 @@ class IdHeadService(
                     .mapNotNull { it.trim().toLongOrNull() }
 
                 when (statusIds.size) {
-                    0 -> { /* Ничего не делаем */ }
+                    0 -> { /* Ничего не делаем */
+                    }
+
                     1 -> predicates.add(cb.equal(root.get<Long>("idStatus"), statusIds.first()))
                     else -> predicates.add(root.get<Long>("idStatus").`in`(statusIds))
                 }
@@ -126,6 +130,7 @@ class IdHeadService(
             storeIn?.let { predicates.add(cb.equal(root.get<Long>("storein"), it)) }
             storeOut?.let { predicates.add(cb.equal(root.get<Long>("storeout"), it)) }
             doctypeRn?.let { predicates.add(cb.equal(root.get<Long>("doctype"), it)) }
+            storeOper?.let { predicates.add(cb.equal(root.get<Long>("storeoper"), it)) }
             docnumb?.let { predicates.add(cb.equal(root.get<BigDecimal>("docnumb"), it)) }
 
             // ✅ Фильтр по дате "от" (docdate >= dateFrom)

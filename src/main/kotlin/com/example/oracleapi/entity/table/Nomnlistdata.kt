@@ -1,4 +1,4 @@
-package com.example.oracleapi.entity.nomnlistdata
+package com.example.oracleapi.entity.table
 
 import com.example.oracleapi.Helper
 import jakarta.persistence.Column
@@ -9,7 +9,7 @@ import jakarta.persistence.Table
 import java.time.LocalDateTime
 
 @Entity
-@Table(name = "NOMNLISTDATA", schema = Helper.SCHEME)
+@Table(name = "NOMNLISTDATA", schema = Helper.Companion.SCHEME)
 class Nomnlistdata {
     @Id
     @Column(name = "RN")

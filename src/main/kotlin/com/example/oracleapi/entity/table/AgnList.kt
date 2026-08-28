@@ -2,12 +2,15 @@ package com.example.oracleapi.entity.table
 
 import com.example.oracleapi.Helper
 import jakarta.persistence.*
+import jakarta.validation.constraints.NotNull
+import org.hibernate.annotations.JoinColumnOrFormula
+import org.hibernate.annotations.JoinFormula
 import java.time.LocalDateTime
 
 
 @Entity
 @Table(name = "AGNLIST", schema = Helper.SCHEME)
-data class AgnList(
+class AgnList(
     @Id
     @Column(name = "RN", nullable = false)
     var rn: Long = 0,
@@ -29,6 +32,19 @@ data class AgnList(
 
     @Column(name = "AGNTYPE", nullable = false)
     var agntype: Long = 0,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumnOrFormula(
+        column = JoinColumn(
+            name = Field.AGNTYPE,
+            referencedColumnName = Field.FIELD_VALUE,
+            insertable = false,
+            updatable = false
+        )
+    )
+
+    @JoinColumnOrFormula(formula = JoinFormula(value = "'${Field.AGNTYPE}'", referencedColumnName = Field.FIELD_NAME))
+    var agntypeEntity: Field? = null,
 
     @Column(name = "ADDR_FACTPOST", length = 160)
     var addrFactpost: String? = null,
@@ -146,6 +162,10 @@ data class AgnList(
 
     @Column(name = "PHONENUMBERRN")
     var phonenumberrn: Long? = null,
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "PHONENUMBERRN", nullable = false, updatable = false, insertable = false)
+    open var phonenumberrnEntity: Agnphonenumberlist? = null,
 
     @Column(name = "CREATED")
     var created: LocalDateTime? = null,

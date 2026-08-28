@@ -2,7 +2,7 @@ package com.example.oracleapi.service.nomnlistdata
 
 import com.example.oracleapi.config.UserDetailsFromToken
 import com.example.oracleapi.dto.nomnlistdata.NomnlistdataMetadata
-import com.example.oracleapi.entity.nomnlistdata.Nomnlistdata
+import com.example.oracleapi.entity.table.Nomnlistdata
 import com.example.oracleapi.repository.nomnlistdata.NomnlistdataRepository
 import com.example.oracleapi.service.ImageService
 import com.example.oracleapi.service.public.PublicGenIdRnProcedur

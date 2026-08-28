@@ -1,6 +1,6 @@
 package com.example.oracleapi.dto.nomnlistdata
 
-import com.example.oracleapi.entity.nomnlistdata.Nomnlistdata
+import com.example.oracleapi.entity.table.Nomnlistdata
 
 data class NomnlistdataMetadata(
     val rn: Long,

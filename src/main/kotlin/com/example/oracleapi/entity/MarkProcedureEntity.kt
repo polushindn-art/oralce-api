@@ -1,4 +1,4 @@
-package com.example.oracleapi.entity.mark
+package com.example.oracleapi.entity
 
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
@@ -8,7 +8,6 @@ import jakarta.persistence.NamedStoredProcedureQueries
 import jakarta.persistence.NamedStoredProcedureQuery
 import jakarta.persistence.ParameterMode
 import jakarta.persistence.StoredProcedureParameter
-import java.sql.Clob
 
 /**
  * Entity с описанием всех процедур пакета PKG_MARK

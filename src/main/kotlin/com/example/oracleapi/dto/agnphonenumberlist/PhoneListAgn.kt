@@ -3,7 +3,6 @@ package com.example.oracleapi.dto.agnphonenumberlist
 import com.example.oracleapi.entity.table.Agnphonenumberlist
 
 data class PhoneListAgn(
-    val rnAgn: Long?,
     val phonenumber: String?,
     val phoneTail: String?,
     val mainPhone: Boolean?,
@@ -11,14 +10,13 @@ data class PhoneListAgn(
     val agnCode: String?
 ) {
     companion object {
-        fun fromEntity(entity: Agnphonenumberlist): PhoneListAgn {
+        fun fromEntity(entity: Agnphonenumberlist?): PhoneListAgn {
             return PhoneListAgn(
-                entity.prnagnEntity?.rn,
-                entity.phonenumber,
-                entity.phoneTail,
-                entity.rn == entity.prnagnEntity?.phonenumberrn,
-                entity.prnagnEntity?.agnname,
-                entity.prnagnEntity?.agncode
+                entity?.phonenumber,
+                entity?.phoneTail,
+                entity?.rn == entity?.prnagnEntity?.phonenumberrn,
+                entity?.prnagnEntity?.agnname,
+                entity?.prnagnEntity?.agncode
             )
         }
     }

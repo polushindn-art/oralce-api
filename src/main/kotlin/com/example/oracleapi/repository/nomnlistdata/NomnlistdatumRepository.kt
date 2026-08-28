@@ -1,6 +1,6 @@
 package com.example.oracleapi.repository.nomnlistdata
 
-import com.example.oracleapi.entity.nomnlistdata.Nomnlistdata
+import com.example.oracleapi.entity.table.Nomnlistdata
 import jakarta.transaction.Transactional
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying

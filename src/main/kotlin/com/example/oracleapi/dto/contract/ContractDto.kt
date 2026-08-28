@@ -2,9 +2,7 @@ package com.example.oracleapi.dto.contract
 
 import com.example.oracleapi.annotation.BindingDateFormat
 import com.example.oracleapi.dto.agn.AgnListSimpleDto
-import com.example.oracleapi.dto.orderpay.OrderpayspecDto
 import com.example.oracleapi.entity.table.Contract
-import com.example.oracleapi.entity.table.Orderpayspec
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 import java.io.Serializable

@@ -3,9 +3,13 @@ package com.example.oracleapi.dto.agn
 import com.example.oracleapi.entity.table.AgnList
 
 data class AgnListResponse(
+    /**Идентификатор*/
     val rn: Long,
+    /**Мнемокод контрагента*/
     val agncode: String,
+    /**Наименование контрагента*/
     val agnname: String,
+    /**ИНН*/
     val inn: String?
 
 ) {

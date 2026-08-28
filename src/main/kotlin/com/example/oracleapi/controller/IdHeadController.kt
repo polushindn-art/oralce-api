@@ -161,6 +161,7 @@ class IdHeadController(
     fun getByFiltersWithPagination(
         @RequestParam(required = false) status: String?,
         @RequestParam(required = false) doctype: Long?,
+        @RequestParam(required = false) storeoper: Long?,
         @RequestParam(required = false) docnumb: BigDecimal?,
         @RequestParam(required = false) storein: Long?,
         @RequestParam(required = false) storeout: Long?,
@@ -169,7 +170,19 @@ class IdHeadController(
         @ParameterObject
         @PageableDefault(size = 20, sort = ["docdate", "rn"], direction = Sort.Direction.DESC) pageable: Pageable
     ): MyApiResponse<List<IdheadResponse>> {
-        return success(idHeadService.getByFiltersWithPagination(status, doctype, docnumb, storein, storeout, dateFrom, dateTo, pageable))
+        return success(
+            idHeadService.getByFiltersWithPagination(
+                status,
+                doctype,
+                storeoper,
+                docnumb,
+                storein,
+                storeout,
+                dateFrom,
+                dateTo,
+                pageable
+            )
+        )
     }
 
 }

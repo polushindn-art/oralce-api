@@ -2,6 +2,7 @@ package com.example.oracleapi.controller
 
 import com.example.oracleapi.dto.ResponseRN
 import com.example.oracleapi.dto.agn.AgnListForUpdResponse
+import com.example.oracleapi.dto.agn.AgnListInfoResponse
 import com.example.oracleapi.dto.agn.AgnListInsResponse
 import com.example.oracleapi.dto.agn.AgnListUpdRequest
 import com.example.oracleapi.dto.agn.AgnListUpdResponse
@@ -87,6 +88,19 @@ class AgnListController(
     )
     fun delete(@Valid rn: Long): MyApiResponse<ResponseRN> {
         return success(agnListService.del(rn))
+    }
+
+    /**
+     * Получить информацию о контрагенте
+     * @param rn Идентификатор
+     * @return [com.example.oracleapi.dto.agn.AgnListInfoResponse]
+     * */
+    @GetMapping("info")
+    @Operation(
+        summary = "Получить информацию"
+    )
+    fun getInfo(@Valid rn: Long): MyApiResponse<AgnListInfoResponse> {
+        return success(agnListService.getByRnInfo(rn))
     }
 
 }
