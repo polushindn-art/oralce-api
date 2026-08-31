@@ -1,6 +1,6 @@
 package com.example.oracleapi.controller
 
-import com.example.oracleapi.dto.ResponseRN
+import com.example.oracleapi.dto.RnResponse
 import com.example.oracleapi.dto.common.MyApiResponse
 import com.example.oracleapi.dto.prcPriceOS.PrcPriceOSRequest
 import com.example.oracleapi.service.prcPriceOS.PrcPriceOsService
@@ -21,7 +21,7 @@ class PrcPriceOsController(
 
     @PostMapping("/ins_api")
     @Operation(summary = "Создать цену")
-    fun insApi(@Valid @RequestBody request: PrcPriceOSRequest): MyApiResponse<ResponseRN> {
+    fun insApi(@Valid @RequestBody request: PrcPriceOSRequest): MyApiResponse<RnResponse> {
         return success(prcPriceOsService.ins(request))
     }
 

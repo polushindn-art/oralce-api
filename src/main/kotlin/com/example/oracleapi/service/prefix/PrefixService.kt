@@ -10,8 +10,9 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class PrefixService(
-    val prefixRepository: PrefixRepository
+    private val prefixRepository: PrefixRepository
 ) {
+    @Transactional(readOnly = true)
     fun existsByDocpref(prefix: String): Boolean {
         return prefixRepository.existsByDocpref(prefix)
     }

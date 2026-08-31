@@ -32,6 +32,7 @@ spring:
     properties:
       hibernate:
         jakarta.persistence.query.timeout: 60000
+        ddl-auto: validate
 
   # ==========================================
   # МУЛЬТИПАРТ И ПУЛЫ ЗАДАЧ (из properties)

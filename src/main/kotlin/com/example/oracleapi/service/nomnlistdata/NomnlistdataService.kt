@@ -1,8 +1,7 @@
 package com.example.oracleapi.service.nomnlistdata
 
 import com.example.oracleapi.config.UserDetailsFromToken
-import com.example.oracleapi.dto.nomnlistdata.NomnlistdataMetadata
-import com.example.oracleapi.entity.table.Nomnlistdata
+import com.example.oracleapi.dto.nomnlistdata.NomnlistdataMetadataDto
 import com.example.oracleapi.repository.nomnlistdata.NomnlistdataRepository
 import com.example.oracleapi.service.ImageService
 import com.example.oracleapi.service.public.PublicGenIdRnProcedur
@@ -19,7 +18,8 @@ class NomnlistdataService(
     private val imageService: ImageService
 ) {
 
-    private fun getCurrentUserAgn(): Long? {
+    @Transactional(readOnly = true)
+    fun getCurrentUserAgn(): Long? {
         val authentication = SecurityContextHolder.getContext().authentication
         val userDetails = authentication?.principal as? UserDetailsFromToken
         return userDetails?.userAgn
@@ -27,17 +27,19 @@ class NomnlistdataService(
 
     // ========== МЕТОДЫ ДЛЯ INFO (Возвращают DTO) ==========
 
-    fun getInfoByNomen(nomen: Long): List<NomnlistdataMetadata> {
-        return repository.findByNomenNative(nomen).map { NomnlistdataMetadata.fromEntity(it) }
+    @Transactional(readOnly = true)
+    fun getInfoByNomen(nomen: Long): List<NomnlistdataMetadataDto> {
+        return repository.findByNomenNative(nomen).map { NomnlistdataMetadataDto.fromEntity(it) }
     }
 
-    fun getPhotoInfoByNomen(nomen: Long, photonum: Int): NomnlistdataMetadata? {
+    @Transactional(readOnly = true)
+    fun getPhotoInfoByNomen(nomen: Long, photonum: Int): NomnlistdataMetadataDto? {
         val photo = repository.findByNomenAndPhotonumNative(nomen, photonum) ?: return null
-        return NomnlistdataMetadata.fromEntity(photo)
+        return NomnlistdataMetadataDto.fromEntity(photo)
     }
 
     // ========== МЕТОДЫ ДЛЯ ПРОСМОТРА И СКАЧИВАНИЯ БАЙТОВ ==========
-
+    @Transactional(readOnly = true)
     fun getPhotoData(nomen: Long, photonum: Int, isPreview: Boolean = false): ByteArray? {
         val photo = repository.findByNomenAndPhotonumNative(nomen, photonum) ?: return null
         val data = if (isPreview) photo.minidata else photo.imageData
@@ -45,6 +47,7 @@ class NomnlistdataService(
         return data
     }
 
+    @Transactional(readOnly = true)
     fun getMainPhotoData(nomen: Long): ByteArray? {
         val photo = repository.findByNomenAndPhotonumNative(nomen, 1) ?: return null
         val data = photo.imageData
@@ -52,6 +55,7 @@ class NomnlistdataService(
         return data
     }
 
+    @Transactional(readOnly = true)
     fun getFirstPhotoData(nomen: Long): ByteArray? {
         val photo = repository.findByNomenNative(nomen).firstOrNull() ?: return null
         val data = photo.imageData
@@ -59,6 +63,7 @@ class NomnlistdataService(
         return data
     }
 
+    @Transactional(readOnly = true)
     fun getPhotoDownloadData(nomen: Long, photonum: Int, isPreview: Boolean = false): DownloadResult {
         val photo = repository.findByNomenAndPhotonumNative(nomen, photonum)
             ?: return DownloadResult.NotFound("Фото для номенклатуры $nomen (№$photonum) не найдено")
@@ -80,7 +85,7 @@ class NomnlistdataService(
         nomen: Long,
         file: MultipartFile,
         needDownload: Boolean? = null
-    ): NomnlistdataMetadata {
+    ): NomnlistdataMetadataDto {
         if (file.isEmpty) {
             throw IllegalArgumentException("Файл не может быть пустым")
         }
@@ -129,7 +134,7 @@ class NomnlistdataService(
         )
 
         val createdPhoto = repository.findByNomenAndPhotonumNative(nomen, newPhotonum)!!
-        return NomnlistdataMetadata.fromEntity(createdPhoto)
+        return NomnlistdataMetadataDto.fromEntity(createdPhoto)
     }
 
     // ========== УДАЛЕНИЕ ==========

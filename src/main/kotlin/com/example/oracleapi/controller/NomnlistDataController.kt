@@ -1,7 +1,7 @@
 package com.example.oracleapi.controller
 
 import com.example.oracleapi.dto.common.MyApiResponse
-import com.example.oracleapi.dto.nomnlistdata.NomnlistdataMetadata
+import com.example.oracleapi.dto.nomnlistdata.NomnlistdataMetadataDto
 import com.example.oracleapi.service.nomnlistdata.DownloadResult
 import com.example.oracleapi.service.nomnlistdata.NomnlistdataService
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -28,7 +28,7 @@ class NomnlistDataController(
     @Operation(summary = "Получить список всех фото для номенклатуры")
     fun getInfoByNomen(
         @PathVariable nomen: Long
-    ): MyApiResponse<List<NomnlistdataMetadata>> {
+    ): MyApiResponse<List<NomnlistdataMetadataDto>> {
         return successList(service.getInfoByNomen(nomen))
     }
 
@@ -37,7 +37,7 @@ class NomnlistDataController(
     fun getPhotoInfoByNomen(
         @PathVariable nomen: Long,
         @PathVariable photonum: Int
-    ): MyApiResponse<NomnlistdataMetadata> {
+    ): MyApiResponse<NomnlistdataMetadataDto> {
         val metadata = service.getPhotoInfoByNomen(nomen, photonum)
             ?: return error("Фото для номенклатуры $nomen (№$photonum) не найдено")
         return success(metadata)
@@ -141,7 +141,7 @@ class NomnlistDataController(
         @RequestParam nomen: Long,
         @RequestParam file: MultipartFile,
         @RequestParam(required = false) needDownload: Boolean?
-    ): MyApiResponse<NomnlistdataMetadata> {
+    ): MyApiResponse<NomnlistdataMetadataDto> {
         return try {
             val metadata = service.uploadPhoto(
                 nomen = nomen,

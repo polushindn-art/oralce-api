@@ -1,6 +1,6 @@
 package com.example.oracleapi.service.ordernaklhead
 
-import com.example.oracleapi.dto.ResponseRN
+import com.example.oracleapi.dto.RnResponse
 import com.example.oracleapi.dto.orderNakl.OrderNaklHeadDelRequest
 import com.example.oracleapi.dto.orderNakl.OrderNaklHeadRequest
 import com.example.oracleapi.dto.orderNakl.OrderNaklSpecRequest
@@ -26,7 +26,7 @@ class NaklHeadService(
     private val orderHeadServise: OrderHeadService
 ) {
     /** Создание заголовка */
-    fun insNaklHead(request: OrderNaklHeadRequest): ResponseRN {
+    fun insNaklHead(request: OrderNaklHeadRequest): RnResponse {
 
         if (!orderHeadServise.existByRn(request.prn)) {
             throw IllegalArgumentException("Заказ с RN: ${request.prn} не найден")
@@ -62,7 +62,7 @@ class NaklHeadService(
     }
 
     /** Удаление заголовка */
-    fun delHead(request: OrderNaklHeadDelRequest): ResponseRN {
+    fun delHead(request: OrderNaklHeadDelRequest): RnResponse {
         return naklHeadDel.take(request)
     }
 

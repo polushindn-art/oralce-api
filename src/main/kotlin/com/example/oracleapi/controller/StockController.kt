@@ -14,7 +14,7 @@ import java.math.BigDecimal
 @RequestMapping("/v1/stock")
 @Tag(name = "Остаток на складах")
 class StockController(
-    val stockService: StockService
+    private val stockService: StockService
 ) : BaseController() {
 
     @GetMapping("/findByNomen")

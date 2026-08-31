@@ -5,10 +5,9 @@ import com.example.oracleapi.entity.table.MaxUserAgn
 import com.example.oracleapi.repository.maxUserAgn.MaxUserAgnRepository
 import com.example.oracleapi.service.public.PublicProcedureService
 import com.example.oracleapi.util.PhoneUtils
-import jakarta.transaction.Transactional
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.time.Instant
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 @Service
@@ -22,6 +21,7 @@ class MaxUserAgnService(
     /**
      * Переключить настройку уведомлений о звонках (0 <-> 1)
      */
+    @Transactional
     fun toggleCalls(chatId: String) {
         val entity = maxUserAgnRepository.findByChatId(chatId).firstOrNull() ?: return
         entity.notifCalls = if (entity.notifCalls == 1) 0 else 1
@@ -31,12 +31,14 @@ class MaxUserAgnService(
     /**
      * Переключить настройку уведомлений о днях рождения (0 <-> 1)
      */
+    @Transactional
     fun toggleBirthday(chatId: String) {
         val entity = maxUserAgnRepository.findByChatId(chatId).firstOrNull() ?: return
         entity.notifBirthday = if (entity.notifBirthday == 1) 0 else 1
         maxUserAgnRepository.save(entity)
     }
 
+    @Transactional
     fun save(user: MaxUserAgn): MaxUserAgn {
         return maxUserAgnRepository.save(user)
     }
@@ -44,6 +46,7 @@ class MaxUserAgnService(
     /**
      * Проверить, зарегистрирован ли уже этот чат
      */
+    @Transactional(readOnly = true)
     fun isChatRegistered(chatId: String): Boolean {
         return maxUserAgnRepository.existsByChatId(chatId)
     }
@@ -51,6 +54,7 @@ class MaxUserAgnService(
     /**
      * Найти привязку по chat_id
      */
+    @Transactional(readOnly = true)
     fun findByChatId(chatId: String): MaxUserAgnDto? {
         return MaxUserAgnDto.fromEntity(
             maxUserAgnRepository.findByChatId(chatId).firstOrNull() ?: return null,
@@ -101,6 +105,7 @@ class MaxUserAgnService(
     /**
      * Найти chat_id по номеру и типу бота
      */
+    @Transactional(readOnly = true)
     fun findChatIdByPhoneAndBotType(phone: String, botType: String): String? {
         val phoneTail = PhoneUtils.getPhoneTail(phone)
         return maxUserAgnRepository.findChatIdByPhoneAndBotType(phoneTail, botType)
@@ -137,11 +142,13 @@ class MaxUserAgnService(
     /**
      * Проверить, существует ли привязка
      */
+    @Transactional(readOnly = true)
     fun existsByPhoneAndBotType(phone: String, botType: String): Boolean {
         val phoneTail = PhoneUtils.getPhoneTail(phone)
         return maxUserAgnRepository.existsByPhoneAndBotType(phoneTail, botType)
     }
 
+    @Transactional(readOnly = true)
     fun findByPhoneTailAndBotType(phoneTail: String, botType: String): MaxUserAgn? {
         return maxUserAgnRepository.findByPhoneTailAndBotType(phoneTail, botType).firstOrNull()
     }
@@ -149,6 +156,7 @@ class MaxUserAgnService(
     /**
      * Найти пользователя в MAIN боте по номеру телефона
      */
+    @Transactional(readOnly = true)
     fun findMainUserByPhone(phone: String): MaxUserAgnDto? {
         val cleanPhone = phone.replace(Regex("[^\\d+]"), "")
         val phoneTail = PhoneUtils.getPhoneTail(cleanPhone)

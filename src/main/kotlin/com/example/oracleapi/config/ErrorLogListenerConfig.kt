@@ -3,7 +3,7 @@ package com.example.oracleapi.config
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.AppenderBase
 import com.example.oracleapi.service.ErrorCounter
-import com.example.oracleapi.service.RecentLogBufferService
+import com.example.oracleapi.service.RecentLogBuffer
 import org.springframework.context.annotation.Configuration
 import jakarta.annotation.PostConstruct
 
@@ -15,7 +15,7 @@ import jakarta.annotation.PostConstruct
 @Configuration
 class ErrorLogListenerConfig(
     private val errorCounter: ErrorCounter,
-    private val logBufferService: RecentLogBufferService
+    private val logBufferService: RecentLogBuffer
 ) {
 
     @PostConstruct
@@ -60,7 +60,7 @@ class ErrorLogListenerConfig(
     /**
      * Новый аппендер, который слушает ВСЕ логи и складывает их в буфер.
      */
-    class RecentLogAppender(private val logBufferService: RecentLogBufferService) : AppenderBase<ILoggingEvent>() {
+    class RecentLogAppender(private val logBufferService: RecentLogBuffer) : AppenderBase<ILoggingEvent>() {
         override fun append(eventObject: ILoggingEvent) {
             try {
                 logBufferService.addLog(

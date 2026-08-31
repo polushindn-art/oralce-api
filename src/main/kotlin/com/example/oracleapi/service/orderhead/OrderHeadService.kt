@@ -1,6 +1,6 @@
 package com.example.oracleapi.service.orderhead
 
-import com.example.oracleapi.dto.ResponseRN
+import com.example.oracleapi.dto.RnResponse
 import com.example.oracleapi.dto.orderhead.*
 import com.example.oracleapi.dto.orderhead.arrivalDate.OrderHeadUpdateArDateRequest
 import com.example.oracleapi.dto.orderhead.arrivalDate.OrderHeadUpdateArDateResponse
@@ -18,9 +18,8 @@ import com.example.oracleapi.entity.table.Field
 import com.example.oracleapi.repository.orderhead.OrderheadRepository
 import com.example.oracleapi.service.field.FieldService
 import com.example.oracleapi.service.typedoc.TypedocService
-import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
-import java.time.LocalDate
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class OrderHeadService(
@@ -40,6 +39,8 @@ class OrderHeadService(
     private val typeDocService: TypedocService,
     private val orderheadRepository: OrderheadRepository
 ) {
+
+    @Transactional
     fun createOrder(request: com.example.oracleapi.dto.orderhead.ins.OrderHeadInsRequest): com.example.oracleapi.dto.orderhead.ins.OrderHeadInsResponse {
         // Валидация обязательных полей
         request.crn?.let { require(it > 0) { "CRN обязателен" } }
@@ -59,7 +60,7 @@ class OrderHeadService(
         return orderHeadUpdProcedure.execute(request)
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     fun getStatus(rn: Long?): com.example.oracleapi.dto.orderhead.status.OrderHeadStatusResponse {
         rn?.let { require(rn > 0L) { "RN обязательна" } }
         return orderHeadStatusGet.take(rn ?: 0)
@@ -75,14 +76,14 @@ class OrderHeadService(
     }
 
     @Transactional
-    fun updateBasisDoc(request: OrderHeadBasisDocUpdateRequest): ResponseRN {
+    fun updateBasisDoc(request: OrderHeadBasisDocUpdateRequest): RnResponse {
         require(request.rn > 0) { "RN обязательна" }
         typeDocService.validateExists(request.type)
         return orderHeadBasisDocUpdate.update(request)
     }
 
     @Transactional
-    fun clearBasisDocs(rn: Long): ResponseRN {
+    fun clearBasisDocs(rn: Long): RnResponse {
         require(rn > 0) { "RN обязательна" }
         return orderHeadBasisDocClear.clearBasisDoc(rn)
     }
@@ -117,7 +118,7 @@ class OrderHeadService(
     }
 
     @Transactional
-    fun updateNote(request: OrderHeadUpdateNoteRequest): ResponseRN {
+    fun updateNote(request: OrderHeadUpdateNoteRequest): RnResponse {
         request.orderhead?.let { require(it > 0) { "RN заказа обязательна" } }
         request.note?.let { require(it.isNotBlank()) { "Отсутствует текст примечания" } }
         return orderHeadUpdateNote.update(request)
@@ -131,6 +132,7 @@ class OrderHeadService(
         return orderHeadUpdateStoreInAndUl.update(request)
     }
 
+    @Transactional(readOnly = true)
     fun existByRn(rn: Long): Boolean {
         return orderheadRepository.existsByRn(rn)
     }

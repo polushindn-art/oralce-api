@@ -2,10 +2,11 @@ package com.example.oracleapi.service.max.call
 
 import com.example.oracleapi.dto.max.MessageResponse
 import org.slf4j.LoggerFactory
+import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
 import kotlin.collections.get
 
-@Service
+@Component
 class MessageService(
     private val botClient: MaxBotCallClientService
 ) {

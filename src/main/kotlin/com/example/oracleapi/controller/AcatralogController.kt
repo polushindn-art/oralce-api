@@ -1,6 +1,6 @@
 package com.example.oracleapi.controller
 
-import com.example.oracleapi.dto.ResponseRN
+import com.example.oracleapi.dto.RnResponse
 import com.example.oracleapi.dto.common.MyApiResponse
 import com.example.oracleapi.service.acatalog.AcatalogService
 import io.swagger.v3.oas.annotations.Operation
@@ -21,7 +21,7 @@ class AcatralogController(
     @Operation(summary = "Получить RN каталога для заказа по rn номенклатруры")
     fun getCatalogByNomen(
         @Valid @RequestParam nomen: Long
-    ): MyApiResponse<ResponseRN> {
+    ): MyApiResponse<RnResponse> {
         return success(aCatalogService.getCatalogByNomenForOrder(nomen))
     }
 }

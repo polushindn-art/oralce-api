@@ -1,11 +1,12 @@
 package com.example.oracleapi.service.wakeUp
 
 import com.example.oracleapi.dto.wakeUp.DeviceInfo
+import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.util.concurrent.ConcurrentHashMap
 
-@Service
+@Component
 class WakeUpService {
     private val devices = ConcurrentHashMap<String, DeviceInfo>()
 

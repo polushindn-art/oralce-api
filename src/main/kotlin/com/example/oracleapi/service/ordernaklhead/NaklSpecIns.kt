@@ -1,7 +1,6 @@
 package com.example.oracleapi.service.ordernaklhead
 
 import com.example.oracleapi.common.BasePackage
-import com.example.oracleapi.dto.ResponseRN
 import com.example.oracleapi.dto.orderNakl.OrderNaklSpecRequest
 import com.example.oracleapi.dto.orderNakl.OrderNaklSpecResponse
 import org.springframework.stereotype.Component

@@ -1,7 +1,7 @@
 package com.example.oracleapi.service.ordernaklhead
 
 import com.example.oracleapi.common.BasePackage
-import com.example.oracleapi.dto.ResponseRN
+import com.example.oracleapi.dto.RnResponse
 import com.example.oracleapi.dto.orderNakl.OrderNaklHeadRequest
 import org.springframework.stereotype.Component
 import java.sql.Types
@@ -16,7 +16,7 @@ class NaklHeadIns(
     override val method = "ins"
     override val count = 9
 
-    fun take(request: OrderNaklHeadRequest): ResponseRN {
+    fun take(request: OrderNaklHeadRequest): RnResponse {
         return dataSource.executePrc {
 
             it.setLong(1,request.prn)
@@ -57,7 +57,7 @@ class NaklHeadIns(
 
             val rn = it.getLong(8)
 
-            ResponseRN(
+            RnResponse(
                 rn
             )
         }

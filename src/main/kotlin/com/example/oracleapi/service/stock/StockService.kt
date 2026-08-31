@@ -3,8 +3,8 @@ package com.example.oracleapi.service.stock
 import com.example.oracleapi.dto.stock.StockDto
 import com.example.oracleapi.dto.stock.StockInfoDto
 import com.example.oracleapi.service.nomnlist.NomnlistService
-import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 
 @Service
@@ -14,14 +14,18 @@ class StockService(
     private val stockMessageFormatter: StockMessageFormatter,
     private val nomnlistService: NomnlistService
 ) {
+
+    @Transactional(readOnly = true)
     fun findStocksByNomen(nomen: BigDecimal): List<StockDto> {
         return stockFindByNomen.all(nomen)
     }
 
+    @Transactional(readOnly = true)
     fun findStocksByNomenQuantNotNull(nomen: BigDecimal): List<StockDto> {
         return stockFindByNomen.notNull(nomen)
     }
 
+    @Transactional(readOnly = true)
     fun getStockByNomenInfo(nomen: BigDecimal): List<StockInfoDto> {
         return stockInfoPipelineGet.getStockInfo(nomen)
     }

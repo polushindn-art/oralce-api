@@ -1,6 +1,6 @@
 package com.example.oracleapi.controller
 
-import com.example.oracleapi.dto.ResponseRN
+import com.example.oracleapi.dto.RnResponse
 import com.example.oracleapi.dto.common.MyApiResponse
 import com.example.oracleapi.dto.prcDoc.head.PrcDocHeadDelRequest
 import com.example.oracleapi.dto.prcDoc.head.PrcDocStatusRequest
@@ -32,7 +32,7 @@ class PrcDocController(
     @Operation(summary = "Создать спецификацию документа ТМЦ")
     fun insSpec(
         @Valid @RequestBody request: PrcdocspecInsRequest
-    ): MyApiResponse<ResponseRN> {
+    ): MyApiResponse<RnResponse> {
         return success(prcDocService.prcSpecIns(request))
     }
 
@@ -49,7 +49,7 @@ class PrcDocController(
         description = "Удаляет запись в таблице PrcDocHead",
         summary = "Удалить заголовок"
     )
-    fun delHead(@Valid @RequestBody request: PrcDocHeadDelRequest): MyApiResponse<ResponseRN> {
+    fun delHead(@Valid @RequestBody request: PrcDocHeadDelRequest): MyApiResponse<RnResponse> {
         return success(prcDocService.delHead(request))
     }
 
@@ -58,7 +58,7 @@ class PrcDocController(
         description = "Удаляет запись в таблице PrcDocSpec",
         summary = "Удалить спецификацию"
     )
-    fun delSpec(@Valid @RequestBody request: PrcDocSpecDelRequest): MyApiResponse<ResponseRN> {
+    fun delSpec(@Valid @RequestBody request: PrcDocSpecDelRequest): MyApiResponse<RnResponse> {
         return success(prcDocService.delSpec(request))
     }
 

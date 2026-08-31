@@ -1,6 +1,6 @@
 package com.example.oracleapi.controller
 
-import com.example.oracleapi.dto.ResponseRN
+import com.example.oracleapi.dto.RnResponse
 import com.example.oracleapi.dto.common.MyApiResponse
 import com.example.oracleapi.dto.orderhead.OrderHeadUpdStoreInAndUlRequest
 import com.example.oracleapi.dto.orderhead.OrderHeadUpdStoreInAndUlResponse
@@ -74,7 +74,7 @@ class OrderHeadController(
     @Operation(summary = "Установить документ от поставщика")
     fun updateBasisDoc(
         @Valid @RequestBody request: OrderHeadBasisDocUpdateRequest
-    ): MyApiResponse<ResponseRN> {
+    ): MyApiResponse<RnResponse> {
         return success(orderHeadService.updateBasisDoc(request))
     }
 
@@ -82,7 +82,7 @@ class OrderHeadController(
     @Operation(summary = "Очистить документ от поставщика")
     fun clearBasisDocs(
         @Valid rn: Long
-    ): MyApiResponse<ResponseRN> {
+    ): MyApiResponse<RnResponse> {
         return success(orderHeadService.clearBasisDocs(rn))
     }
 
@@ -136,7 +136,7 @@ class OrderHeadController(
     @Operation(summary = "Обновить примечание")
     fun updateNote(
         @Valid @RequestBody request: OrderHeadUpdateNoteRequest
-    ): MyApiResponse<ResponseRN> {
+    ): MyApiResponse<RnResponse> {
         return success(orderHeadService.updateNote(request))
     }
 
@@ -144,7 +144,7 @@ class OrderHeadController(
     @Operation(summary = "Удалить спецификацию")
     fun deleteSpec(
         @Valid @RequestBody request: OrderSpecDelRequest
-    ): MyApiResponse<ResponseRN> {
+    ): MyApiResponse<RnResponse> {
         return success(orderSpecService.del(request))
     }
 

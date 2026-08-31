@@ -8,19 +8,18 @@ import com.example.oracleapi.dto.sms.SmsSendRequest
 import com.example.oracleapi.dto.sms.SmsSendResponse
 import com.example.oracleapi.dto.sms.SmsStatusResponse
 import com.example.oracleapi.dto.sms.SmsVerificationResponse
-import com.example.oracleapi.service.sms.SmsRuService
+import com.example.oracleapi.service.sms.SmsRuClient
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.slf4j.LoggerFactory
 import org.springframework.web.bind.annotation.*
-import kotlin.math.pow
 
 @RestController
 @RequestMapping("/v1/sms")
 @Tag(name = "SMS", description = "Сервис отправки SMS через SMS.RU")
 class SmsController(
-    private val smsRuService: SmsRuService
+    private val smsRuService: SmsRuClient
 ) : BaseController() {
 
     private val log = LoggerFactory.getLogger(this::class.java)

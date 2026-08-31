@@ -1,6 +1,6 @@
 package com.example.oracleapi.service.orderspec
 
-import com.example.oracleapi.dto.ResponseRN
+import com.example.oracleapi.dto.RnResponse
 import com.example.oracleapi.dto.orderspec.OrderSpecResponse
 import com.example.oracleapi.dto.orderspec.del.OrderSpecDelRequest
 import com.example.oracleapi.dto.orderspec.ins.OrderSpecInsRequest
@@ -18,6 +18,8 @@ class OrderSpecService(
     private val orderSpecUpd: OrderSpecUpd,
     private val orderSpecDel: OrderSpecDel
 ) {
+
+    @Transactional
     fun createOrderSpec(request: OrderSpecInsRequest): OrderSpecInsResponse {
         require(request.prn != null && request.prn > 0) { "PRN обязателен" }
         require(request.nomen != null && request.nomen > 0) { "NOMEN обязателен" }
@@ -28,6 +30,7 @@ class OrderSpecService(
         return orderSpecInsProcedure.ins(request)
     }
 
+    @Transactional
     fun updateOrderSpec(request: OrderSpecUpdateRequest): OrderSpecUpdateResponse {
         require(request.rn > 0) { "RN обязателен" }
         return orderSpecUpd.take(request)
@@ -40,7 +43,8 @@ class OrderSpecService(
         return OrderSpecResponse.fromEntity(orderSpec)
     }
 
-    fun del(request: OrderSpecDelRequest): ResponseRN {
+    @Transactional
+    fun del(request: OrderSpecDelRequest): RnResponse {
         return orderSpecDel.delSpec(request)
     }
 

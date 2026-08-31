@@ -143,6 +143,7 @@ $dokka.location:com.example.oracleapi.controller/AgnListController///PointingToD
 $dokka.location:com.example.oracleapi.controller/AgnListController/AgnListController/#com.example.oracleapi.service.agnList.AgnListService/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.controller/-agn-list-controller/-agn-list-controller.html
 $dokka.location:com.example.oracleapi.controller/AgnListController/delete/#kotlin.Long/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.controller/-agn-list-controller/delete.html
 $dokka.location:com.example.oracleapi.controller/AgnListController/getAgn/#kotlin.Long/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.controller/-agn-list-controller/get-agn.html
+$dokka.location:com.example.oracleapi.controller/AgnListController/getInfo/#kotlin.Long/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.controller/-agn-list-controller/get-info.html
 $dokka.location:com.example.oracleapi.controller/AgnListController/ins/#com.example.oracleapi.dto.agnlist.AgnListInsRequest/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.controller/-agn-list-controller/ins.html
 $dokka.location:com.example.oracleapi.controller/AgnListController/upd/#com.example.oracleapi.dto.agn.AgnListUpdRequest/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.controller/-agn-list-controller/upd.html
 $dokka.location:com.example.oracleapi.controller/AgnPhoneNumberController///PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.controller/-agn-phone-number-controller/index.html
@@ -246,7 +247,7 @@ $dokka.location:com.example.oracleapi.controller/IdHeadController/IdHeadControll
 $dokka.location:com.example.oracleapi.controller/IdHeadController/createPrihod/#com.example.oracleapi.dto.idhead.prihod.PrihodRequest/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.controller/-id-head-controller/create-prihod.html
 $dokka.location:com.example.oracleapi.controller/IdHeadController/delete/#com.example.oracleapi.dto.idhead.del.IdHeadDeleteRequest/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.controller/-id-head-controller/delete.html
 $dokka.location:com.example.oracleapi.controller/IdHeadController/getAllWithPagination/#org.springframework.data.domain.Pageable/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.controller/-id-head-controller/get-all-with-pagination.html
-$dokka.location:com.example.oracleapi.controller/IdHeadController/getByFiltersWithPagination/#kotlin.String?#kotlin.Long?#java.math.BigDecimal?#kotlin.Long?#kotlin.Long?#java.time.LocalDate?#java.time.LocalDate?#org.springframework.data.domain.Pageable/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.controller/-id-head-controller/get-by-filters-with-pagination.html
+$dokka.location:com.example.oracleapi.controller/IdHeadController/getByFiltersWithPagination/#kotlin.String?#kotlin.Long?#kotlin.Long?#java.math.BigDecimal?#kotlin.Long?#kotlin.Long?#java.time.LocalDate?#java.time.LocalDate?#org.springframework.data.domain.Pageable/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.controller/-id-head-controller/get-by-filters-with-pagination.html
 $dokka.location:com.example.oracleapi.controller/IdHeadController/getByStatus/#kotlin.Long/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.controller/-id-head-controller/get-by-status.html
 $dokka.location:com.example.oracleapi.controller/IdHeadController/getByStatusWithPagination/#kotlin.Long#org.springframework.data.domain.Pageable/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.controller/-id-head-controller/get-by-status-with-pagination.html
 $dokka.location:com.example.oracleapi.controller/IdHeadController/getCount/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.controller/-id-head-controller/get-count.html
@@ -393,6 +394,9 @@ $dokka.location:com.example.oracleapi.controller/StoreController/getAllStores/#/
 $dokka.location:com.example.oracleapi.controller/StoreController/getStoreByRn/#kotlin.Long/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.controller/-store-controller/get-store-by-rn.html
 $dokka.location:com.example.oracleapi.controller/StoreController/getStoresByPbe/#kotlin.Long/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.controller/-store-controller/get-stores-by-pbe.html
 $dokka.location:com.example.oracleapi.controller/StoreController/getStoresForTsd/#kotlin.Long/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.controller/-store-controller/get-stores-for-tsd.html
+$dokka.location:com.example.oracleapi.controller/StoreOperController///PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.controller/-store-oper-controller/index.html
+$dokka.location:com.example.oracleapi.controller/StoreOperController/StoreOperController/#com.example.oracleapi.service.storeoper.StoreOperService/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.controller/-store-oper-controller/-store-oper-controller.html
+$dokka.location:com.example.oracleapi.controller/StoreOperController/getAll/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.controller/-store-oper-controller/get-all.html
 $dokka.location:com.example.oracleapi.controller/ToHeadController///PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.controller/-to-head-controller/index.html
 $dokka.location:com.example.oracleapi.controller/ToHeadController/ToHeadController/#com.example.oracleapi.service.tohead.ToheadService/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.controller/-to-head-controller/-to-head-controller.html
 $dokka.location:com.example.oracleapi.controller/ToHeadController/getByRN/#kotlin.Long/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.controller/-to-head-controller/get-by-r-n.html
@@ -464,6 +468,19 @@ $dokka.location:com.example.oracleapi.dto.agn/AgnListForUpdResponse/shipper/#/Po
 $dokka.location:com.example.oracleapi.dto.agn/AgnListForUpdResponse/supplier/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.agn/-agn-list-for-upd-response/supplier.html
 $dokka.location:com.example.oracleapi.dto.agn/AgnListForUpdResponse/typeDog/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.agn/-agn-list-for-upd-response/type-dog.html
 $dokka.location:com.example.oracleapi.dto.agn/AgnListForUpdResponse/typecard/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.agn/-agn-list-for-upd-response/typecard.html
+$dokka.location:com.example.oracleapi.dto.agn/AgnListInfoResponse///PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.agn/-agn-list-info-response/index.html
+$dokka.location:com.example.oracleapi.dto.agn/AgnListInfoResponse/AgnListInfoResponse/#kotlin.Long?#kotlin.String?#kotlin.String?#kotlin.collections.List[com.example.oracleapi.dto.agnphonenumberlist.PhoneListAgn]?#kotlin.String?#kotlin.String?#kotlin.Long?#kotlin.String?#kotlin.String?#kotlin.String?#kotlin.String?/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.agn/-agn-list-info-response/-agn-list-info-response.html
+$dokka.location:com.example.oracleapi.dto.agn/AgnListInfoResponse/addressFact/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.agn/-agn-list-info-response/address-fact.html
+$dokka.location:com.example.oracleapi.dto.agn/AgnListInfoResponse/addressUl/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.agn/-agn-list-info-response/address-ul.html
+$dokka.location:com.example.oracleapi.dto.agn/AgnListInfoResponse/agnCode/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.agn/-agn-list-info-response/agn-code.html
+$dokka.location:com.example.oracleapi.dto.agn/AgnListInfoResponse/agnName/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.agn/-agn-list-info-response/agn-name.html
+$dokka.location:com.example.oracleapi.dto.agn/AgnListInfoResponse/agnType/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.agn/-agn-list-info-response/agn-type.html
+$dokka.location:com.example.oracleapi.dto.agn/AgnListInfoResponse/agnTypeName/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.agn/-agn-list-info-response/agn-type-name.html
+$dokka.location:com.example.oracleapi.dto.agn/AgnListInfoResponse/eMail/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.agn/-agn-list-info-response/e-mail.html
+$dokka.location:com.example.oracleapi.dto.agn/AgnListInfoResponse/inn/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.agn/-agn-list-info-response/inn.html
+$dokka.location:com.example.oracleapi.dto.agn/AgnListInfoResponse/kpp/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.agn/-agn-list-info-response/kpp.html
+$dokka.location:com.example.oracleapi.dto.agn/AgnListInfoResponse/phone/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.agn/-agn-list-info-response/phone.html
+$dokka.location:com.example.oracleapi.dto.agn/AgnListInfoResponse/rn/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.agn/-agn-list-info-response/rn.html
 $dokka.location:com.example.oracleapi.dto.agn/AgnListInsResponse///PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.agn/-agn-list-ins-response/index.html
 $dokka.location:com.example.oracleapi.dto.agn/AgnListInsResponse/AgnListInsResponse/#kotlin.Long#kotlin.String/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.agn/-agn-list-ins-response/-agn-list-ins-response.html
 $dokka.location:com.example.oracleapi.dto.agn/AgnListInsResponse/message/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.agn/-agn-list-ins-response/message.html
@@ -608,15 +625,14 @@ $dokka.location:com.example.oracleapi.dto.agnphonenumberlist/PhoneCardProjection
 $dokka.location:com.example.oracleapi.dto.agnphonenumberlist/PhoneCardProjection/getDscbarnumb/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.agnphonenumberlist/-phone-card-projection/get-dscbarnumb.html
 $dokka.location:com.example.oracleapi.dto.agnphonenumberlist/PhoneCardProjection/getPhonenumber/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.agnphonenumberlist/-phone-card-projection/get-phonenumber.html
 $dokka.location:com.example.oracleapi.dto.agnphonenumberlist/PhoneListAgn.Companion///PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.agnphonenumberlist/-phone-list-agn/-companion/index.html
-$dokka.location:com.example.oracleapi.dto.agnphonenumberlist/PhoneListAgn.Companion/fromEntity/#com.example.oracleapi.entity.table.Agnphonenumberlist/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.agnphonenumberlist/-phone-list-agn/-companion/from-entity.html
+$dokka.location:com.example.oracleapi.dto.agnphonenumberlist/PhoneListAgn.Companion/fromEntity/#com.example.oracleapi.entity.table.Agnphonenumberlist?/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.agnphonenumberlist/-phone-list-agn/-companion/from-entity.html
 $dokka.location:com.example.oracleapi.dto.agnphonenumberlist/PhoneListAgn///PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.agnphonenumberlist/-phone-list-agn/index.html
-$dokka.location:com.example.oracleapi.dto.agnphonenumberlist/PhoneListAgn/PhoneListAgn/#kotlin.Long?#kotlin.String?#kotlin.String?#kotlin.Boolean?#kotlin.String?#kotlin.String?/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.agnphonenumberlist/-phone-list-agn/-phone-list-agn.html
+$dokka.location:com.example.oracleapi.dto.agnphonenumberlist/PhoneListAgn/PhoneListAgn/#kotlin.String?#kotlin.String?#kotlin.Boolean?#kotlin.String?#kotlin.String?/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.agnphonenumberlist/-phone-list-agn/-phone-list-agn.html
 $dokka.location:com.example.oracleapi.dto.agnphonenumberlist/PhoneListAgn/agnCode/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.agnphonenumberlist/-phone-list-agn/agn-code.html
 $dokka.location:com.example.oracleapi.dto.agnphonenumberlist/PhoneListAgn/agnName/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.agnphonenumberlist/-phone-list-agn/agn-name.html
 $dokka.location:com.example.oracleapi.dto.agnphonenumberlist/PhoneListAgn/mainPhone/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.agnphonenumberlist/-phone-list-agn/main-phone.html
 $dokka.location:com.example.oracleapi.dto.agnphonenumberlist/PhoneListAgn/phoneTail/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.agnphonenumberlist/-phone-list-agn/phone-tail.html
 $dokka.location:com.example.oracleapi.dto.agnphonenumberlist/PhoneListAgn/phonenumber/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.agnphonenumberlist/-phone-list-agn/phonenumber.html
-$dokka.location:com.example.oracleapi.dto.agnphonenumberlist/PhoneListAgn/rnAgn/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.agnphonenumberlist/-phone-list-agn/rn-agn.html
 $dokka.location:com.example.oracleapi.dto.asterisk////PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.asterisk/index.html
 $dokka.location:com.example.oracleapi.dto.asterisk/AuthCallRequest///PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.asterisk/-auth-call-request/index.html
 $dokka.location:com.example.oracleapi.dto.asterisk/AuthCallRequest/AuthCallRequest/#kotlin.String#kotlin.String?#kotlin.String?/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.asterisk/-auth-call-request/-auth-call-request.html
@@ -866,7 +882,7 @@ $dokka.location:com.example.oracleapi.dto.idhead.status/StatusUpdateResponse/suc
 $dokka.location:com.example.oracleapi.dto.idhead////PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.idhead/index.html
 $dokka.location:com.example.oracleapi.dto.idhead//toResponse/com.example.oracleapi.entity.table.Idhead#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.idhead/to-response.html
 $dokka.location:com.example.oracleapi.dto.idhead/IdheadResponse///PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.idhead/-idhead-response/index.html
-$dokka.location:com.example.oracleapi.dto.idhead/IdheadResponse/IdheadResponse/#kotlin.Long#kotlin.Long#kotlin.Long#kotlin.String#kotlin.String#java.time.LocalDateTime?#java.math.BigDecimal?#java.math.BigDecimal?#kotlin.Long#kotlin.String?#kotlin.String?#kotlin.String?#kotlin.Long?#kotlin.String?#kotlin.Long?#kotlin.Long?#kotlin.String?#java.math.BigDecimal?#java.math.BigDecimal?/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.idhead/-idhead-response/-idhead-response.html
+$dokka.location:com.example.oracleapi.dto.idhead/IdheadResponse/IdheadResponse/#kotlin.Long#kotlin.Long#kotlin.Long#kotlin.String#kotlin.String#java.time.LocalDateTime?#java.math.BigDecimal?#java.math.BigDecimal?#kotlin.Long#kotlin.String?#kotlin.String?#kotlin.String?#kotlin.Long?#kotlin.String?#kotlin.Long?#kotlin.Long?#kotlin.String?#kotlin.String?#kotlin.String?#java.math.BigDecimal?#java.math.BigDecimal?/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.idhead/-idhead-response/-idhead-response.html
 $dokka.location:com.example.oracleapi.dto.idhead/IdheadResponse/crn/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.idhead/-idhead-response/crn.html
 $dokka.location:com.example.oracleapi.dto.idhead/IdheadResponse/docdate/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.idhead/-idhead-response/docdate.html
 $dokka.location:com.example.oracleapi.dto.idhead/IdheadResponse/docnumb/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.idhead/-idhead-response/docnumb.html
@@ -880,6 +896,8 @@ $dokka.location:com.example.oracleapi.dto.idhead/IdheadResponse/rn/#/PointingToD
 $dokka.location:com.example.oracleapi.dto.idhead/IdheadResponse/statusCode/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.idhead/-idhead-response/status-code.html
 $dokka.location:com.example.oracleapi.dto.idhead/IdheadResponse/storeinCode/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.idhead/-idhead-response/storein-code.html
 $dokka.location:com.example.oracleapi.dto.idhead/IdheadResponse/storeoper/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.idhead/-idhead-response/storeoper.html
+$dokka.location:com.example.oracleapi.dto.idhead/IdheadResponse/storeoperCode/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.idhead/-idhead-response/storeoper-code.html
+$dokka.location:com.example.oracleapi.dto.idhead/IdheadResponse/storeoperName/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.idhead/-idhead-response/storeoper-name.html
 $dokka.location:com.example.oracleapi.dto.idhead/IdheadResponse/storeoutCode/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.idhead/-idhead-response/storeout-code.html
 $dokka.location:com.example.oracleapi.dto.idhead/IdheadResponse/sumprice/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.idhead/-idhead-response/sumprice.html
 $dokka.location:com.example.oracleapi.dto.idhead/IdheadResponse/sumvolume/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.idhead/-idhead-response/sumvolume.html
@@ -1932,6 +1950,15 @@ $dokka.location:com.example.oracleapi.dto.store/StoreSimpleResponse/rn/#/Pointin
 $dokka.location:com.example.oracleapi.dto.store/StoreSimpleResponse/storecode/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.store/-store-simple-response/storecode.html
 $dokka.location:com.example.oracleapi.dto.store/StoreSimpleResponse/storename/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.store/-store-simple-response/storename.html
 $dokka.location:com.example.oracleapi.dto.store/StoreSimpleResponse/usesas/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.store/-store-simple-response/usesas.html
+$dokka.location:com.example.oracleapi.dto.storeoper////PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.storeoper/index.html
+$dokka.location:com.example.oracleapi.dto.storeoper/StoreoperDto.Companion///PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.storeoper/-storeoper-dto/-companion/index.html
+$dokka.location:com.example.oracleapi.dto.storeoper/StoreoperDto.Companion/fromEntity/#com.example.oracleapi.entity.table.Storeoper/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.storeoper/-storeoper-dto/-companion/from-entity.html
+$dokka.location:com.example.oracleapi.dto.storeoper/StoreoperDto///PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.storeoper/-storeoper-dto/index.html
+$dokka.location:com.example.oracleapi.dto.storeoper/StoreoperDto/StoreoperDto/#kotlin.Long?#kotlin.String?#kotlin.String?#kotlin.String?/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.storeoper/-storeoper-dto/-storeoper-dto.html
+$dokka.location:com.example.oracleapi.dto.storeoper/StoreoperDto/note/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.storeoper/-storeoper-dto/note.html
+$dokka.location:com.example.oracleapi.dto.storeoper/StoreoperDto/rn/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.storeoper/-storeoper-dto/rn.html
+$dokka.location:com.example.oracleapi.dto.storeoper/StoreoperDto/stropercode/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.storeoper/-storeoper-dto/stropercode.html
+$dokka.location:com.example.oracleapi.dto.storeoper/StoreoperDto/stropername/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.storeoper/-storeoper-dto/stropername.html
 $dokka.location:com.example.oracleapi.dto.tohead////PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.tohead/index.html
 $dokka.location:com.example.oracleapi.dto.tohead/ToHeadWithSpec///PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.tohead/-to-head-with-spec/index.html
 $dokka.location:com.example.oracleapi.dto.tohead/ToHeadWithSpec/ToHeadWithSpec/#kotlin.Long?#kotlin.Long?#kotlin.String?#java.time.LocalDate?#kotlin.Long?#com.example.oracleapi.dto.agn.AgnListSimpleDto?#kotlin.Long?#java.math.BigDecimal?#java.math.BigDecimal?#kotlin.Long?#kotlin.collections.List[com.example.oracleapi.dto.tospec.TospecDto]/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto.tohead/-to-head-with-spec/-to-head-with-spec.html
@@ -2123,26 +2150,6 @@ $dokka.location:com.example.oracleapi.dto/UserAuthInfo/roles/#/PointingToDeclara
 $dokka.location:com.example.oracleapi.dto/UserAuthInfo/userAgn/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto/-user-auth-info/user-agn.html
 $dokka.location:com.example.oracleapi.dto/UserAuthInfo/usercode/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto/-user-auth-info/usercode.html
 $dokka.location:com.example.oracleapi.dto/UserAuthInfo/username/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.dto/-user-auth-info/username.html
-$dokka.location:com.example.oracleapi.entity.mark////PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.mark/index.html
-$dokka.location:com.example.oracleapi.entity.mark/MarkProcedureEntity///PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.mark/-mark-procedure-entity/index.html
-$dokka.location:com.example.oracleapi.entity.mark/MarkProcedureEntity/MarkProcedureEntity/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.mark/-mark-procedure-entity/-mark-procedure-entity.html
-$dokka.location:com.example.oracleapi.entity.nomnlistdata////PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.nomnlistdata/index.html
-$dokka.location:com.example.oracleapi.entity.nomnlistdata/Nomnlistdata///PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.nomnlistdata/-nomnlistdata/index.html
-$dokka.location:com.example.oracleapi.entity.nomnlistdata/Nomnlistdata/Nomnlistdata/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.nomnlistdata/-nomnlistdata/-nomnlistdata.html
-$dokka.location:com.example.oracleapi.entity.nomnlistdata/Nomnlistdata/created/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.nomnlistdata/-nomnlistdata/created.html
-$dokka.location:com.example.oracleapi.entity.nomnlistdata/Nomnlistdata/deleted/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.nomnlistdata/-nomnlistdata/deleted.html
-$dokka.location:com.example.oracleapi.entity.nomnlistdata/Nomnlistdata/deluser/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.nomnlistdata/-nomnlistdata/deluser.html
-$dokka.location:com.example.oracleapi.entity.nomnlistdata/Nomnlistdata/fileSize/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.nomnlistdata/-nomnlistdata/file-size.html
-$dokka.location:com.example.oracleapi.entity.nomnlistdata/Nomnlistdata/height/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.nomnlistdata/-nomnlistdata/height.html
-$dokka.location:com.example.oracleapi.entity.nomnlistdata/Nomnlistdata/imageData/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.nomnlistdata/-nomnlistdata/image-data.html
-$dokka.location:com.example.oracleapi.entity.nomnlistdata/Nomnlistdata/manager/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.nomnlistdata/-nomnlistdata/manager.html
-$dokka.location:com.example.oracleapi.entity.nomnlistdata/Nomnlistdata/md5/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.nomnlistdata/-nomnlistdata/md5.html
-$dokka.location:com.example.oracleapi.entity.nomnlistdata/Nomnlistdata/minidata/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.nomnlistdata/-nomnlistdata/minidata.html
-$dokka.location:com.example.oracleapi.entity.nomnlistdata/Nomnlistdata/needdownload/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.nomnlistdata/-nomnlistdata/needdownload.html
-$dokka.location:com.example.oracleapi.entity.nomnlistdata/Nomnlistdata/nomen/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.nomnlistdata/-nomnlistdata/nomen.html
-$dokka.location:com.example.oracleapi.entity.nomnlistdata/Nomnlistdata/photonum/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.nomnlistdata/-nomnlistdata/photonum.html
-$dokka.location:com.example.oracleapi.entity.nomnlistdata/Nomnlistdata/rn/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.nomnlistdata/-nomnlistdata/rn.html
-$dokka.location:com.example.oracleapi.entity.nomnlistdata/Nomnlistdata/width/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.nomnlistdata/-nomnlistdata/width.html
 $dokka.location:com.example.oracleapi.entity.table////PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/index.html
 $dokka.location:com.example.oracleapi.entity.table//toDto/com.example.oracleapi.entity.table.Phonebook#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/to-dto.html
 $dokka.location:com.example.oracleapi.entity.table/Acatalog///PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-acatalog/index.html
@@ -2151,7 +2158,7 @@ $dokka.location:com.example.oracleapi.entity.table/Acatalog/crn/#/PointingToDecl
 $dokka.location:com.example.oracleapi.entity.table/Acatalog/name/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-acatalog/name.html
 $dokka.location:com.example.oracleapi.entity.table/Acatalog/rn/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-acatalog/rn.html
 $dokka.location:com.example.oracleapi.entity.table/AgnList///PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-agn-list/index.html
-$dokka.location:com.example.oracleapi.entity.table/AgnList/AgnList/#kotlin.Long#kotlin.Long#kotlin.String#kotlin.String#kotlin.String?#kotlin.String?#kotlin.Long#kotlin.String?#kotlin.String?#kotlin.String?#kotlin.String?#kotlin.String?#kotlin.String?#kotlin.String?#kotlin.String?#kotlin.String?#kotlin.String?#java.time.LocalDateTime?#kotlin.String?#kotlin.String?#kotlin.String?#kotlin.String?#kotlin.String?#kotlin.Long?#kotlin.Long?#kotlin.Long#kotlin.Long?#kotlin.Long?#kotlin.Double?#kotlin.String?#kotlin.String?#java.time.LocalDateTime?#kotlin.String?#kotlin.Long#kotlin.Long#kotlin.Long?#java.time.LocalDateTime?#java.time.LocalDateTime?#kotlin.Long#kotlin.Long?#kotlin.Long?#kotlin.Long?#java.time.LocalDateTime?#kotlin.Long?#kotlin.Long?#kotlin.Long?#java.time.LocalDateTime?#kotlin.Long?#kotlin.Double?#kotlin.Double?/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-agn-list/-agn-list.html
+$dokka.location:com.example.oracleapi.entity.table/AgnList/AgnList/#kotlin.Long#kotlin.Long#kotlin.String#kotlin.String#kotlin.String?#kotlin.String?#kotlin.Long#com.example.oracleapi.entity.table.Field?#kotlin.String?#kotlin.String?#kotlin.String?#kotlin.String?#kotlin.String?#kotlin.String?#kotlin.String?#kotlin.String?#kotlin.String?#kotlin.String?#java.time.LocalDateTime?#kotlin.String?#kotlin.String?#kotlin.String?#kotlin.String?#kotlin.String?#kotlin.Long?#kotlin.Long?#kotlin.Long#kotlin.Long?#kotlin.Long?#kotlin.Double?#kotlin.String?#kotlin.String?#java.time.LocalDateTime?#kotlin.String?#kotlin.Long#kotlin.Long#kotlin.Long?#java.time.LocalDateTime?#java.time.LocalDateTime?#kotlin.Long#kotlin.Long?#kotlin.Long?#kotlin.Long?#java.time.LocalDateTime?#kotlin.Long?#kotlin.Long?#kotlin.Long?#com.example.oracleapi.entity.table.Agnphonenumberlist?#java.time.LocalDateTime?#kotlin.Long?#kotlin.Double?#kotlin.Double?/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-agn-list/-agn-list.html
 $dokka.location:com.example.oracleapi.entity.table/AgnList/addrFactpost/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-agn-list/addr-factpost.html
 $dokka.location:com.example.oracleapi.entity.table/AgnList/addrUrpost/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-agn-list/addr-urpost.html
 $dokka.location:com.example.oracleapi.entity.table/AgnList/agnContacts/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-agn-list/agn-contacts.html
@@ -2160,6 +2167,7 @@ $dokka.location:com.example.oracleapi.entity.table/AgnList/agngroup/#/PointingTo
 $dokka.location:com.example.oracleapi.entity.table/AgnList/agnidnumb/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-agn-list/agnidnumb.html
 $dokka.location:com.example.oracleapi.entity.table/AgnList/agnname/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-agn-list/agnname.html
 $dokka.location:com.example.oracleapi.entity.table/AgnList/agntype/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-agn-list/agntype.html
+$dokka.location:com.example.oracleapi.entity.table/AgnList/agntypeEntity/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-agn-list/agntype-entity.html
 $dokka.location:com.example.oracleapi.entity.table/AgnList/authRequire/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-agn-list/auth-require.html
 $dokka.location:com.example.oracleapi.entity.table/AgnList/bankaccbik/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-agn-list/bankaccbik.html
 $dokka.location:com.example.oracleapi.entity.table/AgnList/bankacckor/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-agn-list/bankacckor.html
@@ -2195,6 +2203,7 @@ $dokka.location:com.example.oracleapi.entity.table/AgnList/passportWhen/#/Pointi
 $dokka.location:com.example.oracleapi.entity.table/AgnList/passportWho/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-agn-list/passport-who.html
 $dokka.location:com.example.oracleapi.entity.table/AgnList/phone/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-agn-list/phone.html
 $dokka.location:com.example.oracleapi.entity.table/AgnList/phonenumberrn/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-agn-list/phonenumberrn.html
+$dokka.location:com.example.oracleapi.entity.table/AgnList/phonenumberrnEntity/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-agn-list/phonenumberrn-entity.html
 $dokka.location:com.example.oracleapi.entity.table/AgnList/realization/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-agn-list/realization.html
 $dokka.location:com.example.oracleapi.entity.table/AgnList/reasonCode/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-agn-list/reason-code.html
 $dokka.location:com.example.oracleapi.entity.table/AgnList/receiver/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-agn-list/receiver.html
@@ -2352,6 +2361,10 @@ $dokka.location:com.example.oracleapi.entity.table/Division/istypedoc/#/Pointing
 $dokka.location:com.example.oracleapi.entity.table/Division/note/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-division/note.html
 $dokka.location:com.example.oracleapi.entity.table/Division/rn/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-division/rn.html
 $dokka.location:com.example.oracleapi.entity.table/Field.Companion///PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-field/-companion/index.html
+$dokka.location:com.example.oracleapi.entity.table/Field.Companion/AGNTYPE/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-field/-companion/-a-g-n-t-y-p-e.html
+$dokka.location:com.example.oracleapi.entity.table/Field.Companion/FIELD_NAME/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-field/-companion/-f-i-e-l-d_-n-a-m-e.html
+$dokka.location:com.example.oracleapi.entity.table/Field.Companion/FIELD_VALUE/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-field/-companion/-f-i-e-l-d_-v-a-l-u-e.html
+$dokka.location:com.example.oracleapi.entity.table/Field.Companion/ID_STATUS/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-field/-companion/-i-d_-s-t-a-t-u-s.html
 $dokka.location:com.example.oracleapi.entity.table/Field.Companion/ORDER_STATUS/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-field/-companion/-o-r-d-e-r_-s-t-a-t-u-s.html
 $dokka.location:com.example.oracleapi.entity.table/Field.Companion/PRCDOC_STATUS/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-field/-companion/-p-r-c-d-o-c_-s-t-a-t-u-s.html
 $dokka.location:com.example.oracleapi.entity.table/Field///PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-field/index.html
@@ -2424,6 +2437,7 @@ $dokka.location:com.example.oracleapi.entity.table/Idhead/storeInEntity/#/Pointi
 $dokka.location:com.example.oracleapi.entity.table/Idhead/storeOutEntity/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-idhead/store-out-entity.html
 $dokka.location:com.example.oracleapi.entity.table/Idhead/storein/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-idhead/storein.html
 $dokka.location:com.example.oracleapi.entity.table/Idhead/storeoper/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-idhead/storeoper.html
+$dokka.location:com.example.oracleapi.entity.table/Idhead/storeoperEntity/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-idhead/storeoper-entity.html
 $dokka.location:com.example.oracleapi.entity.table/Idhead/storeout/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-idhead/storeout.html
 $dokka.location:com.example.oracleapi.entity.table/Idhead/sumprice/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-idhead/sumprice.html
 $dokka.location:com.example.oracleapi.entity.table/Idhead/sumvolume/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-idhead/sumvolume.html
@@ -2717,6 +2731,22 @@ $dokka.location:com.example.oracleapi.entity.table/Nomnlist/typepriceEntity/#/Po
 $dokka.location:com.example.oracleapi.entity.table/Nomnlist/weight/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-nomnlist/weight.html
 $dokka.location:com.example.oracleapi.entity.table/Nomnlist/whsconst/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-nomnlist/whsconst.html
 $dokka.location:com.example.oracleapi.entity.table/Nomnlist/width/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-nomnlist/width.html
+$dokka.location:com.example.oracleapi.entity.table/Nomnlistdata///PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-nomnlistdata/index.html
+$dokka.location:com.example.oracleapi.entity.table/Nomnlistdata/Nomnlistdata/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-nomnlistdata/-nomnlistdata.html
+$dokka.location:com.example.oracleapi.entity.table/Nomnlistdata/created/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-nomnlistdata/created.html
+$dokka.location:com.example.oracleapi.entity.table/Nomnlistdata/deleted/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-nomnlistdata/deleted.html
+$dokka.location:com.example.oracleapi.entity.table/Nomnlistdata/deluser/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-nomnlistdata/deluser.html
+$dokka.location:com.example.oracleapi.entity.table/Nomnlistdata/fileSize/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-nomnlistdata/file-size.html
+$dokka.location:com.example.oracleapi.entity.table/Nomnlistdata/height/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-nomnlistdata/height.html
+$dokka.location:com.example.oracleapi.entity.table/Nomnlistdata/imageData/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-nomnlistdata/image-data.html
+$dokka.location:com.example.oracleapi.entity.table/Nomnlistdata/manager/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-nomnlistdata/manager.html
+$dokka.location:com.example.oracleapi.entity.table/Nomnlistdata/md5/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-nomnlistdata/md5.html
+$dokka.location:com.example.oracleapi.entity.table/Nomnlistdata/minidata/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-nomnlistdata/minidata.html
+$dokka.location:com.example.oracleapi.entity.table/Nomnlistdata/needdownload/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-nomnlistdata/needdownload.html
+$dokka.location:com.example.oracleapi.entity.table/Nomnlistdata/nomen/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-nomnlistdata/nomen.html
+$dokka.location:com.example.oracleapi.entity.table/Nomnlistdata/photonum/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-nomnlistdata/photonum.html
+$dokka.location:com.example.oracleapi.entity.table/Nomnlistdata/rn/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-nomnlistdata/rn.html
+$dokka.location:com.example.oracleapi.entity.table/Nomnlistdata/width/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-nomnlistdata/width.html
 $dokka.location:com.example.oracleapi.entity.table/Nomnlistp///PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-nomnlistp/index.html
 $dokka.location:com.example.oracleapi.entity.table/Nomnlistp/Nomnlistp/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-nomnlistp/-nomnlistp.html
 $dokka.location:com.example.oracleapi.entity.table/Nomnlistp/master/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-nomnlistp/master.html
@@ -3133,7 +3163,6 @@ $dokka.location:com.example.oracleapi.entity.table/Storeoper/Storeoper/#/Pointin
 $dokka.location:com.example.oracleapi.entity.table/Storeoper/accounting/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-storeoper/accounting.html
 $dokka.location:com.example.oracleapi.entity.table/Storeoper/connecteddoc/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-storeoper/connecteddoc.html
 $dokka.location:com.example.oracleapi.entity.table/Storeoper/excludenomentype/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-storeoper/excludenomentype.html
-$dokka.location:com.example.oracleapi.entity.table/Storeoper/id/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-storeoper/id.html
 $dokka.location:com.example.oracleapi.entity.table/Storeoper/isidhead/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-storeoper/isidhead.html
 $dokka.location:com.example.oracleapi.entity.table/Storeoper/isparthead/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-storeoper/isparthead.html
 $dokka.location:com.example.oracleapi.entity.table/Storeoper/isprovider/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-storeoper/isprovider.html
@@ -3149,6 +3178,7 @@ $dokka.location:com.example.oracleapi.entity.table/Storeoper/operreturn/#/Pointi
 $dokka.location:com.example.oracleapi.entity.table/Storeoper/opertosale/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-storeoper/opertosale.html
 $dokka.location:com.example.oracleapi.entity.table/Storeoper/orderindex/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-storeoper/orderindex.html
 $dokka.location:com.example.oracleapi.entity.table/Storeoper/reflect/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-storeoper/reflect.html
+$dokka.location:com.example.oracleapi.entity.table/Storeoper/rn/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-storeoper/rn.html
 $dokka.location:com.example.oracleapi.entity.table/Storeoper/storeoperin/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-storeoper/storeoperin.html
 $dokka.location:com.example.oracleapi.entity.table/Storeoper/storeoperincol/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-storeoper/storeoperincol.html
 $dokka.location:com.example.oracleapi.entity.table/Storeoper/storeoperout/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.table/-storeoper/storeoperout.html
@@ -3409,6 +3439,9 @@ $dokka.location:com.example.oracleapi.entity.view/VMarkFind/note/#/PointingToDec
 $dokka.location:com.example.oracleapi.entity.view/VMarkFind/rn/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.view/-v-mark-find/rn.html
 $dokka.location:com.example.oracleapi.entity.view/VMarkFind/stateMark/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.view/-v-mark-find/state-mark.html
 $dokka.location:com.example.oracleapi.entity.view/VMarkFind/status/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity.view/-v-mark-find/status.html
+$dokka.location:com.example.oracleapi.entity////PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity/index.html
+$dokka.location:com.example.oracleapi.entity/MarkProcedureEntity///PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity/-mark-procedure-entity/index.html
+$dokka.location:com.example.oracleapi.entity/MarkProcedureEntity/MarkProcedureEntity/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.entity/-mark-procedure-entity/-mark-procedure-entity.html
 $dokka.location:com.example.oracleapi.exception////PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.exception/index.html
 $dokka.location:com.example.oracleapi.exception/DocumentNotFoundException///PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.exception/-document-not-found-exception/index.html
 $dokka.location:com.example.oracleapi.exception/DocumentNotFoundException/DocumentNotFoundException/#kotlin.Long/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.exception/-document-not-found-exception/-document-not-found-exception.html
@@ -3444,7 +3477,7 @@ $dokka.location:com.example.oracleapi.handler/GlobalExceptionHandler/handleEntit
 $dokka.location:com.example.oracleapi.handler/GlobalExceptionHandler/handleGeneralException/#java.lang.Exception#jakarta.servlet.http.HttpServletRequest/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.handler/-global-exception-handler/handle-general-exception.html
 $dokka.location:com.example.oracleapi.handler/GlobalExceptionHandler/handleHttpMessageNotReadable/#org.springframework.http.converter.HttpMessageNotReadableException#jakarta.servlet.http.HttpServletRequest/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.handler/-global-exception-handler/handle-http-message-not-readable.html
 $dokka.location:com.example.oracleapi.handler/GlobalExceptionHandler/handleIllegalArgument/#java.lang.IllegalArgumentException#jakarta.servlet.http.HttpServletRequest/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.handler/-global-exception-handler/handle-illegal-argument.html
-$dokka.location:com.example.oracleapi.handler/GlobalExceptionHandler/handleInvalidToken/#com.example.oracleapi.handler.GlobalExceptionHandler.InvalidTokenException#jakarta.servlet.http.HttpServletRequest/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.handler/-global-exception-handler/handle-invalid-token.html
+$dokka.location:com.example.oracleapi.handler/GlobalExceptionHandler/handleInvalidToken/#com.example.oracleapi.exception.GlobalExceptionHandler.InvalidTokenException#jakarta.servlet.http.HttpServletRequest/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.handler/-global-exception-handler/handle-invalid-token.html
 $dokka.location:com.example.oracleapi.handler/GlobalExceptionHandler/handleMethodNotSupported/#org.springframework.web.HttpRequestMethodNotSupportedException#jakarta.servlet.http.HttpServletRequest/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.handler/-global-exception-handler/handle-method-not-supported.html
 $dokka.location:com.example.oracleapi.handler/GlobalExceptionHandler/handleMissingParam/#org.springframework.web.bind.MissingServletRequestParameterException#jakarta.servlet.http.HttpServletRequest/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.handler/-global-exception-handler/handle-missing-param.html
 $dokka.location:com.example.oracleapi.handler/GlobalExceptionHandler/handleNoHandlerFound/#org.springframework.web.servlet.NoHandlerFoundException#jakarta.servlet.http.HttpServletRequest/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.handler/-global-exception-handler/handle-no-handler-found.html
@@ -3629,6 +3662,8 @@ $dokka.location:com.example.oracleapi.repository.store/StoreRepository/findBySto
 $dokka.location:com.example.oracleapi.repository.store/StoreRepository/findByStorenameContainingIgnoreCaseOrStorecodeContainingIgnoreCase/#kotlin.String#kotlin.String#org.springframework.data.domain.Pageable/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.repository.store/-store-repository/find-by-storename-containing-ignore-case-or-storecode-containing-ignore-case.html
 $dokka.location:com.example.oracleapi.repository.store/StoreRepository/findByStorepbe/#kotlin.Long/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.repository.store/-store-repository/find-by-storepbe.html
 $dokka.location:com.example.oracleapi.repository.store/StoreRepository/findByStorepbeAndNote/#kotlin.Long#kotlin.String/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.repository.store/-store-repository/find-by-storepbe-and-note.html
+$dokka.location:com.example.oracleapi.repository.storeOper////PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.repository.storeOper/index.html
+$dokka.location:com.example.oracleapi.repository.storeOper/StoreoperRepository///PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.repository.storeOper/-storeoper-repository/index.html
 $dokka.location:com.example.oracleapi.repository.tohead////PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.repository.tohead/index.html
 $dokka.location:com.example.oracleapi.repository.tohead/ToheadRepository///PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.repository.tohead/-tohead-repository/index.html
 $dokka.location:com.example.oracleapi.repository.tohead/ToheadRepository/findAll/#org.springframework.data.domain.Pageable/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.repository.tohead/-tohead-repository/find-all.html
@@ -3695,6 +3730,9 @@ $dokka.location:com.example.oracleapi.service.agnList/AgnListDel/count/#/Pointin
 $dokka.location:com.example.oracleapi.service.agnList/AgnListDel/method/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.agnList/-agn-list-del/method.html
 $dokka.location:com.example.oracleapi.service.agnList/AgnListDel/pkg/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.agnList/-agn-list-del/pkg.html
 $dokka.location:com.example.oracleapi.service.agnList/AgnListDel/take/#kotlin.Long/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.agnList/-agn-list-del/take.html
+$dokka.location:com.example.oracleapi.service.agnList/AgnListInfo///PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.agnList/-agn-list-info/index.html
+$dokka.location:com.example.oracleapi.service.agnList/AgnListInfo/AgnListInfo/#com.example.oracleapi.repository.agnlist.AgnListRepository#com.example.oracleapi.repository.agnphonenumberlist.AgnphonenumberlistRepository/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.agnList/-agn-list-info/-agn-list-info.html
+$dokka.location:com.example.oracleapi.service.agnList/AgnListInfo/getByRnInfo/#kotlin.Long/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.agnList/-agn-list-info/get-by-rn-info.html
 $dokka.location:com.example.oracleapi.service.agnList/AgnListIns///PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.agnList/-agn-list-ins/index.html
 $dokka.location:com.example.oracleapi.service.agnList/AgnListIns/AgnListIns/#com.fasterxml.jackson.databind.ObjectMapper#javax.sql.DataSource/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.agnList/-agn-list-ins/-agn-list-ins.html
 $dokka.location:com.example.oracleapi.service.agnList/AgnListIns/count/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.agnList/-agn-list-ins/count.html
@@ -3702,11 +3740,12 @@ $dokka.location:com.example.oracleapi.service.agnList/AgnListIns/method/#/Pointi
 $dokka.location:com.example.oracleapi.service.agnList/AgnListIns/pkg/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.agnList/-agn-list-ins/pkg.html
 $dokka.location:com.example.oracleapi.service.agnList/AgnListIns/take/#com.example.oracleapi.dto.agnlist.AgnListInsRequest/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.agnList/-agn-list-ins/take.html
 $dokka.location:com.example.oracleapi.service.agnList/AgnListService///PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.agnList/-agn-list-service/index.html
-$dokka.location:com.example.oracleapi.service.agnList/AgnListService/AgnListService/#com.example.oracleapi.service.agnList.AgnListIns#com.example.oracleapi.repository.agnlist.AgnListRepository#com.example.oracleapi.service.agnList.AgnListUpd#com.example.oracleapi.service.agnList.AgnListDel/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.agnList/-agn-list-service/-agn-list-service.html
+$dokka.location:com.example.oracleapi.service.agnList/AgnListService/AgnListService/#com.example.oracleapi.service.agnList.AgnListIns#com.example.oracleapi.repository.agnlist.AgnListRepository#com.example.oracleapi.service.agnList.AgnListUpd#com.example.oracleapi.service.agnList.AgnListDel#com.example.oracleapi.service.agnList.AgnListInfo#com.example.oracleapi.repository.agnphonenumberlist.AgnphonenumberlistRepository/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.agnList/-agn-list-service/-agn-list-service.html
 $dokka.location:com.example.oracleapi.service.agnList/AgnListService/del/#kotlin.Long/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.agnList/-agn-list-service/del.html
 $dokka.location:com.example.oracleapi.service.agnList/AgnListService/existsById/#kotlin.Long/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.agnList/-agn-list-service/exists-by-id.html
 $dokka.location:com.example.oracleapi.service.agnList/AgnListService/getByRn/#kotlin.Long/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.agnList/-agn-list-service/get-by-rn.html
 $dokka.location:com.example.oracleapi.service.agnList/AgnListService/getByRnForUpdate/#kotlin.Long/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.agnList/-agn-list-service/get-by-rn-for-update.html
+$dokka.location:com.example.oracleapi.service.agnList/AgnListService/getByRnInfo/#kotlin.Long/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.agnList/-agn-list-service/get-by-rn-info.html
 $dokka.location:com.example.oracleapi.service.agnList/AgnListService/ins/#com.example.oracleapi.dto.agnlist.AgnListInsRequest/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.agnList/-agn-list-service/ins.html
 $dokka.location:com.example.oracleapi.service.agnList/AgnListService/isOurOrg/#kotlin.Long/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.agnList/-agn-list-service/is-our-org.html
 $dokka.location:com.example.oracleapi.service.agnList/AgnListService/und/#com.example.oracleapi.dto.agn.AgnListUpdRequest/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.agnList/-agn-list-service/und.html
@@ -3847,7 +3886,7 @@ $dokka.location:com.example.oracleapi.service.idhead/IdHeadService/delete/#com.e
 $dokka.location:com.example.oracleapi.service.idhead/IdHeadService/deleteFun/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.idhead/-id-head-service/delete-fun.html
 $dokka.location:com.example.oracleapi.service.idhead/IdHeadService/fieldService/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.idhead/-id-head-service/field-service.html
 $dokka.location:com.example.oracleapi.service.idhead/IdHeadService/getAllWithPagination/#org.springframework.data.domain.Pageable/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.idhead/-id-head-service/get-all-with-pagination.html
-$dokka.location:com.example.oracleapi.service.idhead/IdHeadService/getByFiltersWithPagination/#kotlin.String?#kotlin.Long?#java.math.BigDecimal?#kotlin.Long?#kotlin.Long?#java.time.LocalDate?#java.time.LocalDate?#org.springframework.data.domain.Pageable/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.idhead/-id-head-service/get-by-filters-with-pagination.html
+$dokka.location:com.example.oracleapi.service.idhead/IdHeadService/getByFiltersWithPagination/#kotlin.String?#kotlin.Long?#kotlin.Long?#java.math.BigDecimal?#kotlin.Long?#kotlin.Long?#java.time.LocalDate?#java.time.LocalDate?#org.springframework.data.domain.Pageable/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.idhead/-id-head-service/get-by-filters-with-pagination.html
 $dokka.location:com.example.oracleapi.service.idhead/IdHeadService/getByStatus/#kotlin.Long/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.idhead/-id-head-service/get-by-status.html
 $dokka.location:com.example.oracleapi.service.idhead/IdHeadService/getByStatusWithPagination/#kotlin.Long#org.springframework.data.domain.Pageable/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.idhead/-id-head-service/get-by-status-with-pagination.html
 $dokka.location:com.example.oracleapi.service.idhead/IdHeadService/getCount/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.idhead/-id-head-service/get-count.html
@@ -4333,6 +4372,13 @@ $dokka.location:com.example.oracleapi.service.stock/StockService/findStocksByNom
 $dokka.location:com.example.oracleapi.service.stock/StockService/findStocksByNomenQuantNotNull/#java.math.BigDecimal/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.stock/-stock-service/find-stocks-by-nomen-quant-not-null.html
 $dokka.location:com.example.oracleapi.service.stock/StockService/getFullStockMessageByBarcode/#kotlin.String/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.stock/-stock-service/get-full-stock-message-by-barcode.html
 $dokka.location:com.example.oracleapi.service.stock/StockService/getStockByNomenInfo/#java.math.BigDecimal/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.stock/-stock-service/get-stock-by-nomen-info.html
+$dokka.location:com.example.oracleapi.service.storeoper////PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.storeoper/index.html
+$dokka.location:com.example.oracleapi.service.storeoper/StoreOperGet///PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.storeoper/-store-oper-get/index.html
+$dokka.location:com.example.oracleapi.service.storeoper/StoreOperGet/StoreOperGet/#com.example.oracleapi.repository.storeOper.StoreoperRepository/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.storeoper/-store-oper-get/-store-oper-get.html
+$dokka.location:com.example.oracleapi.service.storeoper/StoreOperGet/getAll/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.storeoper/-store-oper-get/get-all.html
+$dokka.location:com.example.oracleapi.service.storeoper/StoreOperService///PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.storeoper/-store-oper-service/index.html
+$dokka.location:com.example.oracleapi.service.storeoper/StoreOperService/StoreOperService/#com.example.oracleapi.service.storeoper.StoreOperGet/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.storeoper/-store-oper-service/-store-oper-service.html
+$dokka.location:com.example.oracleapi.service.storeoper/StoreOperService/allRecords/#/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.storeoper/-store-oper-service/all-records.html
 $dokka.location:com.example.oracleapi.service.tohead////PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.tohead/index.html
 $dokka.location:com.example.oracleapi.service.tohead/ToHeaAndSpec///PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.tohead/-to-hea-and-spec/index.html
 $dokka.location:com.example.oracleapi.service.tohead/ToHeaAndSpec/ToHeaAndSpec/#com.example.oracleapi.repository.tohead.ToheadRepository#com.example.oracleapi.repository.tospec.TospecRepository/PointingToDeclaration/-oracle-a-p-i/com.example.oracleapi.service.tohead/-to-hea-and-spec/-to-hea-and-spec.html
@@ -4588,6 +4634,7 @@ com.example.oracleapi.dto.sendmail
 com.example.oracleapi.dto.sms
 com.example.oracleapi.dto.stock
 com.example.oracleapi.dto.store
+com.example.oracleapi.dto.storeoper
 com.example.oracleapi.dto.tohead
 com.example.oracleapi.dto.tospec
 com.example.oracleapi.dto.tsdlist
@@ -4598,8 +4645,7 @@ com.example.oracleapi.dto.userpart
 com.example.oracleapi.dto.vMark
 com.example.oracleapi.dto.wakeUp
 com.example.oracleapi.dto.website
-com.example.oracleapi.entity.mark
-com.example.oracleapi.entity.nomnlistdata
+com.example.oracleapi.entity
 com.example.oracleapi.entity.table
 com.example.oracleapi.entity.view
 com.example.oracleapi.exception
@@ -4632,6 +4678,7 @@ com.example.oracleapi.repository.prefix
 com.example.oracleapi.repository.price
 com.example.oracleapi.repository.stock
 com.example.oracleapi.repository.store
+com.example.oracleapi.repository.storeOper
 com.example.oracleapi.repository.tohead
 com.example.oracleapi.repository.tospec
 com.example.oracleapi.repository.tsd
@@ -4680,6 +4727,7 @@ com.example.oracleapi.service.public
 com.example.oracleapi.service.sendmail
 com.example.oracleapi.service.sms
 com.example.oracleapi.service.stock
+com.example.oracleapi.service.storeoper
 com.example.oracleapi.service.tohead
 com.example.oracleapi.service.tsdlist
 com.example.oracleapi.service.typePrice

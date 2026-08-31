@@ -2,8 +2,8 @@ package com.example.oracleapi.controller
 
 import com.example.oracleapi.dto.common.MyApiResponse
 import com.example.oracleapi.dto.glossary.ExportMarkdownResponse
-import com.example.oracleapi.dto.glossary.GlossaryHistory
-import com.example.oracleapi.dto.glossary.GlossaryTerm
+import com.example.oracleapi.dto.glossary.GlossaryHistoryResponse
+import com.example.oracleapi.dto.glossary.GlossaryTermResponse
 import com.example.oracleapi.dto.glossary.SaveGlossaryRequest
 import com.example.oracleapi.service.glossary.GlossaryService
 import io.swagger.v3.oas.annotations.Operation
@@ -27,13 +27,13 @@ class GlossaryController(
     fun getAllTerms(
         @RequestParam(required = false) category: String?,
         @RequestParam(required = false) search: String?
-    ): MyApiResponse<List<GlossaryTerm>> {
+    ): MyApiResponse<List<GlossaryTermResponse>> {
         return successList(glossaryService.getAllTerms(category, search))
     }
 
     @GetMapping("/term/{rn}")
     @Operation(summary = "Получить термин по RN")
-    fun getTerm(@PathVariable rn: Long): MyApiResponse<GlossaryTerm> {
+    fun getTerm(@PathVariable rn: Long): MyApiResponse<GlossaryTermResponse> {
         return success(glossaryService.getTerm(rn))
     }
 
@@ -45,13 +45,13 @@ class GlossaryController(
 
     @GetMapping("/history/{rn}")
     @Operation(summary = "Получить историю изменений термина")
-    fun getHistory(@PathVariable rn: Long): MyApiResponse<List<GlossaryHistory>> {
+    fun getHistory(@PathVariable rn: Long): MyApiResponse<List<GlossaryHistoryResponse>> {
         return successList(glossaryService.getHistory(rn))
     }
 
     @GetMapping("/search")
     @Operation(summary = "Поиск терминов")
-    fun searchTerms(@RequestParam query: String): MyApiResponse<List<GlossaryTerm>> {
+    fun searchTerms(@RequestParam query: String): MyApiResponse<List<GlossaryTermResponse>> {
         return successList(glossaryService.searchTerms(query))
     }
 
@@ -77,7 +77,7 @@ class GlossaryController(
 
     @PostMapping("/term")
     @Operation(summary = "Создать новый термин")
-    fun createTerm(@RequestBody request: SaveGlossaryRequest): MyApiResponse<GlossaryTerm> {
+    fun createTerm(@RequestBody request: SaveGlossaryRequest): MyApiResponse<GlossaryTermResponse> {
         return try {
             success(glossaryService.createTerm(request), "Термин создан")
         } catch (e: Exception) {
@@ -128,7 +128,7 @@ class GlossaryController(
     fun updateTerm(
         @PathVariable rn: Long,
         @RequestBody request: SaveGlossaryRequest
-    ): MyApiResponse<GlossaryTerm> {
+    ): MyApiResponse<GlossaryTermResponse> {
         return try {
             success(glossaryService.updateTerm(rn, request), "Термин обновлён")
         } catch (e: Exception) {
@@ -164,13 +164,13 @@ class GlossaryController(
 
     @GetMapping("/terms/deleted")
     @Operation(summary = "Получить список удалённых терминов")
-    fun getDeletedTerms(): MyApiResponse<List<GlossaryTerm>> {
+    fun getDeletedTerms(): MyApiResponse<List<GlossaryTermResponse>> {
         return successList(glossaryService.getDeletedTerms())
     }
 
     @PutMapping("/term/{rn}/restore")
     @Operation(summary = "Восстановить удалённый термин")
-    fun restoreTerm(@PathVariable rn: Long): MyApiResponse<GlossaryTerm> {
+    fun restoreTerm(@PathVariable rn: Long): MyApiResponse<GlossaryTermResponse> {
         return try {
             val term = glossaryService.restoreTerm(rn)
             success(term, "Термин восстановлен")

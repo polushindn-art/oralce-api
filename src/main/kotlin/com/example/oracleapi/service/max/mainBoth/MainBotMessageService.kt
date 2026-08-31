@@ -2,11 +2,11 @@ package com.example.oracleapi.service.max.mainBoth
 
 import com.example.oracleapi.dto.max.MessageResponse
 import org.slf4j.LoggerFactory
-import org.springframework.stereotype.Service
+import org.springframework.stereotype.Component
 
-@Service
+@Component
 class MainBotMessageService(
-    private val botClient: MaxBotMainClientService
+    private val botClient: MaxBotMainClient
 ) {
 
     private val log = LoggerFactory.getLogger(this::class.java)

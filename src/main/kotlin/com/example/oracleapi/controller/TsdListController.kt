@@ -1,15 +1,14 @@
 package com.example.oracleapi.controller
 
 import com.example.oracleapi.dto.common.MyApiResponse
-import com.example.oracleapi.dto.tsdlist.Registeredjson
+import com.example.oracleapi.dto.tsdlist.RegisteredjsonResponse
 import com.example.oracleapi.dto.tsdlist.TsdIdResponse
 import com.example.oracleapi.dto.tsdlist.TsdUpsertRequest
 import com.example.oracleapi.dto.tsdlist.TsdUpsertResponse
-import com.example.oracleapi.dto.tsdlist.UsedJson
+import com.example.oracleapi.dto.tsdlist.UsedJsonResponse
 import com.example.oracleapi.service.tsdlist.TsdListService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
-import jakarta.servlet.http.HttpServletRequest
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
@@ -27,7 +26,7 @@ class TsdListController(
     )
     fun registeredjson(
         @RequestParam(required = false) sn: String?
-    ): MyApiResponse<List<Registeredjson>> {
+    ): MyApiResponse<List<RegisteredjsonResponse>> {
         return successList(tsdListService.getRegisteredSessions(sn))
     }
 
@@ -38,7 +37,7 @@ class TsdListController(
     )
     fun usedTsd(
         @RequestParam(required = false) pbe: Long?
-    ): MyApiResponse<List<UsedJson>> {
+    ): MyApiResponse<List<UsedJsonResponse>> {
         return successList(tsdListService.getUsedTsd(pbe))
     }
 

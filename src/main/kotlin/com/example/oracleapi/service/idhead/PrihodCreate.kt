@@ -9,7 +9,6 @@ import jakarta.persistence.EntityManager
 import jakarta.persistence.ParameterMode
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
-import org.springframework.transaction.annotation.Transactional
 
 @Component
 class PrihodCreate(
@@ -20,7 +19,6 @@ class PrihodCreate(
     private val agnlistRepository: AgnListRepository
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
-    @Transactional
     fun createPrihodByJson(request: PrihodRequest): Long {
         // Преобразуем запрос в JSON строку
         val jsonString = objectMapper.writeValueAsString(request)

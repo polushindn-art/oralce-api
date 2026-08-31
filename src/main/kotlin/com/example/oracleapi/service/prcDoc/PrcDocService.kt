@@ -1,6 +1,6 @@
 package com.example.oracleapi.service.prcDoc
 
-import com.example.oracleapi.dto.ResponseRN
+import com.example.oracleapi.dto.RnResponse
 import com.example.oracleapi.dto.prcDoc.head.PrcDocHeadDelRequest
 import com.example.oracleapi.dto.prcDoc.head.PrcDocStatusRequest
 import com.example.oracleapi.dto.prcDoc.head.PrcDocStatusResponse
@@ -36,7 +36,7 @@ class PrcDocService(
     }
 
     @Transactional
-    fun prcSpecIns(request: PrcdocspecInsRequest): ResponseRN {
+    fun prcSpecIns(request: PrcdocspecInsRequest): RnResponse {
 
         val fieldsNomncatToCheck = listOf(
             request.nomncatCS to "CS",
@@ -79,11 +79,11 @@ class PrcDocService(
         return prcDocStatusUpdate.take(request)
     }
 
-    fun delHead(request: PrcDocHeadDelRequest): ResponseRN {
+    fun delHead(request: PrcDocHeadDelRequest): RnResponse {
         return prcDocHeadDel.take(request)
     }
 
-    fun delSpec(request: PrcDocSpecDelRequest): ResponseRN {
+    fun delSpec(request: PrcDocSpecDelRequest): RnResponse {
         return prcDocSpecDel.take(request)
     }
 

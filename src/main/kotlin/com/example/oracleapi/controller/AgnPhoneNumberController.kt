@@ -2,7 +2,7 @@ package com.example.oracleapi.controller
 
 import com.example.oracleapi.dto.agnphonenumberlist.AgnphonenumberlistDto
 import com.example.oracleapi.dto.agnphonenumberlist.PhoneCardDto
-import com.example.oracleapi.dto.agnphonenumberlist.PhoneListAgn
+import com.example.oracleapi.dto.agnphonenumberlist.PhoneListAgnDto
 import com.example.oracleapi.dto.common.MyApiResponse
 import com.example.oracleapi.service.agnphonenumber.AgnPhoneService
 import io.swagger.v3.oas.annotations.Operation
@@ -55,7 +55,7 @@ class AgnPhoneNumberController(
         description = "Возвращает номера контрагенат",
         summary = "Номера контрагента"
     )
-    fun findPhoneByRn(@Valid rn: Long): MyApiResponse<List<PhoneListAgn>> {
+    fun findPhoneByRn(@Valid rn: Long): MyApiResponse<List<PhoneListAgnDto>> {
         return successList(agnPhoneService.searchPhoneByAgn(rn))
     }
 

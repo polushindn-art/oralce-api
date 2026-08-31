@@ -1,6 +1,6 @@
 package com.example.oracleapi.controller
 
-import com.example.oracleapi.dto.ResponseRN
+import com.example.oracleapi.dto.RnResponse
 import com.example.oracleapi.dto.agn.AgnListForUpdResponse
 import com.example.oracleapi.dto.agn.AgnListInfoResponse
 import com.example.oracleapi.dto.agn.AgnListInsResponse
@@ -79,14 +79,14 @@ class AgnListController(
      * Удаляет запись контрагента из таблицы `AgnList` по регистрационному номеру (`RN`).
      *
      * @param rn Уникальный регистрационный номер удаляемого контрагента.
-     * @return [MyApiResponse] с информацией об удаленном `RN` ([ResponseRN]).
+     * @return [MyApiResponse] с информацией об удаленном `RN` ([RnResponse]).
      */
     @DeleteMapping("/del")
     @Operation(
         description = "Удаляет запись из таблицы AgnList",
         summary = "Удалить запись"
     )
-    fun delete(@Valid rn: Long): MyApiResponse<ResponseRN> {
+    fun delete(@Valid rn: Long): MyApiResponse<RnResponse> {
         return success(agnListService.del(rn))
     }
 

@@ -1,10 +1,9 @@
 package com.example.oracleapi.controller
 
-import com.example.oracleapi.dto.RequestRN
+import com.example.oracleapi.dto.RnRequest
 import com.example.oracleapi.dto.common.MyApiResponse
 import com.example.oracleapi.dto.contract.ContractDto
 import com.example.oracleapi.service.contract.ContractService
-import com.example.oracleapi.service.idhead.UpdateStatus
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
@@ -25,7 +24,7 @@ class ContractController(private val contractService: ContractService) : BaseCon
 
     @PostMapping("/get_contract_agnlist")
     @Operation(summary = "Получить договора для поставщика")
-    fun getContract(@Valid @RequestBody request: RequestRN): MyApiResponse<List<ContractDto>> {
+    fun getContract(@Valid @RequestBody request: RnRequest): MyApiResponse<List<ContractDto>> {
         return success(contractService.getContract(request))
     }
 

@@ -1,7 +1,7 @@
 package com.example.oracleapi.service.agnList
 
 import com.example.oracleapi.dto.agn.AgnListInfoResponse
-import com.example.oracleapi.dto.agnphonenumberlist.PhoneListAgn
+import com.example.oracleapi.dto.agnphonenumberlist.PhoneListAgnDto
 import com.example.oracleapi.repository.agnlist.AgnListRepository
 import com.example.oracleapi.repository.agnphonenumberlist.AgnphonenumberlistRepository
 import org.springframework.stereotype.Component
@@ -16,7 +16,7 @@ class AgnListInfo(
         val phoneEntities = agnphonenumberlistRepository.findAllByPrnagn(rn)
 
         val phoneDtoList = phoneEntities.map { phone ->
-            PhoneListAgn(
+            PhoneListAgnDto(
                 phone.phonenumber,
                 phone.phoneTail,
                 phone.rn == phone.prnagnEntity?.phonenumberrn,

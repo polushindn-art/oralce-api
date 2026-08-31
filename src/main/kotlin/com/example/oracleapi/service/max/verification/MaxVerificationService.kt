@@ -5,7 +5,7 @@ import com.example.oracleapi.dto.max.DisabledPersonStatus
 import com.example.oracleapi.dto.max.LargeFamilyStatus
 import com.example.oracleapi.dto.max.StudentStatus
 import com.example.oracleapi.dto.max.common.MaxApiResponse
-import com.example.oracleapi.dto.max.common.MaxError
+import com.example.oracleapi.dto.max.common.MaxErrorDetails
 import com.example.oracleapi.service.max.common.MaxApiClientService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -53,7 +53,7 @@ class MaxVerificationService(
         }
     }
 
-    private fun extractMaxError(e: Exception): MaxError? {
+    private fun extractMaxError(e: Exception): MaxErrorDetails? {
         val message = e.message ?: return null
         val codePattern = "\"code\":\"([A-Z_]+)\"".toRegex()
         val matchResult = codePattern.find(message)
@@ -67,7 +67,7 @@ class MaxVerificationService(
         val detailsMatch = detailsPattern.find(message)
         val details = detailsMatch?.groupValues?.get(1)
 
-        return MaxError(
+        return MaxErrorDetails(
             code = code,
             message = errorMessage,
             details = details
@@ -120,7 +120,7 @@ class MaxVerificationService(
         )
     }
 
-    private fun handleErrorResponse(error: MaxError?): AgeVerificationResponse {
+    private fun handleErrorResponse(error: MaxErrorDetails?): AgeVerificationResponse {
         if (error == null) {
             return AgeVerificationResponse(
                 isAdult = false,

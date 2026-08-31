@@ -1,16 +1,16 @@
 package com.example.oracleapi.service.glossary
 
-import com.example.oracleapi.dto.glossary.GlossaryHistory
-import com.example.oracleapi.dto.glossary.GlossaryTerm
+import com.example.oracleapi.dto.glossary.GlossaryHistoryResponse
+import com.example.oracleapi.dto.glossary.GlossaryTermResponse
 import com.example.oracleapi.dto.glossary.SaveGlossaryRequest
 import com.example.oracleapi.entity.table.GlossaryHistoryEntity
 import com.example.oracleapi.entity.table.GlossaryTermEntity
 import com.example.oracleapi.repository.glossary.GlossaryHistoryRepository
 import com.example.oracleapi.repository.glossary.GlossaryTermRepository
 import com.example.oracleapi.service.public.PublicGenIdRnProcedur
-import jakarta.transaction.Transactional
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class GlossaryService(
@@ -21,8 +21,8 @@ class GlossaryService(
 ) {
 
     // ============ GET ============
-
-    fun getAllTerms(category: String?, search: String?): List<GlossaryTerm> {
+    @Transactional(readOnly = true)
+    fun getAllTerms(category: String?, search: String?): List<GlossaryTermResponse> {
         val entities = when {
             !search.isNullOrBlank() -> glossaryTermRepository.searchActive(search)
             !category.isNullOrBlank() -> glossaryTermRepository.findActiveByCategory(category)
@@ -31,21 +31,25 @@ class GlossaryService(
         return entities.map { it.toDto() }
     }
 
-    fun getTerm(rn: Long): GlossaryTerm {
+    @Transactional(readOnly = true)
+    fun getTerm(rn: Long): GlossaryTermResponse {
         val entity = glossaryTermRepository.findActiveByRn(rn)
             ?: throw Exception("Термин с RN '$rn' не найден")
         return entity.toDto()
     }
 
+    @Transactional(readOnly = true)
     fun getCategories(): List<String> {
         return glossaryTermRepository.findDistinctCategories()
     }
 
-    fun searchTerms(query: String): List<GlossaryTerm> {
+    @Transactional(readOnly = true)
+    fun searchTerms(query: String): List<GlossaryTermResponse> {
         return glossaryTermRepository.searchActive(query).map { it.toDto() }
     }
 
-    fun getHistory(termRn: Long): List<GlossaryHistory> {
+    @Transactional(readOnly = true)
+    fun getHistory(termRn: Long): List<GlossaryHistoryResponse> {
         return glossaryHistoryRepository.findByTermRnOrderByVersionDesc(termRn)
             .map { it.toDto() }
     }
@@ -53,7 +57,7 @@ class GlossaryService(
     // ============ CREATE ============
 
     @Transactional
-    fun createTerm(request: SaveGlossaryRequest): GlossaryTerm {
+    fun createTerm(request: SaveGlossaryRequest): GlossaryTermResponse {
         // 1. Генерация RN
         val genIdResponse = genIdRnProcedur.take()
         val newRn = genIdResponse.rn ?: throw Exception("Не удалось сгенерировать RN")
@@ -80,7 +84,7 @@ class GlossaryService(
     // ============ UPDATE ============
 
     @Transactional
-    fun updateTerm(rn: Long, request: SaveGlossaryRequest): GlossaryTerm {
+    fun updateTerm(rn: Long, request: SaveGlossaryRequest): GlossaryTermResponse {
         // 1. Поиск термина
         val entity = glossaryTermRepository.findActiveByRn(rn)
             ?: throw Exception("Термин с RN '$rn' не найден")
@@ -156,8 +160,8 @@ class GlossaryService(
 
     // ============ MAPPERS ============
 
-    private fun GlossaryTermEntity.toDto(): GlossaryTerm {
-        return GlossaryTerm(
+    private fun GlossaryTermEntity.toDto(): GlossaryTermResponse {
+        return GlossaryTermResponse(
             rn = this.rn ?: throw Exception("RN не может быть null"),
             term = this.term ?: throw Exception("Term не может быть null"),
             definition = this.definition ?: throw Exception("Definition не может быть null"),
@@ -169,8 +173,8 @@ class GlossaryService(
         )
     }
 
-    private fun GlossaryHistoryEntity.toDto(): GlossaryHistory {
-        return GlossaryHistory(
+    private fun GlossaryHistoryEntity.toDto(): GlossaryHistoryResponse {
+        return GlossaryHistoryResponse(
             rn = this.rn ?: throw Exception("RN не может быть null"),
             termRn = this.termRn ?: throw Exception("TermRn не может быть null"),
             term = this.term ?: "",
@@ -181,13 +185,14 @@ class GlossaryService(
         )
     }
 
-    fun getDeletedTerms(): List<GlossaryTerm> {
+    @Transactional(readOnly = true)
+    fun getDeletedTerms(): List<GlossaryTermResponse> {
         val entities = glossaryTermRepository.findAllDeleted()
         return entities.map { it.toDto() }
     }
 
     @Transactional
-    fun restoreTerm(rn: Long): GlossaryTerm {
+    fun restoreTerm(rn: Long): GlossaryTermResponse {
         val entity = glossaryTermRepository.findDeletedByRn(rn)
             ?: throw Exception("Удалённый термин с RN '$rn' не найден")
 

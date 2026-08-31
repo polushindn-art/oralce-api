@@ -11,18 +11,18 @@ data class MaxApiResponse(
     val status: String,
 
     @field:Schema(description = "Данные ответа (при успехе)")
-    val data: MaxData? = null,
+    val data: MaxDataSpec? = null,
 
     @field:Schema(description = "Ошибка (при ошибке)")
-    val error: MaxError? = null,
+    val error: MaxErrorDetails? = null,
 
     @field:Schema(description = "Метаданные запроса")
-    val metadata: MaxMetadata? = null
+    val metadata: MaxMetadataSpec? = null
 )
 
 @Schema(description = "Данные ответа MAX API")
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class MaxData(
+data class MaxDataSpec(
     @field:Schema(description = "ID сессии")
     @field:JsonProperty("session_id")
     val sessionId: String,
@@ -38,28 +38,28 @@ data class MaxData(
     // В ДОКУМЕНТАЦИИ ЕСТЬ, но в реальных ответах НЕТ → делаем опциональным!
     @field:Schema(description = "Метаданные (внутри data)")
     @field:JsonProperty("metadata")
-    val metadata: MaxMetadata? = null
+    val metadata: MaxMetadataSpec? = null
 )
 
 @Schema(description = "Детали верификации")
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class VerificationDetails(
     @field:Schema(description = "Подтверждение возраста")
-    val adult: AdultStatus,
+    val adult: AdultStatusInfo,
 
     @field:Schema(description = "Статус студента (опционально)")
-    val student: StudentStatusFromMax? = null,
+    val student: StudentStatusFromMaxInfo? = null,
 
     @field:Schema(description = "Статус многодетной семьи (опционально)")
     @field:JsonProperty("certificateLargeFamily")
-    val certificateLargeFamily: LargeFamilyStatusFromMax? = null,
+    val certificateLargeFamily: LargeFamilyStatusFromMaxInfo? = null,
 
     @field:Schema(description = "Статус пенсионера (опционально)")
-    val pensioner: PensionerStatus? = null,
+    val pensioner: PensionerStatusInfo? = null,
 
     @field:Schema(description = "Статус инвалида (опционально)")
     @field:JsonProperty("disabledPerson")
-    val disabledPerson: DisabledPersonStatusFromMax? = null,
+    val disabledPerson: DisabledPersonStatusFromMaxInfo? = null,
 
     @field:Schema(description = "Сырые данные с подписью Минцифры (опционально)")
     @field:JsonProperty("raw_data")
@@ -67,14 +67,14 @@ data class VerificationDetails(
 )
 
 @Schema(description = "Статус возраста")
-data class AdultStatus(
+data class AdultStatusInfo(
     @field:Schema(description = "Подтвержден ли возраст 18+", example = "true")
     val status: Boolean
 )
 
 @Schema(description = "Статус студента от MAX")
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class StudentStatusFromMax(
+data class StudentStatusFromMaxInfo(
     @field:Schema(description = "Является ли студентом", example = "true")
     val status: Boolean,
 
@@ -89,7 +89,7 @@ data class StudentStatusFromMax(
 
 @Schema(description = "Статус многодетной семьи от MAX")
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class LargeFamilyStatusFromMax(
+data class LargeFamilyStatusFromMaxInfo(
     @field:Schema(description = "Есть ли статус многодетной семьи", example = "true")
     val status: Boolean,
 
@@ -99,14 +99,14 @@ data class LargeFamilyStatusFromMax(
 
 @Schema(description = "Статус пенсионера от MAX")
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class PensionerStatus(
+data class PensionerStatusInfo(
     @field:Schema(description = "Является ли пенсионером", example = "false")
     val status: Boolean
 )
 
 @Schema(description = "Статус инвалида от MAX")
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class DisabledPersonStatusFromMax(
+data class DisabledPersonStatusFromMaxInfo(
     @field:Schema(description = "Является ли инвалидом", example = "true")
     val status: Boolean,
 
@@ -117,7 +117,7 @@ data class DisabledPersonStatusFromMax(
 
 @Schema(description = "Ошибка от MAX API")
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class MaxError(
+data class MaxErrorDetails(
     @field:Schema(description = "Код ошибки", example = "SESSION_NOT_FOUND")
     val code: String,
 
@@ -130,7 +130,7 @@ data class MaxError(
 
 @Schema(description = "Метаданные запроса")
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class MaxMetadata(
+data class MaxMetadataSpec(
     @field:Schema(description = "ID запроса", example = "req_123456789")
     @field:JsonProperty("request_id")
     val requestId: String,

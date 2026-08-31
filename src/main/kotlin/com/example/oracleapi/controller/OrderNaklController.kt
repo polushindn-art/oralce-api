@@ -1,6 +1,6 @@
 package com.example.oracleapi.controller
 
-import com.example.oracleapi.dto.ResponseRN
+import com.example.oracleapi.dto.RnResponse
 import com.example.oracleapi.dto.common.MyApiResponse
 import com.example.oracleapi.dto.orderNakl.OrderNaklHeadDelRequest
 import com.example.oracleapi.dto.orderNakl.OrderNaklHeadRequest
@@ -25,7 +25,7 @@ class OrderNaklController(
 
     @PostMapping("/ins_head")
     @Operation(summary = "Создать заголовок документа")
-    fun insHead(@Valid @RequestBody request: OrderNaklHeadRequest): MyApiResponse<ResponseRN> {
+    fun insHead(@Valid @RequestBody request: OrderNaklHeadRequest): MyApiResponse<RnResponse> {
         return success(naklHeadService.insNaklHead(request))
     }
 
@@ -37,7 +37,7 @@ class OrderNaklController(
 
     @DeleteMapping("/del_head")
     @Operation(summary = "Удаление документа")
-    fun delHead(@Valid @RequestBody request: OrderNaklHeadDelRequest): MyApiResponse<ResponseRN> {
+    fun delHead(@Valid @RequestBody request: OrderNaklHeadDelRequest): MyApiResponse<RnResponse> {
         return success(naklHeadService.delHead(request))
     }
 

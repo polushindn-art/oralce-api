@@ -1,6 +1,6 @@
 package com.example.oracleapi.repository.tsd
-import com.example.oracleapi.dto.tsdlist.Registeredjson
-import com.example.oracleapi.dto.tsdlist.UsedJson
+import com.example.oracleapi.dto.tsdlist.RegisteredjsonResponse
+import com.example.oracleapi.dto.tsdlist.UsedJsonResponse
 import com.example.oracleapi.entity.table.TsdListHistory
 import com.example.oracleapi.entity.table.Tsdlist
 import org.springframework.data.jpa.repository.JpaRepository
@@ -16,7 +16,7 @@ interface TsdListHistoryRepository : JpaRepository<TsdListHistory, Long> {
      */
     @Query(
         """
-        SELECT new com.example.oracleapi.dto.tsdlist.Registeredjson(
+        SELECT new com.example.oracleapi.dto.tsdlist.RegisteredjsonResponse(
             t.sn,
             FUNCTION('TO_CHAR', th.timestart, 'YYYY-MM-DD HH24:MI:SS'),
             ul.usercode,
@@ -40,14 +40,14 @@ interface TsdListHistoryRepository : JpaRepository<TsdListHistory, Long> {
         ORDER BY th.timestart DESC
     """
     )
-    fun findRegisteredSessions(@Param("sn") sn: String?): List<Registeredjson>
+    fun findRegisteredSessions(@Param("sn") sn: String?): List<RegisteredjsonResponse>
 
     /**
      * Получить активных пользователей ТСД
      */
     @Query(
         """
-        SELECT new com.example.oracleapi.dto.tsdlist.UsedJson(
+        SELECT new com.example.oracleapi.dto.tsdlist.UsedJsonResponse(
             ul.usercode,
             a.agnname,
             t.sn,
@@ -64,7 +64,7 @@ interface TsdListHistoryRepository : JpaRepository<TsdListHistory, Long> {
         ORDER BY a.agnname
     """
     )
-    fun findActiveUsers(@Param("pbe") pbe: Long?): List<UsedJson>
+    fun findActiveUsers(@Param("pbe") pbe: Long?): List<UsedJsonResponse>
 
     /**
      * Найти активную сессию по SN (для авторизации терминала)

@@ -1,9 +1,10 @@
 package com.example.oracleapi.service.max
 
+import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
 import java.util.concurrent.ConcurrentHashMap
 
-@Service
+@Component
 class RegistrationCodeService {
 
     private val codeStorage = ConcurrentHashMap<String, CodeInfo>()

@@ -1,7 +1,7 @@
 package com.example.oracleapi.service.agnList
 
 import com.example.oracleapi.common.BasePackage
-import com.example.oracleapi.dto.ResponseRN
+import com.example.oracleapi.dto.RnResponse
 import org.springframework.stereotype.Component
 import javax.sql.DataSource
 
@@ -14,11 +14,11 @@ class AgnListDel(
     override val method = "del"
     override val count = 1
 
-    fun take(rn: Long): ResponseRN {
+    fun take(rn: Long): RnResponse {
         return dataSource.executePrc {
             it.setLong(1, rn)
             it.execute()
-            ResponseRN(
+            RnResponse(
                 rn
             )
         }

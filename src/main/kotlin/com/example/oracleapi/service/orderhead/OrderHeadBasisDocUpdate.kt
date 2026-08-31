@@ -1,6 +1,6 @@
 package com.example.oracleapi.service.orderhead
 
-import com.example.oracleapi.dto.ResponseRN
+import com.example.oracleapi.dto.RnResponse
 import com.example.oracleapi.dto.orderhead.basisDoc.OrderHeadBasisDocUpdateRequest
 import com.example.oracleapi.repository.orderhead.OrderheadRepository
 import jakarta.transaction.Transactional
@@ -11,7 +11,7 @@ class OrderHeadBasisDocUpdate(
     private val orderheadRepository: OrderheadRepository
 ) {
     @Transactional
-    fun update(request: OrderHeadBasisDocUpdateRequest): ResponseRN {
+    fun update(request: OrderHeadBasisDocUpdateRequest): RnResponse {
         val updated = orderheadRepository.updateBasisdoc(
             request.rn,
             request.type,
@@ -22,7 +22,7 @@ class OrderHeadBasisDocUpdate(
         if (updated == 0) {
             throw IllegalArgumentException("OrderHead с RN=${request.rn} не найден")
         }
-        return ResponseRN(request.rn)
+        return RnResponse(request.rn)
     }
 
 }

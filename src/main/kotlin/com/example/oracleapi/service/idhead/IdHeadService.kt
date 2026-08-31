@@ -5,10 +5,10 @@ import com.example.oracleapi.dto.idhead.IdheadResponse
 import com.example.oracleapi.dto.idhead.del.IdHeadDeleteRequest
 import com.example.oracleapi.dto.idhead.prihod.PrihodRequest
 import com.example.oracleapi.dto.idhead.status.StatusUpdateRequest
-import com.example.oracleapi.dto.idhead.toResponse
 import com.example.oracleapi.dto.idspec.IdheadWithSpecTsdResponse
-import com.example.oracleapi.dto.idspec.toIdspecTsdResponse
+import com.example.oracleapi.mapper.toIdspecTsdResponse
 import com.example.oracleapi.entity.table.Idhead
+import com.example.oracleapi.mapper.toResponse
 import com.example.oracleapi.repository.idhead.IdheadRepository
 import com.example.oracleapi.repository.idspec.IdspecRepository
 import com.example.oracleapi.service.field.FieldService
@@ -22,31 +22,38 @@ import java.time.LocalDate
 
 @Service
 class IdHeadService(
-    val prihodFunction: PrihodCreate,
-    val updateStatusFun: UpdateStatus,
-    val deleteFun: IdHeadDelete,
-    val idheadRepository: IdheadRepository,
-    val idspecRepository: IdspecRepository,
-    val fieldService: FieldService
+    private val prihodFunction: PrihodCreate,
+    private val updateStatusFun: UpdateStatus,
+    private val deleteFun: IdHeadDelete,
+    private val idheadRepository: IdheadRepository,
+    private val idspecRepository: IdspecRepository,
+    private val fieldService: FieldService
 ) {
+
+    @Transactional
     fun prihodCreate(request: PrihodRequest): Long {
         return prihodFunction.createPrihodByJson(request)
     }
 
+    @Transactional
     fun updateStatus(request: StatusUpdateRequest) {
         return updateStatusFun.updateStatus(request)
     }
 
+    @Transactional
     fun delete(request: IdHeadDeleteRequest) {
         return deleteFun.delete(request)
     }
 
+    @Transactional(readOnly = true)
     fun getByStatus(status: Long): List<IdheadResponse> {
         return idheadRepository.findByIdStatus(status).map { it.toResponse() }
     }
 
+    @Transactional(readOnly = true)
     fun getCount(): Long = idheadRepository.countAllBy()
 
+    @Transactional(readOnly = true)
     fun getCountByStatus(status: Long): Long = idheadRepository.countByIdStatus(status)
 
     @Transactional(readOnly = true)
@@ -77,14 +84,17 @@ class IdHeadService(
 
     // ========== МЕТОДЫ С ПАГИНАЦИЕЙ ==========
 
+    @Transactional(readOnly = true)
     fun getAllWithPagination(pageable: Pageable): Page<IdheadResponse> {
         return idheadRepository.findAll(pageable).map { it.toResponse() }
     }
 
+    @Transactional(readOnly = true)
     fun getByStatusWithPagination(status: Long, pageable: Pageable): Page<IdheadResponse> {
         return idheadRepository.findByIdStatus(status, pageable).map { it.toResponse() }
     }
 
+    @Transactional(readOnly = true)
     fun getByFiltersWithPagination(
         status: String?,
         doctype: Long?,

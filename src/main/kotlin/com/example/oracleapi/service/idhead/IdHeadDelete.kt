@@ -7,7 +7,6 @@ import jakarta.persistence.EntityManager
 import jakarta.persistence.ParameterMode
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
-import org.springframework.transaction.annotation.Transactional
 
 @Component
 class IdHeadDelete(
@@ -16,7 +15,6 @@ class IdHeadDelete(
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
-    @Transactional
     fun delete(request: IdHeadDeleteRequest) {
         log.info("Удаление документа: rn={}, isUpdate={}", request.rn, request.isUpdate)
 

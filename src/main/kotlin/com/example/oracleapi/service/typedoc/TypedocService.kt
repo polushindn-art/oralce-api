@@ -15,6 +15,7 @@ class TypedocService(
     /**
      * Получить все типы документов
      */
+    @Transactional(readOnly = true)
     fun getAllTypedocs(): List<TypedocResponse> {
         return typedocRepository.findAll()
             .map { it.toResponse() }
@@ -23,11 +24,13 @@ class TypedocService(
     /**
      * Получить документы по divisionCode
      * */
+    @Transactional(readOnly = true)
     fun getTypeDocByDivisionCode(divisionCode: String): List<TypedocResponse> {
         return typedocRepository.findByDivision(divisionCode)
             .map { it.toResponse() }
     }
 
+    @Transactional(readOnly = true)
     fun existsById(rn: Long): Boolean {
         return typedocRepository.existsById(rn)
     }

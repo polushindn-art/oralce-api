@@ -1,7 +1,6 @@
 package com.example.oracleapi.service.protocolMark
 
 import com.example.oracleapi.common.BasePackage
-import com.example.oracleapi.dto.ResponseRN
 import com.example.oracleapi.dto.protocolMark.ProtocolMarkRequest
 import org.springframework.stereotype.Component
 import javax.sql.DataSource

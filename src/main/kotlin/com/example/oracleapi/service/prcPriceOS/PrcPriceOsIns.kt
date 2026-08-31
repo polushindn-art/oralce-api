@@ -1,7 +1,7 @@
 package com.example.oracleapi.service.prcPriceOS
 
 import com.example.oracleapi.common.BasePackage
-import com.example.oracleapi.dto.ResponseRN
+import com.example.oracleapi.dto.RnResponse
 import com.example.oracleapi.dto.prcPriceOS.PrcPriceOSRequest
 import org.springframework.stereotype.Component
 import java.sql.Types
@@ -15,7 +15,7 @@ class PrcPriceOsIns(
     override val method = "ins_api"
     override val count = 8
 
-    fun take(request: PrcPriceOSRequest): ResponseRN {
+    fun take(request: PrcPriceOSRequest): RnResponse {
         return dataSource.executePrc {
 
             it.registerOutParameter(1, Types.NUMERIC)
@@ -29,7 +29,7 @@ class PrcPriceOsIns(
 
             it.execute()
 
-            ResponseRN(
+            RnResponse(
                 it.getLong(1)
             )
         }

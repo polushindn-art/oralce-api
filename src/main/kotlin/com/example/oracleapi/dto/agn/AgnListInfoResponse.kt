@@ -1,6 +1,6 @@
 package com.example.oracleapi.dto.agn
 
-import com.example.oracleapi.dto.agnphonenumberlist.PhoneListAgn
+import com.example.oracleapi.dto.agnphonenumberlist.PhoneListAgnDto
 
 /**
  * DTO ответ информации о контрагенте
@@ -13,7 +13,7 @@ data class AgnListInfoResponse(
     /**Мнемокод*/
     val agnCode: String?,
     /**Телефонные номера*/
-    val phone: List<PhoneListAgn>? = null,
+    val phone: List<PhoneListAgnDto>? = null,
     /**ИНН*/
     val inn: String?,
     /**КПП*/

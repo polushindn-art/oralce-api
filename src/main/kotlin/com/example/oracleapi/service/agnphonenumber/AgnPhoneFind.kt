@@ -2,7 +2,7 @@ package com.example.oracleapi.service.agnphonenumber
 
 import com.example.oracleapi.dto.agnphonenumberlist.AgnphonenumberlistDto
 import com.example.oracleapi.dto.agnphonenumberlist.PhoneCardDto
-import com.example.oracleapi.dto.agnphonenumberlist.PhoneListAgn
+import com.example.oracleapi.dto.agnphonenumberlist.PhoneListAgnDto
 import com.example.oracleapi.repository.agnphonenumberlist.AgnphonenumberlistRepository
 import com.example.oracleapi.util.PhoneUtils
 import org.springframework.stereotype.Component
@@ -31,9 +31,9 @@ class AgnPhoneFind(
         }
     }
 
-    fun searchPhoneByAgn(rn: Long): List<PhoneListAgn> {
+    fun searchPhoneByAgn(rn: Long): List<PhoneListAgnDto> {
         val result = repository.findAllByPrnagn(rn)
-        return result.map { PhoneListAgn.fromEntity(it) }
+        return result.map { PhoneListAgnDto.fromEntity(it) }
     }
 
 }

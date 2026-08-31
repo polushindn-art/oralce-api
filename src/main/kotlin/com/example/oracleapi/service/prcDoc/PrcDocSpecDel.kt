@@ -1,7 +1,7 @@
 package com.example.oracleapi.service.prcDoc
 
 import com.example.oracleapi.common.BasePackage
-import com.example.oracleapi.dto.ResponseRN
+import com.example.oracleapi.dto.RnResponse
 import com.example.oracleapi.dto.prcDoc.spec.PrcDocSpecDelRequest
 import org.springframework.stereotype.Component
 import javax.sql.DataSource
@@ -15,12 +15,12 @@ class PrcDocSpecDel(
     override val method = "del"
     override val count = 2
 
-    fun take(request: PrcDocSpecDelRequest): ResponseRN {
+    fun take(request: PrcDocSpecDelRequest): RnResponse {
         return dataSource.executePrc {
             it.setLong(1, request.rn)
             it.setBoolean(2, request.isUpdate)
             it.execute()
-            ResponseRN(request.rn)
+            RnResponse(request.rn)
         }
     }
 

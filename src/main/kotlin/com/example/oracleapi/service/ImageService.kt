@@ -1,5 +1,6 @@
 package com.example.oracleapi.service
 
+import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.awt.Image
@@ -10,7 +11,7 @@ import javax.imageio.ImageIO
 import javax.imageio.ImageReader
 import java.util.*
 
-@Service
+@Component
 class ImageService {
 
     /**

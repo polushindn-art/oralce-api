@@ -33,7 +33,7 @@ class TsdListService(
     private val log = LoggerFactory.getLogger(javaClass)
 
     @Transactional(readOnly = true)
-    fun getRegisteredSessions(sn: String?): List<Registeredjson> {
+    fun getRegisteredSessions(sn: String?): List<RegisteredjsonResponse> {
         val data = tsdHistoryRepository.findRegisteredSessions(sn)
 
         // Догружаем склады для каждого PBE
@@ -65,7 +65,7 @@ class TsdListService(
     }
 
     @Transactional(readOnly = true)
-    fun getUsedTsd(pbe: Long?): List<UsedJson> {
+    fun getUsedTsd(pbe: Long?): List<UsedJsonResponse> {
         // Валидация PBE если передан
         if (pbe != null && !pbeRepository.existsById(pbe)) {
             throw IllegalArgumentException("Подразделение с rn = $pbe не существует")
@@ -133,7 +133,7 @@ class TsdListService(
      * Получить полную информацию о терминале в формате Registeredjson
      */
     @Transactional(readOnly = true)
-    fun getTerminalFullInfoAsRegisteredjson(deviceId: String): Registeredjson? {
+    fun getTerminalFullInfoAsRegisteredjson(deviceId: String): RegisteredjsonResponse? {
         log.debug("Getting full info for Device ID: {}", deviceId)
 
         // 1. Находим активную сессию
@@ -185,7 +185,7 @@ class TsdListService(
         }
 
         // 6. Формируем Registeredjson
-        return Registeredjson(
+        return RegisteredjsonResponse(
             sn = tsdList?.sn,
             timestart = activeSession.timestart?.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
             userrn = userList?.rn,
@@ -313,6 +313,7 @@ class TsdListService(
         }
     }
 
+    @Transactional(readOnly = true)
     fun getSnByDeviceId(deviceId: String): TsdIdResponse {
         return TsdIdResponse(
             tsdlistRepository.findByDeviceid(deviceId)?.sn ?: "014.XXXX"

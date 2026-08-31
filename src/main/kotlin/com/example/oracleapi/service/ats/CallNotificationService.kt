@@ -7,6 +7,7 @@ import com.example.oracleapi.service.max.mainBoth.MainBotMessageService
 import com.example.oracleapi.util.PhoneUtils
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 
 /**
@@ -97,6 +98,7 @@ class CallNotificationService(
      * @param phoneNumber Строка с номером телефона для поиска.
      * @return Найденный объект [Phonebook] или `null`.
      */
+    @Transactional(readOnly = true)
     fun findCallerInfo(phoneNumber: String): Phonebook? =
         phonebookRepository.findByPhoneInt(phoneNumber).firstOrNull()
             ?: phonebookRepository.findByPhoneSot(phoneNumber).firstOrNull()

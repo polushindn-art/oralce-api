@@ -1,7 +1,7 @@
 package com.example.oracleapi.service.prcDoc
 
 import com.example.oracleapi.common.BasePackage
-import com.example.oracleapi.dto.ResponseRN
+import com.example.oracleapi.dto.RnResponse
 import com.example.oracleapi.dto.prcDoc.spec.PrcdocspecInsRequest
 import org.springframework.stereotype.Component
 import java.sql.Types
@@ -14,7 +14,7 @@ class PrcDocSpecIns(dataSource: DataSource) : BasePackage(dataSource) {
     override val method = "ins"
     override val count = 29
 
-    fun take(request: PrcdocspecInsRequest): ResponseRN {
+    fun take(request: PrcdocspecInsRequest): RnResponse {
         return dataSource.executePrc { stmt ->
             var idx = 1
 
@@ -74,7 +74,7 @@ class PrcDocSpecIns(dataSource: DataSource) : BasePackage(dataSource) {
 
             stmt.execute()
 
-            ResponseRN(
+            RnResponse(
                 rn = stmt.getLong(rnPos)
             )
         }

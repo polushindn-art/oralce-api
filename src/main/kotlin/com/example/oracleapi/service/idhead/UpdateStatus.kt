@@ -3,11 +3,10 @@ package com.example.oracleapi.service.idhead
 import com.example.oracleapi.dto.idhead.status.StatusUpdateRequest
 import com.example.oracleapi.exception.DocumentNotFoundException
 import com.example.oracleapi.repository.idhead.IdheadRepository
-import org.springframework.stereotype.Component
 import jakarta.persistence.EntityManager
 import jakarta.persistence.ParameterMode
-import jakarta.transaction.Transactional
 import org.slf4j.LoggerFactory
+import org.springframework.stereotype.Component
 
 @Component
 class UpdateStatus(
@@ -16,7 +15,6 @@ class UpdateStatus(
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
-    @Transactional
     fun updateStatus(request: StatusUpdateRequest) {
         log.info("Обновление статуса документа: rn={}, newStatus={}", request.rn, request.newStatus)
 

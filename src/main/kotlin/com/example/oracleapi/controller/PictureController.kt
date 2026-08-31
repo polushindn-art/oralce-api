@@ -1,7 +1,7 @@
 package com.example.oracleapi.controller
 
 import com.example.oracleapi.dto.common.MyApiResponse
-import com.example.oracleapi.dto.picture.PictureMetadata
+import com.example.oracleapi.dto.picture.PictureMetadataDto
 import com.example.oracleapi.service.picture.PictureResult
 import com.example.oracleapi.service.picture.PictureService
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -24,7 +24,7 @@ class PictureController(
     @Operation(summary = "Получить информацию об изображении")
     fun getInfo(
         @PathVariable rn: Long
-    ): MyApiResponse<PictureMetadata> {
+    ): MyApiResponse<PictureMetadataDto> {
         val metadata = pictureService.getMetadata(rn)
             ?: throw IllegalArgumentException("Изображение с RN=$rn не найдено")
         return success(metadata)
