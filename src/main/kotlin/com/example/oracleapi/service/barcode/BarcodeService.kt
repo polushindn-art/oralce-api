@@ -2,7 +2,6 @@ package com.example.oracleapi.service.barcode
 
 import com.google.zxing.*
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource
-import com.google.zxing.client.j2se.MatrixToImageConfig
 import com.google.zxing.client.j2se.MatrixToImageWriter
 import com.google.zxing.common.GlobalHistogramBinarizer
 import com.google.zxing.common.HybridBinarizer
@@ -20,15 +19,14 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
+import org.springframework.web.client.exchange
 import java.awt.Color
 import java.awt.Font
-import java.awt.GradientPaint
 import java.awt.RenderingHints
 import java.awt.image.BufferedImage
 import java.awt.image.DataBufferByte
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
-import java.io.File
 import javax.imageio.ImageIO
 
 data class DecodeDetailResult(
@@ -380,8 +378,8 @@ class BarcodeService(
                 set("User-Agent", "Mozilla/5.0")
                 set("Accept", "image/*")
             }
-            val response = restTemplate.exchange(
-                url, HttpMethod.GET, HttpEntity<Nothing>(headers), ByteArray::class.java
+            val response = restTemplate.exchange<ByteArray>(
+                url, HttpMethod.GET, HttpEntity<Nothing>(headers)
             )
             val imageBytes = response.body ?: return@withContext null
             ImageIO.read(ByteArrayInputStream(imageBytes))
@@ -508,7 +506,6 @@ class BarcodeService(
             outputStream.toByteArray()
         }
     }
-
 
     fun generateQrCodeBytesWithText(
         text: String,
@@ -714,7 +711,7 @@ class BarcodeService(
         val template = ImageIO.read(resourceStream)
 
         val cardWidth = template.width
-        val cardHeight = template.height
+        template.height
 
         val g = template.createGraphics()
 
@@ -725,7 +722,7 @@ class BarcodeService(
 
         val primaryBlue = Color(0, 71, 171)
         val textDark = Color(15, 23, 42)
-        val textGray = Color(130, 140, 155)
+        Color(130, 140, 155)
 
         // 2. Плашка с номером (для карт со 2-й и далее)
         if (cardIndex > 1) {

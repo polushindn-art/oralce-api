@@ -1,0 +1,38 @@
+2026-08-31 12:42:47.868 [main] INFO  c.e.oracleapi.OracleApiApplicationKt - [IP: LOCAL] - Starting OracleApiApplicationKt using Java 21.0.10 with PID 27244 (C:\svn\oracle\OracleAPI\OracleAPI\target\classes started by polushin in C:\svn\oracle\OracleAPI\OracleAPI)
+2026-08-31 12:42:47.870 [main] DEBUG c.e.oracleapi.OracleApiApplicationKt - [IP: LOCAL] - Running with Spring Boot v3.2.5, Spring v6.1.6
+2026-08-31 12:42:47.870 [main] INFO  c.e.oracleapi.OracleApiApplicationKt - [IP: LOCAL] - The following 1 profile is active: "dev"
+2026-08-31 12:42:49.268 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - [IP: LOCAL] - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-08-31 12:42:49.421 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - [IP: LOCAL] - Finished Spring Data repository scanning in 146 ms. Found 40 JPA repository interfaces.
+2026-08-31 12:42:50.195 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - [IP: LOCAL] - Tomcat initialized with port 8080 (http)
+2026-08-31 12:42:50.206 [main] INFO  o.a.catalina.core.StandardService - [IP: LOCAL] - Starting service [Tomcat]
+2026-08-31 12:42:50.206 [main] INFO  o.a.catalina.core.StandardEngine - [IP: LOCAL] - Starting Servlet engine: [Apache Tomcat/10.1.20]
+2026-08-31 12:42:50.276 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - [IP: LOCAL] - Initializing Spring embedded WebApplicationContext
+2026-08-31 12:42:50.276 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - [IP: LOCAL] - Root WebApplicationContext: initialization completed in 2361 ms
+2026-08-31 12:42:50.522 [main] INFO  c.e.o.c.OracleConfig$$SpringCGLIB$$0 - [IP: LOCAL] - ✅ Using password from configuration
+2026-08-31 12:42:50.522 [main] INFO  c.e.o.c.OracleConfig$$SpringCGLIB$$0 - [IP: LOCAL] - Validating connection to Oracle database...
+2026-08-31 12:42:50.955 [main] INFO  c.e.o.c.OracleConfig$$SpringCGLIB$$0 - [IP: LOCAL] - ✅ Connection to Oracle validated successfully
+2026-08-31 12:42:50.960 [main] INFO  c.e.o.c.OracleConfig$$SpringCGLIB$$0 - [IP: LOCAL] - Creating DataSource for Oracle database
+2026-08-31 12:42:50.961 [main] WARN  com.zaxxer.hikari.HikariConfig - [IP: LOCAL] - OracleArsPool - idleTimeout is close to or more than maxLifetime, disabling it.
+2026-08-31 12:42:50.966 [main] INFO  com.zaxxer.hikari.HikariDataSource - [IP: LOCAL] - OracleArsPool - Starting...
+2026-08-31 12:42:50.974 [main] INFO  com.zaxxer.hikari.HikariDataSource - [IP: LOCAL] - OracleArsPool - Start completed.
+2026-08-31 12:42:51.129 [main] INFO  o.h.jpa.internal.util.LogHelper - [IP: LOCAL] - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-08-31 12:42:51.194 [main] INFO  org.hibernate.Version - [IP: LOCAL] - HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-08-31 12:42:51.226 [main] INFO  o.h.c.i.RegionFactoryInitiator - [IP: LOCAL] - HHH000026: Second-level cache disabled
+2026-08-31 12:42:51.439 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - [IP: LOCAL] - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-08-31 12:42:53.528 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - [IP: LOCAL] - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-08-31 12:42:53.543 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - [IP: LOCAL] - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-08-31 12:42:54.011 [main] INFO  o.s.d.j.r.query.QueryEnhancerFactory - [IP: LOCAL] - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-08-31 12:42:54.436 [main] INFO  c.example.oracleapi.config.JwtHelper - [IP: LOCAL] - JwtHelper initialized. Token expiration: 50400000ms (840 minutes)
+2026-08-31 12:42:56.506 [main] INFO  c.e.o.service.sms.SmsRuClient - [IP: LOCAL] - 🔐 [SMS.RU] Конфигурация загружена: SmsRuProperties(apiId=57BF6FEA..., defaultFrom=StroyFaktor, testMode=false)
+2026-08-31 12:42:56.652 [Thread-3] INFO  c.e.o.service.ats.AmiClientService - [IP: LOCAL] - ✅ AMI авторизация успешна
+2026-08-31 12:42:56.652 [Thread-3] INFO  c.e.o.s.ats.AmiEventListenerService - [IP: LOCAL] - ✅ AMI слушатель запущен
+2026-08-31 12:42:57.820 [main] INFO  c.e.o.service.barcode.BarcodeService - [IP: LOCAL] - ✅ OpenCV успешно загружен и инициализирован!
+2026-08-31 12:42:58.066 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - [IP: LOCAL] - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-08-31 12:42:58.196 [main] INFO  o.s.b.a.w.s.WelcomePageHandlerMapping - [IP: LOCAL] - Adding welcome page template: index
+2026-08-31 12:42:58.545 [main] INFO  o.s.b.a.e.web.EndpointLinksResolver - [IP: LOCAL] - Exposing 2 endpoint(s) beneath base path '/actuator'
+2026-08-31 12:42:58.622 [main] INFO  o.s.s.web.DefaultSecurityFilterChain - [IP: LOCAL] - Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@7d877489, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@1e575053, org.springframework.security.web.context.SecurityContextHolderFilter@1b15c89e, org.springframework.security.web.header.HeaderWriterFilter@16df623d, org.springframework.web.filter.CorsFilter@13bbc985, org.springframework.security.web.authentication.logout.LogoutFilter@99fe0bb, com.example.oracleapi.config.JwtAuthenticationFilter@64079f10, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@1520e3cd, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@5939520e, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@22629c25, org.springframework.security.web.session.SessionManagementFilter@1f2c05b4, org.springframework.security.web.access.ExceptionTranslationFilter@20a101bb, org.springframework.security.web.access.intercept.AuthorizationFilter@3d061f8d]
+2026-08-31 12:42:59.415 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - [IP: LOCAL] - Tomcat started on port 8080 (http) with context path ''
+2026-08-31 12:42:59.432 [main] INFO  c.e.oracleapi.OracleApiApplicationKt - [IP: LOCAL] - Started OracleApiApplicationKt in 12.039 seconds (process running for 12.712)
+2026-08-31 12:43:00.554 [http-nio-8080-exec-2] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - [IP: LOCAL] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-08-31 12:43:00.555 [http-nio-8080-exec-2] INFO  o.s.web.servlet.DispatcherServlet - [IP: LOCAL] - Initializing Servlet 'dispatcherServlet'
+2026-08-31 12:43:00.556 [http-nio-8080-exec-2] INFO  o.s.web.servlet.DispatcherServlet - [IP: LOCAL] - Completed initialization in 1 ms
